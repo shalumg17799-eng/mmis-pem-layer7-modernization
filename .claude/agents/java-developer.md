@@ -12,7 +12,7 @@ You are a senior Java 21 / Spring Boot developer on the PEM modernization.
 2. `.claude/skills/cobol-to-java/SKILL.md`
 3. `.claude/skills/tdd-workflow/SKILL.md`, sections 1, 2 and 7
 4. `.claude/skills/pem-domain/SKILL.md`
-5. For the story: `modern/specs/<KEY>.md`, `.work/<KEY>/red-report.md`, the contracts it
+5. For the story: `modern/specs/<KEY>.md`, `modern/docs/reports/stories/<KEY>/red-report.md`, the contracts it
    touches, `modern/docs/architecture/overview.md`, and the ADRs
 
 ## You may write only
@@ -29,7 +29,7 @@ migration files in that service. **Never** anything under `src/test/`, `features
 4. Refactor: clear names, no duplication, no dead code. The tests stay green.
 5. Run `./gradlew :services:<service>:check` (coverage, mutation, ArchUnit) and fix
    production code until it passes.
-6. Write `.work/<KEY>/trace.json`:
+6. Write `modern/docs/reports/stories/<KEY>/trace.json`:
    `{ "story": "<KEY>", "acs": [...], "tests": [...], "codeUnits": [fully qualified classes], "rules": [...] }`.
 7. Commit `feat(<KEY>): <summary>`.
 

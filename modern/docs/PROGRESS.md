@@ -23,9 +23,10 @@ Replaces "stop at the end of every phase" in MODERNIZATION.md section 4.
 
 | Time | Step | What was done | Files |
 |---|---|---|---|
+| 2026-11-18 18:55 | phase1.8 | Repository tidy-up: removed `.work/`, untracked caches and a generated file, moved per-story state to the story reports, in-memory idempotency check, root README folder map, CLAUDE.md layout | `README.md`, `CLAUDE.md`, `.gitignore`, `.claude/*` (path only), `modern/kag/*` |
 | 2026-11-18 18:19 | phase1.7 | Phase 1 exit checks all pass; graph report written; Phase 1 recorded APPROVED (standing instruction) | `modern/docs/analysis/graph-report.md`, `PROGRESS.md`, `questions.md` (Q3) |
 | 2026-11-18 18:19 | phase1.6 | Spot checks (seed 20261118): 3 random rules and 2 datasets match the AWS data exactly | none (read-only) |
-| 2026-11-18 18:19 | phase1.5c | Live load into `medicaid-kag` (user confirmed the name, Q2); 32 of 32 Cypher checks; second load changed no count (tool proven with a tampered snapshot) | `modern/kag/validate.py`, `.work/kag/*` (git-ignored) |
+| 2026-11-18 18:19 | phase1.5c | Live load into `medicaid-kag` (user confirmed the name, Q2); 32 of 32 Cypher checks; second load changed no count (the comparison was proven against a deliberately altered snapshot) | `modern/kag/validate.py` |
 | 2026-11-18 18:19 | phase1.5b | Loaders 00 to 08, `validate.py` + `validate.cypher`, `load_all.sh`, README, 38 loader tests (73 pytest in total), dry-run counts | `modern/kag/*` |
 | 2026-11-18 18:20 | phase1.5a | kag-curator stopped (it had written nothing); parsers written by the orchestrator per the curator's file; 34 parser unit tests pass | `modern/kag/loaders/parsers.py`, `modern/kag/tests/*`, `constraints.cypher`, `requirements.txt` |
 | 2026-11-18 17:58 | phase1.2 | Neo4j MCP: project venv, `mcp-neo4j-cypher==0.6.0`, read-only, env references only | `.mcp.json`, `modern/kag/.venv` (git-ignored) |
@@ -79,6 +80,7 @@ Replaces "stop at the end of every phase" in MODERNIZATION.md section 4.
 
 | Date | Decision | Made by | Where recorded |
 |---|---|---|---|
+| 2026-11-18 | **Repository tidy-up (user request).** No scratch or temp folder: `.work/` is removed. The per-story state the kit kept in `.work/<KEY>/` (`red-report.md`, `red-commit`, `trace.json`) now lives in `modern/docs/reports/stories/<KEY>/` (8 files under `.claude/` updated; DEFAULT APPLIED - revisit, Q4). Python caches and the generated `dry-run-counts.txt` are no longer tracked; the idempotency check runs in memory (`validate.py --idempotency`). A root `README.md` maps every folder; folder names are unchanged. | user (request), Claude (defaults) | `README.md`, `questions.md` Q4 |
 | 2026-11-18 | **Q2 ANSWERED by the user: the PEM graph database is `medicaid-kag`** on the local KAG Neo4j (`neo4j://127.0.0.1:7687`, user `neo4j`). `medicade-kag` was a typo. The database is online, read-write and was empty before the first load; nothing from this project goes into any other database. The password is never written to any file (the `NEO4J_*` variables are passed to loader commands as one-off process variables until Claude Code is restarted with `.env` loaded). The user should still correct `NEO4J_DATABASE=medicaid-kag` in `.env`. | user | `questions.md` Q2, this file |
 | 2026-11-18 | **Q1 REVISED: not bug-for-bug.** Supersedes the earlier "yes" (option A), which is withdrawn. Business decisions D-001 to D-020 below take the recommended defaults. | user | `questions.md` Q1, this file |
 | 2026-11-18 | D-020: FIX. The business date is an explicit job parameter (`&DATE`, `&BATCH_DATE` were never defined). Accepted recommended default. | user | this file |

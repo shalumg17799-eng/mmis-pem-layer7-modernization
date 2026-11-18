@@ -37,7 +37,7 @@ You are the knowledge-graph curator for the PEM modernization.
 | 2 | `modern/docs/analysis/rule-verification.csv`, `defect-register.md`, `questions.md` | rule verification and evidence, Defect, Question, Regulation links |
 | 3 | `modern/docs/architecture/rule-to-service.csv`, `field-to-column.csv`, the OpenAPI/AsyncAPI files | Service, ApiEndpoint, Event, Table, Column, OWNED_BY, MAPS_TO |
 | 4 | `modern/docs/backlog/jira-map.csv`, `modern/specs/*.md` | Epic, Story, AcceptanceCriterion, DERIVED_FROM |
-| 6, 7 | `.work/<KEY>/trace.json` | TestCase, CodeUnit, VERIFIES, IMPLEMENTED_BY |
+| 6, 7 | `modern/docs/reports/stories/<KEY>/trace.json` | TestCase, CodeUnit, VERIFIES, IMPLEMENTED_BY |
 
 ## Return to the orchestrator
 The loaders run, the validation results (each check: expected vs actual), any mismatch

@@ -27,15 +27,15 @@ description: The mandatory test-first workflow for every story. Covers red/green
    Run the tests. **Every new test must fail, and fail for the expected reason**: an
    assertion failure, or a missing endpoint/class. A failure from broken unrelated code
    does not count. Commit: `test(<KEY>): red - <short summary>`.
-3. **Record the red commit hash** (`git rev-parse HEAD`) in `.work/<KEY>/red-commit`.
+3. **Record the red commit hash** (`git rev-parse HEAD`) in `modern/docs/reports/stories/<KEY>/red-commit`.
 4. **Green.** java-developer (or ui-developer) writes the least production code that
    makes the tests pass. At most 3 attempts.
 5. **Test-protection check** (the orchestrator runs this, every time):
    ```bash
-   git diff --name-only $(cat .work/<KEY>/red-commit) -- '*/src/test/*' 'modern/web-ui/tests/*' 'modern/web-ui/e2e/*' '*.feature'
+   git diff --name-only $(cat modern/docs/reports/stories/<KEY>/red-commit) -- '*/src/test/*' 'modern/web-ui/tests/*' 'modern/web-ui/e2e/*' '*.feature'
    ```
    The output must be empty. If not, revert those files
-   (`git checkout $(cat .work/<KEY>/red-commit) -- <files>`) and send the developer back
+   (`git checkout $(cat modern/docs/reports/stories/<KEY>/red-commit) -- <files>`) and send the developer back
    to step 4 with a warning.
 6. **Refactor.** The developer improves names and removes duplication, with all tests
    still green. No behaviour change.
@@ -76,7 +76,7 @@ description: The mandatory test-first workflow for every story. Covers red/green
 - [ ] All AC tests pass; the full service check passes.
 - [ ] The test-protection check output is empty.
 - [ ] code-reviewer says APPROVE.
-- [ ] Traceability written to `.work/<KEY>/trace.json` (story, ACs, test IDs, code classes,
+- [ ] Traceability written to `modern/docs/reports/stories/<KEY>/trace.json` (story, ACs, test IDs, code classes,
       rule IDs), for kag-curator to load.
 - [ ] `modern/specs/<KEY>.md` updated: `builtCommit` = the feat commit.
 - [ ] Story report written in `modern/docs/reports/stories/<KEY>.md` (phase report format).

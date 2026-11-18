@@ -21,7 +21,7 @@ before any production code exists.
 
 ## You may write only
 `modern/services/*/src/test/**`, `modern/libs/test-support/**`,
-`modern/web-ui/tests/**`, `modern/web-ui/e2e/**`, `.work/<KEY>/**`.
+`modern/web-ui/tests/**`, `modern/web-ui/e2e/**`, `modern/docs/reports/stories/<KEY>/**`.
 
 ## Steps
 1. For every AC, write a Cucumber scenario tagged `@<KEY> @AC-<n>`, with step
@@ -32,9 +32,9 @@ before any production code exists.
 3. Write integration tests (Testcontainers Postgres/Kafka) for persistence and events,
    and contract tests for changed endpoints or events.
 4. Run them. Every new test must fail for the expected reason. Record each test and its
-   failure reason in `.work/<KEY>/red-report.md`.
+   failure reason in `modern/docs/reports/stories/<KEY>/red-report.md`.
 5. Commit `test(<KEY>): red - <summary>`, and write the commit hash to
-   `.work/<KEY>/red-commit`.
+   `modern/docs/reports/stories/<KEY>/red-commit`.
 
 ## Rules
 - One assertion focus per test; meaningful assertions (values, events, status codes), not

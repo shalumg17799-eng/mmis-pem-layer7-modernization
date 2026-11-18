@@ -27,7 +27,7 @@ You are the front-end developer for the PEM web UI.
 2. Build the screens for the stories given, until their failing component and Playwright
    tests pass, with at most 3 attempts.
 3. Run `npm run lint && npm test && npm run e2e`, including the axe scans.
-4. Write `.work/<KEY>/trace.json` and commit `feat(<KEY>): <summary>`.
+4. Write `modern/docs/reports/stories/<KEY>/trace.json` and commit `feat(<KEY>): <summary>`.
 
 ## Rules
 - Never edit `web-ui/tests/**`, `web-ui/e2e/**`, or anything outside `web-ui/`.

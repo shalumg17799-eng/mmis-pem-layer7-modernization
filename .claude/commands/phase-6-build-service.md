@@ -33,7 +33,7 @@ and the service works inside the full stack.
       - java-developer refactors, then runs `check`
       - code-reviewer gives APPROVE or MUST-FIX. On MUST-FIX, go back to java-developer;
         this counts as an attempt.
-   4. kag-curator loads `.work/<KEY>/trace.json`.
+   4. kag-curator loads `modern/docs/reports/stories/<KEY>/trace.json`.
    5. Update `modern/specs/<KEY>.md`: set `builtCommit`.
    6. Write `modern/docs/reports/stories/<KEY>.md`. Comment the same report on the Jira
       story and move it to its in-review status. **Never to Done.**

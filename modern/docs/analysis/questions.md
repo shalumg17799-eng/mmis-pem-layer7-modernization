@@ -46,3 +46,11 @@ The kag-ontology skill has no home for four things the load needed. Applied by d
 4. `Job.role` (`pipeline`, `vsam-definition`, `proc`), so the skill's "2 jobs plus the proc" check still holds.
 
 **Recommended answer: accept all four.** The alternative is to drop them and leave those facts out of the graph.
+
+## Q4. Where does per-story working state live? (raised 2026-11-18, status: DEFAULT APPLIED - revisit)
+
+You asked for no separate folder for temporary files. The kit kept per-story state in a hidden `.work/<KEY>/` folder
+(`red-report.md`, `red-commit`, `trace.json`). Applied by default: those files are audit records, so they live in
+`modern/docs/reports/stories/<KEY>/`, committed with the story. Only the path text changed in 8 files under `.claude/`.
+
+**Recommended answer: accept.** The alternative is to restore `.work/` (git-ignored) and keep them out of the repo.

@@ -23,10 +23,12 @@ and was **not executed**: there is no COBOL compiler or mainframe emulator in th
 
 ## 2. Layout
 
+The full folder map (agents, skills, tests, target frontend, COBOL application) is in the root `README.md`. In short:
+
 ```
 Medco-Transform/
-|-- CLAUDE.md
-|-- source-code/            the mainframe estate (22 files)  <-- the thing to read/edit
+|-- README.md  CLAUDE.md  MODERNIZATION.md  HOW-TO-RUN.md     guides (people / assistants / agent rules / how to run)
+|-- source-code/            the legacy COBOL application (22 files, READ-ONLY)  <-- the thing to read
 |   |-- README.md           estate README: anti-pattern index, app boundaries, run order, target design
 |   |-- BATCH/              8 batch COBOL programs (PRV*.cbl)
 |   |-- ONLINE/             PRVCICS1.cbl  (CICS transaction PINQ)
@@ -38,9 +40,12 @@ Medco-Transform/
 |-- aws-transform/          everything AWS-Transform-related, kept together in one folder
 |   |-- 01-code-analysis/   02-data-analysis/   03-decomposition/   04-documentation/
 |   |-- 05-business-documentation/   06-test-plan/   07-test-data-collection/   08-smf-analysis/
-|   |   (01-08 are GENERATED output: treat as read-only reference)
+|   |   (01-08 are GENERATED output: read-only)
 |   `-- test-data/          4 pipe-delimited feed samples (hand-authored input, see section 9)
-`-- _archive/               the 3 original zips, untouched backup (not needed day to day)
+|-- modern/                 everything we build: docs/, kag/ (graph loaders + tests), services/, web-ui/,
+|                           contracts/, specs/, libs/, infra/, testdata/, parity/, tools/  (see modern/README.md)
+|-- .claude/                agents/ (11 roles), skills/ (10), commands/ (/phase-0 ... /phase-9, /status), settings.json
+`-- _archive/               the original zips, untouched backup
 ```
 
 - **Path mapping:** every path *inside* `aws-transform/` JSON/CSV begins `MMIS-PROVIDER-DEMO-TIER4/`. That is `source-code/`.

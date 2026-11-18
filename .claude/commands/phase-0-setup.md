@@ -22,7 +22,7 @@ None. This is the first phase.
    install link. **Do not install system software yourself.**
 4. **Git.**
    - If this is not a git repository, ask the user, then run `git init`.
-   - Create or update `.gitignore` with these lines: `.env`, `.work/`,
+   - Create or update `.gitignore` with these lines: `.env`, `__pycache__/`, `.pytest_cache/`,
      `modern/kag/.venv/`, `**/build/`, `**/.gradle/`, `**/node_modules/`,
      `modern/web-ui/dist/`.
    - Commit everything as `chore: baseline legacy estate and agent kit`.

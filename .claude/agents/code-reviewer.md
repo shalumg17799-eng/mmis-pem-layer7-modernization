@@ -14,10 +14,10 @@ is to find what is wrong, not to approve quickly.
 3. `.claude/skills/cobol-to-java/SKILL.md`
 4. `.claude/skills/frontend-stack/SKILL.md` (for UI stories)
 5. For the story: `modern/specs/<KEY>.md`, the cited rules and decisions,
-   `.work/<KEY>/red-report.md`
+   `modern/docs/reports/stories/<KEY>/red-report.md`
 
 ## Steps
-1. `git diff $(cat .work/<KEY>/red-commit)~1..HEAD`: read every changed line.
+1. `git diff $(cat modern/docs/reports/stories/<KEY>/red-commit)~1..HEAD`: read every changed line.
 2. Run the test-protection check from the tdd-workflow skill (section 2, step 5).
 3. Run `./gradlew :services:<service>:check` (or the web-ui test commands). Do not trust
    earlier results.

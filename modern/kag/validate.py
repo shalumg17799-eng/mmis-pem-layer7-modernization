@@ -3,8 +3,7 @@
   python validate.py --offline              compute the checks from the loaders in memory (no Neo4j connection)
   python validate.py                        run the same checks as Cypher against the database (NEO4J_* variables)
   python validate.py --render-cypher        print validate.cypher (kept in sync by tests/test_validate.py)
-  python validate.py --save-counts FILE     online: save per-label / per-type counts (use after the 1st load)
-  python validate.py --compare-counts FILE  online: fail if any count differs (use after the 2nd load = idempotency)
+  python validate.py --idempotency          online: count, run every loader again, count again; fail if anything changed
   python validate.py ... --report FILE      also write the table as markdown
 
 Expected values come from the kag-ontology skill section 6 and from facts established independently of the loaders.
@@ -142,6 +141,17 @@ def counts_online() -> dict:
     return {"nodes": dict(sorted(n.items())), "relationships": dict(sorted(r.items()))}
 
 
+def reload_all():
+    """Run every loader again, in order (the same writes as load_all.sh, in this process)."""
+    import importlib
+    driver, db = common.connect()
+    try:
+        for mod in common.LOADERS:
+            common.apply(importlib.import_module(mod).build(), driver, db)
+    finally:
+        driver.close()
+
+
 def table(checks) -> str:
     rows = ["| Check | Expected | Actual | OK |", "|---|---|---|---|"]
     for ch in checks:
@@ -153,27 +163,24 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--offline", action="store_true")
     ap.add_argument("--render-cypher", action="store_true")
-    ap.add_argument("--save-counts", metavar="FILE")
-    ap.add_argument("--compare-counts", metavar="FILE")
+    ap.add_argument("--idempotency", action="store_true", help="re-run every loader and prove no count changes")
     ap.add_argument("--report", metavar="FILE", help="write the check table as markdown")
     a = ap.parse_args()
     if a.render_cypher:
         print(render_cypher())
         return 0
-    if a.save_counts or a.compare_counts:
-        cur = counts_online()
-        if a.save_counts:
-            Path(a.save_counts).parent.mkdir(parents=True, exist_ok=True)
-            Path(a.save_counts).write_text(json.dumps(cur, indent=1), encoding="utf-8")
-            print(f"saved counts: {sum(cur['nodes'].values())} label counts, {sum(cur['relationships'].values())} relationships")
-            return 0
-        prev = json.loads(Path(a.compare_counts).read_text(encoding="utf-8"))
+    if a.idempotency:
+        before = counts_online()
+        reload_all()
+        after = counts_online()
         diff = []
         for kind in ("nodes", "relationships"):
-            for key in sorted(set(prev[kind]) | set(cur[kind])):
-                if prev[kind].get(key) != cur[kind].get(key):
-                    diff.append(f"{kind[:-1]} {key}: {prev[kind].get(key)} -> {cur[kind].get(key)}")
-        print("IDEMPOTENT: the second load changed no count" if not diff else "CHANGED: " + "; ".join(diff))
+            for key in sorted(set(before[kind]) | set(after[kind])):
+                if before[kind].get(key) != after[kind].get(key):
+                    diff.append(f"{kind[:-1]} {key}: {before[kind].get(key)} -> {after[kind].get(key)}")
+        total = sum(before["nodes"].values()), sum(before["relationships"].values())
+        print(f"IDEMPOTENT: re-running every loader changed no count ({total[0]} nodes, {total[1]} relationships)"
+              if not diff else "CHANGED: " + "; ".join(diff))
         return 0 if not diff else 1
     mode = "offline" if a.offline else "online"
     checks = evaluate(mode)

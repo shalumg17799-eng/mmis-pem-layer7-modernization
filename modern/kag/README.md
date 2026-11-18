@@ -7,9 +7,9 @@ Ontology: `.claude/skills/kag-ontology/SKILL.md`. The graph is only ever written
 2. Put `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` in the root `.env` (never in chat or in a file you commit),
    then start Claude Code / a shell with them loaded (HOW-TO-RUN.md section 3). The loaders refuse the default `neo4j` and `system` databases.
 3. `./load_all.sh` writes constraints then `loaders/load_01_*.py` to `load_08_*.py` in order. Re-running changes nothing.
-4. `./load_all.sh --dry-run` parses and counts without a database (output saved in `dry-run-counts.txt`).
+4. `./load_all.sh --dry-run` parses and counts without a database (nothing is written anywhere).
 5. `python validate.py` runs the checks in `validate.cypher` against the database; `python validate.py --offline` computes them in memory.
-6. Idempotency proof: `python validate.py --save-counts F`, run `./load_all.sh` again, then `python validate.py --compare-counts F`.
+6. Idempotency proof: `python validate.py --idempotency` (counts, re-runs every loader, counts again, fails on any difference).
 7. Tests: `.venv/Scripts/python.exe -m pytest tests` (parsers, loaders, validation; no database needed).
 
 | Loader | Loads |
