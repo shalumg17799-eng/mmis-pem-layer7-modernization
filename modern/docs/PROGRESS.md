@@ -23,35 +23,38 @@ Replaces "stop at the end of every phase" in MODERNIZATION.md section 4.
 
 | Time | Step | What was done | Files |
 |---|---|---|---|
+| 2026-11-18 18:19 | phase1.7 | Phase 1 exit checks all pass; graph report written; Phase 1 recorded APPROVED (standing instruction) | `modern/docs/analysis/graph-report.md`, `PROGRESS.md`, `questions.md` (Q3) |
+| 2026-11-18 18:19 | phase1.6 | Spot checks (seed 20261118): 3 random rules and 2 datasets match the AWS data exactly | none (read-only) |
+| 2026-11-18 18:19 | phase1.5c | Live load into `medicaid-kag` (user confirmed the name, Q2); 32 of 32 Cypher checks; second load changed no count (tool proven with a tampered snapshot) | `modern/kag/validate.py`, `.work/kag/*` (git-ignored) |
+| 2026-11-18 18:19 | phase1.5b | Loaders 00 to 08, `validate.py` + `validate.cypher`, `load_all.sh`, README, 38 loader tests (73 pytest in total), dry-run counts | `modern/kag/*` |
 | 2026-11-18 18:20 | phase1.5a | kag-curator stopped (it had written nothing); parsers written by the orchestrator per the curator's file; 34 parser unit tests pass | `modern/kag/loaders/parsers.py`, `modern/kag/tests/*`, `constraints.cypher`, `requirements.txt` |
 | 2026-11-18 17:58 | phase1.2 | Neo4j MCP: project venv, `mcp-neo4j-cypher==0.6.0`, read-only, env references only | `.mcp.json`, `modern/kag/.venv` (git-ignored) |
 | 2026-11-18 17:58 | phase1.0 | Standing working mode recorded; Q1 revised (not bug-for-bug); decisions D-001 to D-020 recorded | `PROGRESS.md`, `questions.md`, `MODERNIZATION.md` |
 
-## Current phase checklist: Phase 1 (knowledge graph)
+## Current phase checklist: Phase 2 (legacy analysis)
 
-- [x] 1 Connection details: local Neo4j Desktop, instance `KAG`, database `medicade-kag`
-- [x] 2 MCP configuration (`.mcp.json`, project venv, read-only)
-- [ ] 3 Restart Claude Code with the `NEO4J_*` variables loaded (**user action, pending**)
-- [ ] 4 Verify the connection (needs step 3)
-- [ ] 5a kag-curator writes schema, loaders 01-08, parser tests, `--dry-run` (**running**)
-- [ ] 5b Orchestrator checks the dry-run counts against the source files
-- [ ] 5c Run loaders twice plus validation; second run must change nothing (needs Neo4j)
-- [ ] 6 Spot check 3 rule IDs and 1 dataset (needs Neo4j)
+- [ ] 1 Per-program verification of the 403 rules (PRVENR01, PRVSCR01, PRVRSK01, PRVREV01, PRVTMS01, PRVSAN01, PRVDIR01, PRVCICS1, PRVDEAD1), then merge
+- [ ] 2 Cross-program analysis: job-flow.md, data-layouts.md, defect-register.md; confirm or refute D-019
+- [ ] 3 Orchestrator checks (403 rows, no UNVERIFIED, 12 of 12 anti-patterns, every OPEN defect has a question)
+- [ ] 4 Phase 2 graph loader written, run twice, validated
+- [ ] 5 Business decisions: D-001 to D-020 already accepted by the user (recommended defaults); apply them
+- [ ] 6 Record the decisions in the defect register, questions.md and this file
 - [ ] 7 Commit
 
-## Pending graph loads (run all of them as soon as `NEO4J_*` is visible)
+## Pending graph loads
 
-- Phase 1: `constraints.cypher`, loaders `load_01` to `load_08`, `validate.py`, then the second load.
-- Phase 2: rule-verification, defect and decision loader (added when Phase 2 finishes).
-- Phase 3: services, contracts, tables and mappings loader (added when Phase 3 finishes).
+- Phase 1: **done** (loaded into `medicaid-kag` on 2026-11-18; second load unchanged; 32 of 32 checks).
+- Phase 2: rule-verification, defect and decision loader (written and loaded when Phase 2 finishes).
+- Phase 3: services, contracts, tables and mappings loader (written and loaded when Phase 3 finishes).
+- Open: the Neo4j MCP read path is not yet exercised; it needs Claude Code restarted with the `NEO4J_*` variables loaded.
 
 ## Phases
 
 | Phase | Status | Approved on | Notes |
 |---|---|---|---|
 | 0 Setup | APPROVED | 2026-11-18 | Git stays local; push only when the user asks. `uv` is not used (see Decisions). |
-| 1 Knowledge graph | IN PROGRESS | | Phase 1: waiting for Neo4j restart (MCP configured with a project venv; env vars not yet visible to Claude Code) |
-| 2 Legacy analysis | NOT STARTED | | |
+| 1 Knowledge graph | APPROVED (standing instruction, 2026-11-18) | 2026-11-18 | Loaded into `medicaid-kag`; 32 of 32 checks; second load unchanged; spot checks match; 3 explained count differences in `graph-report.md`. MCP read path pending a restart. |
+| 2 Legacy analysis | IN PROGRESS | | |
 | 3 Architecture and UX | NOT STARTED | | |
 | 4 Backlog | NOT STARTED | | |
 | 5 Platform | NOT STARTED | | |
@@ -76,6 +79,7 @@ Replaces "stop at the end of every phase" in MODERNIZATION.md section 4.
 
 | Date | Decision | Made by | Where recorded |
 |---|---|---|---|
+| 2026-11-18 | **Q2 ANSWERED by the user: the PEM graph database is `medicaid-kag`** on the local KAG Neo4j (`neo4j://127.0.0.1:7687`, user `neo4j`). `medicade-kag` was a typo. The database is online, read-write and was empty before the first load; nothing from this project goes into any other database. The password is never written to any file (the `NEO4J_*` variables are passed to loader commands as one-off process variables until Claude Code is restarted with `.env` loaded). The user should still correct `NEO4J_DATABASE=medicaid-kag` in `.env`. | user | `questions.md` Q2, this file |
 | 2026-11-18 | **Q1 REVISED: not bug-for-bug.** Supersedes the earlier "yes" (option A), which is withdrawn. Business decisions D-001 to D-020 below take the recommended defaults. | user | `questions.md` Q1, this file |
 | 2026-11-18 | D-020: FIX. The business date is an explicit job parameter (`&DATE`, `&BATCH_DATE` were never defined). Accepted recommended default. | user | this file |
 | 2026-11-18 | D-019: an analyst approval sets a provider to ACTIVE after a Pass screening. Accepted recommended default. Phase 2 still confirms or refutes, with evidence, that no legacy program sets ACTIVE except sanction reinstate (`R`). | user | this file |
@@ -118,3 +122,4 @@ See `modern/docs/analysis/questions.md`. Count open: 0
 | Connection | Configured in phase | How |
 |---|---|---|
 | Git remote `origin` (GitHub) | 0 | `git remote`, HTTPS, no credentials stored by Claude; not pushed yet |
+| Neo4j instance `KAG`, database `medicaid-kag` | 1 | Python loaders and `validate.py` via the `NEO4J_*` environment variables (values never stored in any file); MCP `neo4j` is configured read-only in `.mcp.json` but not yet connected |
