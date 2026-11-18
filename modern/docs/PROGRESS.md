@@ -23,6 +23,7 @@ Replaces "stop at the end of every phase" in MODERNIZATION.md section 4.
 
 | Time | Step | What was done | Files |
 |---|---|---|---|
+| 2026-11-18 18:20 | phase1.5a | kag-curator stopped (it had written nothing); parsers written by the orchestrator per the curator's file; 34 parser unit tests pass | `modern/kag/loaders/parsers.py`, `modern/kag/tests/*`, `constraints.cypher`, `requirements.txt` |
 | 2026-11-18 17:58 | phase1.2 | Neo4j MCP: project venv, `mcp-neo4j-cypher==0.6.0`, read-only, env references only | `.mcp.json`, `modern/kag/.venv` (git-ignored) |
 | 2026-11-18 17:58 | phase1.0 | Standing working mode recorded; Q1 revised (not bug-for-bug); decisions D-001 to D-020 recorded | `PROGRESS.md`, `questions.md`, `MODERNIZATION.md` |
 
