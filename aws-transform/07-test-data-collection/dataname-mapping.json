@@ -1,0 +1,19 @@
+{
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVDAY01.jcl-3f15ba4c/vsam_datasets_before/B3F1V000_MMPRV_PROVIDER_MASTER_KSDS.jcl": "MMPRV.PROVIDER.MASTER.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVVSM02.jcl-62020d4e/vsam_datasets_before/B620V001_MMPRV_SCREEN_RESULTS_KSDS.jcl": "MMPRV.SCREEN.RESULTS.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVMTH01.jcl-fc4facec/vsam_datasets_before/BFC4V000_MMPRV_PROVIDER_MASTER_KSDS.jcl": "MMPRV.PROVIDER.MASTER.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVVSM02.jcl-62020d4e/vsam_datasets_before/B620V000_MMPRV_SANCTION_MASTER_KSDS.jcl": "MMPRV.SANCTION.MASTER.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVDAY01.jcl-3f15ba4c/vsam_datasets_after/A3F1V001_MMPRV_PROVIDER_MASTER_KSDS.jcl": "MMPRV.PROVIDER.MASTER.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVVSM02.jcl-62020d4e/vsam_datasets_after/A620V002_MMPRV_SANCTION_MASTER_KSDS.jcl": "MMPRV.SANCTION.MASTER.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVVSM02.jcl-62020d4e/vsam_datasets_after/A620V003_MMPRV_SCREEN_RESULTS_KSDS.jcl": "MMPRV.SCREEN.RESULTS.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVVSM01.jcl-e0d7c457/vsam_datasets_after/AE0DV001_MMPRV_PROVIDER_MASTER_KSDS.jcl": "MMPRV.PROVIDER.MASTER.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVDAY01.jcl-3f15ba4c/sequential_datasets_before/B3F1S000_MMPRV_PROV_APPS_D&DATE.jcl": "MMPRV.PROV.APPS.D&DATE",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVVSM01.jcl-e0d7c457/vsam_datasets_before/BE0DV000_MMPRV_PROVIDER_MASTER_KSDS.jcl": "MMPRV.PROVIDER.MASTER.KSDS",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVMTH01.jcl-fc4facec/sequential_datasets_before/BFC4S000_MMPRV_TMSIS_PROVIDER_D&DATE.jcl": "MMPRV.TMSIS.PROVIDER.D&DATE",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVMTH01.jcl-fc4facec/sequential_datasets_before/BFC4S001_MMPRV_TMSIS_ARCHIVE(+1).jcl": "MMPRV.TMSIS.ARCHIVE(+1)",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVDAY01.jcl-3f15ba4c/sequential_datasets_after/A3F1S001_MMPRV_PROV_ERRORS_D&DATE.jcl": "MMPRV.PROV.ERRORS.D&DATE",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVDAY01.jcl-3f15ba4c/sequential_datasets_after/A3F1S002_MMPRV_SCREEN_RESULTS_D&DATE.jcl": "MMPRV.SCREEN.RESULTS.D&DATE",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVMTH01.jcl-fc4facec/sequential_datasets_after/AFC4S003_MMPRV_TMSIS_ARCHIVE(+0).jcl": "MMPRV.TMSIS.ARCHIVE(+0)",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVMTH01.jcl-fc4facec/sequential_datasets_after/AFC4S004_MMPRV_REVAL_QUEUE_D&DATE.jcl": "MMPRV.REVAL.QUEUE.D&DATE",
+  "/ramdisk/1/test_data_collection/outputs/generated_jcls/TC-PRVMTH01.jcl-fc4facec/sequential_datasets_after/AFC4S002_MMPRV_TMSIS_PROVIDER_D&DATE.jcl": "MMPRV.TMSIS.PROVIDER.D&DATE"
+}

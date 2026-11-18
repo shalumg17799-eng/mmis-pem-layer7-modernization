@@ -1,0 +1,201 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVTMS01.cbl",
+        "type": "cobol"
+      },
+      "overview": "This program operates within a state Medicaid Management Information System (MMIS) and serves as a monthly data submission component for the federal T-MSIS (Transformed Medicaid Statistical Information System) reporting requirement. It is invoked by the PRVMTH01 batch job as part of the monthly provider data submission cycle to CMS. The program extracts active providers from the state's provider master file and formats them into the standardized T-MSIS provider submission file (PEM-10 layout), solving the need to report current active provider enrollment status to CMS on a monthly basis. It reads the indexed provider master file sequentially, filters for active providers only, and writes formatted output records containing provider identifiers, NPI, status, and reporting period.",
+      "key_features": [
+        {
+          "feature": "Active Provider Extraction",
+          "description": "Reads the provider master file and selects only providers flagged as active for inclusion in the T-MSIS submission, excluding inactive or terminated providers."
+        },
+        {
+          "feature": "T-MSIS Record Formatting",
+          "description": "Formats each qualifying provider into the standardized 120-character T-MSIS PRV01 detail record layout, including Medicaid provider ID, NPI, active status code, and reporting period."
+        },
+        {
+          "feature": "Monthly Reporting Period Stamping",
+          "description": "Captures the current system date as a YYDDD Julian date and stamps each output record with the reporting period, identifying the submission cycle for CMS."
+        },
+        {
+          "feature": "Sequential File Output",
+          "description": "Writes all qualifying provider records to a sequential output file (TMSISOUT) for downstream transmission to the CMS T-MSIS data intake system."
+        },
+        {
+          "feature": "Enrollment Date Validation",
+          "description": "Performs a basic check to flag providers whose enrollment year appears to be in the future relative to today, providing a data quality warning during processing."
+        },
+        {
+          "feature": "Output Record Count Reporting",
+          "description": "Tracks and displays the total number of T-MSIS provider rows written, supporting job reconciliation and submission volume verification."
+        },
+        {
+          "feature": "Known Date Arithmetic Defect",
+          "description": "Uses 2-digit year YYDDD Julian date comparisons which produce incorrect results across year and century boundaries, a documented source of T-MSIS data quality rejects that requires remediation."
+        }
+      ]
+    },
+    "input_output": [
+      {
+        "name": "PRV-MASTER-FILE",
+        "type": "Read",
+        "description": "Indexed provider master file (DD: PRVMSTR) - sequentially read to extract all active providers (PRV-ENROLL-STATUS = 'A') for T-MSIS submission. Contains provider NPI, Medicaid ID, type code, taxonomy, risk tier, enrollment status, effective date, revalidation due date, and variant data for individual, group, or facility providers."
+      },
+      {
+        "name": "TMSIS-OUT-FILE",
+        "type": "Write",
+        "description": "Sequential T-MSIS provider output file (DD: TMSISOUT) - receives fixed 120-character detail records (record type PRV01) containing provider Medicaid ID, NPI, active status indicator, and current Julian period date for monthly CMS T-MSIS provider submission."
+      }
+    ],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "Initialize Program",
+          "description": "Sets program ID, accepts the current Julian date from the system (YYDDD format), and splits it into 2-digit year (WS-TODAY-YY) and 3-digit day-of-year (WS-TODAY-DDD) components. Opens PRV-MASTER-FILE for input and TMSIS-OUT-FILE for output.",
+          "records": [
+            "WS-PROGRAM-ID",
+            "WS-TODAY-JUL",
+            "WS-TODAY-YY",
+            "WS-TODAY-DDD",
+            "WS-PRV-STATUS",
+            "WS-TMS-STATUS"
+          ]
+        },
+        {
+          "step": 2,
+          "process": "Sequential Read of Provider Master",
+          "description": "Reads the indexed PRV-MASTER-FILE sequentially using NEXT RECORD access mode. Checks file status after each read; sets end-of-file flag when status indicates EOF. Continues until all records are exhausted.",
+          "records": [
+            "PRV-NPI",
+            "WS-PRV-STATUS",
+            "WS-FILE-STATUS",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "Filter Active Providers",
+          "description": "Evaluates the PRV-ACTIVE flag on each provider master record. Only records where PRV-ACTIVE is true are passed to the write step; inactive providers are silently skipped.",
+          "records": [
+            "PRV-ACTIVE",
+            "PRV-NPI"
+          ]
+        },
+        {
+          "step": 4,
+          "process": "Enrollment Date Validation",
+          "description": "Extracts the 2-digit year from the provider's CCYYMMDD effective date (characters 3-4) into WS-ENROLL-YY. Compares WS-ENROLL-YY against WS-TODAY-YY using direct numeric comparison. If enrollment year exceeds today's 2-digit year, a warning is displayed to SYSOUT. This comparison is broken across century boundaries (e.g., YY=99 vs YY=00).",
+          "records": [
+            "PRV-EFFECTIVE-DATE",
+            "WS-ENROLL-YY",
+            "WS-TODAY-YY",
+            "PRV-NPI"
+          ]
+        },
+        {
+          "step": 5,
+          "process": "Build T-MSIS Output Detail Record",
+          "description": "Populates the WS-TMSIS-DETAIL working storage area with a fixed 'PRV01' record type indicator, the provider's Medicaid ID, NPI, a hardcoded active status of 'A', and the current Julian date (YYDDD) as the submission period. Remaining 90 bytes are space-filled.",
+          "records": [
+            "PRV-MEDICAID-ID",
+            "PRV-NPI",
+            "WS-T-PROVID",
+            "WS-T-NPI",
+            "WS-T-STATUS",
+            "WS-T-PERIOD-YYDDD",
+            "WS-TODAY-JUL"
+          ]
+        },
+        {
+          "step": 6,
+          "process": "Write T-MSIS Output Record",
+          "description": "Moves the completed WS-TMSIS-DETAIL (120 bytes) to TMSIS-OUT-RECORD and writes it to the sequential TMSIS-OUT-FILE. Increments WS-OUT-COUNT by 1 for each record written.",
+          "records": [
+            "WS-TMSIS-DETAIL",
+            "TMSIS-OUT-RECORD",
+            "WS-OUT-COUNT",
+            "WS-TMS-STATUS"
+          ]
+        },
+        {
+          "step": 7,
+          "process": "Finalize and Report",
+          "description": "After all provider records are processed, closes both files and displays the total count of T-MSIS provider rows written (WS-OUT-COUNT) to SYSOUT before terminating.",
+          "records": [
+            "WS-OUT-COUNT",
+            "WS-PRV-STATUS",
+            "WS-TMS-STATUS"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "PRV-MASTER-FILE must be open before sequential read loop",
+          "description": "The EXTRACT-NEXT paragraph performs READ PRV-MASTER-FILE NEXT RECORD, which requires the file to have been successfully opened in the MAIN-CONTROL paragraph. No explicit open-status check is coded after the OPEN statement, so an open failure would cause an unhandled abend on the first read."
+        },
+        {
+          "dependency": "WS-TODAY-JUL must be populated before WRITE-TMSIS-ROW",
+          "description": "WS-TODAY-JUL is accepted from the system DAY special register at program initialization and is later moved directly into WS-T-PERIOD-YYDDD in every output record. If the ACCEPT fails or returns an unexpected format, all submission period values will be incorrect."
+        },
+        {
+          "dependency": "PRV-ACTIVE flag state controls record inclusion",
+          "description": "The entire extract depends on the PRV-ACTIVE flag within PRVRECRD copybook being correctly set in the provider master file. No secondary validation of provider status is performed; a stale or incorrectly set flag will cause providers to be included or excluded erroneously from the T-MSIS submission."
+        },
+        {
+          "dependency": "PRV-EFFECTIVE-DATE format assumed to be CCYYMMDD",
+          "description": "WRITE-TMSIS-ROW extracts characters 3-4 of PRV-EFFECTIVE-DATE as the 2-digit year. This assumes the field is always populated in CCYYMMDD format. If the date is missing, zero-filled, or in a different format, WS-ENROLL-YY will contain incorrect data, producing false future-enrollment warnings or silently passing bad data."
+        },
+        {
+          "dependency": "2-digit Julian year cross-century comparison is broken",
+          "description": "WS-ENROLL-YY and WS-TODAY-YY are both 2-digit packed decimal fields. A provider enrolled in year 1999 (YY=99) compared against a reporting date in year 2000 (YY=00) will incorrectly evaluate 99 > 00 as true, triggering a spurious future-enrollment warning. Conversely, a genuinely future enrollment in a later century would not be detected. This also affects WS-T-PERIOD-YYDDD in the output record, which carries the same 2-digit year defect into the T-MSIS submission file."
+        },
+        {
+          "dependency": "WS-FILE-STATUS and WS-END-OF-FILE-FLAG from WRKSTORE copybook",
+          "description": "The EOF detection logic relies on WS-FS-EOF condition and WS-END-OF-FILE-FLAG defined in the WRKSTORE copybook. The EXTRACT-NEXT paragraph moves WS-PRV-STATUS to WS-FILE-STATUS and then tests WS-FS-EOF. If the copybook condition-name or flag definitions are misaligned, the read loop may not terminate correctly or may skip valid records."
+        },
+        {
+          "dependency": "TMSIS-OUT-FILE sequential write order",
+          "description": "Records are written to the T-MSIS output file in the same order they are read from the indexed provider master file (by NPI key sequence). Downstream CMS T-MSIS processing may have expectations about record ordering or uniqueness; duplicate NPI records in the master file would produce duplicate rows in the output without any deduplication logic."
+        },
+        {
+          "dependency": "WS-OUT-COUNT overflow risk",
+          "description": "WS-OUT-COUNT is defined as PIC 9(07), supporting a maximum of 9,999,999 records. If the active provider population exceeds this threshold, the counter will overflow silently and the final display count will be incorrect, though file writing will continue."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "File Operation Errors - Read",
+        "description": "After each READ of PRV-MASTER-FILE, WS-PRV-STATUS is moved to WS-FILE-STATUS and checked via the WS-FS-EOF condition. Only end-of-file (EOF) is explicitly handled by setting WS-END-OF-FILE to TRUE. Non-EOF read errors (e.g., I/O failures, record not found) are not trapped, logged, or abended — they are silently ignored and processing continues to the next iteration."
+      },
+      {
+        "category": "File Operation Errors - Write",
+        "description": "WS-TMS-STATUS is populated by the FILE STATUS clause on TMSIS-OUT-FILE, but it is never checked after the WRITE TMSIS-OUT-RECORD statement. Write failures (disk full, allocation errors, invalid record length) are completely undetected and unhandled, meaning lost output records would go unnoticed."
+      },
+      {
+        "category": "File Open/Close Errors",
+        "description": "OPEN INPUT and OPEN OUTPUT statements are issued for both files without any subsequent check of WS-PRV-STATUS or WS-TMS-STATUS. A failed open would leave file status codes set to non-zero values, but processing would continue unchecked, likely causing downstream read/write failures that are also unhandled."
+      },
+      {
+        "category": "Input Validation Errors - Date Logic",
+        "description": "A partial validation exists for enrollment date: the 2-digit year (WS-ENROLL-YY) extracted from PRV-EFFECTIVE-DATE is compared to WS-TODAY-YY. If the enrollment year appears greater than today's year, a DISPLAY warning is issued to SYSOUT. However, this check is broken by the YYDDD 2-digit year anti-pattern — cross-century comparisons (e.g., YY=99 vs YY=00) produce false positives or miss genuine future dates. No abend, record skip, or reject file write occurs; the suspect record is still written to the T-MSIS output."
+      },
+      {
+        "category": "Business Rule Validation - Provider Status",
+        "description": "Only records where PRV-ACTIVE is true are forwarded to WRITE-TMSIS-ROW. Inactive providers are silently skipped with no logging, reject count, or audit trail. There is no validation of other required fields (e.g., NPI format, Medicaid ID presence) before writing the output record."
+      },
+      {
+        "category": "Program-Level / Abend Handling",
+        "description": "There is no centralized error routine, no CALL to an abend handler, and no use of EVALUATE or nested IF logic to classify and respond to error conditions. The program relies entirely on STOP RUN for normal termination. Abnormal conditions that do not trigger an OS-level abend will result in silent data quality issues rather than a detectable job failure."
+      },
+      {
+        "category": "Audit and Reporting",
+        "description": "The only end-of-job reporting is a single DISPLAY of the output row count (WS-OUT-COUNT). There is no error count, reject count, warning count, or summary of skipped records. This makes post-run error diagnosis dependent solely on operator observation of the DISPLAY message and any incidental DISPLAY output from the future-enrollment warning."
+      }
+    ]
+  }
+}

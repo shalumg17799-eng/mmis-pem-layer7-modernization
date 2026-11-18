@@ -1,0 +1,192 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVREV01.cbl",
+        "type": "cobol"
+      },
+      "overview": "PRVREV01 operates within a Medicaid Management Information System (MMIS) as part of the Provider Enrollment Module (PEM-4), executing as a scheduled month-end batch step (PRVMTH01, STEP010) to enforce federal revalidation requirements under 42 CFR 455.414, which mandates provider re-screening at least every five years. The program solves the compliance problem of identifying enrolled providers whose revalidation due dates have lapsed, ensuring the state agency can systematically re-screen those providers rather than allowing stale enrollments to persist. It reads the full provider master file, flags any active provider whose revalidation due date is on or before the current date, and writes those providers to an output queue for downstream re-screening workflows.",
+      "key_features": [
+        {
+          "feature": "Federal Compliance Enforcement",
+          "description": "Implements 42 CFR 455.414 revalidation requirements by identifying providers who have exceeded their 5-year re-screening window."
+        },
+        {
+          "feature": "Month-End Batch Sweep",
+          "description": "Runs as a point-in-time, month-end only process triggered by the PRVMTH01 job, scanning the entire provider master file sequentially."
+        },
+        {
+          "feature": "Active Provider Filtering",
+          "description": "Restricts revalidation candidates to currently active providers only, excluding inactive or terminated enrollments from the output queue."
+        },
+        {
+          "feature": "Due Date Comparison",
+          "description": "Compares each provider's stored revalidation due date against the current system date to determine if revalidation is overdue."
+        },
+        {
+          "feature": "Revalidation Queue Output",
+          "description": "Writes overdue providers to a sequential output file (REVALQ) with NPI, due date, and a RESCREEN-REQUIRED action code for downstream processing."
+        },
+        {
+          "feature": "Processing Audit Count",
+          "description": "Tracks and displays the total number of providers queued for revalidation at job completion, supporting operational reconciliation."
+        },
+        {
+          "feature": "Known Year-2070 Date Defect",
+          "description": "Inherits a 2-digit-year due-date sorting defect from PRVRSK01, causing providers with due years beyond 2070 to be mis-evaluated in date comparisons."
+        },
+        {
+          "feature": "Superseded by Continuous Monitoring",
+          "description": "Acknowledged as a legacy batch approach, replaced in modern environments by event-driven continuous re-screening triggered by LEIE or license change events rather than waiting for month-end."
+        }
+      ]
+    },
+    "input_output": [
+      {
+        "name": "PRV-MASTER-FILE",
+        "type": "Read",
+        "description": "Provider master indexed file (DD: PRVMSTR) - sequentially read in dynamic access mode to retrieve all provider records; filters for active providers (PRV-ENROLL-STATUS = 'A') whose revalidation due date (PRV-REVAL-DUE-DATE) is less than or equal to today's date"
+      },
+      {
+        "name": "REVAL-OUT-FILE",
+        "type": "Write",
+        "description": "Revalidation queue sequential output file (DD: REVALQ) - receives 80-byte records for each provider identified as requiring re-screening, containing the provider NPI, revalidation due date, and action code 'RESCREEN-REQUIRED'"
+      }
+    ],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "Program Initialization",
+          "description": "Sets program identifier, accepts the current date in YYYYMMDD format from the system, and opens the provider master file for sequential input and the revalidation output queue file for output.",
+          "records": [
+            "WS-PROGRAM-ID",
+            "WS-TODAY",
+            "WS-PRV-STATUS",
+            "WS-REV-STATUS"
+          ]
+        },
+        {
+          "step": 2,
+          "process": "Sequential Provider Master Read",
+          "description": "Reads each record sequentially from the indexed provider master file (PRVMSTR) using NEXT RECORD access. Moves the file status into the working storage status field and checks for end-of-file condition.",
+          "records": [
+            "PRV-NPI",
+            "PRV-ACTIVE",
+            "PRV-REVAL-DUE-DATE",
+            "WS-PRV-STATUS",
+            "WS-FILE-STATUS",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "Active Provider Revalidation Date Filter",
+          "description": "Evaluates each provider record against two conditions: the provider must be in an active status (PRV-ACTIVE flag set) AND the revalidation due date must be less than or equal to today's date (WS-TODAY). Only records satisfying both conditions proceed to queuing. Providers with future due dates or inactive status are silently bypassed.",
+          "records": [
+            "PRV-ACTIVE",
+            "PRV-REVAL-DUE-DATE",
+            "WS-TODAY"
+          ]
+        },
+        {
+          "step": 4,
+          "process": "Queue Provider for Rescreening",
+          "description": "For each provider that passes the filter, moves the NPI and revalidation due date into the output record, sets the action literal to 'RESCREEN-REQUIRED', writes the 80-character fixed-format record to the revalidation output queue file (REVALQ), and increments the revalidation counter.",
+          "records": [
+            "REV-NPI",
+            "REV-DUE-DATE",
+            "REV-ACTION",
+            "REVAL-OUT-RECORD",
+            "WS-REVAL-COUNT"
+          ]
+        },
+        {
+          "step": 5,
+          "process": "End-of-File Loop Termination",
+          "description": "When the file status indicates end-of-file on PRV-MASTER-FILE, sets WS-END-OF-FILE flag to TRUE, which terminates the PERFORM UNTIL loop and exits the read cycle.",
+          "records": [
+            "WS-PRV-STATUS",
+            "WS-FS-EOF",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 6,
+          "process": "Finalization and Reporting",
+          "description": "Closes both files (PRV-MASTER-FILE and REVAL-OUT-FILE), displays the total count of providers queued for revalidation to the system log, and terminates the program with STOP RUN.",
+          "records": [
+            "WS-REVAL-COUNT",
+            "WS-PRV-STATUS",
+            "WS-REV-STATUS"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "Provider Master File Sequential Access Order",
+          "description": "PRV-MASTER-FILE is opened with DYNAMIC access but read using NEXT RECORD (sequential sweep). No START or random READ is issued, so all active and inactive providers are evaluated in NPI key sequence. Any provider record not yet committed to the master file by upstream jobs will be invisible to this sweep."
+        },
+        {
+          "dependency": "Month-End Batch Sequencing (PRVMTH01 STEP010)",
+          "description": "PRVREV01 is called as STEP010 within the PRVMTH01 job stream. It depends on all prior steps in that job having completed successfully and the provider master file being fully updated and closed before this program opens it. No internal handshake or checkpoint mechanism is present; sequencing is entirely controlled by JCL step dependencies."
+        },
+        {
+          "dependency": "PRV-REVAL-DUE-DATE Two-Digit Year Defect",
+          "description": "The revalidation due date comparison (PRV-REVAL-DUE-DATE <= WS-TODAY) is inherited from PRVRSK01 and carries a known 2-digit-year sort defect. Providers whose computed due year wraps past 2070 will have a numerically low due date value, causing them to appear overdue immediately or sort incorrectly relative to WS-TODAY. This is a data integrity dependency: correctness of the filter relies on all due dates being within the non-wrapping range of the date encoding scheme."
+        },
+        {
+          "dependency": "PRV-ACTIVE Flag State Validity",
+          "description": "The filter logic gates entirely on the PRV-ACTIVE flag from PRVRECRD. If upstream enrollment or termination processing has not correctly set or cleared this flag before month-end, providers may be incorrectly included (terminated providers flagged active) or excluded (active providers flagged inactive) from the revalidation queue."
+        },
+        {
+          "dependency": "REVALQ Output File Availability",
+          "description": "REVAL-OUT-FILE (DD REVALQ) must be allocated and writable before the program executes. There is no error-handling branch for a non-zero WS-REV-STATUS after the WRITE; a write failure would silently drop records from the queue while the counter continues to increment, producing a misleading final count."
+        },
+        {
+          "dependency": "WS-TODAY System Date Accuracy",
+          "description": "The entire revalidation eligibility determination depends on the value accepted from DATE YYYYMMDD. If the job runs on an incorrect system date (e.g., a re-run on a different calendar day), providers may be incorrectly included or excluded. There is no override or parameter mechanism to supply an external reference date."
+        },
+        {
+          "dependency": "PRVRECRD and WRKSTORE Copybook Consistency",
+          "description": "The program references PRV-NPI, PRV-ACTIVE, and PRV-REVAL-DUE-DATE by qualified name from PRVRECRD, and WS-END-OF-FILE-FLAG, WS-FS-EOF, WS-FILE-STATUS, and WS-PROGRAM-ID from WRKSTORE. Any structural change to either copybook (field renaming, reordering, or length change) without recompiling this program will cause incorrect field mapping or abends."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "File Operation Errors - Open",
+        "description": "No explicit error handling after OPEN statements for either PRV-MASTER-FILE or REVAL-OUT-FILE. File status codes WS-PRV-STATUS and WS-REV-STATUS are declared but not checked post-OPEN. A failed open would likely cause an uncontrolled abend rather than a graceful error message."
+      },
+      {
+        "category": "File Operation Errors - Sequential Read",
+        "description": "After each READ of PRV-MASTER-FILE, WS-PRV-STATUS is moved to WS-FILE-STATUS and checked only for EOF condition (WS-FS-EOF). Non-EOF error statuses (e.g., '30' hardware error, '91' file unavailable) are silently ignored — the program falls through the IF logic without branching to any error routine, potentially looping or skipping records without notification."
+      },
+      {
+        "category": "File Operation Errors - Write",
+        "description": "The WRITE to REVAL-OUT-FILE in QUEUE-FOR-REVAL has no subsequent check of WS-REV-STATUS. A failed write (e.g., disk full, I/O error) is completely undetected; the counter WS-REVAL-COUNT is still incremented, producing a misleading final count and no error message or abend."
+      },
+      {
+        "category": "File Operation Errors - Close",
+        "description": "CLOSE for both files is performed with no status code evaluation afterward. Errors during close (e.g., incomplete buffer flush) go unreported and unhandled."
+      },
+      {
+        "category": "Input Validation Errors - Date Comparison",
+        "description": "No validation is performed on PRV-REVAL-DUE-DATE before the numeric comparison against WS-TODAY. Non-numeric or zero-filled due dates are compared directly, risking incorrect queue inclusion. Additionally, the code inherits a known 2-digit-year defect from PRVRSK01 where due dates past year 2070 mis-sort, but no guard or compensating validation exists."
+      },
+      {
+        "category": "Input Validation Errors - Record Content",
+        "description": "No validation of PRV-NPI or other critical fields before writing to REVAL-OUT-FILE. Blank or malformed NPI values are written to the output queue without any rejection or warning, potentially corrupting downstream re-screening processes."
+      },
+      {
+        "category": "Transaction Processing Errors - Missing Abend/Rollback Logic",
+        "description": "There is no abend handler, no DECLARATIVES section, and no rollback mechanism. Any mid-run failure leaves REVAL-OUT-FILE in a partial state with no indicator of incompleteness. The final DISPLAY count may reflect a partial run as if it were successful."
+      },
+      {
+        "category": "Operational / Logging Errors",
+        "description": "Error reporting is limited to a single DISPLAY of the queued provider count at normal termination. There are no error-specific DISPLAY or log messages for any failure condition, making post-run diagnosis entirely dependent on system-level job logs or abend codes rather than application-level messaging."
+      }
+    ]
+  }
+}

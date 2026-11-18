@@ -1,0 +1,192 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVSAN01.cbl",
+        "type": "cobol"
+      },
+      "overview": "PRVSAN01 operates within a Medicaid Management Information System (MMIS) as part of the Sanctions and Provider Enrollment Management (PEM) application suite. It serves as a critical compliance and regulatory workflow component, processing government-mandated exclusions, suspensions, and terminations against enrolled healthcare providers, and ensuring downstream systems such as claims processing and managed care organizations (MCOs) are notified of provider status changes. The program reads a batch input file of sanction actions issued by regulatory or administrative authorities, applies each action directly to the Provider Master file by updating provider enrollment status, and triggers the generation of formal notices to affected parties. It solves the operational need to systematically enforce provider exclusions and terminations across the Medicaid system in a repeatable, auditable batch process.",
+      "key_features": [
+        {
+          "feature": "Sanction Action Processing",
+          "description": "Reads a sequential batch input file containing provider NPI numbers and associated sanction actions (Terminate, Suspend, Reinstate) issued by regulatory authorities."
+        },
+        {
+          "feature": "Provider Status Updates",
+          "description": "Looks up each provider in the Provider Master file by NPI and updates their enrollment status to reflect the sanctioned action, including termination, denial, or reinstatement."
+        },
+        {
+          "feature": "Termination Tracking",
+          "description": "Maintains a running count of providers terminated during the batch run and reports the total at job completion for audit and reporting purposes."
+        },
+        {
+          "feature": "Notice Generation",
+          "description": "Dynamically invokes an action-specific notice program (e.g., PRVNTTRM, PRVNTSUS, PRVNTRST) to generate formal notifications to downstream systems and affected parties following each status change."
+        },
+        {
+          "feature": "Error Handling for Unknown Providers",
+          "description": "Detects and logs cases where a sanctioned NPI does not exist in the Provider Master file, allowing for exception review without halting the batch run."
+        },
+        {
+          "feature": "Downstream System Notification",
+          "description": "Ensures that claims processing and MCO systems are informed of provider status changes by triggering notices after each sanction is applied, maintaining data consistency across the MMIS ecosystem."
+        },
+        {
+          "feature": "Multi-Action Support",
+          "description": "Handles three distinct regulatory actions within a single batch run — termination, suspension, and reinstatement — allowing the program to serve as a unified sanctions processor for varied compliance scenarios."
+        }
+      ]
+    },
+    "input_output": [
+      {
+        "name": "SANCTION-IN-FILE (SANCIN)",
+        "type": "Read",
+        "description": "Sequential input file containing sanction/termination transactions. Each 80-byte record includes provider NPI, action code (T=Terminate, S=Suspend, R=Reinstate), reason text, and effective date. Drives the main processing loop."
+      },
+      {
+        "name": "PRV-MASTER-FILE (PRVMSTR)",
+        "type": "Read-Write",
+        "description": "VSAM KSDS Provider Master file owned by PEMAPP1. Keyed by PRV-NPI. Read to retrieve existing provider records, then rewritten to apply enrollment status changes (Active, Terminated, Denied) based on incoming sanction actions."
+      }
+    ],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "Program Initialization",
+          "description": "Sets program identifier, opens PRV-MASTER-FILE (VSAM KSDS, I-O mode) owned by PEMAPP1, and opens SANCTION-IN-FILE (sequential input). Initializes end-of-file flag to 'N'.",
+          "records": [
+            "WS-PROGRAM-ID",
+            "WS-PRV-STATUS",
+            "WS-SAN-STATUS",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 2,
+          "process": "Read Sanction Input Record",
+          "description": "Reads the next sequential record from SANCTION-IN-FILE (SANCIN). Checks file status; if EOF is detected, sets the end-of-file flag to terminate the processing loop.",
+          "records": [
+            "SAN-NPI",
+            "SAN-ACTION",
+            "SAN-REASON",
+            "SAN-EFF-DATE",
+            "WS-SAN-STATUS",
+            "WS-FS-EOF"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "Lookup Provider Master Record",
+          "description": "Moves SAN-NPI from the sanction input record into PRV-NPI as the VSAM key, then performs a keyed READ on PRV-MASTER-FILE. If the record is not found (status not '00'), logs a warning and skips to the next input record.",
+          "records": [
+            "SAN-NPI",
+            "PRV-NPI",
+            "WS-PRV-STATUS",
+            "PRV-MASTER-RECORD"
+          ]
+        },
+        {
+          "step": 4,
+          "process": "Apply Sanction Action to Provider Record",
+          "description": "Evaluates SAN-ACTION to determine the sanction type. Sets the corresponding provider status flag: PRV-TERMINATED for 'T', PRV-DENIED for 'S', or PRV-ACTIVE for 'R'. Increments WS-TERM-COUNT for terminations. Rewrites the updated provider master record directly to the PEMAPP1-owned VSAM KSDS.",
+          "records": [
+            "SAN-ACTION",
+            "PRV-TERMINATED",
+            "PRV-DENIED",
+            "PRV-ACTIVE",
+            "PRV-MASTER-RECORD",
+            "WS-TERM-COUNT"
+          ]
+        },
+        {
+          "step": 5,
+          "process": "Assemble Dynamic Notice Program Name",
+          "description": "Constructs the notice generator program name at runtime by concatenating the fixed prefix 'PRVNT' (WS-NOTICE-PREFIX) with a 3-character suffix derived from the sanction action: 'TRM', 'SUS', 'RST', or 'GEN'. The result is stored in WS-NOTICE-PGM.",
+          "records": [
+            "WS-NOTICE-PREFIX",
+            "WS-NOTICE-SUFFIX",
+            "WS-NOTICE-PGM",
+            "SAN-ACTION"
+          ]
+        },
+        {
+          "step": 6,
+          "process": "Invoke Dynamic Notice Generator",
+          "description": "Calls the dynamically assembled program name stored in WS-NOTICE-PGM (e.g., PRVNTTRM, PRVNTSUS, PRVNTRST) using the updated PRV-MASTER-RECORD as the parameter. If the program is not found, logs an error with the unresolved program name. This call target is unresolvable by static analysis tools.",
+          "records": [
+            "WS-NOTICE-PGM",
+            "PRV-MASTER-RECORD"
+          ]
+        },
+        {
+          "step": 7,
+          "process": "Loop Termination and Shutdown",
+          "description": "After all sanction input records are processed, closes both PRV-MASTER-FILE and SANCTION-IN-FILE. Displays a summary count of terminated providers (WS-TERM-COUNT) and stops the run.",
+          "records": [
+            "WS-TERM-COUNT",
+            "WS-PRV-STATUS",
+            "WS-SAN-STATUS"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "Cross-Application VSAM Direct Write (PEMAPP2 → PEMAPP1)",
+          "description": "PRVSAN01 (owned by PEMAPP2) opens and REWRITEs PRV-MASTER-FILE (PRVMSTR KSDS), which is owned and maintained by PEMAPP1. There is no API boundary or service layer. Any concurrent PEMAPP1 job opening the same VSAM file in I-O mode risks enqueue conflicts or data corruption. This tight coupling is the primary modernization blocker: neither application can be independently migrated without exposing a Provider update API or co-migrating both."
+        },
+        {
+          "dependency": "Sequential Read-Before-Update on Provider Master",
+          "description": "A keyed READ of PRV-MASTER-FILE must succeed (status '00') before APPLY-SANCTION is invoked. The REWRITE in APPLY-SANCTION depends on the record being held in the file's I-O buffer from the preceding READ. If the READ fails, the REWRITE is skipped entirely, meaning no sanction is applied and no rollback or error record is written."
+        },
+        {
+          "dependency": "Sanction Input Record Ordering and Completeness",
+          "description": "SANCTION-IN-FILE is processed strictly sequentially with no sorting or deduplication. If multiple sanction records exist for the same NPI (e.g., a SUSPEND followed by a TERMINATE), each is applied in file order, with each triggering a separate REWRITE and notice call. The final state of the provider record depends entirely on the order of records in the input file."
+        },
+        {
+          "dependency": "Dynamic Call Target Resolution at Runtime",
+          "description": "The notice generator program name (WS-NOTICE-PGM) is assembled at runtime from WS-NOTICE-PREFIX and WS-NOTICE-SUFFIX. The called programs (PRVNTTRM, PRVNTSUS, PRVNTRST, PRVNTGEN) must be present in the load library at execution time. A missing program causes an ON EXCEPTION branch with only a DISPLAY warning; the REWRITE has already been committed at this point, meaning the provider record is updated but no notice is generated, creating a silent data integrity gap."
+        },
+        {
+          "dependency": "File Status Field Shared Across Files",
+          "description": "WS-FILE-STATUS (from WRKSTORE copybook) is used to evaluate the sanction input file status after each READ, while WS-PRV-STATUS is checked separately for the provider master. The WS-FS-EOF condition is evaluated against WS-FILE-STATUS, which is populated from WS-SAN-STATUS. Any misalignment in the WRKSTORE copybook definitions between these fields could cause premature loop termination or missed EOF detection."
+        },
+        {
+          "dependency": "REWRITE Committed Before Notice Generation",
+          "description": "In APPLY-SANCTION, the REWRITE of PRV-MASTER-RECORD is executed unconditionally before GENERATE-NOTICE is called. There is no transactional boundary: if the dynamic notice CALL fails or the called program abends, the provider master has already been permanently updated with no compensating logic or rollback mechanism."
+        },
+        {
+          "dependency": "PRVRECRD Copybook Structural Coupling",
+          "description": "PRV-MASTER-RECORD layout is defined entirely by the PRVRECRD copybook, which is shared between PEMAPP1 and PEMAPP2. Any change to field offsets, lengths, or 88-level condition names (PRV-TERMINATED, PRV-DENIED, PRV-ACTIVE) in PRVRECRD requires coordinated recompilation of all programs in both applications that reference it."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "File Operation Errors - Sequential Input File",
+        "description": "File status is captured in WS-SAN-STATUS after each READ of SANCTION-IN-FILE. EOF condition is detected via WS-FS-EOF flag (likely an 88-level on WS-FILE-STATUS copied from WRKSTORE), which sets WS-END-OF-FILE to TRUE to terminate processing. No explicit handling for non-EOF read errors (e.g., status '30', '92') — abnormal statuses are not trapped or reported, meaning corrupt or unreadable input records may silently fall through."
+      },
+      {
+        "category": "File Operation Errors - VSAM Indexed Master File (PRV-MASTER-FILE)",
+        "description": "After the keyed READ of PRV-MASTER-FILE, WS-PRV-STATUS is checked explicitly for '00' (successful). Any non-zero status (record not found, locked, I/O error) results in a DISPLAY message showing the unresolved NPI ('PRVSAN01: NPI NOT FOUND <NPI>'). No distinction is made between a true not-found condition (status '23') and hard I/O errors (status '30', '92', etc.), and processing continues to the next record rather than aborting. The REWRITE operation after APPLY-SANCTION has no file status check at all — a failed REWRITE is silently ignored."
+      },
+      {
+        "category": "Transaction Processing Errors - Unrecognized Sanction Action Code",
+        "description": "In APPLY-SANCTION, the EVALUATE TRUE block handles only 'T', 'S', and 'R' action codes via 88-level conditions. There is no WHEN OTHER clause, so an unrecognized action code results in no state change to the provider record, yet REWRITE and GENERATE-NOTICE are still executed unconditionally. This means a bad action code silently produces a no-op update and still triggers a notice generation attempt."
+      },
+      {
+        "category": "Dynamic Call Errors - Notice Program Resolution",
+        "description": "In GENERATE-NOTICE, the notice program name is assembled at runtime by concatenating WS-NOTICE-PREFIX ('PRVNT') with a 3-character suffix (TRM, SUS, RST, GEN). The CALL WS-NOTICE-PGM includes an ON EXCEPTION clause that catches program-not-found or load failures and issues a DISPLAY message ('PRVSAN01: NOTICE PGM NOT FOUND <pgm-name>'). Processing continues after the failed call — there is no rollback of the REWRITE already applied to the provider master, creating a potential state inconsistency where the provider record is updated but no downstream notification is sent."
+      },
+      {
+        "category": "File Open/Close Errors",
+        "description": "OPEN I-O for PRV-MASTER-FILE and OPEN INPUT for SANCTION-IN-FILE in MAIN-CONTROL have no file status checks following the OPEN statements. A failure to open either file (e.g., DD not allocated, VSAM cluster unavailable) will not be detected before processing begins, likely resulting in an abend (e.g., S013 or S106) rather than a controlled error message and graceful termination."
+      },
+      {
+        "category": "Audit and Completion Reporting",
+        "description": "A basic completion count is maintained via WS-TERM-COUNT, which is incremented only for SAN-TERMINATE actions and displayed at program end ('PRVSAN01: PROVIDERS TERMINATED=<count>'). There is no equivalent count or summary for suspended or reinstated providers, no error record count, and no abend or return code set on failure — downstream job scheduling cannot distinguish a successful run from one with widespread record-not-found or REWRITE errors."
+      }
+    ]
+  }
+}

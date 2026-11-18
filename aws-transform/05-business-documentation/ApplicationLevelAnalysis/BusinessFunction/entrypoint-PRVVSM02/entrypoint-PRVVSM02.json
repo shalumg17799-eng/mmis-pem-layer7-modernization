@@ -1,0 +1,69 @@
+{
+    "created_on": "2026-11-17",
+    "document_title": "PRVVSM02.jcl Batch Documentation",
+    "type": "entry_point",
+    "document_name": "PRVVSM02.jcl",
+    "summary": {
+        "overview": "This batch job initializes the MMIS Provider Screening and Sanctioning data stores by resetting and recreating two key files: the Screening Results file and the Sanction Master file. It ensures each processing cycle begins with clean, empty files, preventing carry-over of stale data from previous runs.",
+        "business_functions": [
+            "File Initialization - Removes any existing Screening Results and Sanction Master files to ensure a clean processing environment for the current cycle",
+            "Screening Results File Setup - Recreates the Screening Results data store, ready to capture outcomes of provider screening transactions against sanction records",
+            "Sanction Master File Setup - Recreates the Sanction Master reference data store, ready to be loaded with sanctioned provider entities used during the screening process"
+        ],
+        "environment_summary": {
+            "workload_type": "Batch",
+            "database_types": [
+                "VSAM"
+            ],
+            "integration_components": [
+                "N/A"
+            ],
+            "dataset_types": [
+                "VSAM KSDS"
+            ]
+        }
+    },
+    "functionality_flow": {
+        "PRVVSM02.jcl": [
+            {
+                "program_name": "IDCAMS",
+                "program_overview": "IBM system utility that deletes and recreates the VSAM Screening Results and Sanction Master data stores to initialize a clean environment for provider screening and sanctioning processing",
+                "called_programs": []
+            }
+        ]
+    },
+    "datasource_summary": [
+        {
+            "name": "Screening Results File (MMPRV.SCREEN.RESULTS.KSDS)",
+            "original_name": "MMPRV.SCREEN.RESULTS.KSDS",
+            "business_name": "Screening Results File",
+            "type": "VSAM_KSDS",
+            "function": "Stores screening result records used to capture and track the outcomes of customer or entity screening activities. The file is fully refreshed (deleted and recreated as empty) during the initialization process, making it ready to receive new screening results for each processing cycle.",
+            "used_by_programs": [
+                "PRVVSM02.jcl"
+            ],
+            "accessType": [
+                "DELETE",
+                "WRITE"
+            ]
+        },
+        {
+            "name": "Sanction Master File (MMPRV.SANCTION.MASTER.KSDS)",
+            "original_name": "MMPRV.SANCTION.MASTER.KSDS",
+            "business_name": "Sanction Master File",
+            "type": "VSAM_KSDS",
+            "function": "Stores sanction master records that define the reference data used for sanctions screening and compliance checks. The file is fully refreshed (deleted and recreated as empty) during the initialization process, preparing it to be loaded with the latest sanctions reference data for each processing cycle.",
+            "used_by_programs": [
+                "PRVVSM02.jcl"
+            ],
+            "accessType": [
+                "DELETE",
+                "WRITE"
+            ]
+        }
+    ],
+    "program_paths": {
+        "PRVVSM02.jcl": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM02.jcl"
+    },
+    "flow_diagram_code": "flowchart TD\n    IDCAMS[\"IBM system utility that deletes and recreates the VSAM Screening Results and Sanction Master data stores to initialize a clean environment for provider screening and sanctioning processing (IDCAMS) \"]\n"
+}

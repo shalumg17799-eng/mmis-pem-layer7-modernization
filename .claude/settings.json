@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(source-code/**)",
+      "Write(source-code/**)",
+      "Edit(_archive/**)",
+      "Write(_archive/**)",
+      "Edit(aws-transform/01-code-analysis/**)",
+      "Write(aws-transform/01-code-analysis/**)",
+      "Edit(aws-transform/02-data-analysis/**)",
+      "Write(aws-transform/02-data-analysis/**)",
+      "Edit(aws-transform/03-decomposition/**)",
+      "Write(aws-transform/03-decomposition/**)",
+      "Edit(aws-transform/04-documentation/**)",
+      "Write(aws-transform/04-documentation/**)",
+      "Edit(aws-transform/05-business-documentation/**)",
+      "Write(aws-transform/05-business-documentation/**)",
+      "Edit(aws-transform/06-test-plan/**)",
+      "Write(aws-transform/06-test-plan/**)",
+      "Edit(aws-transform/07-test-data-collection/**)",
+      "Write(aws-transform/07-test-data-collection/**)",
+      "Edit(aws-transform/08-smf-analysis/**)",
+      "Write(aws-transform/08-smf-analysis/**)",
+      "Read(.env)",
+      "Edit(.env)",
+      "Write(.env)"
+    ]
+  }
+}

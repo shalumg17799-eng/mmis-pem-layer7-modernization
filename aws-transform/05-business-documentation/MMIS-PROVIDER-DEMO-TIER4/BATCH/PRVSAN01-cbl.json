@@ -1,0 +1,1499 @@
+{
+    "name": "PRVSAN01.cbl",
+    "program_name": "PRVSAN01.cbl",
+    "generated_at": "2026-11-17T12:39:34Z",
+    "overview": {
+        "total_key_functionalities": 9,
+        "total_rules": 58,
+        "main_flow_diagram": "flowchart TD\n    A([Start: PRVSAN01 Provider Sanction Processing]):::start\n    B[Open Provider Master File & Sanction Input File]:::process\n    C{More Sanction\nRecords?}:::decision\n    D[1:Sanction Input Processing\nRead Next Sanction Record\nExtract NPI, Action Code,\nReason & Effective Date]:::process\n    E[2:Provider Lookup by NPI\nSearch Provider Master\nUsing NPI from Sanction Record]:::process\n    F{Provider\nFound?}:::decision\n    G[3:Provider Not Found Handling\nLog Unmatched NPI\nSkip Record]:::process\n    H{What is the\nSanction Action?}:::decision\n    I[4:Provider Termination\nUpdate Provider Status\nto Terminated\nIncrement Termination Counter]:::process\n    J[5:Provider Suspension\nUpdate Provider Status\nto Denied/Suspended\nBlock Claims & Services]:::process\n    K[6:Provider Reinstatement\nUpdate Provider Status\nto Active\nRestore Provider Eligibility]:::process\n    L[7:Provider Master Record Update\nPersist Updated Provider Status\nBack to Provider Master File]:::process\n    M[8:Sanction Notice Generation\nInvoke Appropriate Notice Program\nTRM / SUS / RST\nNotify Claims & MCO Systems]:::process\n    N{Notice Program\nFound?}:::decision\n    O[Notice Sent Successfully\nto Downstream Systems]:::process\n    P[Log: Notice Program\nNot Found - Skip Notice]:::process\n    Q[9:Termination Count Reporting\nDisplay Total Providers\nTerminated This Run]:::process\n    R([End: PRVSAN01 Processing Complete]):::final\n\n    SAN_FILE[(SANCTION-IN-FILE\nSequential Sanctions File)]:::datasource\n    PRV_FILE[(PRV-MASTER-FILE\nVSAM Provider Master)]:::datasource\n\n    A --> B\n    B --> C\n    SAN_FILE -.->|Read Sequentially| D\n    C -->|Yes - Records Remain| D\n    D --> E\n    PRV_FILE -.->|Lookup by NPI Key| E\n    E --> F\n    F -->|No - NPI Not Found| G\n    G --> C\n    F -->|Yes - Provider Found| H\n    H -->|Terminate| I\n    H -->|Suspend| J\n    H -->|Reinstate| K\n    I --> L\n    J --> L\n    K --> L\n    L -.->|Rewrite Updated Record| PRV_FILE\n    L --> M\n    M --> N\n    N -->|Yes - Program Found| O\n    N -->|No - Program Missing| P\n    O --> C\n    P --> C\n    C -->|No - End of File| Q\n    Q --> R\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313\n\n    class O success\n    class P error\n    class G error",
+        "rules": [
+            {
+                "rule_id": "R-PRVSAN01-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "Sequential Sanction Record Reading",
+                "rule_description": "The system reads each sanction record sequentially from the Sanction Input File, extracting the provider NPI and sanction action type for processing.",
+                "sub_graph_node_text": "1:Sanction Input Processing\nRead Next Sanction Record\nExtract NPI, Action Code,\nReason & Effective Date",
+                "acceptance_criteria": {
+                    "Given": "The Sanction Input File is open and contains one or more sanction records, each carrying a provider NPI and a sanction action type (Terminate, Suspend, or Reinstate)",
+                    "When": "The system reads the next available sanction record from the Sanction Input File",
+                    "Then": "The provider NPI and sanction action type are extracted from the record and made available for provider lookup and sanction processing; if no more records exist, the end-of-file condition is set and processing loop terminates"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00002",
+                "rule_type": "Validation Rules",
+                "rule_name": "Provider Lookup by NPI",
+                "rule_description": "Before applying any sanction, the system must locate the provider in the Provider Master File using the NPI extracted from the sanction record.",
+                "sub_graph_node_text": "2:Provider Lookup by NPI\nSearch Provider Master\nUsing NPI from Sanction Record",
+                "acceptance_criteria": {
+                    "Given": "A sanction record has been successfully read and the provider NPI has been extracted from the sanction record",
+                    "When": "The system searches the Provider Master File using the NPI from the sanction record as the lookup key",
+                    "Then": "If the provider is found in the Provider Master File, the provider's master record is retrieved and made available for sanction application; if the provider is not found, the not-found handling process is triggered"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00003",
+                "rule_type": "Validation Rules",
+                "rule_name": "Unmatched Provider NPI Handling",
+                "rule_description": "When a sanction record references an NPI that does not exist in the Provider Master File, the record is skipped and a warning is logged. No status update or notice is generated.",
+                "sub_graph_node_text": "3:Provider Not Found Handling\nLog Unmatched NPI\nSkip Record",
+                "acceptance_criteria": {
+                    "Given": "A sanction record has been read from the Sanction Input File containing a provider NPI",
+                    "When": "The system searches the Provider Master File and the NPI from the sanction record is not found",
+                    "Then": "The system logs a warning message 'PRVSAN01: NPI NOT FOUND' along with the unmatched NPI value; no provider status update is performed; no sanction notice is generated; and processing continues with the next sanction record"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00004",
+                "rule_type": "Decision Rules",
+                "rule_name": "Provider Termination Status Update",
+                "rule_description": "When a sanction action is of type Terminate, the provider's status is updated to Terminated in the Provider Master File and the termination counter is incremented.",
+                "sub_graph_node_text": "4:Provider Termination\nUpdate Provider Status\nto Terminated\nIncrement Termination Counter",
+                "acceptance_criteria": {
+                    "Given": "A sanction record has been read, the provider NPI has been found in the Provider Master File, and the sanction action type is Terminate",
+                    "When": "The system applies the termination sanction to the provider's master record",
+                    "Then": "The provider's status in the Provider Master File is set to Terminated; the running count of terminated providers for this processing run is incremented by 1"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00005",
+                "rule_type": "Decision Rules",
+                "rule_name": "Provider Suspension Status Update",
+                "rule_description": "When a sanction action is of type Suspend, the provider's status is updated to Denied in the Provider Master File, effectively blocking the provider from active participation.",
+                "sub_graph_node_text": "5:Provider Suspension\nUpdate Provider Status\nto Denied/Suspended\nBlock Claims & Services",
+                "acceptance_criteria": {
+                    "Given": "A sanction record has been read, the provider NPI has been found in the Provider Master File, and the sanction action type is Suspend",
+                    "When": "The system applies the suspension sanction to the provider's master record",
+                    "Then": "The provider's status in the Provider Master File is set to Denied/Suspended; the provider is no longer considered active; the termination counter is not incremented"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00006",
+                "rule_type": "Decision Rules",
+                "rule_name": "Provider Reinstatement Status Restoration",
+                "rule_description": "When a sanction action is of type Reinstate, the provider's status is restored to Active in the Provider Master File, reversing any prior suspension or termination.",
+                "sub_graph_node_text": "6:Provider Reinstatement\nUpdate Provider Status\nto Active\nRestore Provider Eligibility",
+                "acceptance_criteria": {
+                    "Given": "A sanction record has been read, the provider NPI has been found in the Provider Master File, and the sanction action type is Reinstate",
+                    "When": "The system applies the reinstatement sanction to the provider's master record",
+                    "Then": "The provider's status in the Provider Master File is set to Active; the provider's eligibility to participate is fully restored; the termination counter is not incremented"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00007",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Master Record Persistence After Sanction",
+                "rule_description": "After any sanction action (Terminate, Suspend, or Reinstate) is applied to a provider's record, the updated record must be immediately saved back to the Provider Master File.",
+                "sub_graph_node_text": "7:Provider Master Record Update\nPersist Updated Provider Status\nBack to Provider Master File",
+                "acceptance_criteria": {
+                    "Given": "A sanction action (Terminate, Suspend, or Reinstate) has been applied to a provider's master record and the provider's status field has been updated in memory",
+                    "When": "The system completes the status update for the provider",
+                    "Then": "The updated provider master record is written back to the Provider Master File, persisting the new status; this occurs for every successfully applied sanction regardless of sanction type"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00008",
+                "rule_type": "Action Rules",
+                "rule_name": "Sanction Notice Program Selection and Invocation",
+                "rule_description": "After a provider's status is updated, the system dynamically selects and invokes the appropriate notice program based on the sanction action type, passing the full provider master record to the notice program.",
+                "sub_graph_node_text": "8:Sanction Notice Generation\nInvoke Appropriate Notice Program\nTRM / SUS / RST\nNotify Claims & MCO Systems",
+                "acceptance_criteria": {
+                    "Given": "A provider's master record has been successfully updated with a sanction action and saved to the Provider Master File",
+                    "When": "The system determines the appropriate notice program to invoke based on the sanction action type: Terminate maps to suffix 'TRM', Suspend maps to suffix 'SUS', Reinstate maps to suffix 'RST', and any other action maps to suffix 'GEN'; the notice program name is constructed by combining the standard notice prefix with the determined suffix",
+                    "Then": "The dynamically constructed notice program is invoked with the full provider master record as input so that downstream systems (Claims, MCO) are notified of the provider status change"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00009",
+                "rule_type": "Process Rules",
+                "rule_name": "Notice Program Not Found Handling",
+                "rule_description": "If the dynamically constructed notice program cannot be found or invoked, a warning is logged and processing continues without stopping. The provider status update already saved is not reversed.",
+                "sub_graph_node_text": "Notice Sent Successfully\nto Downstream Systems / Log: Notice Program\nNot Found - Skip Notice",
+                "acceptance_criteria": {
+                    "Given": "The system has constructed a notice program name and attempted to invoke it with the provider master record",
+                    "When": "The notice program cannot be found or is unavailable for execution",
+                    "Then": "The system logs a warning message 'PRVSAN01: NOTICE PGM NOT FOUND' along with the name of the missing notice program; the provider status update that was already saved to the Provider Master File is retained and not rolled back; processing continues with the next sanction record"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSAN01-cbl-00010",
+                "rule_type": "Computation Rules",
+                "rule_name": "Termination Count Summary Reporting",
+                "rule_description": "At the end of the processing run, the system reports the total number of providers that were terminated during this execution.",
+                "sub_graph_node_text": "9:Termination Count Reporting\nDisplay Total Providers\nTerminated This Run",
+                "acceptance_criteria": {
+                    "Given": "All sanction records in the Sanction Input File have been processed and the end-of-file condition has been reached",
+                    "When": "The system completes the sanction processing loop and closes all files",
+                    "Then": "The system displays the summary message 'PRVSAN01: PROVIDERS TERMINATED=' followed by the total count of providers whose status was set to Terminated during this processing run; only Terminate actions contribute to this count, not Suspend or Reinstate actions"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "sanction-input-processing",
+            "title": "Sanction Input Processing",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Sanction Input Processing])\n    B[Read Next Record\\nfrom Sanctions Input File]\n    C{End of\\nSanctions File?}\n    D[Extract Sanction Record Details:\\n- Provider NPI\\n- Action Code\\n  Terminate / Suspend / Reinstate\\n- Reason\\n- Effective Date]\n    E{Validate\\nAction Code}\n    F[Action Code: TERMINATE\\nProvider to be Terminated]\n    G[Action Code: SUSPEND\\nProvider to be Suspended]\n    H[Action Code: REINSTATE\\nProvider to be Reinstated]\n    I([End: All Sanction\\nRecords Processed])\n    J([Pass Record for\\nProvider Lookup & Update])\n\n    A --> B\n    B --> C\n    C -->|Yes - No More Records| I\n    C -->|No - Record Available| D\n    D --> E\n    E -->|Terminate| F\n    E -->|Suspend| G\n    E -->|Reinstate| H\n    F --> J\n    G --> J\n    H --> J",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00011",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Sequential Processing of Sanction Input Records",
+                    "rule_description": "The system must read and process each sanction record one at a time from the Sanctions Input File in sequential order, continuing until all records have been processed.",
+                    "sub_graph_node_text": "Read Next Record from Sanctions Input File",
+                    "acceptance_criteria": {
+                        "Given": "The Sanctions Input File is open and contains one or more sanction records pending processing",
+                        "When": "The system is ready to process the next sanction action",
+                        "Then": "The system reads the next available sanction record sequentially from the Sanctions Input File and makes it available for further processing; this cycle repeats for every record in the file until no more records remain"
+                    },
+                    "key_functionality_id": "sanction-input-processing"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00012",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Detect End of Sanctions File and Stop Processing",
+                    "rule_description": "When all sanction records have been read from the Sanctions Input File, the system must recognize the end-of-file condition and stop the sanction processing loop, proceeding to final reporting.",
+                    "sub_graph_node_text": "End of Sanctions File?",
+                    "acceptance_criteria": {
+                        "Given": "The system is reading records sequentially from the Sanctions Input File",
+                        "When": "The system attempts to read the next record and the Sanctions Input File signals that there are no more records (end-of-file condition is detected)",
+                        "Then": "The system sets the end-of-file indicator to TRUE, exits the sanction processing loop, closes both the Sanctions Input File and the Provider Master File, displays the total count of terminated providers, and ends the program run"
+                    },
+                    "key_functionality_id": "sanction-input-processing"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00013",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Extract Provider NPI from Sanction Record",
+                    "rule_description": "When a sanction record is successfully read, the system must extract the Provider NPI from the sanction record to identify which provider the sanction action applies to, enabling the subsequent lookup of that provider in the Provider Master File.",
+                    "sub_graph_node_text": "Extract Sanction Record Details:\n- Provider NPI\n- Action Code\n  Terminate / Suspend / Reinstate\n- Reason\n- Effective Date",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been successfully read from the Sanctions Input File and the end-of-file condition has not been reached",
+                        "When": "The system extracts the details from the sanction record",
+                        "Then": "The system extracts the Provider NPI (National Provider Identifier) from the sanction record and uses it as the key to locate the corresponding provider record in the Provider Master File for subsequent status update"
+                    },
+                    "key_functionality_id": "sanction-input-processing"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00014",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Validate Sanction Action Code as TERMINATE",
+                    "rule_description": "The system must evaluate the action code on each sanction record to determine the appropriate provider status change. When the action code is TERMINATE, the system identifies the provider as subject to termination.",
+                    "sub_graph_node_text": "Validate Action Code",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read and the corresponding provider has been located in the Provider Master File",
+                        "When": "The system evaluates the action code on the sanction record and the action code is TERMINATE",
+                        "Then": "The system identifies the sanction action as a termination, sets the provider's status to TERMINATED in the Provider Master File, increments the termination counter by 1, saves the updated provider record, and proceeds to generate a termination notice"
+                    },
+                    "key_functionality_id": "sanction-input-processing"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00015",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Validate Sanction Action Code as SUSPEND",
+                    "rule_description": "The system must evaluate the action code on each sanction record to determine the appropriate provider status change. When the action code is SUSPEND, the system identifies the provider as subject to suspension.",
+                    "sub_graph_node_text": "Action Code: SUSPEND\nProvider to be Suspended",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read and the corresponding provider has been located in the Provider Master File",
+                        "When": "The system evaluates the action code on the sanction record and the action code is SUSPEND",
+                        "Then": "The system identifies the sanction action as a suspension, sets the provider's status to DENIED in the Provider Master File, saves the updated provider record, and proceeds to generate a suspension notice"
+                    },
+                    "key_functionality_id": "sanction-input-processing"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00016",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Validate Sanction Action Code as REINSTATE",
+                    "rule_description": "The system must evaluate the action code on each sanction record to determine the appropriate provider status change. When the action code is REINSTATE, the system identifies the provider as subject to reinstatement.",
+                    "sub_graph_node_text": "Action Code: REINSTATE\nProvider to be Reinstated",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read and the corresponding provider has been located in the Provider Master File",
+                        "When": "The system evaluates the action code on the sanction record and the action code is REINSTATE",
+                        "Then": "The system identifies the sanction action as a reinstatement, sets the provider's status back to ACTIVE in the Provider Master File, saves the updated provider record, and proceeds to generate a reinstatement notice"
+                    },
+                    "key_functionality_id": "sanction-input-processing"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00017",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Pass Validated Sanction Record for Provider Lookup and Status Update",
+                    "rule_description": "After the Provider NPI is extracted from a sanction record, the system must use that NPI to look up the provider in the Provider Master File. Only providers found in the Provider Master File are eligible to have a sanction applied; unrecognized providers are skipped with a warning.",
+                    "sub_graph_node_text": "Pass Record for Provider Lookup & Update",
+                    "acceptance_criteria": {
+                        "Given": "The Provider NPI has been extracted from the sanction record and is ready for lookup",
+                        "When": "The system attempts to locate the provider in the Provider Master File using the extracted NPI as the search key",
+                        "Then": "If the provider is found in the Provider Master File, the system proceeds to apply the sanction action (Terminate, Suspend, or Reinstate) and update the provider's status; if the provider is NOT found in the Provider Master File, the system logs a warning message identifying the unrecognized NPI, skips the sanction application and notice generation for that record, and continues to the next sanction record"
+                    },
+                    "key_functionality_id": "sanction-input-processing"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Sanction Input Processing"
+        },
+        {
+            "id": "provider-lookup-by-npi",
+            "title": "Provider Lookup by NPI",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Lookup by NPI])\n    B[Extract NPI from\\nSanction Record]\n    C[Use NPI as Search Key\\nto Query Provider Master File]\n    D{Provider Record\\nFound in\\nMaster File?}\n    E[Retrieve Provider's\\nCurrent Record with\\nExisting Status Details]\n    F[Provider Record\\nReady for\\nSanction Status Update]\n    G[Provider NPI\\nNot Found in\\nMaster File]\n    H([End: Route to\\nApply Sanction])\n    I([End: Route to\\nNot Found Handling])\n\n    A --> B\n    B --> C\n    C --> D\n    D -->|Yes - Provider Exists| E\n    E --> F\n    F --> H\n    D -->|No - Provider Missing| G\n    G --> I",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00018",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Extract NPI from Sanction Record as Provider Lookup Key",
+                    "rule_description": "The National Provider Identifier (NPI) present in the incoming sanction record must be extracted and used as the unique search key to locate the corresponding provider in the Provider Master File before any sanction can be applied.",
+                    "sub_graph_node_text": "Extract NPI from Sanction Record",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been successfully read from the Sanction Input File and contains a National Provider Identifier (NPI)",
+                        "When": "The system prepares to look up the provider in the Provider Master File",
+                        "Then": "The NPI value from the sanction record is set as the search key to query the Provider Master File, ensuring the correct provider record is targeted for retrieval"
+                    },
+                    "key_functionality_id": "provider-lookup-by-npi"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00019",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Query Provider Master File Using NPI",
+                    "rule_description": "The system must search the Provider Master File using the NPI extracted from the sanction record to retrieve the provider's current record, including their existing enrollment status, prior to applying any sanction action.",
+                    "sub_graph_node_text": "Use NPI as Search Key to Query Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The NPI from the sanction record has been set as the search key",
+                        "When": "The system queries the Provider Master File using that NPI",
+                        "Then": "The Provider Master File is searched for a matching provider record using the NPI as the unique identifier, and the result determines whether processing continues with a sanction update or routes to not-found handling"
+                    },
+                    "key_functionality_id": "provider-lookup-by-npi"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00020",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Route to Sanction Processing When Provider Record is Found",
+                    "rule_description": "When the Provider Master File lookup using the NPI is successful and the provider record exists, the system must retrieve the provider's current record with all existing status details and route processing to apply the sanction action.",
+                    "sub_graph_node_text": "Provider Record Found in Master File?",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File has been queried using the NPI from the sanction record",
+                        "When": "A matching provider record is found in the Provider Master File",
+                        "Then": "The provider's current record including existing enrollment status details is retrieved and made available, and processing is routed to the Apply Sanction step to update the provider's status"
+                    },
+                    "key_functionality_id": "provider-lookup-by-npi"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00021",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Log Warning and Skip Processing When Provider NPI is Not Found",
+                    "rule_description": "When the Provider Master File lookup fails to find a provider matching the NPI from the sanction record, the system must log a warning message identifying the unrecognized NPI and skip all further processing for that sanction record \u2014 no status update and no notice generation will occur.",
+                    "sub_graph_node_text": "Provider NPI Not Found in Master File",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File has been queried using the NPI from the sanction record",
+                        "When": "No matching provider record is found in the Provider Master File for the given NPI",
+                        "Then": "A warning message is logged stating 'NPI NOT FOUND' along with the specific NPI value from the sanction record, no provider status update is performed, no notice is generated, and processing moves on to the next sanction record"
+                    },
+                    "key_functionality_id": "provider-lookup-by-npi"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Lookup by NPI"
+        },
+        {
+            "id": "provider-not-found-handling",
+            "title": "Provider Not Found Handling",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Lookup Result Received])\n    B{Was Provider\\nFound in\\nProvider Master?}\n    C[Retrieve Provider Record\\nfor Sanction Processing]\n    D[Log Unmatched NPI\\nPRVSAN01: NPI NOT FOUND\\nRecord the Unresolved NPI Value]\n    E[Skip All Sanction Actions\\nfor This Record\\nNo Status Update\\nNo Notice Generated]\n    F([Return: Read Next\\nSanction Record])\n\n    A --> B\n    B -->|Yes - Provider Exists| C\n    B -->|No - Provider Not Found| D\n    C --> F\n    D --> E\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00022",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Provider Existence Validation Before Sanction Processing",
+                    "rule_description": "Before applying any sanction action, the system must verify that the provider identified by the NPI in the sanction record exists in the Provider Master File. Only providers that are found in the master file are eligible for sanction processing.",
+                    "sub_graph_node_text": "Was Provider Found in Provider Master?",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read from the Sanction Input File containing a provider NPI",
+                        "When": "The system attempts to look up the provider NPI in the Provider Master File",
+                        "Then": "If the provider NPI is found in the Provider Master File, the provider record is retrieved and made available for sanction processing; if the provider NPI is not found, all sanction actions for that record are skipped including no status update and no notice generation"
+                    },
+                    "key_functionality_id": "provider-not-found-handling"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00023",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Unmatched Provider NPI Warning Log",
+                    "rule_description": "When a provider NPI from the sanction input file cannot be matched to any record in the Provider Master File, the system must log a warning message that identifies the unresolved NPI value so that it can be investigated and resolved.",
+                    "sub_graph_node_text": "Log Unmatched NPI PRVSAN01: NPI NOT FOUND Record the Unresolved NPI Value",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read from the Sanction Input File containing a provider NPI",
+                        "When": "The provider NPI lookup in the Provider Master File returns no matching record",
+                        "Then": "The system logs a warning message in the format 'PRVSAN01: NPI NOT FOUND' followed by the specific NPI value from the sanction record that could not be matched"
+                    },
+                    "key_functionality_id": "provider-not-found-handling"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00024",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Skip Sanction Processing for Unmatched Provider",
+                    "rule_description": "When a provider NPI from the sanction input cannot be found in the Provider Master File, no sanction actions of any kind are performed for that record. This means the provider status is not changed and no notice is generated, ensuring that sanctions are only applied to verified, existing providers.",
+                    "sub_graph_node_text": "Skip All Sanction Actions for This Record No Status Update No Notice Generated",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read from the Sanction Input File and the provider NPI has been looked up in the Provider Master File",
+                        "When": "The provider NPI is not found in the Provider Master File",
+                        "Then": "The system does not update any provider status in the Provider Master File, does not generate or send any notice for that sanction record, and proceeds directly to read the next sanction record from the Sanction Input File"
+                    },
+                    "key_functionality_id": "provider-not-found-handling"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Not Found Handling"
+        },
+        {
+            "id": "provider-termination",
+            "title": "Provider Termination",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Sanction Action Identified\\nas TERMINATE])\n    B[Update Provider Status\\nto Terminated in\\nProvider Master Record]\n    C[Increment Termination\\nCounter by 1]\n    D[Save Updated Provider\\nRecord to Provider Master]\n    E([Proceed to\\nNotice Generation])\n\n    PRV_FILE[(PRV-MASTER-FILE\\nVSAM Provider Master)]\n\n    A --> B\n    B --> C\n    C --> D\n    D -.->|Rewrite Terminated\\nProvider Record| PRV_FILE\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00025",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Termination Sanction Action",
+                    "rule_description": "When processing a sanction record, the system must evaluate the sanction action type and route to termination processing only when the action is explicitly identified as TERMINATE.",
+                    "sub_graph_node_text": "Sanction Action Identified as TERMINATE",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read from the Sanction Input File and the corresponding provider has been found in the Provider Master File",
+                        "When": "The sanction action type on the sanction record is TERMINATE",
+                        "Then": "The system identifies this as a termination action and proceeds to update the provider's status to Terminated in the Provider Master Record"
+                    },
+                    "key_functionality_id": "provider-termination"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00026",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Update Provider Status to Terminated",
+                    "rule_description": "When a sanction action is identified as TERMINATE, the provider's enrollment status in the Provider Master Record must be changed to Terminated, effectively ending the provider's active participation.",
+                    "sub_graph_node_text": "Update Provider Status to Terminated in Provider Master Record",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record with action type TERMINATE has been matched to an existing provider in the Provider Master File using the provider's NPI",
+                        "When": "The termination sanction is being applied to the provider's master record",
+                        "Then": "The provider's status field in the Provider Master Record is set to TERMINATED, overriding any prior status (Active, Denied, or otherwise)"
+                    },
+                    "key_functionality_id": "provider-termination"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00027",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Increment Termination Counter for Each Terminated Provider",
+                    "rule_description": "Each time a provider is successfully terminated during the sanction processing run, the program's running count of terminated providers must be incremented by exactly 1 to support end-of-run reporting.",
+                    "sub_graph_node_text": "Increment Termination Counter by 1",
+                    "acceptance_criteria": {
+                        "Given": "A provider's status has just been set to Terminated in the Provider Master Record as a result of a TERMINATE sanction action",
+                        "When": "The termination status update is applied",
+                        "Then": "The termination counter is increased by exactly 1, accumulating the total number of providers terminated during the current processing run"
+                    },
+                    "key_functionality_id": "provider-termination"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00028",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Persist Terminated Provider Status to Provider Master File",
+                    "rule_description": "After the provider's status has been updated to Terminated and the termination counter has been incremented, the updated Provider Master Record must be permanently saved back to the Provider Master File to ensure the termination is recorded.",
+                    "sub_graph_node_text": "Save Updated Provider Record to Provider Master",
+                    "acceptance_criteria": {
+                        "Given": "The provider's status in the in-memory Provider Master Record has been set to Terminated and the termination counter has been incremented",
+                        "When": "The sanction update for the current provider is complete",
+                        "Then": "The updated Provider Master Record \u2014 containing the new Terminated status \u2014 is written back to and permanently stored in the Provider Master File, replacing the previous record for that provider NPI"
+                    },
+                    "key_functionality_id": "provider-termination"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Termination"
+        },
+        {
+            "id": "provider-suspension",
+            "title": "Provider Suspension",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Suspension Process])\n    B{Is Sanction\\nAction = Suspend?}\n    C[Set Provider Status\\nto Denied/Suspended\\nin Provider Master Record]\n    D[(PRV-MASTER-FILE\\nVSAM Provider Master)]\n    E[Save Updated Provider Status\\nto Provider Master File]\n    F[Provider is Now Blocked\\nfrom Receiving Claims\\nor Services]\n    G[Invoke Suspension\\nNotice Program - SUS\\nNotify Downstream Systems]\n    H([End: Provider Suspension Complete])\n    Z([Skip - Not a\\nSuspension Action])\n\n    A --> B\n    B -->|Yes - Suspend Action| C\n    B -->|No - Other Action| Z\n    C --> E\n    E -.->|Rewrite Record| D\n    E --> F\n    F --> G\n    G --> H",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00029",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Suspension Sanction Action",
+                    "rule_description": "Determine whether the current sanction record carries a Suspend action, which triggers the provider suspension workflow.",
+                    "sub_graph_node_text": "Is Sanction Action = Suspend?",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read from the Sanction Input File and the corresponding provider has been located in the Provider Master File",
+                        "When": "The sanction action on the record is evaluated",
+                        "Then": "If the sanction action is Suspend, the provider suspension process is initiated; if the sanction action is any other type (Terminate or Reinstate), the suspension process is skipped and the appropriate alternative action is taken instead"
+                    },
+                    "key_functionality_id": "provider-suspension"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00030",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Set Provider Status to Denied/Suspended",
+                    "rule_description": "When a Suspend sanction action is identified, the provider's status in the Provider Master Record must be updated to Denied, effectively blocking the provider from receiving claims or services.",
+                    "sub_graph_node_text": "Set Provider Status to Denied/Suspended in Provider Master Record",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record with a Suspend action has been matched to an existing provider in the Provider Master File",
+                        "When": "The Suspend sanction action is confirmed",
+                        "Then": "The provider's status field in the Provider Master Record is set to Denied/Suspended, marking the provider as ineligible to receive claims or services"
+                    },
+                    "key_functionality_id": "provider-suspension"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00031",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Save Updated Provider Suspension Status to Provider Master File",
+                    "rule_description": "After the provider's status has been set to Denied/Suspended in memory, the updated record must be immediately persisted back to the Provider Master File to ensure the change is recorded and effective.",
+                    "sub_graph_node_text": "Save Updated Provider Status to Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The provider's status in the Provider Master Record has been updated to Denied/Suspended",
+                        "When": "The sanction update has been applied to the in-memory provider record",
+                        "Then": "The updated Provider Master Record is written back and saved to the Provider Master File, making the suspension status permanent and visible to downstream systems"
+                    },
+                    "key_functionality_id": "provider-suspension"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00032",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Invoke Suspension Notice Program to Notify Downstream Systems",
+                    "rule_description": "After a provider's suspension status has been saved, a dedicated Suspension Notice Program must be called to generate and dispatch a suspension notice, ensuring the provider and relevant downstream systems are informed of the suspension.",
+                    "sub_graph_node_text": "Invoke Suspension Notice Program - SUS Notify Downstream Systems",
+                    "acceptance_criteria": {
+                        "Given": "The provider's status has been successfully updated to Denied/Suspended and saved to the Provider Master File",
+                        "When": "The suspension sanction action has been fully applied and persisted",
+                        "Then": "The system dynamically builds the Suspension Notice Program name by combining the standard notice prefix with the suffix 'SUS', calls that notice program passing the full Provider Master Record, and if the notice program cannot be found or executed, a warning is logged identifying the missing program name, but processing continues without interruption"
+                    },
+                    "key_functionality_id": "provider-suspension"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Suspension"
+        },
+        {
+            "id": "provider-reinstatement",
+            "title": "Provider Reinstatement",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Reinstatement])\n    B{Sanction Action\\nis Reinstate?}\n    C[Set Provider Status\\nto ACTIVE in\\nProvider Master Record]\n    D[Save Updated Provider\\nStatus to Provider\\nMaster File]\n    E[Select Reinstatement\\nNotice Program - RST]\n    F[Invoke Reinstatement\\nNotice Program\\nPassing Provider Details]\n    G{Notice Program\\nSuccessfully Invoked?}\n    H[Send Reinstatement\\nNotifications to\\nClaims & MCO Systems]\n    I[Log: Reinstatement\\nNotice Program\\nNot Available]\n    J([End: Provider\\nEligibility Restored])\n    PRV_FILE[(PRV-MASTER-FILE\\nVSAM Provider Master)]\n\n    A --> B\n    B -->|Yes - Reinstate Action| C\n    B -->|No - Other Action| J\n    C --> D\n    D -.->|Persist Active Status| PRV_FILE\n    D --> E\n    E --> F\n    F --> G\n    G -->|Yes - Program Found| H\n    G -->|No - Program Missing| I\n    H --> J\n    I --> J",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00033",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Reinstatement Sanction Action",
+                    "rule_description": "Determines whether the current sanction record carries a Reinstate action, which triggers the provider eligibility restoration workflow.",
+                    "sub_graph_node_text": "Sanction Action is Reinstate?",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read from the Sanction Input File and the provider NPI has been successfully located in the Provider Master File",
+                        "When": "The sanction action type on the sanction record is evaluated",
+                        "Then": "If the sanction action is Reinstate, the provider reinstatement workflow is initiated; if the sanction action is any other type (Terminate or Suspend), the reinstatement workflow is bypassed and the appropriate alternate sanction workflow is followed instead"
+                    },
+                    "key_functionality_id": "provider-reinstatement"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00034",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Restore Provider Status to Active on Reinstatement",
+                    "rule_description": "When a Reinstate sanction action is identified, the provider's status in the Provider Master Record must be updated to Active, restoring the provider's eligibility to participate.",
+                    "sub_graph_node_text": "Set Provider Status to ACTIVE in Provider Master Record",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record with a Reinstate action has been matched to an existing provider in the Provider Master File",
+                        "When": "The Reinstate sanction action is applied to the provider's master record",
+                        "Then": "The provider's status field in the Provider Master Record is set to ACTIVE, overriding any prior Terminated or Denied status and restoring the provider's eligibility"
+                    },
+                    "key_functionality_id": "provider-reinstatement"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00035",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Persist Reinstated Provider Status to Provider Master File",
+                    "rule_description": "After the provider's status has been updated to Active in memory, the updated record must be immediately saved back to the Provider Master File to make the reinstatement permanent and visible across systems.",
+                    "sub_graph_node_text": "Save Updated Provider Status to Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The provider's status in the Provider Master Record has been set to ACTIVE following a Reinstate sanction action",
+                        "When": "The updated provider master record is written back to the Provider Master File",
+                        "Then": "The Provider Master File is updated with the provider's new Active status, and the reinstatement is permanently recorded; the updated record reflects the restored eligibility of the provider"
+                    },
+                    "key_functionality_id": "provider-reinstatement"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00036",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Select Reinstatement Notice Program Using RST Suffix",
+                    "rule_description": "For a Reinstate sanction action, the system must identify the correct notice program by assigning the suffix 'RST' and combining it with the standard notice program prefix to form the full notice program name.",
+                    "sub_graph_node_text": "Select Reinstatement Notice Program - RST",
+                    "acceptance_criteria": {
+                        "Given": "A Reinstate sanction action has been successfully applied and the provider's status has been saved as Active in the Provider Master File",
+                        "When": "The notice program name is being constructed for the reinstatement notification",
+                        "Then": "The notice suffix 'RST' is selected and combined with the standard notice program prefix to form the complete reinstatement notice program name; for Terminate actions the suffix is 'TRM', for Suspend actions the suffix is 'SUS', and for any other unrecognized action the suffix defaults to 'GEN'"
+                    },
+                    "key_functionality_id": "provider-reinstatement"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00037",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Invoke Reinstatement Notice Program with Provider Details",
+                    "rule_description": "The dynamically constructed reinstatement notice program must be called and passed the full provider master record so that the notice program can use provider details to generate and send reinstatement notifications.",
+                    "sub_graph_node_text": "Invoke Reinstatement Notice Program Passing Provider Details",
+                    "acceptance_criteria": {
+                        "Given": "The reinstatement notice program name has been constructed using the 'RST' suffix combined with the standard notice program prefix",
+                        "When": "The reinstatement notice program is invoked",
+                        "Then": "The system calls the constructed notice program and passes the complete Provider Master Record (including provider NPI, status, and all provider details) to the notice program so it can generate the appropriate reinstatement notification"
+                    },
+                    "key_functionality_id": "provider-reinstatement"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00038",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Log Warning When Reinstatement Notice Program Is Not Available",
+                    "rule_description": "If the reinstatement notice program cannot be found or invoked, the system must log a warning identifying the missing program name. Processing must continue without interruption \u2014 the provider's Active status update is not reversed.",
+                    "sub_graph_node_text": "Log: Reinstatement Notice Program Not Available",
+                    "acceptance_criteria": {
+                        "Given": "The reinstatement notice program has been constructed and an attempt has been made to invoke it with the provider's master record",
+                        "When": "The notice program cannot be found or successfully invoked",
+                        "Then": "A warning message is logged displaying 'PRVSAN01: NOTICE PGM NOT FOUND' along with the name of the notice program that could not be found; the provider's Active status update already saved to the Provider Master File is retained and not reversed; processing continues to the next sanction record"
+                    },
+                    "key_functionality_id": "provider-reinstatement"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00039",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Send Reinstatement Notifications Upon Successful Notice Program Invocation",
+                    "rule_description": "When the reinstatement notice program is successfully invoked with the provider's details, the notice program is responsible for generating and sending reinstatement notifications, completing the provider eligibility restoration process.",
+                    "sub_graph_node_text": "Send Reinstatement Notifications to Claims & MCO Systems",
+                    "acceptance_criteria": {
+                        "Given": "The reinstatement notice program has been successfully found and invoked with the complete Provider Master Record",
+                        "When": "The reinstatement notice program executes using the provider details passed to it",
+                        "Then": "The reinstatement notice program generates and sends the appropriate reinstatement notifications using the provider details from the Provider Master Record, completing the provider eligibility restoration process"
+                    },
+                    "key_functionality_id": "provider-reinstatement"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Reinstatement"
+        },
+        {
+            "id": "provider-master-record-update",
+            "title": "Provider Master Record Update",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Master Record Update])\n    B{Which Sanction\\nAction Was Applied?}\n    C[Provider Status Set\\nto Terminated]\n    D[Provider Status Set\\nto Denied/Suspended]\n    E[Provider Status Set\\nto Active]\n    F[Write Updated Provider Record\\nBack to Provider Master File]\n    G{Update\\nSuccessful?}\n    H([Proceed to\\nSanction Notice Generation])\n    I[Log: Provider Master\\nUpdate Failed for NPI]\n\n    A --> B\n    B -->|Terminate Action| C\n    B -->|Suspend Action| D\n    B -->|Reinstate Action| E\n    C --> F\n    D --> F\n    E --> F\n    F --> G\n    G -->|Yes| H\n    G -->|No| I",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00040",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Set Provider Status to Terminated When Terminate Sanction is Applied",
+                    "rule_description": "When a sanction action of type Terminate is applied to a provider, the provider's status in the Provider Master record must be updated to Terminated before the record is persisted.",
+                    "sub_graph_node_text": "Provider Status Set to Terminated",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been located in the Provider Master File using the NPI from the sanction input record, and the sanction action type is Terminate",
+                        "When": "The system evaluates the sanction action type and identifies it as a Terminate action",
+                        "Then": "The provider's status on the Provider Master Record is set to Terminated"
+                    },
+                    "key_functionality_id": "provider-master-record-update"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00041",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Set Provider Status to Denied/Suspended When Suspend Sanction is Applied",
+                    "rule_description": "When a sanction action of type Suspend is applied to a provider, the provider's status in the Provider Master record must be updated to Denied before the record is persisted.",
+                    "sub_graph_node_text": "Provider Status Set to Denied/Suspended",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been located in the Provider Master File using the NPI from the sanction input record, and the sanction action type is Suspend",
+                        "When": "The system evaluates the sanction action type and identifies it as a Suspend action",
+                        "Then": "The provider's status on the Provider Master Record is set to Denied (Suspended)"
+                    },
+                    "key_functionality_id": "provider-master-record-update"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00042",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Set Provider Status to Active When Reinstate Sanction is Applied",
+                    "rule_description": "When a sanction action of type Reinstate is applied to a provider, the provider's status in the Provider Master record must be restored to Active before the record is persisted.",
+                    "sub_graph_node_text": "Provider Status Set to Active",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been located in the Provider Master File using the NPI from the sanction input record, and the sanction action type is Reinstate",
+                        "When": "The system evaluates the sanction action type and identifies it as a Reinstate action",
+                        "Then": "The provider's status on the Provider Master Record is set to Active"
+                    },
+                    "key_functionality_id": "provider-master-record-update"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00043",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Persist Updated Provider Status to Provider Master File",
+                    "rule_description": "After the provider's status has been updated in memory based on the sanction action (Terminated, Denied, or Active), the updated provider record must be written back and saved to the Provider Master File to make the change permanent.",
+                    "sub_graph_node_text": "Write Updated Provider Record Back to Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "A provider's status has been updated in the Provider Master Record based on the applied sanction action (Terminate sets status to Terminated, Suspend sets status to Denied, Reinstate sets status to Active)",
+                        "When": "The system completes the status update on the provider record",
+                        "Then": "The updated Provider Master Record is written back to the Provider Master File, permanently saving the new provider status"
+                    },
+                    "key_functionality_id": "provider-master-record-update"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00044",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Proceed to Sanction Notice Generation After Successful Provider Record Update",
+                    "rule_description": "Once the updated provider record has been successfully written back to the Provider Master File, the system must immediately proceed to generate and send the appropriate sanction notice to the provider.",
+                    "sub_graph_node_text": "Proceed to Sanction Notice Generation",
+                    "acceptance_criteria": {
+                        "Given": "The updated Provider Master Record reflecting the applied sanction action (Terminated, Denied, or Active status) has been written back to the Provider Master File",
+                        "When": "The Provider Master File record update is completed",
+                        "Then": "The system proceeds to the Sanction Notice Generation process, passing the updated Provider Master Record to generate the appropriate notice corresponding to the sanction type applied"
+                    },
+                    "key_functionality_id": "provider-master-record-update"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Master Record Update"
+        },
+        {
+            "id": "sanction-notice-generation",
+            "title": "Sanction Notice Generation",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Sanction Notice Generation])\n    B{What is the\\nSanction Action Type?}\n    C[Select Termination\\nNotice Program\\nSuffix: TRM]\n    D[Select Suspension\\nNotice Program\\nSuffix: SUS]\n    E[Select Reinstatement\\nNotice Program\\nSuffix: RST]\n    F[Select General\\nNotice Program\\nSuffix: GEN]\n    G[Build Full Notice\\nProgram Name\\nPrefix + Suffix]\n    H[Invoke Notice Program\\nPassing Provider Record\\nto Downstream Systems\\nClaims & MCO]\n    I{Notice Program\\nSuccessfully Invoked?}\n    J[Notifications Sent\\nSuccessfully to\\nDownstream Systems]\n    K[Log Warning:\\nNotice Program\\nNot Available\\nSkip Notification]\n    L([End: Sanction Notice Generation])\n\n    A --> B\n    B -->|Terminate| C\n    B -->|Suspend| D\n    B -->|Reinstate| E\n    B -->|Other/Unknown| F\n    C --> G\n    D --> G\n    E --> G\n    F --> G\n    G --> H\n    H --> I\n    I -->|Yes - Program Found| J\n    I -->|No - Program Missing| K\n    J --> L\n    K --> L",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00045",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Determine Notice Program Based on Sanction Action Type",
+                    "rule_description": "When a sanction is applied to a provider, the system must determine the appropriate notice program to invoke based on the type of sanction action (Termination, Suspension, Reinstatement, or Other/Unknown).",
+                    "sub_graph_node_text": "What is the Sanction Action Type?",
+                    "acceptance_criteria": {
+                        "Given": "A sanction action has been successfully applied to a provider record and the provider master record has been updated",
+                        "When": "The system evaluates the sanction action type from the sanction input record",
+                        "Then": "The system selects the corresponding notice program suffix: 'TRM' for Termination, 'SUS' for Suspension, 'RST' for Reinstatement, and 'GEN' for any other or unknown sanction type"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00046",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Select Termination Notice Program Suffix",
+                    "rule_description": "When the sanction action type is Termination, the system assigns the notice program suffix 'TRM' to identify the correct termination notice program to be invoked.",
+                    "sub_graph_node_text": "Select Termination Notice Program Suffix: TRM",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been processed and the sanction action type is identified as Termination",
+                        "When": "The system evaluates the sanction action type and matches it to Termination",
+                        "Then": "The notice program suffix is set to 'TRM' to be used in building the full notice program name"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00047",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Select Suspension Notice Program Suffix",
+                    "rule_description": "When the sanction action type is Suspension, the system assigns the notice program suffix 'SUS' to identify the correct suspension notice program to be invoked.",
+                    "sub_graph_node_text": "Select Suspension Notice Program Suffix: SUS",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been processed and the sanction action type is identified as Suspension",
+                        "When": "The system evaluates the sanction action type and matches it to Suspension",
+                        "Then": "The notice program suffix is set to 'SUS' to be used in building the full notice program name"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00048",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Select Reinstatement Notice Program Suffix",
+                    "rule_description": "When the sanction action type is Reinstatement, the system assigns the notice program suffix 'RST' to identify the correct reinstatement notice program to be invoked.",
+                    "sub_graph_node_text": "Select Reinstatement Notice Program Suffix: RST",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been processed and the sanction action type is identified as Reinstatement",
+                        "When": "The system evaluates the sanction action type and matches it to Reinstatement",
+                        "Then": "The notice program suffix is set to 'RST' to be used in building the full notice program name"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00049",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Select General Notice Program Suffix for Unknown Sanction Type",
+                    "rule_description": "When the sanction action type does not match any of the known types (Termination, Suspension, or Reinstatement), the system assigns the default general notice program suffix 'GEN'.",
+                    "sub_graph_node_text": "Select General Notice Program Suffix: GEN",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been processed and the sanction action type does not match Termination, Suspension, or Reinstatement",
+                        "When": "The system evaluates the sanction action type and finds no specific match",
+                        "Then": "The notice program suffix is set to 'GEN' as the default general notice program identifier"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00050",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Build Full Notice Program Name from Prefix and Suffix",
+                    "rule_description": "After the appropriate suffix is determined based on the sanction action type, the system constructs the full notice program name by combining the standard notice program prefix with the selected suffix.",
+                    "sub_graph_node_text": "Build Full Notice Program Name Prefix + Suffix",
+                    "acceptance_criteria": {
+                        "Given": "The notice program prefix is available and the notice program suffix has been determined based on the sanction action type (TRM, SUS, RST, or GEN)",
+                        "When": "The system builds the full notice program name",
+                        "Then": "The full notice program name is constructed by concatenating the notice program prefix with the selected suffix, resulting in a complete program name (e.g., prefix + 'TRM', prefix + 'SUS', prefix + 'RST', or prefix + 'GEN')"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00051",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Invoke Notice Program with Provider Record for Downstream Notification",
+                    "rule_description": "Once the full notice program name is built, the system invokes the notice program passing the complete provider master record so that downstream systems such as Claims and MCO receive the appropriate sanction notification.",
+                    "sub_graph_node_text": "Invoke Notice Program Passing Provider Record to Downstream Systems Claims & MCO",
+                    "acceptance_criteria": {
+                        "Given": "The full notice program name has been successfully constructed and the provider master record contains the updated sanction status",
+                        "When": "The system invokes the dynamically built notice program",
+                        "Then": "The notice program is called with the full provider master record as input, enabling downstream systems including Claims and MCO to receive and process the sanction notification"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00052",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Handle Successful Notice Program Invocation",
+                    "rule_description": "When the notice program is successfully found and invoked, the sanction notification is considered sent to downstream systems such as Claims and MCO, and processing continues normally.",
+                    "sub_graph_node_text": "Notifications Sent Successfully to Downstream Systems",
+                    "acceptance_criteria": {
+                        "Given": "The notice program name has been built and the system attempts to invoke it with the provider master record",
+                        "When": "The notice program is found and successfully invoked without any exception",
+                        "Then": "The notification is considered successfully sent to downstream systems (Claims and MCO) and the sanction processing for that provider record is complete"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00053",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Handle Missing Notice Program Without Stopping Processing",
+                    "rule_description": "When the dynamically built notice program cannot be found or invoked, the system logs a warning message identifying the missing program name and skips the notification step. The sanction status update already applied to the provider record is retained and processing continues with the next sanction record.",
+                    "sub_graph_node_text": "Log Warning: Notice Program Not Available Skip Notification",
+                    "acceptance_criteria": {
+                        "Given": "The notice program name has been built and the system attempts to invoke it with the provider master record",
+                        "When": "The notice program cannot be found or is unavailable (an exception occurs during invocation)",
+                        "Then": "The system logs a warning message containing the text 'NOTICE PGM NOT FOUND' along with the name of the missing notice program, skips sending the notification to downstream systems, retains the sanction status update already saved to the provider master record, and continues processing the next sanction record without stopping"
+                    },
+                    "key_functionality_id": "sanction-notice-generation"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Sanction Notice Generation"
+        },
+        {
+            "id": "termination-count-reporting",
+            "title": "Termination Count Reporting",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Termination Count Reporting])\n    B{Sanction Action\\nis Terminate?}\n    C[Increment Termination Counter\\nby 1]\n    D[Continue Processing\\nRemaining Sanction Records]\n    E{More Sanction\\nRecords to Process?}\n    F[All Records Processed\\nEnd of Sanction File]\n    G[Display Final Termination Count\\nTotal Providers Terminated\\nThis Processing Run]\n    H([End: Termination Count Reported\\nfor Audit & Reporting])\n\n    A --> B\n    B -->|Yes - Terminate Action| C\n    B -->|No - Suspend or Reinstate| D\n    C --> D\n    D --> E\n    E -->|Yes - More Records| B\n    E -->|No - End of File| F\n    F --> G\n    G --> H",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00054",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Increment Termination Counter for Terminate Sanctions Only",
+                    "rule_description": "Each time a sanction action is identified as a Termination, the system increments the termination counter by 1. This counter exclusively tracks provider terminations and is not incremented for Suspend or Reinstate sanction actions.",
+                    "sub_graph_node_text": "Increment Termination Counter by 1",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read from the Sanction Input File and the provider NPI has been found in the Provider Master File",
+                        "When": "The sanction action type on the sanction record is TERMINATE",
+                        "Then": "The termination counter (WS-TERM-COUNT) is incremented by exactly 1 to record that one additional provider has been terminated in this processing run"
+                    },
+                    "key_functionality_id": "termination-count-reporting"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00055",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Termination Counter Not Incremented for Non-Terminate Sanctions",
+                    "rule_description": "When a sanction action is Suspend or Reinstate, the termination counter remains unchanged. Only Terminate sanction actions contribute to the termination count, ensuring the counter accurately reflects only provider terminations.",
+                    "sub_graph_node_text": "No - Suspend or Reinstate",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been read from the Sanction Input File and the provider NPI has been found in the Provider Master File",
+                        "When": "The sanction action type on the sanction record is either SUSPEND or REINSTATE (not TERMINATE)",
+                        "Then": "The termination counter (WS-TERM-COUNT) is NOT incremented and retains its current value, as only termination actions are counted"
+                    },
+                    "key_functionality_id": "termination-count-reporting"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00056",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Continue Processing Remaining Sanction Records After Each Action",
+                    "rule_description": "After each sanction record is processed (regardless of whether it was a Terminate, Suspend, or Reinstate action), the system continues to the next sanction record in the Sanction Input File until all records have been processed.",
+                    "sub_graph_node_text": "Continue Processing Remaining Sanction Records",
+                    "acceptance_criteria": {
+                        "Given": "A sanction record has been fully processed including any status update and notice generation",
+                        "When": "There are more sanction records remaining in the Sanction Input File",
+                        "Then": "The system reads and processes the next sanction record, repeating the sanction evaluation and counter logic for each subsequent record"
+                    },
+                    "key_functionality_id": "termination-count-reporting"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00057",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Detect End of Sanction File to Stop Processing Loop",
+                    "rule_description": "The system continuously reads sanction records and processes them in a loop. When the end of the Sanction Input File is reached, the loop terminates and no further sanction records are processed.",
+                    "sub_graph_node_text": "No - End of File",
+                    "acceptance_criteria": {
+                        "Given": "The system is actively reading and processing records from the Sanction Input File in a loop",
+                        "When": "A read attempt on the Sanction Input File returns an end-of-file condition",
+                        "Then": "The end-of-file flag (WS-END-OF-FILE-FLAG) is set to TRUE, the processing loop exits, and no further sanction records are read or processed"
+                    },
+                    "key_functionality_id": "termination-count-reporting"
+                },
+                {
+                    "rule_id": "R-PRVSAN01-cbl-00058",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Final Termination Count After All Records Are Processed",
+                    "rule_description": "Once all sanction records in the Sanction Input File have been processed, the system displays the total number of providers that were terminated during the current processing run. This count serves as an audit and reporting summary for the batch execution.",
+                    "sub_graph_node_text": "Display Final Termination Count - Total Providers Terminated This Processing Run",
+                    "acceptance_criteria": {
+                        "Given": "All sanction records in the Sanction Input File have been read and processed, and the end-of-file condition has been reached",
+                        "When": "The processing loop has completed and both the Provider Master File and Sanction Input File are being closed",
+                        "Then": "The system displays the message 'PRVSAN01: PROVIDERS TERMINATED=' followed by the final value of the termination counter (WS-TERM-COUNT), representing the total number of providers terminated during this processing run for audit and reporting purposes"
+                    },
+                    "key_functionality_id": "termination-count-reporting"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Termination Count Reporting"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Sanction Input File is open and contains one or more sanction records, each carrying a provider NPI and a sanction action type (Terminate, Suspend, or Reinstate)",
+                "When": "The system reads the next available sanction record from the Sanction Input File",
+                "Then": "The provider NPI and sanction action type are extracted from the record and made available for provider lookup and sanction processing; if no more records exist, the end-of-file condition is set and processing loop terminates"
+            },
+            "Rule_Name": "Sequential Sanction Record Reading",
+            "Rule_Description": "The system reads each sanction record sequentially from the Sanction Input File, extracting the provider NPI and sanction action type for processing."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00002",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been successfully read and the provider NPI has been extracted from the sanction record",
+                "When": "The system searches the Provider Master File using the NPI from the sanction record as the lookup key",
+                "Then": "If the provider is found in the Provider Master File, the provider's master record is retrieved and made available for sanction application; if the provider is not found, the not-found handling process is triggered"
+            },
+            "Rule_Name": "Provider Lookup by NPI",
+            "Rule_Description": "Before applying any sanction, the system must locate the provider in the Provider Master File using the NPI extracted from the sanction record."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00003",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File containing a provider NPI",
+                "When": "The system searches the Provider Master File and the NPI from the sanction record is not found",
+                "Then": "The system logs a warning message 'PRVSAN01: NPI NOT FOUND' along with the unmatched NPI value; no provider status update is performed; no sanction notice is generated; and processing continues with the next sanction record"
+            },
+            "Rule_Name": "Unmatched Provider NPI Handling",
+            "Rule_Description": "When a sanction record references an NPI that does not exist in the Provider Master File, the record is skipped and a warning is logged. No status update or notice is generated."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00004",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read, the provider NPI has been found in the Provider Master File, and the sanction action type is Terminate",
+                "When": "The system applies the termination sanction to the provider's master record",
+                "Then": "The provider's status in the Provider Master File is set to Terminated; the running count of terminated providers for this processing run is incremented by 1"
+            },
+            "Rule_Name": "Provider Termination Status Update",
+            "Rule_Description": "When a sanction action is of type Terminate, the provider's status is updated to Terminated in the Provider Master File and the termination counter is incremented."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00005",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read, the provider NPI has been found in the Provider Master File, and the sanction action type is Suspend",
+                "When": "The system applies the suspension sanction to the provider's master record",
+                "Then": "The provider's status in the Provider Master File is set to Denied/Suspended; the provider is no longer considered active; the termination counter is not incremented"
+            },
+            "Rule_Name": "Provider Suspension Status Update",
+            "Rule_Description": "When a sanction action is of type Suspend, the provider's status is updated to Denied in the Provider Master File, effectively blocking the provider from active participation."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00006",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read, the provider NPI has been found in the Provider Master File, and the sanction action type is Reinstate",
+                "When": "The system applies the reinstatement sanction to the provider's master record",
+                "Then": "The provider's status in the Provider Master File is set to Active; the provider's eligibility to participate is fully restored; the termination counter is not incremented"
+            },
+            "Rule_Name": "Provider Reinstatement Status Restoration",
+            "Rule_Description": "When a sanction action is of type Reinstate, the provider's status is restored to Active in the Provider Master File, reversing any prior suspension or termination."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00007",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction action (Terminate, Suspend, or Reinstate) has been applied to a provider's master record and the provider's status field has been updated in memory",
+                "When": "The system completes the status update for the provider",
+                "Then": "The updated provider master record is written back to the Provider Master File, persisting the new status; this occurs for every successfully applied sanction regardless of sanction type"
+            },
+            "Rule_Name": "Provider Master Record Persistence After Sanction",
+            "Rule_Description": "After any sanction action (Terminate, Suspend, or Reinstate) is applied to a provider's record, the updated record must be immediately saved back to the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00008",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider's master record has been successfully updated with a sanction action and saved to the Provider Master File",
+                "When": "The system determines the appropriate notice program to invoke based on the sanction action type: Terminate maps to suffix 'TRM', Suspend maps to suffix 'SUS', Reinstate maps to suffix 'RST', and any other action maps to suffix 'GEN'; the notice program name is constructed by combining the standard notice prefix with the determined suffix",
+                "Then": "The dynamically constructed notice program is invoked with the full provider master record as input so that downstream systems (Claims, MCO) are notified of the provider status change"
+            },
+            "Rule_Name": "Sanction Notice Program Selection and Invocation",
+            "Rule_Description": "After a provider's status is updated, the system dynamically selects and invokes the appropriate notice program based on the sanction action type, passing the full provider master record to the notice program."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00009",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system has constructed a notice program name and attempted to invoke it with the provider master record",
+                "When": "The notice program cannot be found or is unavailable for execution",
+                "Then": "The system logs a warning message 'PRVSAN01: NOTICE PGM NOT FOUND' along with the name of the missing notice program; the provider status update that was already saved to the Provider Master File is retained and not rolled back; processing continues with the next sanction record"
+            },
+            "Rule_Name": "Notice Program Not Found Handling",
+            "Rule_Description": "If the dynamically constructed notice program cannot be found or invoked, a warning is logged and processing continues without stopping. The provider status update already saved is not reversed."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00010",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "All sanction records in the Sanction Input File have been processed and the end-of-file condition has been reached",
+                "When": "The system completes the sanction processing loop and closes all files",
+                "Then": "The system displays the summary message 'PRVSAN01: PROVIDERS TERMINATED=' followed by the total count of providers whose status was set to Terminated during this processing run; only Terminate actions contribute to this count, not Suspend or Reinstate actions"
+            },
+            "Rule_Name": "Termination Count Summary Reporting",
+            "Rule_Description": "At the end of the processing run, the system reports the total number of providers that were terminated during this execution."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00011",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Sanctions Input File is open and contains one or more sanction records pending processing",
+                "When": "The system is ready to process the next sanction action",
+                "Then": "The system reads the next available sanction record sequentially from the Sanctions Input File and makes it available for further processing; this cycle repeats for every record in the file until no more records remain"
+            },
+            "Rule_Name": "Sequential Processing of Sanction Input Records",
+            "Rule_Description": "The system must read and process each sanction record one at a time from the Sanctions Input File in sequential order, continuing until all records have been processed."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00012",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system is reading records sequentially from the Sanctions Input File",
+                "When": "The system attempts to read the next record and the Sanctions Input File signals that there are no more records (end-of-file condition is detected)",
+                "Then": "The system sets the end-of-file indicator to TRUE, exits the sanction processing loop, closes both the Sanctions Input File and the Provider Master File, displays the total count of terminated providers, and ends the program run"
+            },
+            "Rule_Name": "Detect End of Sanctions File and Stop Processing",
+            "Rule_Description": "When all sanction records have been read from the Sanctions Input File, the system must recognize the end-of-file condition and stop the sanction processing loop, proceeding to final reporting."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00013",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been successfully read from the Sanctions Input File and the end-of-file condition has not been reached",
+                "When": "The system extracts the details from the sanction record",
+                "Then": "The system extracts the Provider NPI (National Provider Identifier) from the sanction record and uses it as the key to locate the corresponding provider record in the Provider Master File for subsequent status update"
+            },
+            "Rule_Name": "Extract Provider NPI from Sanction Record",
+            "Rule_Description": "When a sanction record is successfully read, the system must extract the Provider NPI from the sanction record to identify which provider the sanction action applies to, enabling the subsequent lookup of that provider in the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00014",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read and the corresponding provider has been located in the Provider Master File",
+                "When": "The system evaluates the action code on the sanction record and the action code is TERMINATE",
+                "Then": "The system identifies the sanction action as a termination, sets the provider's status to TERMINATED in the Provider Master File, increments the termination counter by 1, saves the updated provider record, and proceeds to generate a termination notice"
+            },
+            "Rule_Name": "Validate Sanction Action Code as TERMINATE",
+            "Rule_Description": "The system must evaluate the action code on each sanction record to determine the appropriate provider status change. When the action code is TERMINATE, the system identifies the provider as subject to termination."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00015",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read and the corresponding provider has been located in the Provider Master File",
+                "When": "The system evaluates the action code on the sanction record and the action code is SUSPEND",
+                "Then": "The system identifies the sanction action as a suspension, sets the provider's status to DENIED in the Provider Master File, saves the updated provider record, and proceeds to generate a suspension notice"
+            },
+            "Rule_Name": "Validate Sanction Action Code as SUSPEND",
+            "Rule_Description": "The system must evaluate the action code on each sanction record to determine the appropriate provider status change. When the action code is SUSPEND, the system identifies the provider as subject to suspension."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00016",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read and the corresponding provider has been located in the Provider Master File",
+                "When": "The system evaluates the action code on the sanction record and the action code is REINSTATE",
+                "Then": "The system identifies the sanction action as a reinstatement, sets the provider's status back to ACTIVE in the Provider Master File, saves the updated provider record, and proceeds to generate a reinstatement notice"
+            },
+            "Rule_Name": "Validate Sanction Action Code as REINSTATE",
+            "Rule_Description": "The system must evaluate the action code on each sanction record to determine the appropriate provider status change. When the action code is REINSTATE, the system identifies the provider as subject to reinstatement."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00017",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider NPI has been extracted from the sanction record and is ready for lookup",
+                "When": "The system attempts to locate the provider in the Provider Master File using the extracted NPI as the search key",
+                "Then": "If the provider is found in the Provider Master File, the system proceeds to apply the sanction action (Terminate, Suspend, or Reinstate) and update the provider's status; if the provider is NOT found in the Provider Master File, the system logs a warning message identifying the unrecognized NPI, skips the sanction application and notice generation for that record, and continues to the next sanction record"
+            },
+            "Rule_Name": "Pass Validated Sanction Record for Provider Lookup and Status Update",
+            "Rule_Description": "After the Provider NPI is extracted from a sanction record, the system must use that NPI to look up the provider in the Provider Master File. Only providers found in the Provider Master File are eligible to have a sanction applied; unrecognized providers are skipped with a warning."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00018",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been successfully read from the Sanction Input File and contains a National Provider Identifier (NPI)",
+                "When": "The system prepares to look up the provider in the Provider Master File",
+                "Then": "The NPI value from the sanction record is set as the search key to query the Provider Master File, ensuring the correct provider record is targeted for retrieval"
+            },
+            "Rule_Name": "Extract NPI from Sanction Record as Provider Lookup Key",
+            "Rule_Description": "The National Provider Identifier (NPI) present in the incoming sanction record must be extracted and used as the unique search key to locate the corresponding provider in the Provider Master File before any sanction can be applied."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00019",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The NPI from the sanction record has been set as the search key",
+                "When": "The system queries the Provider Master File using that NPI",
+                "Then": "The Provider Master File is searched for a matching provider record using the NPI as the unique identifier, and the result determines whether processing continues with a sanction update or routes to not-found handling"
+            },
+            "Rule_Name": "Query Provider Master File Using NPI",
+            "Rule_Description": "The system must search the Provider Master File using the NPI extracted from the sanction record to retrieve the provider's current record, including their existing enrollment status, prior to applying any sanction action."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00020",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File has been queried using the NPI from the sanction record",
+                "When": "A matching provider record is found in the Provider Master File",
+                "Then": "The provider's current record including existing enrollment status details is retrieved and made available, and processing is routed to the Apply Sanction step to update the provider's status"
+            },
+            "Rule_Name": "Route to Sanction Processing When Provider Record is Found",
+            "Rule_Description": "When the Provider Master File lookup using the NPI is successful and the provider record exists, the system must retrieve the provider's current record with all existing status details and route processing to apply the sanction action."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00021",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File has been queried using the NPI from the sanction record",
+                "When": "No matching provider record is found in the Provider Master File for the given NPI",
+                "Then": "A warning message is logged stating 'NPI NOT FOUND' along with the specific NPI value from the sanction record, no provider status update is performed, no notice is generated, and processing moves on to the next sanction record"
+            },
+            "Rule_Name": "Log Warning and Skip Processing When Provider NPI is Not Found",
+            "Rule_Description": "When the Provider Master File lookup fails to find a provider matching the NPI from the sanction record, the system must log a warning message identifying the unrecognized NPI and skip all further processing for that sanction record \u2014 no status update and no notice generation will occur."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00022",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File containing a provider NPI",
+                "When": "The system attempts to look up the provider NPI in the Provider Master File",
+                "Then": "If the provider NPI is found in the Provider Master File, the provider record is retrieved and made available for sanction processing; if the provider NPI is not found, all sanction actions for that record are skipped including no status update and no notice generation"
+            },
+            "Rule_Name": "Provider Existence Validation Before Sanction Processing",
+            "Rule_Description": "Before applying any sanction action, the system must verify that the provider identified by the NPI in the sanction record exists in the Provider Master File. Only providers that are found in the master file are eligible for sanction processing."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00023",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File containing a provider NPI",
+                "When": "The provider NPI lookup in the Provider Master File returns no matching record",
+                "Then": "The system logs a warning message in the format 'PRVSAN01: NPI NOT FOUND' followed by the specific NPI value from the sanction record that could not be matched"
+            },
+            "Rule_Name": "Unmatched Provider NPI Warning Log",
+            "Rule_Description": "When a provider NPI from the sanction input file cannot be matched to any record in the Provider Master File, the system must log a warning message that identifies the unresolved NPI value so that it can be investigated and resolved."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00024",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File and the provider NPI has been looked up in the Provider Master File",
+                "When": "The provider NPI is not found in the Provider Master File",
+                "Then": "The system does not update any provider status in the Provider Master File, does not generate or send any notice for that sanction record, and proceeds directly to read the next sanction record from the Sanction Input File"
+            },
+            "Rule_Name": "Skip Sanction Processing for Unmatched Provider",
+            "Rule_Description": "When a provider NPI from the sanction input cannot be found in the Provider Master File, no sanction actions of any kind are performed for that record. This means the provider status is not changed and no notice is generated, ensuring that sanctions are only applied to verified, existing providers."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00025",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File and the corresponding provider has been found in the Provider Master File",
+                "When": "The sanction action type on the sanction record is TERMINATE",
+                "Then": "The system identifies this as a termination action and proceeds to update the provider's status to Terminated in the Provider Master Record"
+            },
+            "Rule_Name": "Identify Termination Sanction Action",
+            "Rule_Description": "When processing a sanction record, the system must evaluate the sanction action type and route to termination processing only when the action is explicitly identified as TERMINATE."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00026",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record with action type TERMINATE has been matched to an existing provider in the Provider Master File using the provider's NPI",
+                "When": "The termination sanction is being applied to the provider's master record",
+                "Then": "The provider's status field in the Provider Master Record is set to TERMINATED, overriding any prior status (Active, Denied, or otherwise)"
+            },
+            "Rule_Name": "Update Provider Status to Terminated",
+            "Rule_Description": "When a sanction action is identified as TERMINATE, the provider's enrollment status in the Provider Master Record must be changed to Terminated, effectively ending the provider's active participation."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00027",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider's status has just been set to Terminated in the Provider Master Record as a result of a TERMINATE sanction action",
+                "When": "The termination status update is applied",
+                "Then": "The termination counter is increased by exactly 1, accumulating the total number of providers terminated during the current processing run"
+            },
+            "Rule_Name": "Increment Termination Counter for Each Terminated Provider",
+            "Rule_Description": "Each time a provider is successfully terminated during the sanction processing run, the program's running count of terminated providers must be incremented by exactly 1 to support end-of-run reporting."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00028",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's status in the in-memory Provider Master Record has been set to Terminated and the termination counter has been incremented",
+                "When": "The sanction update for the current provider is complete",
+                "Then": "The updated Provider Master Record \u2014 containing the new Terminated status \u2014 is written back to and permanently stored in the Provider Master File, replacing the previous record for that provider NPI"
+            },
+            "Rule_Name": "Persist Terminated Provider Status to Provider Master File",
+            "Rule_Description": "After the provider's status has been updated to Terminated and the termination counter has been incremented, the updated Provider Master Record must be permanently saved back to the Provider Master File to ensure the termination is recorded."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00029",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File and the corresponding provider has been located in the Provider Master File",
+                "When": "The sanction action on the record is evaluated",
+                "Then": "If the sanction action is Suspend, the provider suspension process is initiated; if the sanction action is any other type (Terminate or Reinstate), the suspension process is skipped and the appropriate alternative action is taken instead"
+            },
+            "Rule_Name": "Identify Suspension Sanction Action",
+            "Rule_Description": "Determine whether the current sanction record carries a Suspend action, which triggers the provider suspension workflow."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00030",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record with a Suspend action has been matched to an existing provider in the Provider Master File",
+                "When": "The Suspend sanction action is confirmed",
+                "Then": "The provider's status field in the Provider Master Record is set to Denied/Suspended, marking the provider as ineligible to receive claims or services"
+            },
+            "Rule_Name": "Set Provider Status to Denied/Suspended",
+            "Rule_Description": "When a Suspend sanction action is identified, the provider's status in the Provider Master Record must be updated to Denied, effectively blocking the provider from receiving claims or services."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00031",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's status in the Provider Master Record has been updated to Denied/Suspended",
+                "When": "The sanction update has been applied to the in-memory provider record",
+                "Then": "The updated Provider Master Record is written back and saved to the Provider Master File, making the suspension status permanent and visible to downstream systems"
+            },
+            "Rule_Name": "Save Updated Provider Suspension Status to Provider Master File",
+            "Rule_Description": "After the provider's status has been set to Denied/Suspended in memory, the updated record must be immediately persisted back to the Provider Master File to ensure the change is recorded and effective."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00032",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's status has been successfully updated to Denied/Suspended and saved to the Provider Master File",
+                "When": "The suspension sanction action has been fully applied and persisted",
+                "Then": "The system dynamically builds the Suspension Notice Program name by combining the standard notice prefix with the suffix 'SUS', calls that notice program passing the full Provider Master Record, and if the notice program cannot be found or executed, a warning is logged identifying the missing program name, but processing continues without interruption"
+            },
+            "Rule_Name": "Invoke Suspension Notice Program to Notify Downstream Systems",
+            "Rule_Description": "After a provider's suspension status has been saved, a dedicated Suspension Notice Program must be called to generate and dispatch a suspension notice, ensuring the provider and relevant downstream systems are informed of the suspension."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00033",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File and the provider NPI has been successfully located in the Provider Master File",
+                "When": "The sanction action type on the sanction record is evaluated",
+                "Then": "If the sanction action is Reinstate, the provider reinstatement workflow is initiated; if the sanction action is any other type (Terminate or Suspend), the reinstatement workflow is bypassed and the appropriate alternate sanction workflow is followed instead"
+            },
+            "Rule_Name": "Identify Reinstatement Sanction Action",
+            "Rule_Description": "Determines whether the current sanction record carries a Reinstate action, which triggers the provider eligibility restoration workflow."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00034",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record with a Reinstate action has been matched to an existing provider in the Provider Master File",
+                "When": "The Reinstate sanction action is applied to the provider's master record",
+                "Then": "The provider's status field in the Provider Master Record is set to ACTIVE, overriding any prior Terminated or Denied status and restoring the provider's eligibility"
+            },
+            "Rule_Name": "Restore Provider Status to Active on Reinstatement",
+            "Rule_Description": "When a Reinstate sanction action is identified, the provider's status in the Provider Master Record must be updated to Active, restoring the provider's eligibility to participate."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00035",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's status in the Provider Master Record has been set to ACTIVE following a Reinstate sanction action",
+                "When": "The updated provider master record is written back to the Provider Master File",
+                "Then": "The Provider Master File is updated with the provider's new Active status, and the reinstatement is permanently recorded; the updated record reflects the restored eligibility of the provider"
+            },
+            "Rule_Name": "Persist Reinstated Provider Status to Provider Master File",
+            "Rule_Description": "After the provider's status has been updated to Active in memory, the updated record must be immediately saved back to the Provider Master File to make the reinstatement permanent and visible across systems."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00036",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A Reinstate sanction action has been successfully applied and the provider's status has been saved as Active in the Provider Master File",
+                "When": "The notice program name is being constructed for the reinstatement notification",
+                "Then": "The notice suffix 'RST' is selected and combined with the standard notice program prefix to form the complete reinstatement notice program name; for Terminate actions the suffix is 'TRM', for Suspend actions the suffix is 'SUS', and for any other unrecognized action the suffix defaults to 'GEN'"
+            },
+            "Rule_Name": "Select Reinstatement Notice Program Using RST Suffix",
+            "Rule_Description": "For a Reinstate sanction action, the system must identify the correct notice program by assigning the suffix 'RST' and combining it with the standard notice program prefix to form the full notice program name."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00037",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The reinstatement notice program name has been constructed using the 'RST' suffix combined with the standard notice program prefix",
+                "When": "The reinstatement notice program is invoked",
+                "Then": "The system calls the constructed notice program and passes the complete Provider Master Record (including provider NPI, status, and all provider details) to the notice program so it can generate the appropriate reinstatement notification"
+            },
+            "Rule_Name": "Invoke Reinstatement Notice Program with Provider Details",
+            "Rule_Description": "The dynamically constructed reinstatement notice program must be called and passed the full provider master record so that the notice program can use provider details to generate and send reinstatement notifications."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00038",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The reinstatement notice program has been constructed and an attempt has been made to invoke it with the provider's master record",
+                "When": "The notice program cannot be found or successfully invoked",
+                "Then": "A warning message is logged displaying 'PRVSAN01: NOTICE PGM NOT FOUND' along with the name of the notice program that could not be found; the provider's Active status update already saved to the Provider Master File is retained and not reversed; processing continues to the next sanction record"
+            },
+            "Rule_Name": "Log Warning When Reinstatement Notice Program Is Not Available",
+            "Rule_Description": "If the reinstatement notice program cannot be found or invoked, the system must log a warning identifying the missing program name. Processing must continue without interruption \u2014 the provider's Active status update is not reversed."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00039",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The reinstatement notice program has been successfully found and invoked with the complete Provider Master Record",
+                "When": "The reinstatement notice program executes using the provider details passed to it",
+                "Then": "The reinstatement notice program generates and sends the appropriate reinstatement notifications using the provider details from the Provider Master Record, completing the provider eligibility restoration process"
+            },
+            "Rule_Name": "Send Reinstatement Notifications Upon Successful Notice Program Invocation",
+            "Rule_Description": "When the reinstatement notice program is successfully invoked with the provider's details, the notice program is responsible for generating and sending reinstatement notifications, completing the provider eligibility restoration process."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00040",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been located in the Provider Master File using the NPI from the sanction input record, and the sanction action type is Terminate",
+                "When": "The system evaluates the sanction action type and identifies it as a Terminate action",
+                "Then": "The provider's status on the Provider Master Record is set to Terminated"
+            },
+            "Rule_Name": "Set Provider Status to Terminated When Terminate Sanction is Applied",
+            "Rule_Description": "When a sanction action of type Terminate is applied to a provider, the provider's status in the Provider Master record must be updated to Terminated before the record is persisted."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00041",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been located in the Provider Master File using the NPI from the sanction input record, and the sanction action type is Suspend",
+                "When": "The system evaluates the sanction action type and identifies it as a Suspend action",
+                "Then": "The provider's status on the Provider Master Record is set to Denied (Suspended)"
+            },
+            "Rule_Name": "Set Provider Status to Denied/Suspended When Suspend Sanction is Applied",
+            "Rule_Description": "When a sanction action of type Suspend is applied to a provider, the provider's status in the Provider Master record must be updated to Denied before the record is persisted."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00042",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been located in the Provider Master File using the NPI from the sanction input record, and the sanction action type is Reinstate",
+                "When": "The system evaluates the sanction action type and identifies it as a Reinstate action",
+                "Then": "The provider's status on the Provider Master Record is set to Active"
+            },
+            "Rule_Name": "Set Provider Status to Active When Reinstate Sanction is Applied",
+            "Rule_Description": "When a sanction action of type Reinstate is applied to a provider, the provider's status in the Provider Master record must be restored to Active before the record is persisted."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00043",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider's status has been updated in the Provider Master Record based on the applied sanction action (Terminate sets status to Terminated, Suspend sets status to Denied, Reinstate sets status to Active)",
+                "When": "The system completes the status update on the provider record",
+                "Then": "The updated Provider Master Record is written back to the Provider Master File, permanently saving the new provider status"
+            },
+            "Rule_Name": "Persist Updated Provider Status to Provider Master File",
+            "Rule_Description": "After the provider's status has been updated in memory based on the sanction action (Terminated, Denied, or Active), the updated provider record must be written back and saved to the Provider Master File to make the change permanent."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00044",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The updated Provider Master Record reflecting the applied sanction action (Terminated, Denied, or Active status) has been written back to the Provider Master File",
+                "When": "The Provider Master File record update is completed",
+                "Then": "The system proceeds to the Sanction Notice Generation process, passing the updated Provider Master Record to generate the appropriate notice corresponding to the sanction type applied"
+            },
+            "Rule_Name": "Proceed to Sanction Notice Generation After Successful Provider Record Update",
+            "Rule_Description": "Once the updated provider record has been successfully written back to the Provider Master File, the system must immediately proceed to generate and send the appropriate sanction notice to the provider."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00045",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction action has been successfully applied to a provider record and the provider master record has been updated",
+                "When": "The system evaluates the sanction action type from the sanction input record",
+                "Then": "The system selects the corresponding notice program suffix: 'TRM' for Termination, 'SUS' for Suspension, 'RST' for Reinstatement, and 'GEN' for any other or unknown sanction type"
+            },
+            "Rule_Name": "Determine Notice Program Based on Sanction Action Type",
+            "Rule_Description": "When a sanction is applied to a provider, the system must determine the appropriate notice program to invoke based on the type of sanction action (Termination, Suspension, Reinstatement, or Other/Unknown)."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00046",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been processed and the sanction action type is identified as Termination",
+                "When": "The system evaluates the sanction action type and matches it to Termination",
+                "Then": "The notice program suffix is set to 'TRM' to be used in building the full notice program name"
+            },
+            "Rule_Name": "Select Termination Notice Program Suffix",
+            "Rule_Description": "When the sanction action type is Termination, the system assigns the notice program suffix 'TRM' to identify the correct termination notice program to be invoked."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00047",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been processed and the sanction action type is identified as Suspension",
+                "When": "The system evaluates the sanction action type and matches it to Suspension",
+                "Then": "The notice program suffix is set to 'SUS' to be used in building the full notice program name"
+            },
+            "Rule_Name": "Select Suspension Notice Program Suffix",
+            "Rule_Description": "When the sanction action type is Suspension, the system assigns the notice program suffix 'SUS' to identify the correct suspension notice program to be invoked."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00048",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been processed and the sanction action type is identified as Reinstatement",
+                "When": "The system evaluates the sanction action type and matches it to Reinstatement",
+                "Then": "The notice program suffix is set to 'RST' to be used in building the full notice program name"
+            },
+            "Rule_Name": "Select Reinstatement Notice Program Suffix",
+            "Rule_Description": "When the sanction action type is Reinstatement, the system assigns the notice program suffix 'RST' to identify the correct reinstatement notice program to be invoked."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00049",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been processed and the sanction action type does not match Termination, Suspension, or Reinstatement",
+                "When": "The system evaluates the sanction action type and finds no specific match",
+                "Then": "The notice program suffix is set to 'GEN' as the default general notice program identifier"
+            },
+            "Rule_Name": "Select General Notice Program Suffix for Unknown Sanction Type",
+            "Rule_Description": "When the sanction action type does not match any of the known types (Termination, Suspension, or Reinstatement), the system assigns the default general notice program suffix 'GEN'."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00050",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The notice program prefix is available and the notice program suffix has been determined based on the sanction action type (TRM, SUS, RST, or GEN)",
+                "When": "The system builds the full notice program name",
+                "Then": "The full notice program name is constructed by concatenating the notice program prefix with the selected suffix, resulting in a complete program name (e.g., prefix + 'TRM', prefix + 'SUS', prefix + 'RST', or prefix + 'GEN')"
+            },
+            "Rule_Name": "Build Full Notice Program Name from Prefix and Suffix",
+            "Rule_Description": "After the appropriate suffix is determined based on the sanction action type, the system constructs the full notice program name by combining the standard notice program prefix with the selected suffix."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00051",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The full notice program name has been successfully constructed and the provider master record contains the updated sanction status",
+                "When": "The system invokes the dynamically built notice program",
+                "Then": "The notice program is called with the full provider master record as input, enabling downstream systems including Claims and MCO to receive and process the sanction notification"
+            },
+            "Rule_Name": "Invoke Notice Program with Provider Record for Downstream Notification",
+            "Rule_Description": "Once the full notice program name is built, the system invokes the notice program passing the complete provider master record so that downstream systems such as Claims and MCO receive the appropriate sanction notification."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00052",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The notice program name has been built and the system attempts to invoke it with the provider master record",
+                "When": "The notice program is found and successfully invoked without any exception",
+                "Then": "The notification is considered successfully sent to downstream systems (Claims and MCO) and the sanction processing for that provider record is complete"
+            },
+            "Rule_Name": "Handle Successful Notice Program Invocation",
+            "Rule_Description": "When the notice program is successfully found and invoked, the sanction notification is considered sent to downstream systems such as Claims and MCO, and processing continues normally."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00053",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The notice program name has been built and the system attempts to invoke it with the provider master record",
+                "When": "The notice program cannot be found or is unavailable (an exception occurs during invocation)",
+                "Then": "The system logs a warning message containing the text 'NOTICE PGM NOT FOUND' along with the name of the missing notice program, skips sending the notification to downstream systems, retains the sanction status update already saved to the provider master record, and continues processing the next sanction record without stopping"
+            },
+            "Rule_Name": "Handle Missing Notice Program Without Stopping Processing",
+            "Rule_Description": "When the dynamically built notice program cannot be found or invoked, the system logs a warning message identifying the missing program name and skips the notification step. The sanction status update already applied to the provider record is retained and processing continues with the next sanction record."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00054",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File and the provider NPI has been found in the Provider Master File",
+                "When": "The sanction action type on the sanction record is TERMINATE",
+                "Then": "The termination counter (WS-TERM-COUNT) is incremented by exactly 1 to record that one additional provider has been terminated in this processing run"
+            },
+            "Rule_Name": "Increment Termination Counter for Terminate Sanctions Only",
+            "Rule_Description": "Each time a sanction action is identified as a Termination, the system increments the termination counter by 1. This counter exclusively tracks provider terminations and is not incremented for Suspend or Reinstate sanction actions."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00055",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been read from the Sanction Input File and the provider NPI has been found in the Provider Master File",
+                "When": "The sanction action type on the sanction record is either SUSPEND or REINSTATE (not TERMINATE)",
+                "Then": "The termination counter (WS-TERM-COUNT) is NOT incremented and retains its current value, as only termination actions are counted"
+            },
+            "Rule_Name": "Termination Counter Not Incremented for Non-Terminate Sanctions",
+            "Rule_Description": "When a sanction action is Suspend or Reinstate, the termination counter remains unchanged. Only Terminate sanction actions contribute to the termination count, ensuring the counter accurately reflects only provider terminations."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00056",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A sanction record has been fully processed including any status update and notice generation",
+                "When": "There are more sanction records remaining in the Sanction Input File",
+                "Then": "The system reads and processes the next sanction record, repeating the sanction evaluation and counter logic for each subsequent record"
+            },
+            "Rule_Name": "Continue Processing Remaining Sanction Records After Each Action",
+            "Rule_Description": "After each sanction record is processed (regardless of whether it was a Terminate, Suspend, or Reinstate action), the system continues to the next sanction record in the Sanction Input File until all records have been processed."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00057",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system is actively reading and processing records from the Sanction Input File in a loop",
+                "When": "A read attempt on the Sanction Input File returns an end-of-file condition",
+                "Then": "The end-of-file flag (WS-END-OF-FILE-FLAG) is set to TRUE, the processing loop exits, and no further sanction records are read or processed"
+            },
+            "Rule_Name": "Detect End of Sanction File to Stop Processing Loop",
+            "Rule_Description": "The system continuously reads sanction records and processes them in a loop. When the end of the Sanction Input File is reached, the loop terminates and no further sanction records are processed."
+        },
+        {
+            "Rule_Id": "R-PRVSAN01-cbl-00058",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All sanction records in the Sanction Input File have been read and processed, and the end-of-file condition has been reached",
+                "When": "The processing loop has completed and both the Provider Master File and Sanction Input File are being closed",
+                "Then": "The system displays the message 'PRVSAN01: PROVIDERS TERMINATED=' followed by the final value of the termination counter (WS-TERM-COUNT), representing the total number of providers terminated during this processing run for audit and reporting purposes"
+            },
+            "Rule_Name": "Display Final Termination Count After All Records Are Processed",
+            "Rule_Description": "Once all sanction records in the Sanction Input File have been processed, the system displays the total number of providers that were terminated during the current processing run. This count serves as an audit and reporting summary for the batch execution."
+        }
+    ],
+    "description": "PRVSAN01 is a batch sanctions and termination processor that reads incoming sanction records and applies exclusions, suspensions, or reinstatements to provider master records. For each sanction action processed, the program updates the provider's status on the Provider Master file and dynamically invokes an appropriate notice-generation program to notify downstream systems such as Claims and MCO. It is a standalone batch main program with no CICS interaction.\n\n<br>\n\n- **Execution Environment**: Batch\n- **Database Access**: VSAM (Indexed and Sequential Files)\n- **MQ Calls**: No\n- **Module Type**: Main/Driver module\n\n<br>\n\n### Key Functionalities:\n\n1: Sanction Input Processing - Read each sanction record sequentially from the incoming sanctions file, extracting the provider NPI, action code (Terminate/Suspend/Reinstate), reason, and effective date for processing\n\n2: Provider Lookup by NPI - Search the Provider Master file using the NPI from the sanction record to retrieve the provider's current record for status update\n\n3: Provider Not Found Handling - When a provider NPI from the sanction input does not exist in the Provider Master, log the unmatched NPI and skip processing for that record\n\n4: Provider Termination - When the sanction action is Terminate, update the provider's status in the Provider Master to Terminated and increment the termination counter\n\n5: Provider Suspension - When the sanction action is Suspend, update the provider's status in the Provider Master to Denied/Suspended, preventing the provider from receiving claims or services\n\n6: Provider Reinstatement - When the sanction action is Reinstate, update the provider's status in the Provider Master back to Active, restoring the provider's eligibility\n\n7: Provider Master Record Update - Persist the updated provider status (Terminated, Suspended, or Active) back to the Provider Master file after applying the sanction action\n\n8: Sanction Notice Generation - Based on the sanction action type (Termination, Suspension, or Reinstatement), invoke the appropriate notice program to generate and send notifications to downstream systems such as Claims and MCO\n\n9: Termination Count Reporting - Track and display the total number of providers terminated during the processing run for audit and reporting purposes\n\n"
+}

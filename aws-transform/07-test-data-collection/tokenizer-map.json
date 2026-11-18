@@ -1,0 +1,8 @@
+{
+  "mapping": {
+    "TC-PRVDAY01.jcl-3f15ba4c": "token1",
+    "TC-PRVMTH01.jcl-fc4facec": "token2",
+    "TC-PRVVSM02.jcl-62020d4e": "token3",
+    "TC-PRVVSM01.jcl-e0d7c457": "token4"
+  }
+}

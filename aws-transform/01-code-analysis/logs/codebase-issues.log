@@ -1,0 +1,165 @@
+2026-11-17 11:23:39,771 [main] INFO :  | |   ___ __ _ __ _ __ _  _|_ _|_ _  _ __ _  _| |_ ___/ __| |_  ___ __| |_____ _ _
+2026-11-17 11:23:39,772 [main] INFO :  | |__/ -_) _` / _` / _| || || || ' \| '_ \ || |  _(_-< (__| ' \/ -_) _| / / -_) '_|
+2026-11-17 11:23:39,772 [main] INFO :  |____\___\__, \__,_\__|\_, |___|_||_| .__/\_,_|\__/__/\___|_||_\___\__|_\_\___|_|
+2026-11-17 11:23:39,772 [main] INFO :           |___/         |__/         |_|
+2026-11-17 11:23:39,772 [main] INFO :                              Version:   V20261106092015
+2026-11-17 11:23:39,773 [main] INFO : System utilities path provided: /opt/amazon/shared/systemUtilities.json
+2026-11-17 11:23:39,775 [main] INFO : Watchdog started with timeout of 3000 minutes
+2026-11-17 11:23:39,775 [main] INFO : Folder found at /ramdisk/1/assets
+2026-11-17 11:23:39,775 [main] INFO : [CodebaseFilter] No .workpackages-files.json found at /ramdisk/1/legacy_inputs/.lic_engine_metadata/.workpackages-files.json — all codebase files will be analyzed
+2026-11-17 11:23:39,775 [main] INFO : [LIC] Legacy Input Checkers running...
+2026-11-17 11:23:39,776 [main] INFO : [  IID] Insights and Issues Detectors running...
+2026-11-17 11:23:39,795 [main] INFO : [LegacyTypeDetection] classification file location : /ramdisk/1/legacy_inputs/.lic_engine_metadata/.classification.json
+2026-11-17 11:23:39,863 [main] INFO : [LegacyTypeDetection] classification file found at /ramdisk/1/legacy_inputs/.lic_engine_metadata/.classification.json
+2026-11-17 11:23:39,877 [main] INFO : [LegacyTypeDetection] dependencies file location : /ramdisk/1/legacy_inputs/.lic_engine_metadata/.dependencies.json
+2026-11-17 11:23:39,907 [main] INFO : [LegacyTypeDetection] dependencies file found at /ramdisk/1/legacy_inputs/.lic_engine_metadata/.dependencies.json
+2026-11-17 11:23:39,920 [main] INFO : [Homonyms] File not found at /ramdisk/1/legacy_inputs/.lic_engine_metadata/.homonyms.json
+2026-11-17 11:23:39,921 [main] INFO : [Homonyms] File not found at /ramdisk/1/legacy_inputs/.homonyms.json
+2026-11-17 11:23:39,921 [main] INFO : [Homonyms] Loaded 0 homonym results
+2026-11-17 11:23:39,922 [main] INFO : [DuplicatedIds] File location: /ramdisk/1/legacy_inputs/.lic_engine_metadata/.duplicatedIds.json
+2026-11-17 11:23:39,924 [main] INFO : [DuplicatedIds] File found at /ramdisk/1/legacy_inputs/.lic_engine_metadata/.duplicatedIds.json
+2026-11-17 11:23:39,924 [main] INFO : [DuplicatedIds] File not found at /ramdisk/1/legacy_inputs/.duplicatedIds.json
+2026-11-17 11:23:39,924 [main] INFO : [DuplicatedIds] Loaded 0 duplicated ID results
+2026-11-17 11:23:39,932 [main] INFO : [LegacyTypeDetection] charset file not found at /ramdisk/1/legacy_inputs/.lic_engine_metadata/file-charsets.json
+2026-11-17 11:23:39,932 [main] INFO : [LegacyTypeDetection] charset file not found at /ramdisk/1/legacy_inputs/file-charsets.json
+2026-11-17 11:23:39,958 [main] INFO : Transform output files detected : 4 
+2026-11-17 11:23:39,958 [main] INFO : Transform output files detected : 5 
+2026-11-17 11:23:39,960 [main] INFO : Loaded 9 transformed files
+2026-11-17 11:23:39,960 [main] INFO : [LegacyTypes] File not found at /ramdisk/1/legacy_inputs/.lic_engine_metadata/.legacyTypes.json
+2026-11-17 11:23:39,961 [main] INFO : [LegacyTypes] File not found at /ramdisk/1/legacy_inputs/.legacyTypes.json
+2026-11-17 11:23:39,961 [main] INFO : [LegacyTypes] Loaded 0 legacy type entries
+2026-11-17 11:23:39,961 [main] INFO : Using system utilities file: /opt/amazon/shared/systemUtilities.json
+2026-11-17 11:23:40,052 [main] INFO : [InsightDescription] Loading insights from jcl-dd-3rd-party-utilities-insights.json
+2026-11-17 11:23:40,072 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,072 [main] INFO : [InsightDescription] Loading insights from jcl-dd-gdg-insights.json
+2026-11-17 11:23:40,075 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,075 [main] INFO : [InsightDescription] Loading insights from jcl-sort-features-insights.json
+2026-11-17 11:23:40,078 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,078 [main] INFO : [InsightDescription] Loading insights from jcl-idcams-insights.json
+2026-11-17 11:23:40,080 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,080 [main] INFO : [InsightDescription] Loading insights from jcl-called-program-insights.json
+2026-11-17 11:23:40,083 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,083 [main] INFO : [InsightDescription] Loading insights from jcl-extra-languages-insights.json
+2026-11-17 11:23:40,085 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,085 [main] INFO : [InsightDescription] Loading insights from jcl-file-transfer-insights.json
+2026-11-17 11:23:40,087 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,087 [main] INFO : [InsightDescription] Loading insights from jcl-condition-insights.json
+2026-11-17 11:23:40,088 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,089 [main] INFO : [InsightDescription] Loading insights from jcl-multi-gdg-insights.json
+2026-11-17 11:23:40,090 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,090 [main] INFO : [InsightDescription] Loading insights from jcl-called-prg-inlined.json
+2026-11-17 11:23:40,092 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,092 [main] INFO : [InsightDescription] Loading insights from jcl-uses-dd-inlined.json
+2026-11-17 11:23:40,094 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,111 [main] INFO : [IssueDescription] Loading issues from missing-issues.json
+2026-11-17 11:23:40,121 [main] INFO : [IssueDescription] 7 issues description loaded
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Source File: PRVMSTR (Assignment clause)
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Source File: REVALQ (Assignment clause)
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Source File: APPERROR (Assignment clause)
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Source File: APPINPUT (Assignment clause)
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Source File: PRVMSTR (Assignment clause)
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Dataset: MMPRV.REVAL.QUEUE.D&DATE (Resolved Symbol; Write Dataset)
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Dataset: MMPRV.TMSIS.ARCHIVE(+1) (Write Dataset)
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Dataset: MMPRV.TMSIS.PROVIDER.D&DATE (Read Dataset; Resolved Symbol; Write Dataset)
+2026-11-17 11:23:40,122 [main] WARN : Ignoring missing Missing Source File: PRVMSTR (Assignment clause)
+2026-11-17 11:23:40,125 [main] WARN : Ignoring missing Missing Source File: SANCIN (Assignment clause)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Source File: PRVMSTR (Assignment clause)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Source File: PRVMSTR (Assignment clause)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Source File: SCRNOUT (Assignment clause)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Source File: DIROUT (Assignment clause)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Source File: PRVMSTR (Assignment clause)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Dataset: MMPRV.PROV.APPS.D&DATE (Read Dataset; Resolved Symbol)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Dataset: MMPRV.PROV.ERRORS.D&DATE (Resolved Symbol; Write Dataset)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Dataset: MMPRV.SCREEN.RESULTS.D&DATE (Resolved Symbol; Write Dataset)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Source File: PRVMSTR (Assignment clause)
+2026-11-17 11:23:40,126 [main] WARN : Ignoring missing Missing Source File: TMSISOUT (Assignment clause)
+2026-11-17 11:23:40,132 [main] INFO : [IssueDescription] Loading issues from generic-outputs-issues.json
+2026-11-17 11:23:40,137 [main] INFO : [IssueDescription] 8 issues description loaded
+2026-11-17 11:23:40,140 [main] INFO : [IssueDescription] Loading issues from catalog-issues.json
+2026-11-17 11:23:40,143 [main] INFO : [IssueDescription] 1 issues description loaded
+2026-11-17 11:23:40,146 [main] INFO : No unsupported system utilities call detected.
+2026-11-17 11:23:40,146 [main] INFO : No legacy types from BI Backend — skipping unsupported language detection
+2026-11-17 11:23:40,146 [main] INFO : Skipping unsupported language detection — no legacy types provided
+2026-11-17 11:23:40,147 [main] INFO : No ADABAS database calls detected.
+2026-11-17 11:23:40,153 [main] INFO : [IssueDescription] Loading issues from cics-issues.json
+2026-11-17 11:23:40,156 [main] INFO : [IssueDescription] 2 issues description loaded
+2026-11-17 11:23:40,156 [main] INFO : [InsightDescription] Loading insights from cics-insights.json
+2026-11-17 11:23:40,158 [main] INFO : [InsightDescription] 2 insights description loaded
+2026-11-17 11:23:40,163 [main] INFO : [InsightDescription] Loading insights from bms-insights.json
+2026-11-17 11:23:40,165 [main] INFO : [InsightDescription] 6 insights description loaded
+2026-11-17 11:23:40,170 [main] INFO : Found 0 YML files
+2026-11-17 11:23:40,170 [main] INFO : No DBD files found.
+2026-11-17 11:23:40,170 [main] INFO : No PSB files found.
+2026-11-17 11:23:40,173 [main] INFO : [InsightDescription] Loading insights from code-use-cee-insights.json
+2026-11-17 11:23:40,175 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,175 [main] INFO : [InsightDescription] Loading insights from code-use-zip-insights.json
+2026-11-17 11:23:40,176 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,177 [main] INFO : [InsightDescription] Loading insights from code-use-indexed-insights.json
+2026-11-17 11:23:40,178 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,178 [main] INFO : [InsightDescription] Loading insights from code-use-cics-file-insights.json
+2026-11-17 11:23:40,179 [main] INFO : [InsightDescription] 2 insights description loaded
+2026-11-17 11:23:40,179 [main] INFO : [InsightDescription] Loading insights from code-use-sequential-insights.json
+2026-11-17 11:23:40,181 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,181 [main] INFO : [InsightDescription] Loading insights from code-use-report-section.json
+2026-11-17 11:23:40,182 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,182 [main] INFO : [InsightDescription] Loading insights from code-write-jcl.json
+2026-11-17 11:23:40,184 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,184 [main] INFO : [InsightDescription] Loading insights from code-write-to-database-using-view.json
+2026-11-17 11:23:40,185 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,186 [main] INFO : [InsightDescription] Loading insights from unusual-database-columns.json
+2026-11-17 11:23:40,187 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,187 [main] INFO : [InsightDescription] Loading insights from code-use-mq.json
+2026-11-17 11:23:40,189 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,189 [main] INFO : [InsightDescription] Loading insights from code-use-xml.json
+2026-11-17 11:23:40,190 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,191 [main] INFO : [InsightDescription] Loading insights from code-01-aliasing.json
+2026-11-17 11:23:40,192 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,192 [main] INFO : [InsightDescription] Loading insights from code-use-pointer.json
+2026-11-17 11:23:40,193 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,193 [main] INFO : [InsightDescription] Loading insights from ims-databases.json
+2026-11-17 11:23:40,195 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,195 [main] INFO : [InsightDescription] Loading insights from ims-databases-functions-calls.json
+2026-11-17 11:23:40,196 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,197 [main] INFO : [InsightDescription] Loading insights from summary-datasets.json
+2026-11-17 11:23:40,198 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,198 [main] INFO : [InsightDescription] Loading insights from summary-ims-databases.json
+2026-11-17 11:23:40,200 [main] INFO : [InsightDescription] 1 insights description loaded
+2026-11-17 11:23:40,202 [main] INFO : No insights about CICS files access will be emitted since no parsed CSD was provided
+2026-11-17 11:23:40,204 [main] INFO : Loaded 0 LISTCAT definition(s).
+2026-11-17 11:23:40,205 [main] INFO : Enriched dataset summary with JCL datasets. Total datasets: 0.
+2026-11-17 11:23:40,206 [main] INFO : Starting TransformErrorDetector
+2026-11-17 11:23:40,206 [main] WARN : Transform artifacts are missing/not normalized. Skipping TransformErrorDetector
+2026-11-17 11:23:40,209 [main] INFO : [IssueDescription] Loading issues from pli-macro-issues.json
+2026-11-17 11:23:40,212 [main] INFO : [IssueDescription] 4 issues description loaded
+2026-11-17 11:23:40,214 [main] INFO : Starting step: Finding issues into codebase...
+
+2026-11-17 11:23:40,214 [main] INFO : Walking code base at /ramdisk/1/assets
+2026-11-17 11:23:40,223 [main] INFO : Found 14 code base files to perform detection on
+2026-11-17 11:23:40,244 [pool-2-thread-5] INFO : [IssueDescription] Loading issues from cobol-code-issues.json
+2026-11-17 11:23:40,247 [pool-2-thread-5] INFO : [IssueDescription] 1 issues description loaded
+2026-11-17 11:23:40,278 [main] INFO : Ending step : Finding issues into codebase in 0 sec
+
+
+2026-11-17 11:23:40,278 [main] INFO : ====== Performances report ======
+2026-11-17 11:23:40,278 [main] INFO : ====== Performances report ======
+2026-11-17 11:23:40,281 [main] INFO : == Category: processDetectionsFinding > com.aws.bluage.analyse.lic.legacy.code.detectors.engine.finder.DefaultRegexDetector nb processed 14  total time : 318ms
+2026-11-17 11:23:40,281 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVENR01.cbl : 28ms
+2026-11-17 11:23:40,281 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSAN01.cbl : 28ms
+2026-11-17 11:23:40,281 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSCR01.cbl : 28ms
+2026-11-17 11:23:40,281 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVRSK01.cbl : 28ms
+2026-11-17 11:23:40,282 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVTMS01.cbl : 27ms
+2026-11-17 11:23:40,282 [main] INFO : ==
+2026-11-17 11:23:40,282 [main] INFO : == Category: processDetectionsFinding > com.aws.bluage.analyse.lic.legacy.code.detectors.engine.finder.DefaultRegexDetector nb processed 14  total time : 318ms
+2026-11-17 11:23:40,282 [main] INFO : #1 : 28ms
+2026-11-17 11:23:40,282 [main] INFO : #2 : 28ms
+2026-11-17 11:23:40,282 [main] INFO : #3 : 28ms
+2026-11-17 11:23:40,282 [main] INFO : #4 : 28ms
+2026-11-17 11:23:40,282 [main] INFO : #5 : 27ms
+2026-11-17 11:23:40,282 [main] INFO : ==
+2026-11-17 11:23:40,282 [main] INFO : ======
+2026-11-17 11:23:40,282 [main] INFO : ======
+2026-11-17 11:23:40,285 [main] INFO : [  IID] Done in 00:00:00.508
+2026-11-17 11:23:40,285 [main] INFO : [  OUT] Output generation running...
+2026-11-17 11:23:40,309 [main] INFO : [  OUT] Done in 00:00:00.024
+2026-11-17 11:23:40,309 [main] INFO : [LIC] Done in 00:00:00.534
+2026-11-17 11:23:40,313 [main] INFO : Wrote execution status to /ramdisk/1/legacy_inputs/lic-status.json

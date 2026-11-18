@@ -1,0 +1,5 @@
+2026-11-17 11:23:27,251 [main] INFO : Complexity analysis started at: 11:23:27 (version 20260612144411)
+2026-11-17 11:23:27,252 [main] INFO : Complexity analysis started at: 11:23:27 (version 20260612144411)
+2026-11-17 11:23:27,255 [main] INFO : [LegacyTypeDetection] classification file location : /ramdisk/1/cyclomatic/.classification.json
+2026-11-17 11:23:27,378 [main] INFO : Analysis successful, finished at: 11:23:27
+2026-11-17 11:23:27,378 [main] INFO : Global duration : 0 sec

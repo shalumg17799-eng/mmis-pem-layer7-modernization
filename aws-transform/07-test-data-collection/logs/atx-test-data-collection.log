@@ -1,0 +1,5 @@
+2026-11-17 13:20:59,438 - INFO - customer.variable_sub_processor - [_log:129] - [log_id=01d3a9dd-03e6-4e0c-9877-1e05d09ff111] app_config.parsed_args.output_dir =/ramdisk/1/test_data_collection/outputs
+2026-11-17 13:20:59,438 - INFO - customer.variable_sub_processor - [_log:129] - [log_id=01d3a9dd-03e6-4e0c-9877-1e05d09ff111] Starting ATX Test Data Collection application...
+2026-11-17 13:20:59,515 - INFO - customer.variable_sub_processor - [_log:129] - [log_id=01d3a9dd-03e6-4e0c-9877-1e05d09ff111] Application completed successfully
+2026-11-17 13:20:59,515 - INFO - customer.variable_sub_processor - [_log:129] - [log_id=01d3a9dd-03e6-4e0c-9877-1e05d09ff111] ATX Test Data Collection 1.0 completed in 0.07890489400051592 seconds
+2026-11-17 13:20:59,515 - INFO - customer.variable_sub_processor - [_log:129] - [log_id=01d3a9dd-03e6-4e0c-9877-1e05d09ff111] ATX Test Data Collection 1.0 completed in 0.07890489400051592 seconds

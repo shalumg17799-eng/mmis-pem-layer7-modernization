@@ -1,0 +1,781 @@
+2026-11-17 11:23:22,356 [main] INFO : Generating dependencies with the Specific analysis
+2026-11-17 11:23:22,357 [main] INFO : Generating dependencies with the Specific analysis
+2026-11-17 11:23:22,422 [main] INFO : Dependency analysis started at : 11:23:22 (version 20261112103056)
+2026-11-17 11:23:22,490 [main] INFO : [#MRifkI][LegacyTypeDetection] classification file not found ! /ramdisk/1/assets/.classification.json
+2026-11-17 11:23:22,490 [main] INFO : [#MRifkI][LegacyTypeDetection] classification file not found !
+2026-11-17 11:23:22,498 [main] INFO : [#9P8fMc][LegacyTypeDetection] classification file location : /ramdisk/1/dependencies/.classification.json
+2026-11-17 11:23:22,499 [main] INFO : [#9P8fMc][LegacyTypeDetection] classification file
+2026-11-17 11:23:22,527 [main] INFO : [#9P8fMc][LegacyTypeDetection] classification file found ! /ramdisk/1/dependencies/.classification.json
+2026-11-17 11:23:22,527 [main] INFO : [#9P8fMc][LegacyTypeDetection] classification file found !
+2026-11-17 11:23:22,621 [main] INFO : Starting step: Finding global object definitions...
+
+2026-11-17 11:23:22,621 [main] INFO : Starting step: Finding global object definitions...
+
+2026-11-17 11:23:22,626 [main] INFO : [1/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)
+2026-11-17 11:23:22,626 [main] INFO : [1/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)
+2026-11-17 11:23:22,628 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)...
+
+2026-11-17 11:23:22,628 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)...
+
+2026-11-17 11:23:22,716 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) in 0 sec
+
+
+2026-11-17 11:23:22,716 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) in 0 sec
+
+
+2026-11-17 11:23:22,716 [main] INFO : [1/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) : Done"
+2026-11-17 11:23:22,716 [main] INFO : [1/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) : Done"
+2026-11-17 11:23:22,717 [main] INFO : [2/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (1 files)
+2026-11-17 11:23:22,717 [main] INFO : [2/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (1 files)
+2026-11-17 11:23:22,717 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (1 files)...
+
+2026-11-17 11:23:22,717 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (1 files)...
+
+2026-11-17 11:23:22,718 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,718 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,718 [main] INFO : [2/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (1 files) : Done"
+2026-11-17 11:23:22,718 [main] INFO : [2/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (1 files) : Done"
+2026-11-17 11:23:22,718 [main] INFO : [3/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)
+2026-11-17 11:23:22,718 [main] INFO : [3/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)
+2026-11-17 11:23:22,718 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)...
+
+2026-11-17 11:23:22,718 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)...
+
+2026-11-17 11:23:22,745 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,746 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,746 [main] INFO : [3/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) : Done"
+2026-11-17 11:23:22,746 [main] INFO : [3/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) : Done"
+2026-11-17 11:23:22,746 [main] INFO : [4/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)
+2026-11-17 11:23:22,746 [main] INFO : [4/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)
+2026-11-17 11:23:22,746 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)...
+
+2026-11-17 11:23:22,746 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)...
+
+2026-11-17 11:23:22,749 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) in 0 sec
+
+
+2026-11-17 11:23:22,749 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) in 0 sec
+
+
+2026-11-17 11:23:22,750 [main] INFO : [4/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) : Done"
+2026-11-17 11:23:22,750 [main] INFO : [4/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) : Done"
+2026-11-17 11:23:22,750 [main] INFO : [5/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)
+2026-11-17 11:23:22,750 [main] INFO : [5/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)
+2026-11-17 11:23:22,750 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)...
+
+2026-11-17 11:23:22,750 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)...
+
+2026-11-17 11:23:22,751 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,752 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,752 [main] INFO : [5/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) : Done"
+2026-11-17 11:23:22,752 [main] INFO : [5/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) : Done"
+2026-11-17 11:23:22,752 [main] INFO : [6/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (5 files)
+2026-11-17 11:23:22,752 [main] INFO : [6/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (5 files)
+2026-11-17 11:23:22,752 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (5 files)...
+
+2026-11-17 11:23:22,752 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (5 files)...
+
+2026-11-17 11:23:22,753 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (5 files) in 0 sec
+
+
+2026-11-17 11:23:22,753 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (5 files) in 0 sec
+
+
+2026-11-17 11:23:22,754 [main] INFO : [6/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (5 files) : Done"
+2026-11-17 11:23:22,754 [main] INFO : [6/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (5 files) : Done"
+2026-11-17 11:23:22,754 [main] INFO : [7/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)
+2026-11-17 11:23:22,754 [main] INFO : [7/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)
+2026-11-17 11:23:22,754 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)...
+
+2026-11-17 11:23:22,754 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)...
+
+2026-11-17 11:23:22,783 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) in 0 sec
+
+
+2026-11-17 11:23:22,783 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) in 0 sec
+
+
+2026-11-17 11:23:22,783 [main] INFO : [7/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) : Done"
+2026-11-17 11:23:22,783 [main] INFO : [7/9] Processing global definition of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) : Done"
+2026-11-17 11:23:22,784 [main] INFO : [8/9] Processing global definition of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (1 files)
+2026-11-17 11:23:22,784 [main] INFO : [8/9] Processing global definition of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (1 files)
+2026-11-17 11:23:22,784 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (1 files)...
+
+2026-11-17 11:23:22,784 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (1 files)...
+
+2026-11-17 11:23:22,785 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,785 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,785 [main] INFO : [8/9] Processing global definition of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (1 files) : Done"
+2026-11-17 11:23:22,785 [main] INFO : [8/9] Processing global definition of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (1 files) : Done"
+2026-11-17 11:23:22,785 [main] INFO : [9/9] Processing global definition of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)
+2026-11-17 11:23:22,785 [main] INFO : [9/9] Processing global definition of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)
+2026-11-17 11:23:22,785 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)...
+
+2026-11-17 11:23:22,785 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)...
+
+2026-11-17 11:23:22,828 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,828 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,828 [main] INFO : [9/9] Processing global definition of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) : Done"
+2026-11-17 11:23:22,828 [main] INFO : [9/9] Processing global definition of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) : Done"
+2026-11-17 11:23:22,832 [main] INFO : [10/9] Processing objects of Remaining objects turn #1 (2 objects)
+2026-11-17 11:23:22,832 [main] INFO : [10/9] Processing objects of Remaining objects turn #1 (2 objects)
+2026-11-17 11:23:22,833 [main] INFO : Starting step: Remaining objects turn #1 (2 objects)...
+
+2026-11-17 11:23:22,833 [main] INFO : Starting step: Remaining objects turn #1 (2 objects)...
+
+2026-11-17 11:23:22,835 [main] INFO : Ending step : Remaining objects turn #1 (2 objects) in 0 sec
+
+
+2026-11-17 11:23:22,835 [main] INFO : Ending step : Remaining objects turn #1 (2 objects) in 0 sec
+
+
+2026-11-17 11:23:22,835 [main] INFO : [10/9] Processing objects of Remaining objects turn #1 (2 objects) Done
+2026-11-17 11:23:22,835 [main] INFO : [10/9] Processing objects of Remaining objects turn #1 (2 objects) Done
+2026-11-17 11:23:22,835 [main] INFO : [11/9] Processing objects of Last turn (2 objects)
+2026-11-17 11:23:22,835 [main] INFO : [11/9] Processing objects of Last turn (2 objects)
+2026-11-17 11:23:22,836 [main] INFO : Starting step: Last turn (2 objects)...
+
+2026-11-17 11:23:22,836 [main] INFO : Starting step: Last turn (2 objects)...
+
+2026-11-17 11:23:22,836 [main] INFO : Ending step : Last turn (2 objects) in 0 sec
+
+
+2026-11-17 11:23:22,836 [main] INFO : Ending step : Last turn (2 objects) in 0 sec
+
+
+2026-11-17 11:23:22,837 [main] INFO : [11/9] Processing objects of Last turn (2 objects) Done
+2026-11-17 11:23:22,837 [main] INFO : [11/9] Processing objects of Last turn (2 objects) Done
+2026-11-17 11:23:22,839 [main] INFO : Ending step : Finding global object definitions in 0 sec
+
+
+2026-11-17 11:23:22,839 [main] INFO : Ending step : Finding global object definitions in 0 sec
+
+
+2026-11-17 11:23:22,840 [main] INFO : Starting step: Finding dependencies...
+
+2026-11-17 11:23:22,840 [main] INFO : Starting step: Finding dependencies...
+
+2026-11-17 11:23:22,842 [main] INFO : [1/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)
+2026-11-17 11:23:22,842 [main] INFO : [1/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)
+2026-11-17 11:23:22,843 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)...
+
+2026-11-17 11:23:22,843 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)...
+
+2026-11-17 11:23:22,914 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) in 0 sec
+
+
+2026-11-17 11:23:22,914 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) in 0 sec
+
+
+2026-11-17 11:23:22,915 [main] INFO : [1/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) Done
+2026-11-17 11:23:22,915 [main] INFO : [1/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) Done
+2026-11-17 11:23:22,915 [main] INFO : [2/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files)
+2026-11-17 11:23:22,915 [main] INFO : [2/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files)
+2026-11-17 11:23:22,915 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files)...
+
+2026-11-17 11:23:22,915 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files)...
+
+2026-11-17 11:23:22,942 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files) in 0 sec
+
+
+2026-11-17 11:23:22,942 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files) in 0 sec
+
+
+2026-11-17 11:23:22,942 [main] INFO : [2/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files) Done
+2026-11-17 11:23:22,942 [main] INFO : [2/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files) Done
+2026-11-17 11:23:22,942 [main] INFO : [3/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)
+2026-11-17 11:23:22,942 [main] INFO : [3/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)
+2026-11-17 11:23:22,942 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)...
+
+2026-11-17 11:23:22,942 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)...
+
+2026-11-17 11:23:22,999 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,999 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) in 0 sec
+
+
+2026-11-17 11:23:22,999 [main] INFO : [3/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) Done
+2026-11-17 11:23:22,999 [main] INFO : [3/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) Done
+2026-11-17 11:23:23,000 [main] INFO : [4/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)
+2026-11-17 11:23:23,000 [main] INFO : [4/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)
+2026-11-17 11:23:23,000 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)...
+
+2026-11-17 11:23:23,000 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)...
+
+2026-11-17 11:23:23,056 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) in 0 sec
+
+
+2026-11-17 11:23:23,056 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) in 0 sec
+
+
+2026-11-17 11:23:23,056 [main] INFO : [4/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) Done
+2026-11-17 11:23:23,056 [main] INFO : [4/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) Done
+2026-11-17 11:23:23,056 [main] INFO : [5/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)
+2026-11-17 11:23:23,056 [main] INFO : [5/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)
+2026-11-17 11:23:23,056 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)...
+
+2026-11-17 11:23:23,057 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)...
+
+2026-11-17 11:23:23,088 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,088 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,088 [main] INFO : [5/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) Done
+2026-11-17 11:23:23,088 [main] INFO : [5/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) Done
+2026-11-17 11:23:23,088 [main] INFO : [6/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (2 files)
+2026-11-17 11:23:23,088 [main] INFO : [6/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (2 files)
+2026-11-17 11:23:23,089 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (2 files)...
+
+2026-11-17 11:23:23,089 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (2 files)...
+
+2026-11-17 11:23:23,123 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (2 files) in 0 sec
+
+
+2026-11-17 11:23:23,124 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (2 files) in 0 sec
+
+
+2026-11-17 11:23:23,124 [main] INFO : [6/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (2 files) Done
+2026-11-17 11:23:23,124 [main] INFO : [6/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (2 files) Done
+2026-11-17 11:23:23,124 [main] INFO : [7/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)
+2026-11-17 11:23:23,124 [main] INFO : [7/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)
+2026-11-17 11:23:23,124 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)...
+
+2026-11-17 11:23:23,124 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)...
+
+2026-11-17 11:23:23,189 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,190 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,190 [main] INFO : [7/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) Done
+2026-11-17 11:23:23,190 [main] INFO : [7/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) Done
+2026-11-17 11:23:23,190 [main] INFO : [8/11] Processing dependencies of library "MAINFRAME:" (0 files)
+2026-11-17 11:23:23,190 [main] INFO : [8/11] Processing dependencies of library "MAINFRAME:" (0 files)
+2026-11-17 11:23:23,190 [main] INFO : Starting step: library "MAINFRAME:" (0 files)...
+
+2026-11-17 11:23:23,190 [main] INFO : Starting step: library "MAINFRAME:" (0 files)...
+
+2026-11-17 11:23:23,213 [main] INFO : Ending step : library "MAINFRAME:" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,213 [main] INFO : Ending step : library "MAINFRAME:" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,213 [main] INFO : [8/11] Processing dependencies of library "MAINFRAME:" (0 files) Done
+2026-11-17 11:23:23,213 [main] INFO : [8/11] Processing dependencies of library "MAINFRAME:" (0 files) Done
+2026-11-17 11:23:23,214 [main] INFO : [9/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files)
+2026-11-17 11:23:23,214 [main] INFO : [9/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files)
+2026-11-17 11:23:23,214 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files)...
+
+2026-11-17 11:23:23,214 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files)...
+
+2026-11-17 11:23:23,236 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,237 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,237 [main] INFO : [9/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files) Done
+2026-11-17 11:23:23,237 [main] INFO : [9/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files) Done
+2026-11-17 11:23:23,237 [main] INFO : [10/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)
+2026-11-17 11:23:23,237 [main] INFO : [10/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)
+2026-11-17 11:23:23,237 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)...
+
+2026-11-17 11:23:23,237 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)...
+
+2026-11-17 11:23:23,287 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,287 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,287 [main] INFO : [10/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) Done
+2026-11-17 11:23:23,287 [main] INFO : [10/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) Done
+2026-11-17 11:23:23,287 [main] INFO : [11/11] Processing dependencies of library "OTHER:" (0 files)
+2026-11-17 11:23:23,287 [main] INFO : [11/11] Processing dependencies of library "OTHER:" (0 files)
+2026-11-17 11:23:23,288 [main] INFO : Starting step: library "OTHER:" (0 files)...
+
+2026-11-17 11:23:23,288 [main] INFO : Starting step: library "OTHER:" (0 files)...
+
+2026-11-17 11:23:23,311 [main] INFO : Ending step : library "OTHER:" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,311 [main] INFO : Ending step : library "OTHER:" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,311 [main] INFO : [11/11] Processing dependencies of library "OTHER:" (0 files) Done
+2026-11-17 11:23:23,311 [main] INFO : [11/11] Processing dependencies of library "OTHER:" (0 files) Done
+2026-11-17 11:23:23,313 [main] INFO : [12/11] Processing dependencies of Remaining files turn #1 (10 files)
+2026-11-17 11:23:23,313 [main] INFO : [12/11] Processing dependencies of Remaining files turn #1 (10 files)
+2026-11-17 11:23:23,313 [main] INFO : Starting step: Remaining files turn #1 (10 files)...
+
+2026-11-17 11:23:23,313 [main] INFO : Starting step: Remaining files turn #1 (10 files)...
+
+2026-11-17 11:23:23,370 [main] INFO : Ending step : Remaining files turn #1 (10 files) in 0 sec
+
+
+2026-11-17 11:23:23,370 [main] INFO : Ending step : Remaining files turn #1 (10 files) in 0 sec
+
+
+2026-11-17 11:23:23,370 [main] INFO : [12/11] Processing dependencies of Remaining files turn #1 (10 files) Done
+2026-11-17 11:23:23,370 [main] INFO : [12/11] Processing dependencies of Remaining files turn #1 (10 files) Done
+2026-11-17 11:23:23,370 [main] INFO : [13/11] Processing dependencies of Remaining files turn #2 (8 files)
+2026-11-17 11:23:23,370 [main] INFO : [13/11] Processing dependencies of Remaining files turn #2 (8 files)
+2026-11-17 11:23:23,370 [main] INFO : Starting step: Remaining files turn #2 (8 files)...
+
+2026-11-17 11:23:23,370 [main] INFO : Starting step: Remaining files turn #2 (8 files)...
+
+2026-11-17 11:23:23,453 [main] INFO : Ending step : Remaining files turn #2 (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,453 [main] INFO : Ending step : Remaining files turn #2 (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,453 [main] INFO : [13/11] Processing dependencies of Remaining files turn #2 (8 files) Done
+2026-11-17 11:23:23,453 [main] INFO : [13/11] Processing dependencies of Remaining files turn #2 (8 files) Done
+2026-11-17 11:23:23,454 [main] INFO : [14/11] Processing dependencies of Remaining files turn #3 (8 files)
+2026-11-17 11:23:23,454 [main] INFO : [14/11] Processing dependencies of Remaining files turn #3 (8 files)
+2026-11-17 11:23:23,454 [main] INFO : Starting step: Remaining files turn #3 (8 files)...
+
+2026-11-17 11:23:23,454 [main] INFO : Starting step: Remaining files turn #3 (8 files)...
+
+2026-11-17 11:23:23,492 [main] INFO : Ending step : Remaining files turn #3 (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,492 [main] INFO : Ending step : Remaining files turn #3 (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,492 [main] INFO : [14/11] Processing dependencies of Remaining files turn #3 (8 files) Done
+2026-11-17 11:23:23,492 [main] INFO : [14/11] Processing dependencies of Remaining files turn #3 (8 files) Done
+2026-11-17 11:23:23,493 [main] INFO : [15/11] Processing dependencies of Remaining files turn #4 (9 files)
+2026-11-17 11:23:23,493 [main] INFO : [15/11] Processing dependencies of Remaining files turn #4 (9 files)
+2026-11-17 11:23:23,493 [main] INFO : Starting step: Remaining files turn #4 (9 files)...
+
+2026-11-17 11:23:23,493 [main] INFO : Starting step: Remaining files turn #4 (9 files)...
+
+2026-11-17 11:23:23,529 [main] INFO : Ending step : Remaining files turn #4 (9 files) in 0 sec
+
+
+2026-11-17 11:23:23,529 [main] INFO : Ending step : Remaining files turn #4 (9 files) in 0 sec
+
+
+2026-11-17 11:23:23,529 [main] INFO : [15/11] Processing dependencies of Remaining files turn #4 (9 files) Done
+2026-11-17 11:23:23,529 [main] INFO : [15/11] Processing dependencies of Remaining files turn #4 (9 files) Done
+2026-11-17 11:23:23,529 [main] INFO : [16/11] Processing dependencies of Remaining files turn #5 (8 files)
+2026-11-17 11:23:23,529 [main] INFO : [16/11] Processing dependencies of Remaining files turn #5 (8 files)
+2026-11-17 11:23:23,530 [main] INFO : Starting step: Remaining files turn #5 (8 files)...
+
+2026-11-17 11:23:23,530 [main] INFO : Starting step: Remaining files turn #5 (8 files)...
+
+2026-11-17 11:23:23,559 [main] INFO : Ending step : Remaining files turn #5 (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,560 [main] INFO : Ending step : Remaining files turn #5 (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,560 [main] INFO : [16/11] Processing dependencies of Remaining files turn #5 (8 files) Done
+2026-11-17 11:23:23,560 [main] INFO : [16/11] Processing dependencies of Remaining files turn #5 (8 files) Done
+2026-11-17 11:23:23,560 [main] INFO : [17/11] Processing dependencies of Remaining files turn #6 (7 files)
+2026-11-17 11:23:23,560 [main] INFO : [17/11] Processing dependencies of Remaining files turn #6 (7 files)
+2026-11-17 11:23:23,560 [main] INFO : Starting step: Remaining files turn #6 (7 files)...
+
+2026-11-17 11:23:23,560 [main] INFO : Starting step: Remaining files turn #6 (7 files)...
+
+2026-11-17 11:23:23,612 [main] INFO : Ending step : Remaining files turn #6 (7 files) in 0 sec
+
+
+2026-11-17 11:23:23,612 [main] INFO : Ending step : Remaining files turn #6 (7 files) in 0 sec
+
+
+2026-11-17 11:23:23,612 [main] INFO : [17/11] Processing dependencies of Remaining files turn #6 (7 files) Done
+2026-11-17 11:23:23,612 [main] INFO : [17/11] Processing dependencies of Remaining files turn #6 (7 files) Done
+2026-11-17 11:23:23,613 [main] INFO : [18/11] Processing dependencies of Remaining files turn #7 (0 files)
+2026-11-17 11:23:23,613 [main] INFO : [18/11] Processing dependencies of Remaining files turn #7 (0 files)
+2026-11-17 11:23:23,613 [main] INFO : Starting step: Remaining files turn #7 (0 files)...
+
+2026-11-17 11:23:23,613 [main] INFO : Starting step: Remaining files turn #7 (0 files)...
+
+2026-11-17 11:23:23,639 [main] INFO : Ending step : Remaining files turn #7 (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,639 [main] INFO : Ending step : Remaining files turn #7 (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,639 [main] INFO : [18/11] Processing dependencies of Remaining files turn #7 (0 files) Done
+2026-11-17 11:23:23,639 [main] INFO : [18/11] Processing dependencies of Remaining files turn #7 (0 files) Done
+2026-11-17 11:23:23,639 [main] INFO : [19/11] Processing dependencies of Last turn (0 files)
+2026-11-17 11:23:23,639 [main] INFO : [19/11] Processing dependencies of Last turn (0 files)
+2026-11-17 11:23:23,640 [main] INFO : Starting step: Last turn (0 files)...
+
+2026-11-17 11:23:23,640 [main] INFO : Starting step: Last turn (0 files)...
+
+2026-11-17 11:23:23,665 [main] INFO : Ending step : Last turn (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,665 [main] INFO : Ending step : Last turn (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,666 [main] INFO : [19/11] Processing dependencies of Last turn (0 files) Done
+2026-11-17 11:23:23,666 [main] INFO : [19/11] Processing dependencies of Last turn (0 files) Done
+2026-11-17 11:23:23,666 [main] INFO : Ending step : Finding dependencies in 1 sec
+
+
+2026-11-17 11:23:23,666 [main] INFO : Ending step : Finding dependencies in 1 sec
+
+
+2026-11-17 11:23:23,667 [main] INFO : Starting step: Analysis postprocessing...
+
+2026-11-17 11:23:23,667 [main] INFO : Starting step: Analysis postprocessing...
+
+2026-11-17 11:23:23,692 [main] INFO : Starting step: Retrying dependencies...
+
+2026-11-17 11:23:23,692 [main] INFO : Starting step: Retrying dependencies...
+
+2026-11-17 11:23:23,692 [main] INFO : [1/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)
+2026-11-17 11:23:23,693 [main] INFO : [1/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)
+2026-11-17 11:23:23,693 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)...
+
+2026-11-17 11:23:23,693 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files)...
+
+2026-11-17 11:23:23,722 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) in 0 sec
+
+
+2026-11-17 11:23:23,723 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) in 0 sec
+
+
+2026-11-17 11:23:23,723 [main] INFO : [1/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) Done
+2026-11-17 11:23:23,723 [main] INFO : [1/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/VSAM" (2 files) Done
+2026-11-17 11:23:23,723 [main] INFO : [2/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files)
+2026-11-17 11:23:23,723 [main] INFO : [2/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files)
+2026-11-17 11:23:23,723 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files)...
+
+2026-11-17 11:23:23,723 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files)...
+
+2026-11-17 11:23:23,750 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,750 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,750 [main] INFO : [2/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files) Done
+2026-11-17 11:23:23,750 [main] INFO : [2/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/REXX" (0 files) Done
+2026-11-17 11:23:23,750 [main] INFO : [3/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)
+2026-11-17 11:23:23,750 [main] INFO : [3/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)
+2026-11-17 11:23:23,750 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)...
+
+2026-11-17 11:23:23,750 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files)...
+
+2026-11-17 11:23:23,777 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,777 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,777 [main] INFO : [3/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) Done
+2026-11-17 11:23:23,777 [main] INFO : [3/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/ONLINE" (1 files) Done
+2026-11-17 11:23:23,777 [main] INFO : [4/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)
+2026-11-17 11:23:23,777 [main] INFO : [4/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)
+2026-11-17 11:23:23,777 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)...
+
+2026-11-17 11:23:23,777 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files)...
+
+2026-11-17 11:23:23,804 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) in 0 sec
+
+
+2026-11-17 11:23:23,804 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) in 0 sec
+
+
+2026-11-17 11:23:23,804 [main] INFO : [4/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) Done
+2026-11-17 11:23:23,804 [main] INFO : [4/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL" (2 files) Done
+2026-11-17 11:23:23,804 [main] INFO : [5/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)
+2026-11-17 11:23:23,804 [main] INFO : [5/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)
+2026-11-17 11:23:23,805 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)...
+
+2026-11-17 11:23:23,805 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files)...
+
+2026-11-17 11:23:23,831 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,831 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,831 [main] INFO : [5/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) Done
+2026-11-17 11:23:23,831 [main] INFO : [5/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS" (1 files) Done
+2026-11-17 11:23:23,831 [main] INFO : [6/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (4 files)
+2026-11-17 11:23:23,831 [main] INFO : [6/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (4 files)
+2026-11-17 11:23:23,831 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (4 files)...
+
+2026-11-17 11:23:23,831 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (4 files)...
+
+2026-11-17 11:23:23,856 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (4 files) in 0 sec
+
+
+2026-11-17 11:23:23,856 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (4 files) in 0 sec
+
+
+2026-11-17 11:23:23,856 [main] INFO : [6/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (4 files) Done
+2026-11-17 11:23:23,856 [main] INFO : [6/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS" (4 files) Done
+2026-11-17 11:23:23,856 [main] INFO : [7/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)
+2026-11-17 11:23:23,856 [main] INFO : [7/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)
+2026-11-17 11:23:23,857 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)...
+
+2026-11-17 11:23:23,857 [main] INFO : Starting step: library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files)...
+
+2026-11-17 11:23:23,881 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,881 [main] INFO : Ending step : library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) in 0 sec
+
+
+2026-11-17 11:23:23,881 [main] INFO : [7/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) Done
+2026-11-17 11:23:23,881 [main] INFO : [7/11] Processing dependencies of library "MAINFRAME:MMIS-PROVIDER-DEMO-TIER4/BATCH" (8 files) Done
+2026-11-17 11:23:23,881 [main] INFO : [8/11] Processing dependencies of library "MAINFRAME:" (0 files)
+2026-11-17 11:23:23,881 [main] INFO : [8/11] Processing dependencies of library "MAINFRAME:" (0 files)
+2026-11-17 11:23:23,881 [main] INFO : Starting step: library "MAINFRAME:" (0 files)...
+
+2026-11-17 11:23:23,881 [main] INFO : Starting step: library "MAINFRAME:" (0 files)...
+
+2026-11-17 11:23:23,906 [main] INFO : Ending step : library "MAINFRAME:" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,907 [main] INFO : Ending step : library "MAINFRAME:" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,907 [main] INFO : [8/11] Processing dependencies of library "MAINFRAME:" (0 files) Done
+2026-11-17 11:23:23,907 [main] INFO : [8/11] Processing dependencies of library "MAINFRAME:" (0 files) Done
+2026-11-17 11:23:23,907 [main] INFO : [9/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files)
+2026-11-17 11:23:23,907 [main] INFO : [9/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files)
+2026-11-17 11:23:23,907 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files)...
+
+2026-11-17 11:23:23,907 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files)...
+
+2026-11-17 11:23:23,933 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,934 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,934 [main] INFO : [9/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files) Done
+2026-11-17 11:23:23,934 [main] INFO : [9/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4" (0 files) Done
+2026-11-17 11:23:23,934 [main] INFO : [10/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)
+2026-11-17 11:23:23,934 [main] INFO : [10/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)
+2026-11-17 11:23:23,934 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)...
+
+2026-11-17 11:23:23,934 [main] INFO : Starting step: library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files)...
+
+2026-11-17 11:23:23,960 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,960 [main] INFO : Ending step : library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) in 0 sec
+
+
+2026-11-17 11:23:23,960 [main] INFO : [10/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) Done
+2026-11-17 11:23:23,960 [main] INFO : [10/11] Processing dependencies of library "OTHER:MMIS-PROVIDER-DEMO-TIER4/DB2" (1 files) Done
+2026-11-17 11:23:23,961 [main] INFO : [11/11] Processing dependencies of library "OTHER:" (0 files)
+2026-11-17 11:23:23,961 [main] INFO : [11/11] Processing dependencies of library "OTHER:" (0 files)
+2026-11-17 11:23:23,961 [main] INFO : Starting step: library "OTHER:" (0 files)...
+
+2026-11-17 11:23:23,961 [main] INFO : Starting step: library "OTHER:" (0 files)...
+
+2026-11-17 11:23:23,987 [main] INFO : Ending step : library "OTHER:" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,987 [main] INFO : Ending step : library "OTHER:" (0 files) in 0 sec
+
+
+2026-11-17 11:23:23,987 [main] INFO : [11/11] Processing dependencies of library "OTHER:" (0 files) Done
+2026-11-17 11:23:23,987 [main] INFO : [11/11] Processing dependencies of library "OTHER:" (0 files) Done
+2026-11-17 11:23:23,988 [main] INFO : [12/11] Processing dependencies of Remaining files turn #1 (0 files)
+2026-11-17 11:23:23,988 [main] INFO : [12/11] Processing dependencies of Remaining files turn #1 (0 files)
+2026-11-17 11:23:23,988 [main] INFO : Starting step: Remaining files turn #1 (0 files)...
+
+2026-11-17 11:23:23,988 [main] INFO : Starting step: Remaining files turn #1 (0 files)...
+
+2026-11-17 11:23:24,012 [main] INFO : Ending step : Remaining files turn #1 (0 files) in 1 sec
+
+
+2026-11-17 11:23:24,013 [main] INFO : Ending step : Remaining files turn #1 (0 files) in 1 sec
+
+
+2026-11-17 11:23:24,013 [main] INFO : [12/11] Processing dependencies of Remaining files turn #1 (0 files) Done
+2026-11-17 11:23:24,013 [main] INFO : [12/11] Processing dependencies of Remaining files turn #1 (0 files) Done
+2026-11-17 11:23:24,013 [main] INFO : [13/11] Processing dependencies of Last turn (0 files)
+2026-11-17 11:23:24,013 [main] INFO : [13/11] Processing dependencies of Last turn (0 files)
+2026-11-17 11:23:24,013 [main] INFO : Starting step: Last turn (0 files)...
+
+2026-11-17 11:23:24,013 [main] INFO : Starting step: Last turn (0 files)...
+
+2026-11-17 11:23:24,039 [main] INFO : Ending step : Last turn (0 files) in 0 sec
+
+
+2026-11-17 11:23:24,040 [main] INFO : Ending step : Last turn (0 files) in 0 sec
+
+
+2026-11-17 11:23:24,040 [main] INFO : [13/11] Processing dependencies of Last turn (0 files) Done
+2026-11-17 11:23:24,040 [main] INFO : [13/11] Processing dependencies of Last turn (0 files) Done
+2026-11-17 11:23:24,040 [main] INFO : Ending step : Retrying dependencies in 1 sec
+
+
+2026-11-17 11:23:24,040 [main] INFO : Ending step : Retrying dependencies in 1 sec
+
+
+2026-11-17 11:23:24,040 [main] INFO : Ending step : Analysis postprocessing in 1 sec
+
+
+2026-11-17 11:23:24,040 [main] INFO : Ending step : Analysis postprocessing in 1 sec
+
+
+2026-11-17 11:23:24,040 [main] INFO : Starting step: Clearing global declarations cache...
+
+2026-11-17 11:23:24,040 [main] INFO : Starting step: Clearing global declarations cache...
+
+2026-11-17 11:23:24,041 [main] INFO : Ending step : Clearing global declarations cache in 0 sec
+
+
+2026-11-17 11:23:24,041 [main] INFO : Ending step : Clearing global declarations cache in 0 sec
+
+
+2026-11-17 11:23:24,041 [main] INFO : Starting step: Retrying resolution for file dependencies...
+
+2026-11-17 11:23:24,041 [main] INFO : Starting step: Retrying resolution for file dependencies...
+
+2026-11-17 11:23:24,061 [main] INFO : Ending step : Retrying resolution for file dependencies in 0 sec
+
+
+2026-11-17 11:23:24,062 [main] INFO : Ending step : Retrying resolution for file dependencies in 0 sec
+
+
+2026-11-17 11:23:24,062 [main] INFO : Starting step: Retrying resolution for missing dependency sources...
+
+2026-11-17 11:23:24,062 [main] INFO : Starting step: Retrying resolution for missing dependency sources...
+
+2026-11-17 11:23:24,062 [main] INFO : Ending step : Retrying resolution for missing dependency sources in 0 sec
+
+
+2026-11-17 11:23:24,062 [main] INFO : Ending step : Retrying resolution for missing dependency sources in 0 sec
+
+
+2026-11-17 11:23:24,062 [main] INFO : ====== Files and Objects Statistics ========
+2026-11-17 11:23:24,062 [main] INFO : ====== Files and Objects Statistics ========
+2026-11-17 11:23:24,062 [main] INFO : Total files analyzed: 22
+2026-11-17 11:23:24,063 [main] INFO : Total files analyzed: 22
+2026-11-17 11:23:24,063 [main] INFO :   Type: JCL (4 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: JCL (4 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: PROC (1 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: PROC (1 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: REXX (1 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: REXX (1 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: md (1 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: md (1 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: COB (9 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: COB (9 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: CPY (5 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: CPY (5 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: SQL (1 files)
+2026-11-17 11:23:24,063 [main] INFO :   Type: SQL (1 files)
+2026-11-17 11:23:24,063 [main] INFO : Total objects: 91
+2026-11-17 11:23:24,063 [main] INFO : Total objects: 91
+2026-11-17 11:23:24,063 [main] INFO : Scope: GLOBAL (91 objects)
+2026-11-17 11:23:24,064 [main] INFO : Scope: GLOBAL (91 objects)
+2026-11-17 11:23:24,064 [main] INFO :   DATASET: 4
+2026-11-17 11:23:24,064 [main] INFO :   DATASET: 4
+2026-11-17 11:23:24,064 [main] INFO :   COPY: 8
+2026-11-17 11:23:24,064 [main] INFO :   COPY: 8
+2026-11-17 11:23:24,064 [main] INFO :   [SQL]DATABASE: 1
+2026-11-17 11:23:24,064 [main] INFO :   [SQL]DATABASE: 1
+2026-11-17 11:23:24,064 [main] INFO :   [SQL]TABLESPACE: 2
+2026-11-17 11:23:24,064 [main] INFO :   [SQL]TABLESPACE: 2
+2026-11-17 11:23:24,064 [main] INFO :   [SQL]TABLE: 4
+2026-11-17 11:23:24,064 [main] INFO :   [SQL]TABLE: 4
+2026-11-17 11:23:24,064 [main] INFO :   [SQL]INDEX: 4
+2026-11-17 11:23:24,064 [main] INFO :   [SQL]INDEX: 4
+2026-11-17 11:23:24,064 [main] INFO :   FILE_DEFINITION: 68
+2026-11-17 11:23:24,064 [main] INFO :   FILE_DEFINITION: 68
+2026-11-17 11:23:24,064 [main] INFO : ===========================================
+2026-11-17 11:23:24,064 [main] INFO : ===========================================
+2026-11-17 11:23:24,064 [main] INFO : Starting step: Removing and modifying dependencies...
+
+2026-11-17 11:23:24,064 [main] INFO : Starting step: Removing and modifying dependencies...
+
+2026-11-17 11:23:24,115 [main] INFO : Ending step : Removing and modifying dependencies in 0 sec
+
+
+2026-11-17 11:23:24,115 [main] INFO : Ending step : Removing and modifying dependencies in 0 sec
+
+
+2026-11-17 11:23:24,115 [main] INFO : ====== Performances report ======
+2026-11-17 11:23:24,115 [main] INFO : ====== Performances report ======
+2026-11-17 11:23:24,116 [main] INFO : == Category: processDependencies > com.netfective.bluage.analyse.dependency.engine.sql.SQLFileDependenciesFinder 
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/DB2/PRVDDL01.sql : 0s
+2026-11-17 11:23:24,117 [main] INFO : ==
+2026-11-17 11:23:24,117 [main] INFO : == Category: processDependencies > com.netfective.bluage.analyse.dependency.engine.sql.SQLFileDependenciesFinder 
+2026-11-17 11:23:24,117 [main] INFO : #1 : 0s
+2026-11-17 11:23:24,117 [main] INFO : ==
+2026-11-17 11:23:24,117 [main] INFO : == Category: processDependencies > com.netfective.bluage.analyse.dependency.mainframe.v2.cobol.COBOLFileDependenciesLineByLineFinder 
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/ONLINE/PRVCICS1.cbl : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDEAD1.cbl : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVREV01.cbl : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSCR01.cbl : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVRSK01.cbl : 0s
+2026-11-17 11:23:24,117 [main] INFO : ==
+2026-11-17 11:23:24,117 [main] INFO : == Category: processDependencies > com.netfective.bluage.analyse.dependency.mainframe.v2.cobol.COBOLFileDependenciesLineByLineFinder 
+2026-11-17 11:23:24,117 [main] INFO : #1 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #2 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #3 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #4 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #5 : 0s
+2026-11-17 11:23:24,117 [main] INFO : ==
+2026-11-17 11:23:24,117 [main] INFO : == Category: processDependencies > com.netfective.bluage.analyse.dependency.mainframe.v2.cobol.DataCopyFileDependenciesLineByLineFinder 
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/ERRCODES.cpy : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/SCRNREC.cpy : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy : 0s
+2026-11-17 11:23:24,117 [main] INFO : ==
+2026-11-17 11:23:24,117 [main] INFO : == Category: processDependencies > com.netfective.bluage.analyse.dependency.mainframe.v2.cobol.DataCopyFileDependenciesLineByLineFinder 
+2026-11-17 11:23:24,117 [main] INFO : #1 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #2 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #3 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #4 : 0s
+2026-11-17 11:23:24,117 [main] INFO : ==
+2026-11-17 11:23:24,117 [main] INFO : == Category: processDependencies > com.netfective.bluage.analyse.dependency.mainframe.v2.jcl.JCLFileDependenciesFinder 
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM01.jcl : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM02.jcl : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/JCL/PRVMTH01.jcl : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/JCL/PRVDAY01.jcl : 0s
+2026-11-17 11:23:24,117 [main] INFO : MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS/PRVSCRPR.jcl : 0s
+2026-11-17 11:23:24,117 [main] INFO : ==
+2026-11-17 11:23:24,117 [main] INFO : == Category: processDependencies > com.netfective.bluage.analyse.dependency.mainframe.v2.jcl.JCLFileDependenciesFinder 
+2026-11-17 11:23:24,117 [main] INFO : #1 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #2 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #3 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #4 : 0s
+2026-11-17 11:23:24,117 [main] INFO : #5 : 0s
+2026-11-17 11:23:24,117 [main] INFO : ==
+2026-11-17 11:23:24,117 [main] INFO : ======
+2026-11-17 11:23:24,117 [main] INFO : ======
+2026-11-17 11:23:24,153 [main] INFO : Analysis successful, finished at : 11:23:24
+2026-11-17 11:23:24,153 [main] INFO : Global duration : 2 sec

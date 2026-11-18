@@ -1,0 +1,8 @@
+SMF Analyzer starting
+Starting SMF Analysis Workflow
+Initializing SMF Processor...
+SMF components initialized successfully
+Workflow orchestrator initialized successfully
+Streaming file from S3
+Final record counts - SMF30: 0, SMF64: 0, SMF101: 0, SMF102: 0, SMF110: 0, SMF14: 0, SMF15: 0, Unsupported: 0, Errors: 0
+SMF analysis completed in 0.19 seconds

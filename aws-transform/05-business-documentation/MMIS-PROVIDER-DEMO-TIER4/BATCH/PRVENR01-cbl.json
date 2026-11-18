@@ -1,0 +1,1749 @@
+{
+    "name": "PRVENR01.cbl",
+    "program_name": "PRVENR01.cbl",
+    "generated_at": "2026-11-17T12:41:07Z",
+    "overview": {
+        "total_key_functionalities": 10,
+        "total_rules": 68,
+        "main_flow_diagram": "flowchart TD\n    A([Start: Provider Enrollment Load]):::start\n\n    A --> B[1:Batch Initialization]:::process\n    APPINPUT[(APP-INPUT-FILE\nProvider Application\nSequential File)]:::datasource\n    PRVMASTER[(PRV-MASTER-FILE\nProvider Master\nVSAM KSDS)]:::datasource\n    APPERROR[(APP-ERROR-FILE\nError Output\nSequential File)]:::datasource\n\n    APPINPUT -.->|Open for Input| B\n    PRVMASTER -.->|Open for Read/Write| B\n    APPERROR -.->|Open for Output| B\n\n    B --> C[2:Provider Application Reading]:::process\n    APPINPUT -.->|Read Next Record| C\n\n    C --> D{End of File?}:::decision\n    D -->|Yes| T[10:Batch Completion Reporting\nand Return Code Setting]:::process\n\n    D -->|No - Record Read| E{3:NPI Presence\nValidation\nNPI Blank?}:::decision\n\n    E -->|NPI Missing - Invalid| ERR1[Increment Error Counter]:::process\n    ERR1 --> WE1[7:Validation Error Record Writing]:::process\n    APPERROR -.->|Write Error Record| WE1\n    WE1 --> FALL1[8:Invalid Application Written\nto Provider Master - DEFECT\nFall-through due to missing exit]:::process\n\n    E -->|NPI Present| F{4:Provider Type\nClassification Validation\nIndividual/Group/Facility?}:::decision\n\n    F -->|Invalid Type - Invalid| ERR2[Increment Error Counter]:::process\n    ERR2 --> WE2[7:Validation Error Record Writing]:::process\n    APPERROR -.->|Write Error Record| WE2\n    WE2 --> FALL2[8:Invalid Application Written\nto Provider Master - DEFECT\nFall-through due to missing exit]:::process\n\n    F -->|Valid Type| G{5:Provider Taxonomy\nCode Validation\nTaxonomy Blank?}:::decision\n\n    G -->|Taxonomy Missing - Invalid| ERR3[Increment Error Counter]:::process\n    ERR3 --> WE3[7:Validation Error Record Writing]:::process\n    APPERROR -.->|Write Error Record| WE3\n    WE3 --> FALL3[8:Invalid Application Written\nto Provider Master - DEFECT\nFall-through due to missing exit]:::process\n\n    G -->|Taxonomy Present - Valid| H[6:Provider Enrollment\nStatus Assignment\nSet PENDING / UNSCREENED]:::process\n\n    H --> WP[9:Provider Master Record Writing]:::process\n    FALL1 --> WP\n    FALL2 --> WP\n    FALL3 --> WP\n\n    PRVMASTER -.->|Write Provider Record| WP\n\n    WP --> WD{Write Outcome?}:::decision\n    WD -->|Success| WS[Increment Written Counter]:::success\n    WD -->|Duplicate NPI| WDup[Increment Skipped Counter\nLog Duplicate NPI]:::process\n    WD -->|Write Failure| WF[Increment Error Counter\nSet Error Return Code]:::process\n\n    WS --> C\n    WDup --> C\n    WF --> C\n\n    T --> TC[Close All Files\nDisplay Final Counts\nRead / Written / Errors / Skipped]:::process\n    APPINPUT -.->|Close| TC\n    PRVMASTER -.->|Close| TC\n    APPERROR -.->|Close| TC\n\n    TC --> RD{Any Errors\nEncountered?}:::decision\n    RD -->|Yes - Set Warning Return Code 4| ENDW([End: Batch Completed\nWith Warnings]):::final\n    RD -->|No Errors| ENDO([End: Batch Completed\nSuccessfully]):::final\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313",
+        "rules": [
+            {
+                "rule_id": "R-PRVENR01-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "Batch Session Identification and Initialization",
+                "rule_description": "Ensures every enrollment load run is associated with a valid Batch ID. If no Batch ID is supplied at runtime, a default value is assigned so that all processed records can be traced to a specific batch session.",
+                "sub_graph_node_text": "1:Batch Initialization",
+                "acceptance_criteria": {
+                    "Given": "The Provider Enrollment Load batch program (PRVENR01) is starting and the APP-INPUT-FILE (Provider Application Sequential File), PRV-MASTER-FILE (Provider Master VSAM KSDS), and APP-ERROR-FILE (Error Output Sequential File) are opened for processing",
+                    "When": "The program reads the BATCH_ID from the runtime environment and the BATCH_ID value is blank or not provided",
+                    "Then": "The Batch ID is defaulted to 'DEFBATCH' and a startup message is displayed confirming the batch session has begun with the assigned Batch ID, whether defaulted or supplied"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVENR01-cbl-00002",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Application Record Reading",
+                "rule_description": "Controls the sequential reading of provider application records from the input file, incrementing the read counter for each successfully retrieved record and driving the main processing loop until all records are consumed.",
+                "sub_graph_node_text": "2:Provider Application Reading",
+                "acceptance_criteria": {
+                    "Given": "The batch enrollment load is active and the APP-INPUT-FILE (Provider Application Sequential File) is open for input",
+                    "When": "The program reads the next provider application record from APP-INPUT-FILE",
+                    "Then": "If the record is read successfully, the Records Read counter is incremented by 1 and the record is passed forward for validation; if the end of file is reached, the processing loop terminates and the program proceeds to batch completion reporting"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVENR01-cbl-00003",
+                "rule_type": "Validation Rules",
+                "rule_name": "NPI Mandatory Presence Validation",
+                "rule_description": "Enforces that every provider application must carry a National Provider Identifier (NPI). An application without an NPI is immediately rejected, logged to the error file, and excluded from the Provider Master File.",
+                "sub_graph_node_text": "3:NPI Presence Validation NPI Blank?",
+                "acceptance_criteria": {
+                    "Given": "A provider application record has been successfully read from APP-INPUT-FILE and is being validated",
+                    "When": "The NPI field (PRV-NPI) on the provider application record is blank or missing",
+                    "Then": "The Records Errored counter is incremented by 1, a validation error record is written to APP-ERROR-FILE containing the provider NPI, provider type code, and the reason 'VALIDATION-FAILED', and the application is rejected and not written to the Provider Master File (PRV-MASTER-FILE)"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVENR01-cbl-00004",
+                "rule_type": "Validation Rules",
+                "rule_name": "Provider Type Classification Validation",
+                "rule_description": "Enforces that every provider application must be classified as one of the three recognized provider types: Individual, Group, or Facility. Applications that do not carry any of these classifications are rejected.",
+                "sub_graph_node_text": "4:Provider Type Classification Validation Individual/Group/Facility?",
+                "acceptance_criteria": {
+                    "Given": "A provider application record has passed NPI presence validation and is being further validated",
+                    "When": "The provider type on the application is not set to Individual (PRV-INDIVIDUAL), not set to Group (PRV-GROUP), and not set to Facility (PRV-FACILITY) \u2014 meaning none of the three valid provider types is indicated",
+                    "Then": "The Records Errored counter is incremented by 1, a validation error record is written to APP-ERROR-FILE containing the provider NPI, provider type code, and the reason 'VALIDATION-FAILED', and the application is rejected and not written to the Provider Master File (PRV-MASTER-FILE)"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVENR01-cbl-00005",
+                "rule_type": "Validation Rules",
+                "rule_name": "Provider Taxonomy Code Mandatory Presence Validation",
+                "rule_description": "Enforces that every provider application must include a Taxonomy code identifying the provider's specialty or service classification. Applications missing a taxonomy code are rejected and logged.",
+                "sub_graph_node_text": "5:Provider Taxonomy Code Validation Taxonomy Blank?",
+                "acceptance_criteria": {
+                    "Given": "A provider application record has passed both NPI presence validation and provider type classification validation",
+                    "When": "The Taxonomy Code field (PRV-TAXONOMY) on the provider application record is blank or missing",
+                    "Then": "The Records Errored counter is incremented by 1, a validation error record is written to APP-ERROR-FILE containing the provider NPI, provider type code, and the reason 'VALIDATION-FAILED', and the application is rejected and not written to the Provider Master File (PRV-MASTER-FILE)"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVENR01-cbl-00006",
+                "rule_type": "Action Rules",
+                "rule_name": "Validation Error Record Logging",
+                "rule_description": "Defines the content and structure of the error record written to the error output file whenever a provider application fails any validation check. The error record captures the provider identity, type, and the failure reason for downstream review.",
+                "sub_graph_node_text": "7:Validation Error Record Writing",
+                "acceptance_criteria": {
+                    "Given": "A provider application record has failed one or more validation checks (missing NPI, invalid provider type, or missing taxonomy code)",
+                    "When": "The validation error record is being written to APP-ERROR-FILE (Error Output Sequential File)",
+                    "Then": "The error record written to APP-ERROR-FILE must contain: the provider's NPI (PRV-NPI), the literal ' TYPE:', the provider's type code (PRV-TYPE-CODE), and the literal ' ERR:VALIDATION-FAILED' \u2014 all concatenated into a single error detail record"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVENR01-cbl-00007",
+                "rule_type": "Decision Rules",
+                "rule_name": "Validated Provider Enrollment Status Assignment",
+                "rule_description": "Defines the initial enrollment and screening statuses automatically assigned to every provider application that successfully passes all three validation checks before being written to the Provider Master File.",
+                "sub_graph_node_text": "6:Provider Enrollment Status Assignment Set PENDING / UNSCREENED",
+                "acceptance_criteria": {
+                    "Given": "A provider application record has successfully passed all three validations: NPI is present, provider type is Individual or Group or Facility, and taxonomy code is present",
+                    "When": "The application is approved for loading into the Provider Master File (PRV-MASTER-FILE)",
+                    "Then": "The provider's enrollment status is set to PENDING (PRV-PENDING) and the provider's screening status is set to UNSCREENED (PRV-UNSCREENED) before the record is written to PRV-MASTER-FILE"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVENR01-cbl-00008",
+                "rule_type": "Decision Rules",
+                "rule_name": "Provider Master Record Write Outcome Handling",
+                "rule_description": "Governs the three possible outcomes when a provider record is written to the Provider Master File: successful enrollment, duplicate NPI detection (record already exists), or a write failure \u2014 each triggering a distinct business response.",
+                "sub_graph_node_text": "9:Provider Master Record Writing",
+                "acceptance_criteria": {
+                    "Given": "A provider application record with status PENDING and screening status UNSCREENED has been prepared and is being written to PRV-MASTER-FILE (Provider Master VSAM KSDS)",
+                    "When": "The write operation to PRV-MASTER-FILE completes",
+                    "Then": "If the write is successful: the Records Written counter is incremented by 1; if the NPI already exists in PRV-MASTER-FILE (duplicate key): the Records Skipped counter is incremented by 1 and a message is displayed logging the duplicate NPI value; if the write fails for any other reason: the Records Errored counter is incremented by 1"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVENR01-cbl-00009",
+                "rule_type": "Process Rules",
+                "rule_name": "Batch Completion Reporting and Warning Signal",
+                "rule_description": "Defines the end-of-run reporting requirements and the condition under which the batch job signals a warning to the calling process. Final counts for all record categories are displayed and a warning return code is set if any errors were encountered.",
+                "sub_graph_node_text": "10:Batch Completion Reporting and Return Code Setting",
+                "acceptance_criteria": {
+                    "Given": "All provider application records from APP-INPUT-FILE have been processed and the end of file has been reached",
+                    "When": "The batch program is completing and closing APP-INPUT-FILE, PRV-MASTER-FILE, and APP-ERROR-FILE",
+                    "Then": "The program displays four final processing counts: total Records Read, total Records Written to PRV-MASTER-FILE, total Records Errored, and total Records Skipped; additionally, if the Records Errored count is greater than zero, a warning condition (Return Code 4) is set to signal the calling batch scheduler that errors were encountered during the run"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "batch-initialization",
+            "title": "Batch Initialization",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Batch Initialization]) --> B[Set Program Identifier\\nPRVENR01]\n    B --> C[Reset All Record Counters to Zero\\nRecords Read = 0\\nRecords Written = 0\\nRecords Skipped = 0\\nRecords Errored = 0]\n    C --> D[Open Provider Application\\nIntake File for Reading]\n    D --> E[Open Provider Master\\nFile for Read and Write]\n    E --> F[Open Error Output\\nFile for Writing]\n    F --> G[Accept Batch Identifier\\nfrom Environment]\n    G --> H{Batch Identifier\\nProvided?}\n    H -->|Yes - Use Provided Batch ID| I[Use Supplied\\nBatch Identifier]\n    H -->|No - Batch ID is Blank| J[Default Batch Identifier\\nto DEFBATCH]\n    I --> K[Display Enrollment Load\\nStartup Message with Batch ID]\n    J --> K\n    K --> L([Initialization Complete\\nReady to Process Applications])",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00010",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Set Program Identifier at Batch Start",
+                    "rule_description": "At the start of every enrollment load run, the system must identify itself with the program name PRVENR01 to ensure all processing, logging, and audit trail entries are correctly attributed to this enrollment load program.",
+                    "sub_graph_node_text": "Set Program Identifier PRVENR01",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Enrollment Load batch process is being initiated",
+                        "When": "The batch initialization sequence begins",
+                        "Then": "The system must register its program identifier as 'PRVENR01' so that all subsequent processing, messages, and audit entries are tagged to this enrollment load program"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00011",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Reset All Record Counters to Zero Before Processing",
+                    "rule_description": "Before any provider application records are processed, all tracking counters must be initialized to zero to ensure accurate reporting of records read, written, skipped, and errored for the current batch run.",
+                    "sub_graph_node_text": "Reset All Record Counters to Zero\nRecords Read = 0\nRecords Written = 0\nRecords Skipped = 0\nRecords Errored = 0",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Enrollment Load batch process PRVENR01 is starting a new run",
+                        "When": "The batch initialization sequence executes",
+                        "Then": "All four record counters must be set to zero: Records Read counter = 0, Records Written counter = 0, Records Skipped counter = 0, and Records Errored counter = 0, ensuring no carry-over from any prior run"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00012",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Open Provider Application Intake File for Reading",
+                    "rule_description": "The provider application intake file, which contains incoming provider enrollment applications to be processed, must be opened in read-only mode before any application records can be accessed.",
+                    "sub_graph_node_text": "Open Provider Application\nIntake File for Reading",
+                    "acceptance_criteria": {
+                        "Given": "The batch initialization sequence is executing for program PRVENR01",
+                        "When": "The system prepares to process provider enrollment applications",
+                        "Then": "The Provider Application Intake File must be opened in read-only mode so that application records can be sequentially read for validation and enrollment processing"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00013",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Open Provider Master File for Read and Write Access",
+                    "rule_description": "The Provider Master File, which stores the authoritative provider enrollment records, must be opened with both read and write access so that new validated provider records can be added and existing records can be checked for duplicates.",
+                    "sub_graph_node_text": "Open Provider Master\nFile for Read and Write",
+                    "acceptance_criteria": {
+                        "Given": "The batch initialization sequence is executing for program PRVENR01",
+                        "When": "The system prepares to load validated provider records",
+                        "Then": "The Provider Master File must be opened with both read and write access so that validated provider applications can be written to it and existing provider records can be checked during duplicate NPI detection"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00014",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Open Error Output File for Writing Rejected Applications",
+                    "rule_description": "The Error Output File must be opened in write mode before processing begins so that any provider applications that fail validation can be logged with their rejection details for downstream review and remediation.",
+                    "sub_graph_node_text": "Open Error Output\nFile for Writing",
+                    "acceptance_criteria": {
+                        "Given": "The batch initialization sequence is executing for program PRVENR01",
+                        "When": "The system prepares to handle provider application validation failures",
+                        "Then": "The Error Output File must be opened in write mode so that rejected provider applications can be recorded with their NPI, provider type, and validation failure reason for business review"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00015",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Accept Batch Identifier from Runtime Environment",
+                    "rule_description": "The batch run must accept a Batch Identifier supplied by the runtime environment variable 'BATCH_ID' to uniquely identify and track this specific enrollment load execution for audit and operational monitoring purposes.",
+                    "sub_graph_node_text": "Accept Batch Identifier\nfrom Environment",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Enrollment Load batch PRVENR01 is initializing",
+                        "When": "The system reads the runtime environment for a Batch Identifier",
+                        "Then": "The system must retrieve the value of the environment variable 'BATCH_ID' and store it as the Batch Identifier for this run, which will be used in all startup messages and run tracking"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00016",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Default Batch Identifier When Not Supplied",
+                    "rule_description": "If no Batch Identifier is provided at runtime, the system must assign a default value of 'DEFBATCH' to ensure every enrollment load run has a valid batch identifier for tracking and audit purposes, even when the caller does not supply one.",
+                    "sub_graph_node_text": "Default Batch Identifier\nto DEFBATCH",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Enrollment Load batch PRVENR01 is initializing and the environment variable 'BATCH_ID' has been read",
+                        "When": "The retrieved Batch Identifier value is blank or not provided",
+                        "Then": "The system must automatically assign the default Batch Identifier value of 'DEFBATCH' so that the run can be tracked and all startup messages and audit entries carry a valid batch identifier"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00017",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Use Supplied Batch Identifier When Provided",
+                    "rule_description": "When a valid Batch Identifier is supplied by the runtime environment, the system must use that provided value as-is for all run tracking, startup messages, and audit entries without modification.",
+                    "sub_graph_node_text": "Use Supplied\nBatch Identifier",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Enrollment Load batch PRVENR01 is initializing and the environment variable 'BATCH_ID' has been read",
+                        "When": "The retrieved Batch Identifier value is not blank",
+                        "Then": "The system must retain and use the supplied Batch Identifier value for all run tracking, startup messages, and audit entries without any modification or override"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00018",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Enrollment Load Startup Message with Batch Identifier",
+                    "rule_description": "Upon successful initialization, the system must display a startup confirmation message that includes the program name PRVENR01 and the resolved Batch Identifier (either supplied or defaulted) to confirm the enrollment load process has started and is traceable.",
+                    "sub_graph_node_text": "Display Enrollment Load\nStartup Message with Batch ID",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Enrollment Load batch PRVENR01 has completed all initialization steps and the Batch Identifier has been resolved to either the supplied value or the default 'DEFBATCH'",
+                        "When": "Initialization is complete and the system is ready to begin processing provider applications",
+                        "Then": "The system must display the startup message 'PRVENR01: STARTING ENROLLMENT LOAD - BATCH' followed by the resolved Batch Identifier, confirming the batch run has started and identifying the batch for operational monitoring"
+                    },
+                    "key_functionality_id": "batch-initialization"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Batch Initialization"
+        },
+        {
+            "id": "provider-application-reading",
+            "title": "Provider Application Reading",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Read Next Provider Application]) \n    A --> B[Read Next Record from\\nProvider Application Intake File\\ninto Working Storage Area]\n    B --> C{What is the\\nRead Outcome?}\n    C -->|End of File Reached| D[Signal End of File\\nStop Reading Applications]\n    D --> E([End: No More Applications\\nto Process])\n    C -->|Record Successfully Read| F[Increment\\nRecords-Read Counter]\n    F --> G([Continue to\\nValidate Application])\n    C -->|Read Failed| H[Increment\\nError Counter]\n    H --> I([Flag Batch with\\nError Return Code])",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00019",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Sequential Reading of Provider Application Records",
+                    "rule_description": "The system reads provider application records one at a time from the Provider Application Intake File into a working storage area for processing. Each read operation produces one of three outcomes: end-of-file, successful read, or read failure.",
+                    "sub_graph_node_text": "Read Next Record from Provider Application Intake File into Working Storage Area",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Application Intake File is open and available for reading, and the end-of-file condition has not yet been reached",
+                        "When": "The system attempts to read the next provider application record from the Provider Application Intake File",
+                        "Then": "The record is loaded into the working storage area and the read outcome (end-of-file, success, or failure) is captured for subsequent processing decisions"
+                    },
+                    "key_functionality_id": "provider-application-reading"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00020",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "End-of-File Detection Stops Application Processing",
+                    "rule_description": "When the system reaches the end of the Provider Application Intake File, it signals that no more application records are available, stopping the application reading loop.",
+                    "sub_graph_node_text": "Signal End of File - Stop Reading Applications",
+                    "acceptance_criteria": {
+                        "Given": "The system is reading provider application records sequentially from the Provider Application Intake File",
+                        "When": "The read operation returns an end-of-file condition indicating no more records exist in the intake file",
+                        "Then": "The end-of-file flag is set to TRUE, signalling the processing loop to stop reading and move to program termination"
+                    },
+                    "key_functionality_id": "provider-application-reading"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00021",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Increment Records-Read Counter on Successful Application Read",
+                    "rule_description": "Each time a provider application record is successfully read from the intake file, the records-read counter is incremented by one to track total applications received for the batch run.",
+                    "sub_graph_node_text": "Increment Records-Read Counter",
+                    "acceptance_criteria": {
+                        "Given": "The system has attempted to read a provider application record from the Provider Application Intake File",
+                        "When": "The read operation completes successfully and a valid provider application record is loaded into the working storage area",
+                        "Then": "The records-read counter is incremented by 1, and the system proceeds to validate the application record"
+                    },
+                    "key_functionality_id": "provider-application-reading"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00022",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Trigger Application Validation After Successful Read",
+                    "rule_description": "Every successfully read provider application record must be passed to the application validation process before it can be enrolled into the Provider Master File.",
+                    "sub_graph_node_text": "Continue to Validate Application",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has been successfully read from the intake file and the records-read counter has been incremented",
+                        "When": "The read outcome is confirmed as successful",
+                        "Then": "The system invokes the application validation process to check the provider application record for required data elements before enrollment"
+                    },
+                    "key_functionality_id": "provider-application-reading"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00023",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Flag Batch with Error Condition on Application Read Failure",
+                    "rule_description": "If a provider application record cannot be read from the intake file due to a read failure (neither end-of-file nor a successful read), the error counter is incremented and the batch is flagged with an error condition to alert the calling process.",
+                    "sub_graph_node_text": "Flag Batch with Error Return Code",
+                    "acceptance_criteria": {
+                        "Given": "The system is reading provider application records from the Provider Application Intake File",
+                        "When": "The read operation fails with an outcome that is neither end-of-file nor a successful read",
+                        "Then": "The records-error counter is incremented by 1, and the batch is flagged with an error return code of 8 to signal a critical read failure to the calling batch process"
+                    },
+                    "key_functionality_id": "provider-application-reading"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Application Reading"
+        },
+        {
+            "id": "npi-presence-validation",
+            "title": "NPI Presence Validation",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: NPI Presence Validation])\n    A --> B{Is Provider NPI\\nBlank or Missing?}\n    B -->|No - NPI Present| C([NPI Validation Passed\\nProceed to Provider Type\\nClassification Validation])\n    B -->|Yes - NPI Absent| D[Flag Application\\nas Invalid\\nMissing NPI]\n    D --> E[Increment\\nError Counter]\n    E --> F[7: Route to\\nValidation Error\\nRecord Writing]\n    F --> G[8: DEFECT - Fall-through\\nto Provider Master\\nRecord Writing]\n    G --> H([End: NPI Validation\\nFailed - Application\\nRouted for Error Processing])",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00024",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "NPI Presence Check on Provider Application",
+                    "rule_description": "Every provider application submitted for enrollment must contain a National Provider Identifier (NPI). The system must evaluate whether the NPI field is present and populated before allowing the application to proceed through the enrollment validation pipeline.",
+                    "sub_graph_node_text": "Is Provider NPI Blank or Missing?",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has been successfully read from the application input file and is being processed for enrollment validation",
+                        "When": "The system evaluates the Provider NPI field on the application record",
+                        "Then": "If the NPI field is populated with a valid non-blank value, the application passes NPI validation and proceeds to Provider Type Classification validation; if the NPI field is blank or missing, the application fails NPI validation and is routed for error processing"
+                    },
+                    "key_functionality_id": "npi-presence-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00025",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Flag Provider Application as Invalid Due to Missing NPI",
+                    "rule_description": "When a provider application is found to have a missing or blank NPI, the system must formally flag the application as invalid by recording a Missing NPI error condition against the application record before any further error processing steps are taken.",
+                    "sub_graph_node_text": "Flag Application as Invalid Missing NPI",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record is undergoing NPI presence validation and the Provider NPI field has been determined to be blank or missing",
+                        "When": "The system identifies the absence of the NPI value",
+                        "Then": "The system assigns the Missing NPI error code (EC-MISSING-NPI) to the application's validation status, marking the application as invalid due to a missing National Provider Identifier"
+                    },
+                    "key_functionality_id": "npi-presence-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00026",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Increment Error Counter for Missing NPI Application",
+                    "rule_description": "Each provider application that fails NPI presence validation must be counted toward the batch error total. This ensures accurate end-of-run reporting reflects the true number of applications that could not be enrolled due to missing NPI.",
+                    "sub_graph_node_text": "Increment Error Counter",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has been flagged as invalid because the NPI field is blank or missing, and the Missing NPI error condition has been recorded",
+                        "When": "The system processes the NPI validation failure",
+                        "Then": "The system increments the batch error counter by 1, so that the total count of errored applications is accurately maintained and reported at the end of the enrollment batch run"
+                    },
+                    "key_functionality_id": "npi-presence-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00027",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Route Invalid NPI Application to Validation Error Record Writing",
+                    "rule_description": "A provider application that fails NPI presence validation must be routed to the error recording process. This ensures that a detailed error record is written to the error output file, capturing the provider's NPI, provider type code, and a VALIDATION-FAILED indicator for downstream review and remediation.",
+                    "sub_graph_node_text": "7: Route to Validation Error Record Writing",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed NPI presence validation, the Missing NPI error condition has been set, and the error counter has been incremented",
+                        "When": "The system routes the failed application for error documentation",
+                        "Then": "The system invokes the Validation Error Record Writing process, which constructs and writes an error record to the application error output file containing the provider NPI, the provider type code, and the reason 'VALIDATION-FAILED', so that the rejected application is fully documented for review"
+                    },
+                    "key_functionality_id": "npi-presence-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00028",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Unintended Fall-Through of Invalid NPI Application to Provider Master Record Writing",
+                    "rule_description": "After an invalid application (missing NPI) is routed to error record writing, the program's branching logic causes execution to fall through into the Provider Master Record Writing process. This means an application that has failed NPI validation \u2014 and should be excluded from the master file \u2014 is still attempted to be written to the Provider Master File, which is an unintended behavior and represents a defect in the enrollment process.",
+                    "sub_graph_node_text": "8: DEFECT - Fall-through to Provider Master Record Writing",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed NPI presence validation, an error record has been written to the error output file, and the application has been directed to the INVALID-APP branch via a GO TO statement",
+                        "When": "Execution reaches the INVALID-APP paragraph, which contains no processing logic and immediately precedes the WRITE-PROVIDER-RECORD paragraph",
+                        "Then": "Execution unintentionally falls through into the Provider Master Record Writing process, causing the invalid application \u2014 which is missing an NPI \u2014 to be attempted for writing into the Provider Master File; this is a defect because invalid applications should be fully excluded from the master enrollment file and only written to the error output file"
+                    },
+                    "key_functionality_id": "npi-presence-validation"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "NPI Presence Validation"
+        },
+        {
+            "id": "provider-type-classification-validation",
+            "title": "Provider Type Classification Validation",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter: Provider Type\\nClassification Validation])\n    A --> B{Is Provider Type\\nIndividual?}\n    B -->|Yes - Valid Type| PASS([Proceed to\\nTaxonomy Validation])\n    B -->|No| C{Is Provider Type\\nGroup?}\n    C -->|Yes - Valid Type| PASS\n    C -->|No| D{Is Provider Type\\nFacility?}\n    D -->|Yes - Valid Type| PASS\n    D -->|No - Unrecognized Type| E[Flag Application\\nas Invalid]\n    E --> F[Increment\\nError Counter]\n    F --> G[7: Route to\\nValidation Error\\nRecord Writing]\n    G --> H[/Write Error Record\\nto APP-ERROR-FILE\\nNPI + Type Code +\\nVALIDATION-FAILED/]\n    H --> I[8: Fall-through to\\nProvider Master Write\\nDEFECT - Invalid Record\\nWritten as PENDING]\n    I --> END([Exit: Invalid Application\\nRouted to Error and\\nMaster File - DEFECT])",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00029",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Provider Type Must Be Individual, Group, or Facility",
+                    "rule_description": "Validates that every provider application carries a recognized provider type designation. The system checks whether the provider is classified as Individual, Group, or Facility. If none of these three types is present, the application is considered invalid and must not be enrolled.",
+                    "sub_graph_node_text": "Is Provider Type Individual? / Is Provider Type Group? / Is Provider Type Facility?",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has been read from the Application Input File and has passed the NPI presence check, and the application contains a Provider Type Code field",
+                        "When": "The system evaluates the Provider Type field and finds that the provider is NOT classified as Individual AND is NOT classified as Group AND is NOT classified as Facility",
+                        "Then": "The application is flagged as invalid, the error counter is incremented by 1, and the application is routed to error recording and must not proceed to enrollment status assignment or master file loading"
+                    },
+                    "key_functionality_id": "provider-type-classification-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00030",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Valid Provider Type Allows Continuation to Taxonomy Validation",
+                    "rule_description": "When a provider application carries at least one recognized provider type (Individual, Group, or Facility), the application is considered to have passed the provider type check and is permitted to continue to the next validation step \u2014 Taxonomy Code verification.",
+                    "sub_graph_node_text": "Is Provider Type Individual? / Is Provider Type Group? / Is Provider Type Facility? \u2192 Yes - Valid Type \u2192 Proceed to Taxonomy Validation",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has been read from the Application Input File and has passed the NPI presence check",
+                        "When": "The system evaluates the Provider Type field and finds that the provider IS classified as Individual OR IS classified as Group OR IS classified as Facility",
+                        "Then": "The application passes the provider type validation and proceeds immediately to the Taxonomy Code validation step without any error being recorded or the error counter being incremented"
+                    },
+                    "key_functionality_id": "provider-type-classification-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00031",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Increment Error Counter for Unrecognized Provider Type",
+                    "rule_description": "When a provider application fails the provider type classification check (not Individual, not Group, not Facility), the system must track this failure by incrementing the batch-level error counter, which contributes to the final error tally reported at the end of the enrollment run.",
+                    "sub_graph_node_text": "Flag Application as Invalid \u2192 Increment Error Counter",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has been evaluated and found to have no recognized provider type (not Individual, not Group, and not Facility)",
+                        "When": "The provider type validation determines the application is invalid due to an unrecognized or missing provider type",
+                        "Then": "The total error counter for the current batch run is incremented by exactly 1, reflecting this application as an errored record in the final batch summary report"
+                    },
+                    "key_functionality_id": "provider-type-classification-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00032",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Route Invalid Provider Type Application to Error Recording",
+                    "rule_description": "When a provider application fails the provider type classification check, the system must invoke the error record writing process to capture the failure details before the application is excluded from further enrollment processing.",
+                    "sub_graph_node_text": "7: Route to Validation Error Record Writing",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed the provider type validation because the provider type is not Individual, not Group, and not Facility, and the error counter has been incremented",
+                        "When": "The system routes the invalid application away from the enrollment path",
+                        "Then": "The error record writing process is invoked, and after the error record is written, the application is directed to the invalid application exit point, bypassing enrollment status assignment (PENDING and UNSCREENED) and bypassing the normal provider master file write path"
+                    },
+                    "key_functionality_id": "provider-type-classification-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00033",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Write Validation Failure Detail to Error File for Invalid Provider Type",
+                    "rule_description": "For every provider application that fails the provider type classification validation, the system must produce a structured error record in the Application Error File. This error record captures the provider's NPI, the submitted Provider Type Code, and a fixed validation failure indicator to support downstream error review and remediation.",
+                    "sub_graph_node_text": "8: Write Error Record to APP-ERROR-FILE NPI + Type Code + VALIDATION-FAILED",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed the provider type classification validation (provider type is not Individual, not Group, and not Facility), and the error routing process has been invoked",
+                        "When": "The error record writing process executes for this application",
+                        "Then": "A single error record is written to the Application Error File (APP-ERROR-FILE) containing: the provider's NPI, the literal label 'TYPE:' followed by the Provider Type Code value as submitted in the application, and the fixed text 'ERR:VALIDATION-FAILED' \u2014 all concatenated into a single error detail record"
+                    },
+                    "key_functionality_id": "provider-type-classification-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00034",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Invalid Provider Type Application Incorrectly Written to Provider Master File as PENDING \u2014 DEFECT",
+                    "rule_description": "Due to a program flow defect, provider applications that fail the provider type classification validation are not fully excluded from the Provider Master File. After the error record is written, program control falls through to the Provider Master Write step, causing the invalid application to be written to the master file with PENDING enrollment status and UNSCREENED screening status \u2014 the same outcome as a valid application. This is an unintended behavior that results in invalid provider records being enrolled.",
+                    "sub_graph_node_text": "8: Fall-through to Provider Master Write DEFECT - Invalid Record Written as PENDING",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed the provider type classification validation, the error counter has been incremented, and the error record has been written to the Application Error File",
+                        "When": "Program control is directed to the INVALID-APP exit point, which immediately precedes the Provider Master Write step with no intervening logic to halt execution",
+                        "Then": "The invalid provider application record is written to the Provider Master File with enrollment status set to PENDING and screening status set to UNSCREENED \u2014 identical to a valid application \u2014 and the written records counter is incremented, meaning the invalid record is treated as a successfully enrolled provider, which is an unintended and incorrect outcome"
+                    },
+                    "key_functionality_id": "provider-type-classification-validation"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Type Classification Validation"
+        },
+        {
+            "id": "provider-taxonomy-code-validation",
+            "title": "Provider Taxonomy Code Validation",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter: Provider Taxonomy\\nCode Validation])\n    A --> B{Is Provider\\nTaxonomy Code\\nBlank or Missing?}\n    B -->|No - Taxonomy Code\\nIs Present| C([Exit: Proceed to\\nEnrollment Status Assignment])\n    B -->|Yes - Taxonomy Code\\nIs Missing| D[Flag Application\\nas Invalid]\n    D --> E[Increment\\nError Counter]\n    E --> F[7: Write Validation\\nError Record to\\nError Output File]\n    F --> G([Exit: Route to\\nInvalid Application\\nHandling])",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00035",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Provider Taxonomy Code Must Be Present",
+                    "rule_description": "A provider application must include a Taxonomy Code (the specialty or classification code identifying the provider's area of practice). If the Taxonomy Code is absent or blank, the application is considered invalid and must not proceed to enrollment.",
+                    "sub_graph_node_text": "Is Provider Taxonomy Code Blank or Missing?",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has been read from the input file and has already passed NPI and Provider Type validations",
+                        "When": "The Provider Taxonomy Code field on the application is blank or missing",
+                        "Then": "The application is flagged as invalid and must not be enrolled into the Provider Master File"
+                    },
+                    "key_functionality_id": "provider-taxonomy-code-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00036",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Increment Error Counter for Missing Taxonomy Code",
+                    "rule_description": "When a provider application fails the Taxonomy Code validation, the total error count for the batch run must be incremented by one to accurately reflect the number of applications that could not be processed.",
+                    "sub_graph_node_text": "Increment Error Counter",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has been identified as having a blank or missing Taxonomy Code",
+                        "When": "The Taxonomy Code validation failure is confirmed",
+                        "Then": "The batch error counter is incremented by 1, reflecting one additional application that failed validation in the current processing run"
+                    },
+                    "key_functionality_id": "provider-taxonomy-code-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00037",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Write Validation Error Record for Missing Taxonomy Code",
+                    "rule_description": "When a provider application is rejected due to a missing Taxonomy Code, a structured error record must be written to the Error Output File. The error record captures the provider's NPI, their Provider Type Code, and a fixed validation failure indicator to support downstream error review and remediation.",
+                    "sub_graph_node_text": "7: Write Validation Error Record to Error Output File",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed the Taxonomy Code validation check and the error counter has been incremented",
+                        "When": "The error record writing process is triggered for the failed application",
+                        "Then": "An error record is written to the Error Output File containing: the provider's NPI, the label 'TYPE:' followed by the Provider Type Code, and the fixed error indicator 'ERR:VALIDATION-FAILED'"
+                    },
+                    "key_functionality_id": "provider-taxonomy-code-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00038",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Route Invalid Application Away from Enrollment Processing",
+                    "rule_description": "After an error record has been written for a provider application that failed Taxonomy Code validation, the application must be routed to the Invalid Application handler, bypassing all remaining enrollment processing steps including status assignment and master file writing.",
+                    "sub_graph_node_text": "Exit: Route to Invalid Application Handling",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed Taxonomy Code validation and its error record has been written to the Error Output File",
+                        "When": "The invalid application routing is triggered",
+                        "Then": "All remaining enrollment processing steps for this application \u2014 including enrollment status assignment, screening status assignment, and writing to the Provider Master File \u2014 are skipped, and the program proceeds to read the next application record"
+                    },
+                    "key_functionality_id": "provider-taxonomy-code-validation"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00039",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Proceed to Enrollment Status Assignment When Taxonomy Code Is Present",
+                    "rule_description": "When a provider application has a valid, non-blank Taxonomy Code, it has passed all mandatory field validations and must be advanced to the Enrollment Status Assignment step where it will be assigned a PENDING enrollment status and UNSCREENED screening status before being written to the Provider Master File.",
+                    "sub_graph_node_text": "Exit: Proceed to Enrollment Status Assignment",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has a Taxonomy Code that is populated and not blank",
+                        "When": "The Taxonomy Code validation check is completed successfully",
+                        "Then": "The application proceeds to the Enrollment Status Assignment step, where it will be assigned an enrollment status of PENDING and a screening status of UNSCREENED, and will subsequently be written to the Provider Master File"
+                    },
+                    "key_functionality_id": "provider-taxonomy-code-validation"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Taxonomy Code Validation"
+        },
+        {
+            "id": "provider-enrollment-status-assignment",
+            "title": "Provider Enrollment Status Assignment",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Provider Application\\nPassed All Validations])\n    A --> B[Set Enrollment Status\\nto PENDING\\nAwaiting Review]\n    B --> C[Set Screening Status\\nto UNSCREENED\\nAwaiting Background Screening]\n    C --> D{/Provider Record\\nMarked as\\nPENDING + UNSCREENED/}\n    D --> E([Proceed to Write\\nProvider Master Record])\n\n    ",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00040",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Set Provider Enrollment Status to PENDING Upon Successful Validation",
+                    "rule_description": "When a provider application successfully passes all mandatory validations (NPI present, valid provider type, and taxonomy code present), the system must automatically assign an enrollment status of PENDING to indicate the provider is awaiting administrative review before full enrollment is granted.",
+                    "sub_graph_node_text": "Set Enrollment Status to PENDING Awaiting Review",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has successfully passed all three validation checks: NPI is present and not blank, provider type is one of Individual, Group, or Facility, and Taxonomy code is present and not blank",
+                        "When": "The system processes the validated provider application for loading into the Provider Master File",
+                        "Then": "The provider's enrollment status must be set to PENDING, indicating the provider is awaiting review and has not yet been fully enrolled"
+                    },
+                    "key_functionality_id": "provider-enrollment-status-assignment"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00041",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Set Provider Screening Status to UNSCREENED Upon Successful Validation",
+                    "rule_description": "When a provider application successfully passes all mandatory validations, the system must automatically assign a screening status of UNSCREENED to indicate that background screening and credential verification have not yet been performed for this provider.",
+                    "sub_graph_node_text": "Set Screening Status to UNSCREENED Awaiting Background Screening",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has successfully passed all three validation checks: NPI is present and not blank, provider type is one of Individual, Group, or Facility, and Taxonomy code is present and not blank, and the enrollment status has already been set to PENDING",
+                        "When": "The system processes the validated provider application for loading into the Provider Master File",
+                        "Then": "The provider's screening status must be set to UNSCREENED, indicating that background screening and credential verification are yet to be conducted for this provider"
+                    },
+                    "key_functionality_id": "provider-enrollment-status-assignment"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00042",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Proceed to Write Provider Master Record After Status Assignment",
+                    "rule_description": "Only after both the enrollment status (PENDING) and screening status (UNSCREENED) have been assigned to a validated provider application, the system proceeds to write the complete provider record to the Provider Master File. This ensures no provider record is persisted without the mandatory initial statuses.",
+                    "sub_graph_node_text": "Proceed to Write Provider Master Record",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has passed all validations and has been assigned enrollment status of PENDING and screening status of UNSCREENED",
+                        "When": "Both statuses have been successfully set on the provider working record",
+                        "Then": "The system must proceed to write the provider record to the Provider Master File, ensuring the record is stored with both PENDING enrollment status and UNSCREENED screening status as part of the same atomic operation"
+                    },
+                    "key_functionality_id": "provider-enrollment-status-assignment"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Enrollment Status Assignment"
+        },
+        {
+            "id": "validation-error-record-writing",
+            "title": "Validation Error Record Writing",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Validation Error Record Writing Triggered]) --> B{Which Validation\\nFailed?}\n    B -->|NPI is Blank| C[Capture Provider NPI\\nBlank/Missing]\n    B -->|Invalid Provider Type\\nNot Individual/Group/Facility| D[Capture Provider NPI\\nand Invalid Type Code]\n    B -->|Taxonomy Code\\nis Blank| E[Capture Provider NPI\\nand Type Code]\n    C --> F[Assemble Error Record:\\nProvider NPI + Provider Type Code\\n+ VALIDATION-FAILED Indicator]\n    D --> F\n    E --> F\n    F --> G[Write Assembled Error Record\\nto Error Output File]\n    G --> H([Error Record Written\\nfor Downstream Review and Correction])",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00043",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Trigger Error Record for Missing NPI",
+                    "rule_description": "When a provider application is submitted without a National Provider Identifier (NPI), the application fails validation and an error record must be generated to capture the missing NPI condition for downstream review and correction.",
+                    "sub_graph_node_text": "NPI is Blank \u2192 Capture Provider NPI Blank/Missing",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record is being processed and the NPI field on the application is blank or missing",
+                        "When": "The system evaluates the NPI field during application validation",
+                        "Then": "The application is flagged as invalid, the error count is incremented by 1, an error record is assembled containing the blank NPI, the provider type code, and a VALIDATION-FAILED indicator, and the error record is written to the error output file; the application is then excluded from further enrollment processing"
+                    },
+                    "key_functionality_id": "validation-error-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00044",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Trigger Error Record for Invalid Provider Type",
+                    "rule_description": "When a provider application does not carry a recognized provider type \u2014 Individual, Group, or Facility \u2014 the application fails validation and an error record must be generated capturing the provider NPI and the unrecognized type code for downstream review and correction.",
+                    "sub_graph_node_text": "Invalid Provider Type Not Individual/Group/Facility \u2192 Capture Provider NPI and Invalid Type Code",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record is being processed and the provider type is not set to Individual, AND not set to Group, AND not set to Facility (i.e., none of the three recognized provider types is indicated)",
+                        "When": "The system evaluates the provider type field during application validation",
+                        "Then": "The application is flagged as invalid, the error count is incremented by 1, an error record is assembled containing the provider NPI, the provider type code as supplied on the application, and a VALIDATION-FAILED indicator, and the error record is written to the error output file; the application is then excluded from further enrollment processing"
+                    },
+                    "key_functionality_id": "validation-error-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00045",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Trigger Error Record for Missing Taxonomy Code",
+                    "rule_description": "When a provider application is submitted without a Taxonomy code, the application fails validation and an error record must be generated capturing the provider NPI and provider type code for downstream review and correction.",
+                    "sub_graph_node_text": "Taxonomy Code is Blank \u2192 Capture Provider NPI and Type Code",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record is being processed and the Taxonomy code field on the application is blank or missing",
+                        "When": "The system evaluates the Taxonomy code field during application validation",
+                        "Then": "The application is flagged as invalid, the error count is incremented by 1, an error record is assembled containing the provider NPI, the provider type code, and a VALIDATION-FAILED indicator, and the error record is written to the error output file; the application is then excluded from further enrollment processing"
+                    },
+                    "key_functionality_id": "validation-error-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00046",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Assemble Validation Error Record Content",
+                    "rule_description": "When any validation check fails for a provider application, the system must assemble a structured error record combining the provider NPI, the provider type code, and a fixed VALIDATION-FAILED indicator into a single error detail record to ensure all relevant identifying and failure information is captured together for downstream review.",
+                    "sub_graph_node_text": "Assemble Error Record: Provider NPI + Provider Type Code + VALIDATION-FAILED Indicator",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed at least one validation check (missing NPI, invalid provider type, or missing taxonomy code)",
+                        "When": "The system assembles the error record for the failed application",
+                        "Then": "A single error detail record is constructed by concatenating: (1) the Provider NPI from the application, (2) the literal label ' TYPE:', (3) the Provider Type Code from the application, and (4) the fixed indicator ' ERR:VALIDATION-FAILED'; all four components are combined in sequence into the error detail field"
+                    },
+                    "key_functionality_id": "validation-error-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00047",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Write Assembled Error Record to Error Output File",
+                    "rule_description": "Once the error detail record has been assembled for a failed provider application, it must be written to the designated error output file so that the failed application details are available for downstream review and correction workflows.",
+                    "sub_graph_node_text": "Write Assembled Error Record to Error Output File",
+                    "acceptance_criteria": {
+                        "Given": "An error detail record has been fully assembled containing the provider NPI, provider type code, and VALIDATION-FAILED indicator for a provider application that failed validation",
+                        "When": "The system writes the assembled error detail record",
+                        "Then": "The complete error detail record is written to the error output file, making it available for downstream review and correction; one error output record is produced per failed application validation"
+                    },
+                    "key_functionality_id": "validation-error-record-writing"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Validation Error Record Writing"
+        },
+        {
+            "id": "invalid-application-written-to-provider-master-(defect)",
+            "title": "Invalid Application Written to Provider Master (Defect)",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Invalid Application\\nRouted to INVALID-APP]) \n    A --> B[\u26a0\ufe0f DEFECT: INVALID-APP Paragraph\\nContains No Exit or Stop Statement]\n    B --> C[Program Falls Through\\nDirectly to Write Step]\n    C --> D[Invalid Provider Record\\nCopied to Master Record Area]\n    D --> E[Record Written to\\nProvider Master File]\n    E --> F{Write Result}\n    F -->|Record Written Successfully| G[\u26a0\ufe0f Invalid Provider Now Exists\\nin Provider Master as PENDING Record]\n    F -->|Duplicate NPI Detected| H[Record Skipped\\nDuplicate Logged]\n    F -->|Write Failure| I[Error Counter Incremented]\n    G --> J[\u26a0\ufe0f BUSINESS RISK:\\nProvider with Missing NPI\\nOR Invalid Provider Type\\nOR Missing Taxonomy Code\\nis Now PENDING in Master File]\n    J --> K[\u26a0\ufe0f BUSINESS RISK:\\nInvalid Provider Becomes\\nEligible for Auto-Approval\\nand Potential Improper Enrollment]\n\n    ",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00048",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Invalid Application Falls Through to Provider Master Write Due to Missing Exit in INVALID-APP Paragraph",
+                    "rule_description": "When a provider application fails any validation check (missing NPI, invalid provider type, or missing taxonomy), the program routes to the INVALID-APP paragraph. Because INVALID-APP contains no exit or stop statement, execution falls through directly into the WRITE-PROVIDER-RECORD step, causing the invalid record to be written to the Provider Master File.",
+                    "sub_graph_node_text": "\u26a0\ufe0f DEFECT: INVALID-APP Paragraph Contains No Exit or Stop Statement",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has been routed to the INVALID-APP paragraph after failing one or more validation checks (missing NPI, invalid provider type, or missing taxonomy code), and the INVALID-APP paragraph contains no exit, stop, or branch statement to halt further processing",
+                        "When": "The program reaches the INVALID-APP paragraph and completes it without any terminating instruction",
+                        "Then": "Execution must NOT fall through to the WRITE-PROVIDER-RECORD step; instead, the program must return control to the main processing loop and proceed to read the next application record, ensuring the invalid record is never written to the Provider Master File"
+                    },
+                    "key_functionality_id": "invalid-application-written-to-provider-master-(defect)"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00049",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Invalid Provider Record Copied and Written to Provider Master File",
+                    "rule_description": "As a direct consequence of the missing exit in INVALID-APP, the invalid provider application record (which has failed validation) is copied into the master record area and a write is attempted to the Provider Master File. The record written does not have PENDING or UNSCREENED status set, since those assignments are only made on the valid-application path before the PERFORM WRITE-PROVIDER-RECORD call.",
+                    "sub_graph_node_text": "Invalid Provider Record Copied to Master Record Area / Record Written to Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has failed validation (missing NPI, invalid provider type, or missing taxonomy code) and has been written to the Error File with a VALIDATION-FAILED indicator, and the INVALID-APP paragraph has been reached",
+                        "When": "Due to the absence of an exit statement in INVALID-APP, the program falls through and executes the WRITE-PROVIDER-RECORD step, copying the invalid working-storage provider record into the master record area and issuing a write to the Provider Master File",
+                        "Then": "The invalid provider record \u2014 without enrollment status set to PENDING and without screening status set to UNSCREENED \u2014 must NOT be written to the Provider Master File; only fully validated records that have passed all three checks (NPI present, valid provider type, taxonomy present) and have been explicitly assigned PENDING and UNSCREENED statuses should be written to the master"
+                    },
+                    "key_functionality_id": "invalid-application-written-to-provider-master-(defect)"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00050",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Invalid Provider Successfully Written to Master File Becomes PENDING Record",
+                    "rule_description": "When the fall-through write of an invalid provider record succeeds (write status 00), the invalid provider is now present in the Provider Master File. Because the PENDING and UNSCREENED status flags were not set on this record (those SET statements are only executed on the valid path), the record exists in the master in an indeterminate status, yet is counted as a successfully written record.",
+                    "sub_graph_node_text": "\u26a0\ufe0f Invalid Provider Now Exists in Provider Master as PENDING Record",
+                    "acceptance_criteria": {
+                        "Given": "An invalid provider application record (with missing NPI, invalid provider type, or missing taxonomy) has fallen through to the WRITE-PROVIDER-RECORD step due to the missing exit in INVALID-APP, and the write to the Provider Master File returns a successful status (record written, no duplicate detected)",
+                        "When": "The write operation completes successfully and the written-records counter is incremented by 1",
+                        "Then": "The invalid provider record must NOT exist in the Provider Master File; a successful write counter increment must only occur for records that have passed all validation checks and have been explicitly assigned PENDING enrollment status and UNSCREENED screening status; any record written without these statuses being explicitly set represents a data integrity violation"
+                    },
+                    "key_functionality_id": "invalid-application-written-to-provider-master-(defect)"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00051",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Duplicate Invalid Provider NPI Detected During Fall-Through Write",
+                    "rule_description": "When an invalid provider application falls through to the write step and the NPI already exists in the Provider Master File, the duplicate is detected, the record is skipped, and a duplicate NPI message is logged. While this prevents a second write, it does not address the root defect \u2014 the invalid record should never have reached the write step.",
+                    "sub_graph_node_text": "Record Skipped Duplicate Logged",
+                    "acceptance_criteria": {
+                        "Given": "An invalid provider application record has fallen through to the WRITE-PROVIDER-RECORD step due to the missing exit in INVALID-APP, and the Provider Master File already contains a record with the same NPI as the invalid application",
+                        "When": "The write to the Provider Master File returns a duplicate-key condition",
+                        "Then": "The invalid record must be skipped (not written), a duplicate NPI log message must be generated displaying the provider NPI, and the skipped-records counter must be incremented by 1; however, this outcome is only acceptable because the duplicate happened to exist \u2014 the underlying defect of routing invalid records to the write step must still be corrected"
+                    },
+                    "key_functionality_id": "invalid-application-written-to-provider-master-(defect)"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00052",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Provider with Missing NPI, Invalid Type, or Missing Taxonomy Becomes Eligible for Auto-Approval After Improper Master File Entry",
+                    "rule_description": "Once an invalid provider record is written to the Provider Master File due to the fall-through defect, it becomes eligible for downstream enrollment processing including auto-approval workflows. A provider that has not supplied a valid NPI, has not declared a recognized provider type (Individual, Group, or Facility), or has not provided a taxonomy code should never be eligible for enrollment approval. This represents a critical compliance and regulatory risk.",
+                    "sub_graph_node_text": "\u26a0\ufe0f BUSINESS RISK: Invalid Provider Becomes Eligible for Auto-Approval and Potential Improper Enrollment",
+                    "acceptance_criteria": {
+                        "Given": "A provider application has failed one or more of the mandatory enrollment validations: (1) NPI is blank or missing, OR (2) provider type is not Individual, Group, or Facility, OR (3) taxonomy code is blank or missing, and the record has been written to the error file with a VALIDATION-FAILED indicator",
+                        "When": "The invalid provider record is improperly written to the Provider Master File with a successful write outcome due to the fall-through defect",
+                        "Then": "The provider must NOT be eligible for any downstream enrollment processing, auto-approval workflows, or credentialing steps; only provider records that have passed all three validation checks AND have been explicitly assigned PENDING enrollment status AND UNSCREENED screening status through the valid processing path are permitted to exist in the Provider Master File and participate in enrollment workflows; the presence of any record in the master file that bypassed these validations constitutes a compliance violation requiring immediate remediation"
+                    },
+                    "key_functionality_id": "invalid-application-written-to-provider-master-(defect)"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00053",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Provider Type Must Be Individual, Group, or Facility for Enrollment",
+                    "rule_description": "A provider application must declare exactly one recognized provider type \u2014 Individual, Group, or Facility \u2014 as a prerequisite for enrollment. Applications that do not carry any of these three type designations must be rejected and must not be loaded into the Provider Master File.",
+                    "sub_graph_node_text": "\u26a0\ufe0f BUSINESS RISK: Provider with Missing NPI OR Invalid Provider Type OR Missing Taxonomy Code is Now PENDING in Master File",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record is being processed for enrollment and the provider type field does not indicate Individual, does not indicate Group, and does not indicate Facility",
+                        "When": "The provider type validation check is evaluated and none of the three valid type flags (Individual, Group, Facility) are set on the application record",
+                        "Then": "The application must be rejected: the error counter must be incremented by 1, an error record must be written to the Error File containing the provider NPI, the provider type code, and the indicator VALIDATION-FAILED, and the record must NOT be written to the Provider Master File under any circumstances"
+                    },
+                    "key_functionality_id": "invalid-application-written-to-provider-master-(defect)"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00054",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "NPI is Mandatory for Provider Enrollment Application",
+                    "rule_description": "Every provider enrollment application must carry a National Provider Identifier (NPI). An application submitted without an NPI cannot be identified, validated, or enrolled and must be immediately rejected without being loaded into the Provider Master File.",
+                    "sub_graph_node_text": "\u26a0\ufe0f BUSINESS RISK: Provider with Missing NPI OR Invalid Provider Type OR Missing Taxonomy Code is Now PENDING in Master File",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record is being processed for enrollment and the NPI field on the application is blank or empty",
+                        "When": "The NPI presence validation check is evaluated and the NPI field contains no value",
+                        "Then": "The application must be rejected: the error counter must be incremented by 1, an error record must be written to the Error File containing the provider NPI (blank), the provider type code, and the indicator VALIDATION-FAILED, and the record must NOT be written to the Provider Master File under any circumstances"
+                    },
+                    "key_functionality_id": "invalid-application-written-to-provider-master-(defect)"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00055",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Taxonomy Code is Mandatory for Provider Enrollment Application",
+                    "rule_description": "Every provider enrollment application must carry a Taxonomy code that classifies the provider's specialty or service category. An application submitted without a taxonomy code is incomplete and must be rejected without being loaded into the Provider Master File.",
+                    "sub_graph_node_text": "\u26a0\ufe0f BUSINESS RISK: Provider with Missing NPI OR Invalid Provider Type OR Missing Taxonomy Code is Now PENDING in Master File",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record is being processed for enrollment, the NPI is present, the provider type is valid (Individual, Group, or Facility), and the taxonomy code field on the application is blank or empty",
+                        "When": "The taxonomy code presence validation check is evaluated and the taxonomy field contains no value",
+                        "Then": "The application must be rejected: the error counter must be incremented by 1, an error record must be written to the Error File containing the provider NPI, the provider type code, and the indicator VALIDATION-FAILED, and the record must NOT be written to the Provider Master File under any circumstances"
+                    },
+                    "key_functionality_id": "invalid-application-written-to-provider-master-(defect)"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Invalid Application Written to Provider Master (Defect)"
+        },
+        {
+            "id": "provider-master-record-writing",
+            "title": "Provider Master Record Writing",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Provider Master Record Writing\\nProcess Begins])\n    A --> B[Prepare Provider Record\\nfor Writing to Master File]\n    B --> C[(PRV-MASTER-FILE\\nProvider Master\\nVSAM KSDS)]\n    C --> D{Write Outcome?}\n\n    D -->|Write Successful| E[Increment Records\\nWritten Counter]\n    E --> Z([Return to\\nApplication Processing])\n\n    D -->|Duplicate NPI Detected\\nRecord Already Exists| F[Increment Records\\nSkipped Counter]\n    F --> G[Log Duplicate NPI\\nfor Review]\n    G --> Z\n\n    D -->|Write Failed\\nUnexpected Error| H[Increment Records\\nErrored Counter]\n    H --> I[Set Batch Error\\nReturn Code]\n    I --> Z",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00056",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Prepare and Submit Provider Record to Master File",
+                    "rule_description": "Before writing to the Provider Master File, the validated provider application data held in the working storage area must be transferred into the master record structure, ensuring the master file receives a fully formed provider record.",
+                    "sub_graph_node_text": "Prepare Provider Record for Writing to Master File",
+                    "acceptance_criteria": {
+                        "Given": "A provider application record has been processed (either passed validation with PENDING and UNSCREENED statuses set, or reached this step via program flow) and the provider data is available in the working storage provider work area (WS-PRV-WORK)",
+                        "When": "The system prepares the provider record for writing by copying all provider data from the working storage area into the Provider Master Record structure (PRV-MASTER-RECORD) and attempts to write it to the Provider Master File",
+                        "Then": "The Provider Master Record is populated with all provider data fields from the working storage area including NPI, provider type, taxonomy code, enrollment status (PENDING), and screening status (UNSCREENED), and a write operation is submitted to the Provider Master File"
+                    },
+                    "key_functionality_id": "provider-master-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00057",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Increment Written Counter on Successful Provider Record Write",
+                    "rule_description": "When a provider record is successfully written to the Provider Master File for the first time, the batch run's written records counter must be incremented to accurately reflect the number of new providers enrolled in this batch.",
+                    "sub_graph_node_text": "Write Successful",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been submitted for writing to the Provider Master File and the provider's NPI does not already exist in the master file",
+                        "When": "The write operation to the Provider Master File completes successfully (write status is successful with no errors and no duplicate key condition)",
+                        "Then": "The Records Written counter (WS-RECORDS-WRITTEN) is incremented by 1, reflecting one additional provider successfully enrolled into the master file during this batch run"
+                    },
+                    "key_functionality_id": "provider-master-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00058",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Detect and Skip Duplicate Provider NPI on Master File Write",
+                    "rule_description": "If a provider application contains an NPI that already exists in the Provider Master File, the incoming record must not overwrite the existing provider record. The duplicate must be logged for review and counted as skipped to maintain data integrity of the master file.",
+                    "sub_graph_node_text": "Duplicate NPI Detected\nRecord Already Exists",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been submitted for writing to the Provider Master File and the provider's NPI already exists as a key in the Provider Master File",
+                        "When": "The write operation detects a duplicate NPI condition (the NPI key already exists in the master file)",
+                        "Then": "The existing provider record in the master file is preserved and NOT overwritten; the duplicate provider's NPI is logged with the message 'DUPLICATE NPI' followed by the NPI value for operational review; and the Records Skipped counter (WS-RECORDS-SKIPPED) is incremented by 1"
+                    },
+                    "key_functionality_id": "provider-master-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00059",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Handle Unexpected Provider Master File Write Failure",
+                    "rule_description": "If the write to the Provider Master File fails for any reason other than a duplicate NPI, the batch run must record the failure, increment the error counter, and signal an error condition to the batch scheduler so that the failure is visible for operational intervention.",
+                    "sub_graph_node_text": "Write Failed\nUnexpected Error",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been submitted for writing to the Provider Master File and the write operation has not succeeded and the failure is not caused by a duplicate NPI condition",
+                        "When": "The write operation to the Provider Master File results in any unexpected failure condition (any write outcome other than successful write or duplicate NPI)",
+                        "Then": "A write error message 'WRITE ERROR' along with the specific write status code is logged for operational review; the Records Errored counter (WS-RECORDS-ERRORED) is incremented by 1; and the batch Return Code is set to 8 to signal a hard error condition to the batch scheduler"
+                    },
+                    "key_functionality_id": "provider-master-record-writing"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Master Record Writing"
+        },
+        {
+            "id": "batch-completion-reporting-and-return-code-setting",
+            "title": "Batch Completion Reporting and Return Code Setting",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Batch Processing Complete]) --> B[Close All Files\\nProvider Application Intake File\\nProvider Master File\\nError File]\n    B --> C[Display Total Records Read]\n    C --> D[Display Total Records Written\\nto Provider Master]\n    D --> E[Display Total Records Errored]\n    E --> F[Display Total Records Skipped\\nDuplicate NPIs]\n    F --> G{Were Any Errors\\nEncountered During\\nBatch Run?}\n    G -->|Yes - Errors Found| H[Set Warning Return Code 4\\nto Signal Downstream Jobs]\n    G -->|No Errors| I([Batch Completed\\nSuccessfully\\nReturn Code 0])\n    H --> J([Batch Completed\\nWith Warnings\\nReturn Code 4])",
+            "rules": [
+                {
+                    "rule_id": "R-PRVENR01-cbl-00060",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Close All Processing Files at Batch Completion",
+                    "rule_description": "At the end of the batch run, all three files used during provider enrollment processing \u2014 the Provider Application Intake File, the Provider Master File, and the Error File \u2014 must be formally closed to ensure all data is committed and no further access is permitted.",
+                    "sub_graph_node_text": "Close All Files\nProvider Application Intake File\nProvider Master File\nError File",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has finished processing all provider application records from the Provider Application Intake File",
+                        "When": "The batch run reaches its termination phase after all records have been read and processed",
+                        "Then": "The system must close the Provider Application Intake File, the Provider Master File, and the Error File, ensuring all written records are finalized and no further reads or writes can occur"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00061",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Total Provider Application Records Read",
+                    "rule_description": "At batch completion, the total count of provider application records successfully read from the input file during the batch run must be reported to provide visibility into the volume of applications processed.",
+                    "sub_graph_node_text": "Display Total Records Read",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has completed processing and is in the termination phase",
+                        "When": "The batch completion summary is being generated",
+                        "Then": "The system must display the total number of provider application records read from the Provider Application Intake File during the batch run, labeled as 'PRVENR01: READ=' followed by the count"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00062",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Total Provider Records Successfully Written to Master File",
+                    "rule_description": "At batch completion, the total count of provider records successfully written to the Provider Master File must be reported to confirm how many new providers were enrolled during the batch run.",
+                    "sub_graph_node_text": "Display Total Records Written\nto Provider Master",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has completed processing and is in the termination phase",
+                        "When": "The batch completion summary is being generated",
+                        "Then": "The system must display the total number of provider records successfully written to the Provider Master File during the batch run, labeled as 'PRVENR01: WRITTEN=' followed by the count"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00063",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Total Provider Application Records That Encountered Errors",
+                    "rule_description": "At batch completion, the total count of provider application records that failed validation or encountered processing errors must be reported to provide visibility into data quality issues requiring remediation.",
+                    "sub_graph_node_text": "Display Total Records Errored",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has completed processing and is in the termination phase",
+                        "When": "The batch completion summary is being generated",
+                        "Then": "The system must display the total number of provider application records that failed validation or encountered errors during the batch run, labeled as 'PRVENR01: ERRORS=' followed by the count"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00064",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Total Provider Records Skipped Due to Duplicate NPI",
+                    "rule_description": "At batch completion, the total count of provider application records that were skipped because their NPI already existed in the Provider Master File must be reported to identify duplicate enrollment attempts.",
+                    "sub_graph_node_text": "Display Total Records Skipped\nDuplicate NPIs",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has completed processing and is in the termination phase",
+                        "When": "The batch completion summary is being generated",
+                        "Then": "The system must display the total number of provider application records skipped due to a duplicate NPI already present in the Provider Master File, labeled as 'PRVENR01: SKIPPED=' followed by the count"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00065",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Evaluate Whether Any Errors Were Encountered During the Batch Run",
+                    "rule_description": "After displaying all batch summary counts, the system must evaluate whether any provider application records encountered errors during the batch run to determine the appropriate completion status and signal downstream jobs accordingly.",
+                    "sub_graph_node_text": "Were Any Errors\nEncountered During\nBatch Run?",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has displayed all batch summary counts including records read, written, errored, and skipped",
+                        "When": "The system evaluates the total error count accumulated during the batch run",
+                        "Then": "If the total error count is greater than zero, the batch is considered to have completed with warnings and downstream jobs must be notified; if the total error count is zero, the batch is considered to have completed successfully with no warnings issued"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00066",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Set Warning Signal for Downstream Jobs When Batch Errors Are Present",
+                    "rule_description": "When one or more provider application records encountered errors during the batch run, the system must set a warning return code of 4 to signal downstream jobs and dependent processes that the batch completed but with data quality or processing issues that require attention.",
+                    "sub_graph_node_text": "Set Warning Return Code 4\nto Signal Downstream Jobs",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has completed processing all provider application records and the total error count is greater than zero",
+                        "When": "The system evaluates the error count at batch termination and finds that at least one provider application record was errored",
+                        "Then": "The system must set the batch return code to 4 to indicate a warning condition, signaling to downstream jobs and dependent processes that the batch completed with errors requiring review"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00067",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Confirm Successful Batch Completion with No Errors",
+                    "rule_description": "When no provider application records encountered errors during the batch run, the batch is considered to have completed successfully and no warning signal is issued to downstream jobs, implying a default return code of zero.",
+                    "sub_graph_node_text": "Batch Completed\nSuccessfully\nReturn Code 0",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has completed processing all provider application records",
+                        "When": "The system evaluates the error count at batch termination and finds that the total error count is zero",
+                        "Then": "The system must not set any warning return code, allowing the default successful return code of 0 to remain, indicating to downstream jobs that the batch completed without any errors"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                },
+                {
+                    "rule_id": "R-PRVENR01-cbl-00068",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Confirm Batch Completion With Warnings When Errors Were Encountered",
+                    "rule_description": "When the batch run encountered one or more provider application errors, the batch concludes in a warning state with return code 4, distinguishing it from a fully successful run and enabling downstream jobs to take appropriate conditional action.",
+                    "sub_graph_node_text": "Batch Completed\nWith Warnings\nReturn Code 4",
+                    "acceptance_criteria": {
+                        "Given": "The batch enrollment load program PRVENR01 has completed processing and the warning return code of 4 has been set due to one or more errored provider application records",
+                        "When": "The batch program terminates after setting the warning return code",
+                        "Then": "The batch must conclude with return code 4, signaling to all downstream jobs and dependent processes that the provider enrollment batch completed but with warnings, and that the errored records require investigation and remediation before those providers can be enrolled"
+                    },
+                    "key_functionality_id": "batch-completion-reporting-and-return-code-setting"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Batch Completion Reporting and Return Code Setting"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Enrollment Load batch program (PRVENR01) is starting and the APP-INPUT-FILE (Provider Application Sequential File), PRV-MASTER-FILE (Provider Master VSAM KSDS), and APP-ERROR-FILE (Error Output Sequential File) are opened for processing",
+                "When": "The program reads the BATCH_ID from the runtime environment and the BATCH_ID value is blank or not provided",
+                "Then": "The Batch ID is defaulted to 'DEFBATCH' and a startup message is displayed confirming the batch session has begun with the assigned Batch ID, whether defaulted or supplied"
+            },
+            "Rule_Name": "Batch Session Identification and Initialization",
+            "Rule_Description": "Ensures every enrollment load run is associated with a valid Batch ID. If no Batch ID is supplied at runtime, a default value is assigned so that all processed records can be traced to a specific batch session."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00002",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load is active and the APP-INPUT-FILE (Provider Application Sequential File) is open for input",
+                "When": "The program reads the next provider application record from APP-INPUT-FILE",
+                "Then": "If the record is read successfully, the Records Read counter is incremented by 1 and the record is passed forward for validation; if the end of file is reached, the processing loop terminates and the program proceeds to batch completion reporting"
+            },
+            "Rule_Name": "Provider Application Record Reading",
+            "Rule_Description": "Controls the sequential reading of provider application records from the input file, incrementing the read counter for each successfully retrieved record and driving the main processing loop until all records are consumed."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00003",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has been successfully read from APP-INPUT-FILE and is being validated",
+                "When": "The NPI field (PRV-NPI) on the provider application record is blank or missing",
+                "Then": "The Records Errored counter is incremented by 1, a validation error record is written to APP-ERROR-FILE containing the provider NPI, provider type code, and the reason 'VALIDATION-FAILED', and the application is rejected and not written to the Provider Master File (PRV-MASTER-FILE)"
+            },
+            "Rule_Name": "NPI Mandatory Presence Validation",
+            "Rule_Description": "Enforces that every provider application must carry a National Provider Identifier (NPI). An application without an NPI is immediately rejected, logged to the error file, and excluded from the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00004",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has passed NPI presence validation and is being further validated",
+                "When": "The provider type on the application is not set to Individual (PRV-INDIVIDUAL), not set to Group (PRV-GROUP), and not set to Facility (PRV-FACILITY) \u2014 meaning none of the three valid provider types is indicated",
+                "Then": "The Records Errored counter is incremented by 1, a validation error record is written to APP-ERROR-FILE containing the provider NPI, provider type code, and the reason 'VALIDATION-FAILED', and the application is rejected and not written to the Provider Master File (PRV-MASTER-FILE)"
+            },
+            "Rule_Name": "Provider Type Classification Validation",
+            "Rule_Description": "Enforces that every provider application must be classified as one of the three recognized provider types: Individual, Group, or Facility. Applications that do not carry any of these classifications are rejected."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00005",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has passed both NPI presence validation and provider type classification validation",
+                "When": "The Taxonomy Code field (PRV-TAXONOMY) on the provider application record is blank or missing",
+                "Then": "The Records Errored counter is incremented by 1, a validation error record is written to APP-ERROR-FILE containing the provider NPI, provider type code, and the reason 'VALIDATION-FAILED', and the application is rejected and not written to the Provider Master File (PRV-MASTER-FILE)"
+            },
+            "Rule_Name": "Provider Taxonomy Code Mandatory Presence Validation",
+            "Rule_Description": "Enforces that every provider application must include a Taxonomy code identifying the provider's specialty or service classification. Applications missing a taxonomy code are rejected and logged."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00006",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has failed one or more validation checks (missing NPI, invalid provider type, or missing taxonomy code)",
+                "When": "The validation error record is being written to APP-ERROR-FILE (Error Output Sequential File)",
+                "Then": "The error record written to APP-ERROR-FILE must contain: the provider's NPI (PRV-NPI), the literal ' TYPE:', the provider's type code (PRV-TYPE-CODE), and the literal ' ERR:VALIDATION-FAILED' \u2014 all concatenated into a single error detail record"
+            },
+            "Rule_Name": "Validation Error Record Logging",
+            "Rule_Description": "Defines the content and structure of the error record written to the error output file whenever a provider application fails any validation check. The error record captures the provider identity, type, and the failure reason for downstream review."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00007",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has successfully passed all three validations: NPI is present, provider type is Individual or Group or Facility, and taxonomy code is present",
+                "When": "The application is approved for loading into the Provider Master File (PRV-MASTER-FILE)",
+                "Then": "The provider's enrollment status is set to PENDING (PRV-PENDING) and the provider's screening status is set to UNSCREENED (PRV-UNSCREENED) before the record is written to PRV-MASTER-FILE"
+            },
+            "Rule_Name": "Validated Provider Enrollment Status Assignment",
+            "Rule_Description": "Defines the initial enrollment and screening statuses automatically assigned to every provider application that successfully passes all three validation checks before being written to the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00008",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record with status PENDING and screening status UNSCREENED has been prepared and is being written to PRV-MASTER-FILE (Provider Master VSAM KSDS)",
+                "When": "The write operation to PRV-MASTER-FILE completes",
+                "Then": "If the write is successful: the Records Written counter is incremented by 1; if the NPI already exists in PRV-MASTER-FILE (duplicate key): the Records Skipped counter is incremented by 1 and a message is displayed logging the duplicate NPI value; if the write fails for any other reason: the Records Errored counter is incremented by 1"
+            },
+            "Rule_Name": "Provider Master Record Write Outcome Handling",
+            "Rule_Description": "Governs the three possible outcomes when a provider record is written to the Provider Master File: successful enrollment, duplicate NPI detection (record already exists), or a write failure \u2014 each triggering a distinct business response."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00009",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All provider application records from APP-INPUT-FILE have been processed and the end of file has been reached",
+                "When": "The batch program is completing and closing APP-INPUT-FILE, PRV-MASTER-FILE, and APP-ERROR-FILE",
+                "Then": "The program displays four final processing counts: total Records Read, total Records Written to PRV-MASTER-FILE, total Records Errored, and total Records Skipped; additionally, if the Records Errored count is greater than zero, a warning condition (Return Code 4) is set to signal the calling batch scheduler that errors were encountered during the run"
+            },
+            "Rule_Name": "Batch Completion Reporting and Warning Signal",
+            "Rule_Description": "Defines the end-of-run reporting requirements and the condition under which the batch job signals a warning to the calling process. Final counts for all record categories are displayed and a warning return code is set if any errors were encountered."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00010",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Enrollment Load batch process is being initiated",
+                "When": "The batch initialization sequence begins",
+                "Then": "The system must register its program identifier as 'PRVENR01' so that all subsequent processing, messages, and audit entries are tagged to this enrollment load program"
+            },
+            "Rule_Name": "Set Program Identifier at Batch Start",
+            "Rule_Description": "At the start of every enrollment load run, the system must identify itself with the program name PRVENR01 to ensure all processing, logging, and audit trail entries are correctly attributed to this enrollment load program."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00011",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Enrollment Load batch process PRVENR01 is starting a new run",
+                "When": "The batch initialization sequence executes",
+                "Then": "All four record counters must be set to zero: Records Read counter = 0, Records Written counter = 0, Records Skipped counter = 0, and Records Errored counter = 0, ensuring no carry-over from any prior run"
+            },
+            "Rule_Name": "Reset All Record Counters to Zero Before Processing",
+            "Rule_Description": "Before any provider application records are processed, all tracking counters must be initialized to zero to ensure accurate reporting of records read, written, skipped, and errored for the current batch run."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00012",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch initialization sequence is executing for program PRVENR01",
+                "When": "The system prepares to process provider enrollment applications",
+                "Then": "The Provider Application Intake File must be opened in read-only mode so that application records can be sequentially read for validation and enrollment processing"
+            },
+            "Rule_Name": "Open Provider Application Intake File for Reading",
+            "Rule_Description": "The provider application intake file, which contains incoming provider enrollment applications to be processed, must be opened in read-only mode before any application records can be accessed."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00013",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch initialization sequence is executing for program PRVENR01",
+                "When": "The system prepares to load validated provider records",
+                "Then": "The Provider Master File must be opened with both read and write access so that validated provider applications can be written to it and existing provider records can be checked during duplicate NPI detection"
+            },
+            "Rule_Name": "Open Provider Master File for Read and Write Access",
+            "Rule_Description": "The Provider Master File, which stores the authoritative provider enrollment records, must be opened with both read and write access so that new validated provider records can be added and existing records can be checked for duplicates."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00014",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch initialization sequence is executing for program PRVENR01",
+                "When": "The system prepares to handle provider application validation failures",
+                "Then": "The Error Output File must be opened in write mode so that rejected provider applications can be recorded with their NPI, provider type, and validation failure reason for business review"
+            },
+            "Rule_Name": "Open Error Output File for Writing Rejected Applications",
+            "Rule_Description": "The Error Output File must be opened in write mode before processing begins so that any provider applications that fail validation can be logged with their rejection details for downstream review and remediation."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00015",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Enrollment Load batch PRVENR01 is initializing",
+                "When": "The system reads the runtime environment for a Batch Identifier",
+                "Then": "The system must retrieve the value of the environment variable 'BATCH_ID' and store it as the Batch Identifier for this run, which will be used in all startup messages and run tracking"
+            },
+            "Rule_Name": "Accept Batch Identifier from Runtime Environment",
+            "Rule_Description": "The batch run must accept a Batch Identifier supplied by the runtime environment variable 'BATCH_ID' to uniquely identify and track this specific enrollment load execution for audit and operational monitoring purposes."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00016",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Enrollment Load batch PRVENR01 is initializing and the environment variable 'BATCH_ID' has been read",
+                "When": "The retrieved Batch Identifier value is blank or not provided",
+                "Then": "The system must automatically assign the default Batch Identifier value of 'DEFBATCH' so that the run can be tracked and all startup messages and audit entries carry a valid batch identifier"
+            },
+            "Rule_Name": "Default Batch Identifier When Not Supplied",
+            "Rule_Description": "If no Batch Identifier is provided at runtime, the system must assign a default value of 'DEFBATCH' to ensure every enrollment load run has a valid batch identifier for tracking and audit purposes, even when the caller does not supply one."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00017",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Enrollment Load batch PRVENR01 is initializing and the environment variable 'BATCH_ID' has been read",
+                "When": "The retrieved Batch Identifier value is not blank",
+                "Then": "The system must retain and use the supplied Batch Identifier value for all run tracking, startup messages, and audit entries without any modification or override"
+            },
+            "Rule_Name": "Use Supplied Batch Identifier When Provided",
+            "Rule_Description": "When a valid Batch Identifier is supplied by the runtime environment, the system must use that provided value as-is for all run tracking, startup messages, and audit entries without modification."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00018",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Enrollment Load batch PRVENR01 has completed all initialization steps and the Batch Identifier has been resolved to either the supplied value or the default 'DEFBATCH'",
+                "When": "Initialization is complete and the system is ready to begin processing provider applications",
+                "Then": "The system must display the startup message 'PRVENR01: STARTING ENROLLMENT LOAD - BATCH' followed by the resolved Batch Identifier, confirming the batch run has started and identifying the batch for operational monitoring"
+            },
+            "Rule_Name": "Display Enrollment Load Startup Message with Batch Identifier",
+            "Rule_Description": "Upon successful initialization, the system must display a startup confirmation message that includes the program name PRVENR01 and the resolved Batch Identifier (either supplied or defaulted) to confirm the enrollment load process has started and is traceable."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00019",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Application Intake File is open and available for reading, and the end-of-file condition has not yet been reached",
+                "When": "The system attempts to read the next provider application record from the Provider Application Intake File",
+                "Then": "The record is loaded into the working storage area and the read outcome (end-of-file, success, or failure) is captured for subsequent processing decisions"
+            },
+            "Rule_Name": "Sequential Reading of Provider Application Records",
+            "Rule_Description": "The system reads provider application records one at a time from the Provider Application Intake File into a working storage area for processing. Each read operation produces one of three outcomes: end-of-file, successful read, or read failure."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00020",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system is reading provider application records sequentially from the Provider Application Intake File",
+                "When": "The read operation returns an end-of-file condition indicating no more records exist in the intake file",
+                "Then": "The end-of-file flag is set to TRUE, signalling the processing loop to stop reading and move to program termination"
+            },
+            "Rule_Name": "End-of-File Detection Stops Application Processing",
+            "Rule_Description": "When the system reaches the end of the Provider Application Intake File, it signals that no more application records are available, stopping the application reading loop."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00021",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system has attempted to read a provider application record from the Provider Application Intake File",
+                "When": "The read operation completes successfully and a valid provider application record is loaded into the working storage area",
+                "Then": "The records-read counter is incremented by 1, and the system proceeds to validate the application record"
+            },
+            "Rule_Name": "Increment Records-Read Counter on Successful Application Read",
+            "Rule_Description": "Each time a provider application record is successfully read from the intake file, the records-read counter is incremented by one to track total applications received for the batch run."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00022",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has been successfully read from the intake file and the records-read counter has been incremented",
+                "When": "The read outcome is confirmed as successful",
+                "Then": "The system invokes the application validation process to check the provider application record for required data elements before enrollment"
+            },
+            "Rule_Name": "Trigger Application Validation After Successful Read",
+            "Rule_Description": "Every successfully read provider application record must be passed to the application validation process before it can be enrolled into the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00023",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system is reading provider application records from the Provider Application Intake File",
+                "When": "The read operation fails with an outcome that is neither end-of-file nor a successful read",
+                "Then": "The records-error counter is incremented by 1, and the batch is flagged with an error return code of 8 to signal a critical read failure to the calling batch process"
+            },
+            "Rule_Name": "Flag Batch with Error Condition on Application Read Failure",
+            "Rule_Description": "If a provider application record cannot be read from the intake file due to a read failure (neither end-of-file nor a successful read), the error counter is incremented and the batch is flagged with an error condition to alert the calling process."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00024",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has been successfully read from the application input file and is being processed for enrollment validation",
+                "When": "The system evaluates the Provider NPI field on the application record",
+                "Then": "If the NPI field is populated with a valid non-blank value, the application passes NPI validation and proceeds to Provider Type Classification validation; if the NPI field is blank or missing, the application fails NPI validation and is routed for error processing"
+            },
+            "Rule_Name": "NPI Presence Check on Provider Application",
+            "Rule_Description": "Every provider application submitted for enrollment must contain a National Provider Identifier (NPI). The system must evaluate whether the NPI field is present and populated before allowing the application to proceed through the enrollment validation pipeline."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00025",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record is undergoing NPI presence validation and the Provider NPI field has been determined to be blank or missing",
+                "When": "The system identifies the absence of the NPI value",
+                "Then": "The system assigns the Missing NPI error code (EC-MISSING-NPI) to the application's validation status, marking the application as invalid due to a missing National Provider Identifier"
+            },
+            "Rule_Name": "Flag Provider Application as Invalid Due to Missing NPI",
+            "Rule_Description": "When a provider application is found to have a missing or blank NPI, the system must formally flag the application as invalid by recording a Missing NPI error condition against the application record before any further error processing steps are taken."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00026",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has been flagged as invalid because the NPI field is blank or missing, and the Missing NPI error condition has been recorded",
+                "When": "The system processes the NPI validation failure",
+                "Then": "The system increments the batch error counter by 1, so that the total count of errored applications is accurately maintained and reported at the end of the enrollment batch run"
+            },
+            "Rule_Name": "Increment Error Counter for Missing NPI Application",
+            "Rule_Description": "Each provider application that fails NPI presence validation must be counted toward the batch error total. This ensures accurate end-of-run reporting reflects the true number of applications that could not be enrolled due to missing NPI."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00027",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed NPI presence validation, the Missing NPI error condition has been set, and the error counter has been incremented",
+                "When": "The system routes the failed application for error documentation",
+                "Then": "The system invokes the Validation Error Record Writing process, which constructs and writes an error record to the application error output file containing the provider NPI, the provider type code, and the reason 'VALIDATION-FAILED', so that the rejected application is fully documented for review"
+            },
+            "Rule_Name": "Route Invalid NPI Application to Validation Error Record Writing",
+            "Rule_Description": "A provider application that fails NPI presence validation must be routed to the error recording process. This ensures that a detailed error record is written to the error output file, capturing the provider's NPI, provider type code, and a VALIDATION-FAILED indicator for downstream review and remediation."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00028",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed NPI presence validation, an error record has been written to the error output file, and the application has been directed to the INVALID-APP branch via a GO TO statement",
+                "When": "Execution reaches the INVALID-APP paragraph, which contains no processing logic and immediately precedes the WRITE-PROVIDER-RECORD paragraph",
+                "Then": "Execution unintentionally falls through into the Provider Master Record Writing process, causing the invalid application \u2014 which is missing an NPI \u2014 to be attempted for writing into the Provider Master File; this is a defect because invalid applications should be fully excluded from the master enrollment file and only written to the error output file"
+            },
+            "Rule_Name": "Unintended Fall-Through of Invalid NPI Application to Provider Master Record Writing",
+            "Rule_Description": "After an invalid application (missing NPI) is routed to error record writing, the program's branching logic causes execution to fall through into the Provider Master Record Writing process. This means an application that has failed NPI validation \u2014 and should be excluded from the master file \u2014 is still attempted to be written to the Provider Master File, which is an unintended behavior and represents a defect in the enrollment process."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00029",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has been read from the Application Input File and has passed the NPI presence check, and the application contains a Provider Type Code field",
+                "When": "The system evaluates the Provider Type field and finds that the provider is NOT classified as Individual AND is NOT classified as Group AND is NOT classified as Facility",
+                "Then": "The application is flagged as invalid, the error counter is incremented by 1, and the application is routed to error recording and must not proceed to enrollment status assignment or master file loading"
+            },
+            "Rule_Name": "Provider Type Must Be Individual, Group, or Facility",
+            "Rule_Description": "Validates that every provider application carries a recognized provider type designation. The system checks whether the provider is classified as Individual, Group, or Facility. If none of these three types is present, the application is considered invalid and must not be enrolled."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00030",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has been read from the Application Input File and has passed the NPI presence check",
+                "When": "The system evaluates the Provider Type field and finds that the provider IS classified as Individual OR IS classified as Group OR IS classified as Facility",
+                "Then": "The application passes the provider type validation and proceeds immediately to the Taxonomy Code validation step without any error being recorded or the error counter being incremented"
+            },
+            "Rule_Name": "Valid Provider Type Allows Continuation to Taxonomy Validation",
+            "Rule_Description": "When a provider application carries at least one recognized provider type (Individual, Group, or Facility), the application is considered to have passed the provider type check and is permitted to continue to the next validation step \u2014 Taxonomy Code verification."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00031",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has been evaluated and found to have no recognized provider type (not Individual, not Group, and not Facility)",
+                "When": "The provider type validation determines the application is invalid due to an unrecognized or missing provider type",
+                "Then": "The total error counter for the current batch run is incremented by exactly 1, reflecting this application as an errored record in the final batch summary report"
+            },
+            "Rule_Name": "Increment Error Counter for Unrecognized Provider Type",
+            "Rule_Description": "When a provider application fails the provider type classification check (not Individual, not Group, not Facility), the system must track this failure by incrementing the batch-level error counter, which contributes to the final error tally reported at the end of the enrollment run."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00032",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed the provider type validation because the provider type is not Individual, not Group, and not Facility, and the error counter has been incremented",
+                "When": "The system routes the invalid application away from the enrollment path",
+                "Then": "The error record writing process is invoked, and after the error record is written, the application is directed to the invalid application exit point, bypassing enrollment status assignment (PENDING and UNSCREENED) and bypassing the normal provider master file write path"
+            },
+            "Rule_Name": "Route Invalid Provider Type Application to Error Recording",
+            "Rule_Description": "When a provider application fails the provider type classification check, the system must invoke the error record writing process to capture the failure details before the application is excluded from further enrollment processing."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00033",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed the provider type classification validation (provider type is not Individual, not Group, and not Facility), and the error routing process has been invoked",
+                "When": "The error record writing process executes for this application",
+                "Then": "A single error record is written to the Application Error File (APP-ERROR-FILE) containing: the provider's NPI, the literal label 'TYPE:' followed by the Provider Type Code value as submitted in the application, and the fixed text 'ERR:VALIDATION-FAILED' \u2014 all concatenated into a single error detail record"
+            },
+            "Rule_Name": "Write Validation Failure Detail to Error File for Invalid Provider Type",
+            "Rule_Description": "For every provider application that fails the provider type classification validation, the system must produce a structured error record in the Application Error File. This error record captures the provider's NPI, the submitted Provider Type Code, and a fixed validation failure indicator to support downstream error review and remediation."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00034",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed the provider type classification validation, the error counter has been incremented, and the error record has been written to the Application Error File",
+                "When": "Program control is directed to the INVALID-APP exit point, which immediately precedes the Provider Master Write step with no intervening logic to halt execution",
+                "Then": "The invalid provider application record is written to the Provider Master File with enrollment status set to PENDING and screening status set to UNSCREENED \u2014 identical to a valid application \u2014 and the written records counter is incremented, meaning the invalid record is treated as a successfully enrolled provider, which is an unintended and incorrect outcome"
+            },
+            "Rule_Name": "Invalid Provider Type Application Incorrectly Written to Provider Master File as PENDING \u2014 DEFECT",
+            "Rule_Description": "Due to a program flow defect, provider applications that fail the provider type classification validation are not fully excluded from the Provider Master File. After the error record is written, program control falls through to the Provider Master Write step, causing the invalid application to be written to the master file with PENDING enrollment status and UNSCREENED screening status \u2014 the same outcome as a valid application. This is an unintended behavior that results in invalid provider records being enrolled."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00035",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has been read from the input file and has already passed NPI and Provider Type validations",
+                "When": "The Provider Taxonomy Code field on the application is blank or missing",
+                "Then": "The application is flagged as invalid and must not be enrolled into the Provider Master File"
+            },
+            "Rule_Name": "Provider Taxonomy Code Must Be Present",
+            "Rule_Description": "A provider application must include a Taxonomy Code (the specialty or classification code identifying the provider's area of practice). If the Taxonomy Code is absent or blank, the application is considered invalid and must not proceed to enrollment."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00036",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has been identified as having a blank or missing Taxonomy Code",
+                "When": "The Taxonomy Code validation failure is confirmed",
+                "Then": "The batch error counter is incremented by 1, reflecting one additional application that failed validation in the current processing run"
+            },
+            "Rule_Name": "Increment Error Counter for Missing Taxonomy Code",
+            "Rule_Description": "When a provider application fails the Taxonomy Code validation, the total error count for the batch run must be incremented by one to accurately reflect the number of applications that could not be processed."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00037",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed the Taxonomy Code validation check and the error counter has been incremented",
+                "When": "The error record writing process is triggered for the failed application",
+                "Then": "An error record is written to the Error Output File containing: the provider's NPI, the label 'TYPE:' followed by the Provider Type Code, and the fixed error indicator 'ERR:VALIDATION-FAILED'"
+            },
+            "Rule_Name": "Write Validation Error Record for Missing Taxonomy Code",
+            "Rule_Description": "When a provider application is rejected due to a missing Taxonomy Code, a structured error record must be written to the Error Output File. The error record captures the provider's NPI, their Provider Type Code, and a fixed validation failure indicator to support downstream error review and remediation."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00038",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed Taxonomy Code validation and its error record has been written to the Error Output File",
+                "When": "The invalid application routing is triggered",
+                "Then": "All remaining enrollment processing steps for this application \u2014 including enrollment status assignment, screening status assignment, and writing to the Provider Master File \u2014 are skipped, and the program proceeds to read the next application record"
+            },
+            "Rule_Name": "Route Invalid Application Away from Enrollment Processing",
+            "Rule_Description": "After an error record has been written for a provider application that failed Taxonomy Code validation, the application must be routed to the Invalid Application handler, bypassing all remaining enrollment processing steps including status assignment and master file writing."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00039",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has a Taxonomy Code that is populated and not blank",
+                "When": "The Taxonomy Code validation check is completed successfully",
+                "Then": "The application proceeds to the Enrollment Status Assignment step, where it will be assigned an enrollment status of PENDING and a screening status of UNSCREENED, and will subsequently be written to the Provider Master File"
+            },
+            "Rule_Name": "Proceed to Enrollment Status Assignment When Taxonomy Code Is Present",
+            "Rule_Description": "When a provider application has a valid, non-blank Taxonomy Code, it has passed all mandatory field validations and must be advanced to the Enrollment Status Assignment step where it will be assigned a PENDING enrollment status and UNSCREENED screening status before being written to the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00040",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has successfully passed all three validation checks: NPI is present and not blank, provider type is one of Individual, Group, or Facility, and Taxonomy code is present and not blank",
+                "When": "The system processes the validated provider application for loading into the Provider Master File",
+                "Then": "The provider's enrollment status must be set to PENDING, indicating the provider is awaiting review and has not yet been fully enrolled"
+            },
+            "Rule_Name": "Set Provider Enrollment Status to PENDING Upon Successful Validation",
+            "Rule_Description": "When a provider application successfully passes all mandatory validations (NPI present, valid provider type, and taxonomy code present), the system must automatically assign an enrollment status of PENDING to indicate the provider is awaiting administrative review before full enrollment is granted."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00041",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has successfully passed all three validation checks: NPI is present and not blank, provider type is one of Individual, Group, or Facility, and Taxonomy code is present and not blank, and the enrollment status has already been set to PENDING",
+                "When": "The system processes the validated provider application for loading into the Provider Master File",
+                "Then": "The provider's screening status must be set to UNSCREENED, indicating that background screening and credential verification are yet to be conducted for this provider"
+            },
+            "Rule_Name": "Set Provider Screening Status to UNSCREENED Upon Successful Validation",
+            "Rule_Description": "When a provider application successfully passes all mandatory validations, the system must automatically assign a screening status of UNSCREENED to indicate that background screening and credential verification have not yet been performed for this provider."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00042",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has passed all validations and has been assigned enrollment status of PENDING and screening status of UNSCREENED",
+                "When": "Both statuses have been successfully set on the provider working record",
+                "Then": "The system must proceed to write the provider record to the Provider Master File, ensuring the record is stored with both PENDING enrollment status and UNSCREENED screening status as part of the same atomic operation"
+            },
+            "Rule_Name": "Proceed to Write Provider Master Record After Status Assignment",
+            "Rule_Description": "Only after both the enrollment status (PENDING) and screening status (UNSCREENED) have been assigned to a validated provider application, the system proceeds to write the complete provider record to the Provider Master File. This ensures no provider record is persisted without the mandatory initial statuses."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00043",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record is being processed and the NPI field on the application is blank or missing",
+                "When": "The system evaluates the NPI field during application validation",
+                "Then": "The application is flagged as invalid, the error count is incremented by 1, an error record is assembled containing the blank NPI, the provider type code, and a VALIDATION-FAILED indicator, and the error record is written to the error output file; the application is then excluded from further enrollment processing"
+            },
+            "Rule_Name": "Trigger Error Record for Missing NPI",
+            "Rule_Description": "When a provider application is submitted without a National Provider Identifier (NPI), the application fails validation and an error record must be generated to capture the missing NPI condition for downstream review and correction."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00044",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record is being processed and the provider type is not set to Individual, AND not set to Group, AND not set to Facility (i.e., none of the three recognized provider types is indicated)",
+                "When": "The system evaluates the provider type field during application validation",
+                "Then": "The application is flagged as invalid, the error count is incremented by 1, an error record is assembled containing the provider NPI, the provider type code as supplied on the application, and a VALIDATION-FAILED indicator, and the error record is written to the error output file; the application is then excluded from further enrollment processing"
+            },
+            "Rule_Name": "Trigger Error Record for Invalid Provider Type",
+            "Rule_Description": "When a provider application does not carry a recognized provider type \u2014 Individual, Group, or Facility \u2014 the application fails validation and an error record must be generated capturing the provider NPI and the unrecognized type code for downstream review and correction."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00045",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record is being processed and the Taxonomy code field on the application is blank or missing",
+                "When": "The system evaluates the Taxonomy code field during application validation",
+                "Then": "The application is flagged as invalid, the error count is incremented by 1, an error record is assembled containing the provider NPI, the provider type code, and a VALIDATION-FAILED indicator, and the error record is written to the error output file; the application is then excluded from further enrollment processing"
+            },
+            "Rule_Name": "Trigger Error Record for Missing Taxonomy Code",
+            "Rule_Description": "When a provider application is submitted without a Taxonomy code, the application fails validation and an error record must be generated capturing the provider NPI and provider type code for downstream review and correction."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00046",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed at least one validation check (missing NPI, invalid provider type, or missing taxonomy code)",
+                "When": "The system assembles the error record for the failed application",
+                "Then": "A single error detail record is constructed by concatenating: (1) the Provider NPI from the application, (2) the literal label ' TYPE:', (3) the Provider Type Code from the application, and (4) the fixed indicator ' ERR:VALIDATION-FAILED'; all four components are combined in sequence into the error detail field"
+            },
+            "Rule_Name": "Assemble Validation Error Record Content",
+            "Rule_Description": "When any validation check fails for a provider application, the system must assemble a structured error record combining the provider NPI, the provider type code, and a fixed VALIDATION-FAILED indicator into a single error detail record to ensure all relevant identifying and failure information is captured together for downstream review."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00047",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "An error detail record has been fully assembled containing the provider NPI, provider type code, and VALIDATION-FAILED indicator for a provider application that failed validation",
+                "When": "The system writes the assembled error detail record",
+                "Then": "The complete error detail record is written to the error output file, making it available for downstream review and correction; one error output record is produced per failed application validation"
+            },
+            "Rule_Name": "Write Assembled Error Record to Error Output File",
+            "Rule_Description": "Once the error detail record has been assembled for a failed provider application, it must be written to the designated error output file so that the failed application details are available for downstream review and correction workflows."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00048",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has been routed to the INVALID-APP paragraph after failing one or more validation checks (missing NPI, invalid provider type, or missing taxonomy code), and the INVALID-APP paragraph contains no exit, stop, or branch statement to halt further processing",
+                "When": "The program reaches the INVALID-APP paragraph and completes it without any terminating instruction",
+                "Then": "Execution must NOT fall through to the WRITE-PROVIDER-RECORD step; instead, the program must return control to the main processing loop and proceed to read the next application record, ensuring the invalid record is never written to the Provider Master File"
+            },
+            "Rule_Name": "Invalid Application Falls Through to Provider Master Write Due to Missing Exit in INVALID-APP Paragraph",
+            "Rule_Description": "When a provider application fails any validation check (missing NPI, invalid provider type, or missing taxonomy), the program routes to the INVALID-APP paragraph. Because INVALID-APP contains no exit or stop statement, execution falls through directly into the WRITE-PROVIDER-RECORD step, causing the invalid record to be written to the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00049",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has failed validation (missing NPI, invalid provider type, or missing taxonomy code) and has been written to the Error File with a VALIDATION-FAILED indicator, and the INVALID-APP paragraph has been reached",
+                "When": "Due to the absence of an exit statement in INVALID-APP, the program falls through and executes the WRITE-PROVIDER-RECORD step, copying the invalid working-storage provider record into the master record area and issuing a write to the Provider Master File",
+                "Then": "The invalid provider record \u2014 without enrollment status set to PENDING and without screening status set to UNSCREENED \u2014 must NOT be written to the Provider Master File; only fully validated records that have passed all three checks (NPI present, valid provider type, taxonomy present) and have been explicitly assigned PENDING and UNSCREENED statuses should be written to the master"
+            },
+            "Rule_Name": "Invalid Provider Record Copied and Written to Provider Master File",
+            "Rule_Description": "As a direct consequence of the missing exit in INVALID-APP, the invalid provider application record (which has failed validation) is copied into the master record area and a write is attempted to the Provider Master File. The record written does not have PENDING or UNSCREENED status set, since those assignments are only made on the valid-application path before the PERFORM WRITE-PROVIDER-RECORD call."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00050",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "An invalid provider application record (with missing NPI, invalid provider type, or missing taxonomy) has fallen through to the WRITE-PROVIDER-RECORD step due to the missing exit in INVALID-APP, and the write to the Provider Master File returns a successful status (record written, no duplicate detected)",
+                "When": "The write operation completes successfully and the written-records counter is incremented by 1",
+                "Then": "The invalid provider record must NOT exist in the Provider Master File; a successful write counter increment must only occur for records that have passed all validation checks and have been explicitly assigned PENDING enrollment status and UNSCREENED screening status; any record written without these statuses being explicitly set represents a data integrity violation"
+            },
+            "Rule_Name": "Invalid Provider Successfully Written to Master File Becomes PENDING Record",
+            "Rule_Description": "When the fall-through write of an invalid provider record succeeds (write status 00), the invalid provider is now present in the Provider Master File. Because the PENDING and UNSCREENED status flags were not set on this record (those SET statements are only executed on the valid path), the record exists in the master in an indeterminate status, yet is counted as a successfully written record."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00051",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An invalid provider application record has fallen through to the WRITE-PROVIDER-RECORD step due to the missing exit in INVALID-APP, and the Provider Master File already contains a record with the same NPI as the invalid application",
+                "When": "The write to the Provider Master File returns a duplicate-key condition",
+                "Then": "The invalid record must be skipped (not written), a duplicate NPI log message must be generated displaying the provider NPI, and the skipped-records counter must be incremented by 1; however, this outcome is only acceptable because the duplicate happened to exist \u2014 the underlying defect of routing invalid records to the write step must still be corrected"
+            },
+            "Rule_Name": "Duplicate Invalid Provider NPI Detected During Fall-Through Write",
+            "Rule_Description": "When an invalid provider application falls through to the write step and the NPI already exists in the Provider Master File, the duplicate is detected, the record is skipped, and a duplicate NPI message is logged. While this prevents a second write, it does not address the root defect \u2014 the invalid record should never have reached the write step."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00052",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application has failed one or more of the mandatory enrollment validations: (1) NPI is blank or missing, OR (2) provider type is not Individual, Group, or Facility, OR (3) taxonomy code is blank or missing, and the record has been written to the error file with a VALIDATION-FAILED indicator",
+                "When": "The invalid provider record is improperly written to the Provider Master File with a successful write outcome due to the fall-through defect",
+                "Then": "The provider must NOT be eligible for any downstream enrollment processing, auto-approval workflows, or credentialing steps; only provider records that have passed all three validation checks AND have been explicitly assigned PENDING enrollment status AND UNSCREENED screening status through the valid processing path are permitted to exist in the Provider Master File and participate in enrollment workflows; the presence of any record in the master file that bypassed these validations constitutes a compliance violation requiring immediate remediation"
+            },
+            "Rule_Name": "Provider with Missing NPI, Invalid Type, or Missing Taxonomy Becomes Eligible for Auto-Approval After Improper Master File Entry",
+            "Rule_Description": "Once an invalid provider record is written to the Provider Master File due to the fall-through defect, it becomes eligible for downstream enrollment processing including auto-approval workflows. A provider that has not supplied a valid NPI, has not declared a recognized provider type (Individual, Group, or Facility), or has not provided a taxonomy code should never be eligible for enrollment approval. This represents a critical compliance and regulatory risk."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00053",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record is being processed for enrollment and the provider type field does not indicate Individual, does not indicate Group, and does not indicate Facility",
+                "When": "The provider type validation check is evaluated and none of the three valid type flags (Individual, Group, Facility) are set on the application record",
+                "Then": "The application must be rejected: the error counter must be incremented by 1, an error record must be written to the Error File containing the provider NPI, the provider type code, and the indicator VALIDATION-FAILED, and the record must NOT be written to the Provider Master File under any circumstances"
+            },
+            "Rule_Name": "Provider Type Must Be Individual, Group, or Facility for Enrollment",
+            "Rule_Description": "A provider application must declare exactly one recognized provider type \u2014 Individual, Group, or Facility \u2014 as a prerequisite for enrollment. Applications that do not carry any of these three type designations must be rejected and must not be loaded into the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00054",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record is being processed for enrollment and the NPI field on the application is blank or empty",
+                "When": "The NPI presence validation check is evaluated and the NPI field contains no value",
+                "Then": "The application must be rejected: the error counter must be incremented by 1, an error record must be written to the Error File containing the provider NPI (blank), the provider type code, and the indicator VALIDATION-FAILED, and the record must NOT be written to the Provider Master File under any circumstances"
+            },
+            "Rule_Name": "NPI is Mandatory for Provider Enrollment Application",
+            "Rule_Description": "Every provider enrollment application must carry a National Provider Identifier (NPI). An application submitted without an NPI cannot be identified, validated, or enrolled and must be immediately rejected without being loaded into the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00055",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record is being processed for enrollment, the NPI is present, the provider type is valid (Individual, Group, or Facility), and the taxonomy code field on the application is blank or empty",
+                "When": "The taxonomy code presence validation check is evaluated and the taxonomy field contains no value",
+                "Then": "The application must be rejected: the error counter must be incremented by 1, an error record must be written to the Error File containing the provider NPI, the provider type code, and the indicator VALIDATION-FAILED, and the record must NOT be written to the Provider Master File under any circumstances"
+            },
+            "Rule_Name": "Taxonomy Code is Mandatory for Provider Enrollment Application",
+            "Rule_Description": "Every provider enrollment application must carry a Taxonomy code that classifies the provider's specialty or service category. An application submitted without a taxonomy code is incomplete and must be rejected without being loaded into the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00056",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider application record has been processed (either passed validation with PENDING and UNSCREENED statuses set, or reached this step via program flow) and the provider data is available in the working storage provider work area (WS-PRV-WORK)",
+                "When": "The system prepares the provider record for writing by copying all provider data from the working storage area into the Provider Master Record structure (PRV-MASTER-RECORD) and attempts to write it to the Provider Master File",
+                "Then": "The Provider Master Record is populated with all provider data fields from the working storage area including NPI, provider type, taxonomy code, enrollment status (PENDING), and screening status (UNSCREENED), and a write operation is submitted to the Provider Master File"
+            },
+            "Rule_Name": "Prepare and Submit Provider Record to Master File",
+            "Rule_Description": "Before writing to the Provider Master File, the validated provider application data held in the working storage area must be transferred into the master record structure, ensuring the master file receives a fully formed provider record."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00057",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been submitted for writing to the Provider Master File and the provider's NPI does not already exist in the master file",
+                "When": "The write operation to the Provider Master File completes successfully (write status is successful with no errors and no duplicate key condition)",
+                "Then": "The Records Written counter (WS-RECORDS-WRITTEN) is incremented by 1, reflecting one additional provider successfully enrolled into the master file during this batch run"
+            },
+            "Rule_Name": "Increment Written Counter on Successful Provider Record Write",
+            "Rule_Description": "When a provider record is successfully written to the Provider Master File for the first time, the batch run's written records counter must be incremented to accurately reflect the number of new providers enrolled in this batch."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00058",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been submitted for writing to the Provider Master File and the provider's NPI already exists as a key in the Provider Master File",
+                "When": "The write operation detects a duplicate NPI condition (the NPI key already exists in the master file)",
+                "Then": "The existing provider record in the master file is preserved and NOT overwritten; the duplicate provider's NPI is logged with the message 'DUPLICATE NPI' followed by the NPI value for operational review; and the Records Skipped counter (WS-RECORDS-SKIPPED) is incremented by 1"
+            },
+            "Rule_Name": "Detect and Skip Duplicate Provider NPI on Master File Write",
+            "Rule_Description": "If a provider application contains an NPI that already exists in the Provider Master File, the incoming record must not overwrite the existing provider record. The duplicate must be logged for review and counted as skipped to maintain data integrity of the master file."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00059",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been submitted for writing to the Provider Master File and the write operation has not succeeded and the failure is not caused by a duplicate NPI condition",
+                "When": "The write operation to the Provider Master File results in any unexpected failure condition (any write outcome other than successful write or duplicate NPI)",
+                "Then": "A write error message 'WRITE ERROR' along with the specific write status code is logged for operational review; the Records Errored counter (WS-RECORDS-ERRORED) is incremented by 1; and the batch Return Code is set to 8 to signal a hard error condition to the batch scheduler"
+            },
+            "Rule_Name": "Handle Unexpected Provider Master File Write Failure",
+            "Rule_Description": "If the write to the Provider Master File fails for any reason other than a duplicate NPI, the batch run must record the failure, increment the error counter, and signal an error condition to the batch scheduler so that the failure is visible for operational intervention."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00060",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has finished processing all provider application records from the Provider Application Intake File",
+                "When": "The batch run reaches its termination phase after all records have been read and processed",
+                "Then": "The system must close the Provider Application Intake File, the Provider Master File, and the Error File, ensuring all written records are finalized and no further reads or writes can occur"
+            },
+            "Rule_Name": "Close All Processing Files at Batch Completion",
+            "Rule_Description": "At the end of the batch run, all three files used during provider enrollment processing \u2014 the Provider Application Intake File, the Provider Master File, and the Error File \u2014 must be formally closed to ensure all data is committed and no further access is permitted."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00061",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has completed processing and is in the termination phase",
+                "When": "The batch completion summary is being generated",
+                "Then": "The system must display the total number of provider application records read from the Provider Application Intake File during the batch run, labeled as 'PRVENR01: READ=' followed by the count"
+            },
+            "Rule_Name": "Display Total Provider Application Records Read",
+            "Rule_Description": "At batch completion, the total count of provider application records successfully read from the input file during the batch run must be reported to provide visibility into the volume of applications processed."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00062",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has completed processing and is in the termination phase",
+                "When": "The batch completion summary is being generated",
+                "Then": "The system must display the total number of provider records successfully written to the Provider Master File during the batch run, labeled as 'PRVENR01: WRITTEN=' followed by the count"
+            },
+            "Rule_Name": "Display Total Provider Records Successfully Written to Master File",
+            "Rule_Description": "At batch completion, the total count of provider records successfully written to the Provider Master File must be reported to confirm how many new providers were enrolled during the batch run."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00063",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has completed processing and is in the termination phase",
+                "When": "The batch completion summary is being generated",
+                "Then": "The system must display the total number of provider application records that failed validation or encountered errors during the batch run, labeled as 'PRVENR01: ERRORS=' followed by the count"
+            },
+            "Rule_Name": "Display Total Provider Application Records That Encountered Errors",
+            "Rule_Description": "At batch completion, the total count of provider application records that failed validation or encountered processing errors must be reported to provide visibility into data quality issues requiring remediation."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00064",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has completed processing and is in the termination phase",
+                "When": "The batch completion summary is being generated",
+                "Then": "The system must display the total number of provider application records skipped due to a duplicate NPI already present in the Provider Master File, labeled as 'PRVENR01: SKIPPED=' followed by the count"
+            },
+            "Rule_Name": "Display Total Provider Records Skipped Due to Duplicate NPI",
+            "Rule_Description": "At batch completion, the total count of provider application records that were skipped because their NPI already existed in the Provider Master File must be reported to identify duplicate enrollment attempts."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00065",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has displayed all batch summary counts including records read, written, errored, and skipped",
+                "When": "The system evaluates the total error count accumulated during the batch run",
+                "Then": "If the total error count is greater than zero, the batch is considered to have completed with warnings and downstream jobs must be notified; if the total error count is zero, the batch is considered to have completed successfully with no warnings issued"
+            },
+            "Rule_Name": "Evaluate Whether Any Errors Were Encountered During the Batch Run",
+            "Rule_Description": "After displaying all batch summary counts, the system must evaluate whether any provider application records encountered errors during the batch run to determine the appropriate completion status and signal downstream jobs accordingly."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00066",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has completed processing all provider application records and the total error count is greater than zero",
+                "When": "The system evaluates the error count at batch termination and finds that at least one provider application record was errored",
+                "Then": "The system must set the batch return code to 4 to indicate a warning condition, signaling to downstream jobs and dependent processes that the batch completed with errors requiring review"
+            },
+            "Rule_Name": "Set Warning Signal for Downstream Jobs When Batch Errors Are Present",
+            "Rule_Description": "When one or more provider application records encountered errors during the batch run, the system must set a warning return code of 4 to signal downstream jobs and dependent processes that the batch completed but with data quality or processing issues that require attention."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00067",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has completed processing all provider application records",
+                "When": "The system evaluates the error count at batch termination and finds that the total error count is zero",
+                "Then": "The system must not set any warning return code, allowing the default successful return code of 0 to remain, indicating to downstream jobs that the batch completed without any errors"
+            },
+            "Rule_Name": "Confirm Successful Batch Completion with No Errors",
+            "Rule_Description": "When no provider application records encountered errors during the batch run, the batch is considered to have completed successfully and no warning signal is issued to downstream jobs, implying a default return code of zero."
+        },
+        {
+            "Rule_Id": "R-PRVENR01-cbl-00068",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "The batch enrollment load program PRVENR01 has completed processing and the warning return code of 4 has been set due to one or more errored provider application records",
+                "When": "The batch program terminates after setting the warning return code",
+                "Then": "The batch must conclude with return code 4, signaling to all downstream jobs and dependent processes that the provider enrollment batch completed but with warnings, and that the errored records require investigation and remediation before those providers can be enrolled"
+            },
+            "Rule_Name": "Confirm Batch Completion With Warnings When Errors Were Encountered",
+            "Rule_Description": "When the batch run encountered one or more provider application errors, the batch concludes in a warning state with return code 4, distinguishing it from a fully successful run and enabling downstream jobs to take appropriate conditional action."
+        }
+    ],
+    "description": "PRVENR01 is a batch provider enrollment loader program that reads provider applications from a sequential intake file, validates each application (checking for NPI, provider type, and taxonomy), and writes approved pending provider records to the Provider Master indexed file (KSDS). Invalid applications are written to a sequential error file for reporting. This is a Main/Driver program as it contains STOP RUN and no Linkage Section parameters passed from a calling program.\n\n<br>\n\n- **Execution Environment**: Batch\n- **Database Access**: VSAM (Indexed), Sequential Files\n- **MQ Calls**: No\n- **Module Type**: Main module\n\n<br>\n\n### Key Functionalities:\n\n1: Batch Initialization - Initialize the enrollment load process by setting the program identifier, resetting all record counters (read, written, skipped, errored) to zero, opening the provider application intake file, provider master file, and error file, and accepting or defaulting the batch identifier for tracking purposes\n\n2: Provider Application Reading - Sequentially read each provider application record from the intake file into a working storage area, incrementing the records-read counter for each successfully read record, and detecting end-of-file to stop processing\n\n3: NPI Presence Validation - Check that the provider's National Provider Identifier (NPI) is not blank or missing; if the NPI is absent, flag the application as invalid, increment the error counter, and route the application to error recording\n\n4: Provider Type Classification Validation - Verify that the provider application contains a recognized provider type designation (Individual, Group, or Facility); if none of these types is indicated, flag the application as invalid, increment the error counter, and route to error recording\n\n5: Provider Taxonomy Code Validation - Confirm that the provider's taxonomy code (specialty/classification code) is populated and not blank; if missing, flag the application as invalid, increment the error counter, and route to error recording\n\n6: Provider Enrollment Status Assignment - For applications that pass all validations, set the provider's enrollment status to PENDING and screening status to UNSCREENED, marking the provider as awaiting review and background screening before full enrollment\n\n7: Validation Error Record Writing - For each application that fails any validation check, write a detailed error record to the error output file containing the provider NPI, provider type code, and a validation-failed indicator for downstream review and correction\n\n8: Invalid Application Written to Provider Master (Defect) - Due to a missing exit in the INVALID-APP paragraph, provider applications that have FAILED validation (missing NPI, invalid type, or missing taxonomy) also fall through and are written to the provider master file as PENDING records, making them eligible for auto-approval and potential improper enrollment\n\n9: Provider Master Record Writing - Write the provider record (whether valid or invalid due to fall-through defect) to the Provider Master KSDS file; handle outcomes including successful write (increment written counter), duplicate NPI detection (increment skipped counter and log the duplicate NPI), or write failure (increment error counter and set error return code)\n\n10: Batch Completion Reporting and Return Code Setting - Close all files, display final counts of records read, written, errored, and skipped for the batch run, and set a warning return code if any errors were encountered during processing to signal downstream jobs\n\n"
+}

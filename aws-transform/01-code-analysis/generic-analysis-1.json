@@ -1,0 +1,242 @@
+[
+  {
+    "name": "PRVAUTOM.rexx",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/REXX/PRVAUTOM.rexx",
+    "fileType": "rexx",
+    "charset": "ISO-8859-1",
+    "fileExtension": "rexx",
+    "emptyLines": 5,
+    "effectiveLines": 39,
+    "totalLines": 44
+  },
+  {
+    "name": "README.md",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/README.md",
+    "fileType": "md",
+    "charset": "UTF-8",
+    "fileExtension": "md",
+    "emptyLines": 29,
+    "effectiveLines": 108,
+    "totalLines": 137
+  },
+  {
+    "name": "PRVSCRPR.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS/PRVSCRPR.jcl",
+    "fileType": "jcl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "jcl",
+    "commentedLines": 8,
+    "emptyLines": 1,
+    "effectiveLines": 12,
+    "totalLines": 21
+  },
+  {
+    "name": "ERRCODES.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/ERRCODES.cpy",
+    "fileType": "cpy",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cpy",
+    "commentedLines": 3,
+    "emptyLines": 1,
+    "effectiveLines": 11,
+    "totalLines": 15
+  },
+  {
+    "name": "PRVMTH01.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVMTH01.jcl",
+    "fileType": "jcl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "jcl",
+    "commentedLines": 19,
+    "emptyLines": 1,
+    "effectiveLines": 26,
+    "totalLines": 46
+  },
+  {
+    "name": "WRKSTORE.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+    "fileType": "cpy",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cpy",
+    "commentedLines": 9,
+    "emptyLines": 1,
+    "effectiveLines": 14,
+    "totalLines": 24
+  },
+  {
+    "name": "SCRNREC.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/SCRNREC.cpy",
+    "fileType": "cpy",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cpy",
+    "commentedLines": 6,
+    "emptyLines": 1,
+    "effectiveLines": 15,
+    "totalLines": 22
+  },
+  {
+    "name": "PRVRECRD.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+    "fileType": "cpy",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cpy",
+    "commentedLines": 10,
+    "emptyLines": 1,
+    "effectiveLines": 34,
+    "totalLines": 45
+  },
+  {
+    "name": "PRVVSM02.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM02.jcl",
+    "fileType": "jcl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "jcl",
+    "commentedLines": 5,
+    "emptyLines": 3,
+    "effectiveLines": 25,
+    "totalLines": 33
+  },
+  {
+    "name": "PRVVSM01.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM01.jcl",
+    "fileType": "jcl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "jcl",
+    "commentedLines": 5,
+    "emptyLines": 4,
+    "effectiveLines": 26,
+    "totalLines": 35
+  },
+  {
+    "name": "PRVDAY01.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVDAY01.jcl",
+    "fileType": "jcl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "jcl",
+    "commentedLines": 31,
+    "emptyLines": 1,
+    "effectiveLines": 44,
+    "totalLines": 76
+  },
+  {
+    "name": "PRVDDL01.sql",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/DB2/PRVDDL01.sql",
+    "fileType": "sql",
+    "charset": "ISO-8859-1",
+    "fileExtension": "sql",
+    "commentedLines": 22,
+    "emptyLines": 8,
+    "effectiveLines": 45,
+    "totalLines": 75
+  },
+  {
+    "name": "PRVSCR01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSCR01.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 26,
+    "emptyLines": 21,
+    "effectiveLines": 103,
+    "totalLines": 150
+  },
+  {
+    "name": "DCLPROV.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/DCLPROV.cpy",
+    "fileType": "cpy",
+    "charset": "UTF-8",
+    "fileExtension": "cpy",
+    "commentedLines": 5,
+    "emptyLines": 2,
+    "effectiveLines": 23,
+    "totalLines": 30
+  },
+  {
+    "name": "PRVCICS1.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/ONLINE/PRVCICS1.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 10,
+    "emptyLines": 10,
+    "effectiveLines": 54,
+    "totalLines": 74
+  },
+  {
+    "name": "PRVTMS01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVTMS01.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 18,
+    "emptyLines": 14,
+    "effectiveLines": 86,
+    "totalLines": 118
+  },
+  {
+    "name": "PRVSAN01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSAN01.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 27,
+    "emptyLines": 13,
+    "effectiveLines": 99,
+    "totalLines": 139
+  },
+  {
+    "name": "PRVENR01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVENR01.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 31,
+    "emptyLines": 18,
+    "effectiveLines": 141,
+    "totalLines": 190
+  },
+  {
+    "name": "PRVDEAD1.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDEAD1.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 20,
+    "emptyLines": 5,
+    "effectiveLines": 27,
+    "totalLines": 52
+  },
+  {
+    "name": "PRVREV01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVREV01.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 14,
+    "emptyLines": 10,
+    "effectiveLines": 71,
+    "totalLines": 95
+  },
+  {
+    "name": "PRVDIR01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDIR01.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 12,
+    "emptyLines": 10,
+    "effectiveLines": 69,
+    "totalLines": 91
+  },
+  {
+    "name": "PRVRSK01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVRSK01.cbl",
+    "fileType": "cbl",
+    "charset": "ISO-8859-1",
+    "fileExtension": "cbl",
+    "commentedLines": 31,
+    "emptyLines": 16,
+    "effectiveLines": 91,
+    "totalLines": 138
+  }
+]

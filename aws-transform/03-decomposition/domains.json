@@ -1,0 +1,12 @@
+[
+  {
+    "domain_name": "Unassigned",
+    "depends_on": [
+      "decompose"
+    ]
+  },
+  {
+    "domain_name": "decompose",
+    "depends_on": []
+  }
+]

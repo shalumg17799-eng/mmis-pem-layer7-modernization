@@ -1,0 +1,94 @@
+[
+  {
+    "test_case_name": "Test Case - PRVDAY01.jcl",
+    "test_case_id": "TC-PRVDAY01.jcl-3f15ba4c",
+    "job_list": [
+      {
+        "name": "PRVDAY01.jcl",
+        "test_case_order": 1
+      }
+    ],
+    "vsam_datasets_before": [
+      "MMPRV.PROVIDER.MASTER.KSDS"
+    ],
+    "vsam_datasets_after": [
+      "MMPRV.PROVIDER.MASTER.KSDS"
+    ],
+    "data_tables_before": [],
+    "data_tables_after": [],
+    "sequential_datasets_before": [
+      "MMPRV.PROV.APPS.D&DATE"
+    ],
+    "sequential_datasets_after": [
+      "MMPRV.PROV.ERRORS.D&DATE",
+      "MMPRV.SCREEN.RESULTS.D&DATE"
+    ]
+  },
+  {
+    "test_case_name": "Test Case - PRVMTH01.jcl",
+    "test_case_id": "TC-PRVMTH01.jcl-fc4facec",
+    "job_list": [
+      {
+        "name": "PRVMTH01.jcl",
+        "test_case_order": 1
+      }
+    ],
+    "vsam_datasets_before": [
+      "MMPRV.PROVIDER.MASTER.KSDS"
+    ],
+    "vsam_datasets_after": [],
+    "data_tables_before": [],
+    "data_tables_after": [],
+    "sequential_datasets_before": [
+      "MMPRV.TMSIS.PROVIDER.D&DATE",
+      "MMPRV.TMSIS.ARCHIVE(+1)"
+    ],
+    "sequential_datasets_after": [
+      "MMPRV.TMSIS.PROVIDER.D&DATE",
+      "MMPRV.TMSIS.ARCHIVE(+1)",
+      "MMPRV.REVAL.QUEUE.D&DATE"
+    ]
+  },
+  {
+    "test_case_name": "Test Case - PRVVSM02.jcl",
+    "test_case_id": "TC-PRVVSM02.jcl-62020d4e",
+    "job_list": [
+      {
+        "name": "PRVVSM02.jcl",
+        "test_case_order": 1
+      }
+    ],
+    "vsam_datasets_before": [
+      "MMPRV.SANCTION.MASTER.KSDS",
+      "MMPRV.SCREEN.RESULTS.KSDS"
+    ],
+    "vsam_datasets_after": [
+      "MMPRV.SANCTION.MASTER.KSDS",
+      "MMPRV.SCREEN.RESULTS.KSDS"
+    ],
+    "data_tables_before": [],
+    "data_tables_after": [],
+    "sequential_datasets_before": [],
+    "sequential_datasets_after": []
+  },
+  {
+    "test_case_name": "Test Case - PRVVSM01.jcl",
+    "test_case_id": "TC-PRVVSM01.jcl-e0d7c457",
+    "job_list": [
+      {
+        "name": "PRVVSM01.jcl",
+        "test_case_order": 1
+      }
+    ],
+    "vsam_datasets_before": [
+      "MMPRV.PROVIDER.MASTER.KSDS"
+    ],
+    "vsam_datasets_after": [
+      "MMPRV.PROVIDER.MASTER.KSDS"
+    ],
+    "data_tables_before": [],
+    "data_tables_after": [],
+    "sequential_datasets_before": [],
+    "sequential_datasets_after": []
+  }
+]

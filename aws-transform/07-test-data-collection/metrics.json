@@ -1,0 +1,23 @@
+{
+  "metrics_summary": {
+    "application_metrics": {
+      "application_duration_seconds": 0.079,
+      "scheduled_tasks": 17,
+      "test_cases_selected": 4,
+      "template_file_opened": 3,
+      "template_file_not_found": 0,
+      "dataset_variables_processed": 17,
+      "dataset_file_not_found": 0,
+      "constant_variables_processed": 5,
+      "constant_file_not_found": 0,
+      "scheduled_tasks_success": 17,
+      "scheduled_tasks_fail": 0
+    },
+    "execution_metadata": {
+      "start_time": "2026-11-17T13:20:59.018639+00:00",
+      "end_time": "2026-11-17T13:20:59.515720+00:00",
+      "total_execution_time_seconds": 0.5,
+      "timestamp": "20261117_132059"
+    }
+  }
+}

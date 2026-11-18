@@ -1,0 +1,82 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVVSM02.jcl",
+        "type": "jcl"
+      },
+      "overview": "This JCL job defines two VSAM Key-Sequenced Data Sets (KSDS) used in a Medicaid Management Information System (MMIS) provider screening and sanctioning process. It first purges any existing versions of the datasets, then creates a Screening Results KSDS keyed on an 18-byte NPI plus source combination to retain multiple screening verdicts per provider for audit trail purposes, and a Sanction Master KSDS keyed on a 10-byte identifier to track sanctioned providers. The job establishes the foundational data structures needed to support provider credentialing, screening outcome tracking, and sanction management within the MMIS environment.",
+      "parameters": [
+        {
+          "name": "JOB",
+          "value": "(MMIS,VSAM)",
+          "description": "Accounting information parameter that identifies the account to be charged for the job. 'MMIS' is the account number and 'VSAM' is the additional accounting subfield, used for billing and resource tracking purposes."
+        },
+        {
+          "name": "JOBNAME",
+          "value": "PRVVSM02",
+          "description": "The name assigned to the job (positional, part of the JOB statement label). It uniquely identifies the job in the system and is used for tracking, logging, and operator communication."
+        },
+        {
+          "name": "PROGRAMMER NAME",
+          "value": "DEFINE SCRN KSDS",
+          "description": "A free-form text field (positional parameter after accounting info) that provides a descriptive label for the job. It appears on job output headers and helps identify the job's purpose to operators and users."
+        },
+        {
+          "name": "CLASS",
+          "value": "A",
+          "description": "Specifies the job class (input class) that determines which initiator will pick up and execute the job. Class A typically indicates a specific workload category defined by the installation, affecting job scheduling priority and resource allocation."
+        },
+        {
+          "name": "MSGCLASS",
+          "value": "X",
+          "description": "Specifies the output class for the job log and system messages (JES message dataset). Class X typically routes the job log to a held output queue, allowing the user to review messages before they are printed or purged."
+        },
+        {
+          "name": "NOTIFY",
+          "value": "&SYSUID",
+          "description": "Specifies the TSO user ID to be notified when the job completes. The symbolic parameter &SYSUID resolves to the user ID of the person who submitted the job, sending a completion message to that user's TSO session."
+        }
+      ]
+    },
+    "job_details": [
+      {
+        "step": "DEFKSDS",
+        "purpose": "Deletes any pre-existing VSAM KSDS clusters for screening results and sanction master data, then defines two new KSDS clusters with their respective key lengths, record sizes, share options, and space allocations. This establishes the VSAM infrastructure needed to store provider screening verdicts (keyed by NPI + source) and sanction master records.",
+        "programs": "IDCAMS*",
+        "inputs": "SYSIN (inline commands: DELETE MMPRV.SCREEN.RESULTS.KSDS CLUSTER PURGE, DELETE MMPRV.SANCTION.MASTER.KSDS CLUSTER PURGE, DEFINE CLUSTER for MMPRV.SCREEN.RESULTS.KSDS with KEYS(18 0) RECORDSIZE(67 67) SHAREOPTIONS(2 3) CYLINDERS(10 5), DEFINE CLUSTER for MMPRV.SANCTION.MASTER.KSDS with KEYS(10 0) RECORDSIZE(80 80) SHAREOPTIONS(2 3) CYLINDERS(5 2))",
+        "outputs": "VSAM KSDS cluster MMPRV.SCREEN.RESULTS.KSDS (data component: MMPRV.SCREEN.RESULTS.DATA, index component: MMPRV.SCREEN.RESULTS.INDEX); VSAM KSDS cluster MMPRV.SANCTION.MASTER.KSDS (data component: MMPRV.SANCTION.MASTER.DATA, index component: MMPRV.SANCTION.MASTER.INDEX); SYSPRINT (utility execution messages)"
+      }
+    ],
+    "data_operations": [
+      {
+        "step": "DEFKSDS",
+        "type": "Dataset",
+        "objects": "MMPRV.SCREEN.RESULTS.KSDS",
+        "operations": "DELETE",
+        "description": "Deletes the existing SCREENING RESULTS KSDS cluster with PURGE option, removing it regardless of expiration date"
+      },
+      {
+        "step": "DEFKSDS",
+        "type": "Dataset",
+        "objects": "MMPRV.SANCTION.MASTER.KSDS",
+        "operations": "DELETE",
+        "description": "Deletes the existing SANCTION MASTER KSDS cluster with PURGE option, removing it regardless of expiration date"
+      },
+      {
+        "step": "DEFKSDS",
+        "type": "Dataset",
+        "objects": "MMPRV.SCREEN.RESULTS.KSDS, MMPRV.SCREEN.RESULTS.DATA, MMPRV.SCREEN.RESULTS.INDEX",
+        "operations": "DEFINE CLUSTER",
+        "description": "Defines a new VSAM KSDS cluster for screening results with 18-byte key at offset 0, fixed-length 67-byte records, SHAREOPTIONS(2 3), and initial allocation of 10 cylinders with 5 cylinder secondary extent; also defines its DATA and INDEX components"
+      },
+      {
+        "step": "DEFKSDS",
+        "type": "Dataset",
+        "objects": "MMPRV.SANCTION.MASTER.KSDS, MMPRV.SANCTION.MASTER.DATA, MMPRV.SANCTION.MASTER.INDEX",
+        "operations": "DEFINE CLUSTER",
+        "description": "Defines a new VSAM KSDS cluster for sanction master records with 10-byte key at offset 0, fixed-length 80-byte records, SHAREOPTIONS(2 3), and initial allocation of 5 cylinders with 2 cylinder secondary extent; also defines its DATA and INDEX components"
+      }
+    ]
+  }
+}

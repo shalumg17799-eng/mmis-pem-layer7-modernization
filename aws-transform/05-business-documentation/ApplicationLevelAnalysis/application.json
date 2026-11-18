@@ -1,0 +1,12 @@
+{
+  "created_on": "2026-11-17",
+  "document_name": "Application Level Business Specifications",
+  "type": "application",
+  "executive_summary": "This application serves as the core operational platform for a state Medicaid Provider Enrollment and Management program, governing the full lifecycle of healthcare provider participation in the state's Medicaid program. The system delivers four primary business capabilities: real-time online inquiry enabling state analysts to instantly retrieve current provider enrollment status \u2014 including Active, Terminated, Pending, and Denied designations \u2014 to support eligibility determinations and administrative decisions; nightly batch extraction and distribution of active provider data to Managed Care Organizations, ensuring that downstream health plans maintain accurate and current provider directories for member access and network adequacy compliance; automated regulatory enforcement processing that applies sanction actions such as terminations, suspensions, and reinstatements to provider records in accordance with state and federal compliance requirements; and a legacy fingerprint-based background screening workflow, now decommissioned following the state's 2019 transition to electronic LiveScan technology for high-risk provider background checks. Together, these capabilities protect Medicaid program integrity by ensuring that only qualified, compliant providers participate in the program, while supporting transparency, regulatory accountability, and timely information sharing with managed care partners. The application represents a critical administrative infrastructure asset for the state's Medicaid agency, directly impacting provider network management, fraud prevention, and the quality of care available to Medicaid beneficiaries.",
+  "identified_business_functions": [
+    {
+      "name": "Unassigned",
+      "description": "Files that do not belong to any functional group"
+    }
+  ]
+}

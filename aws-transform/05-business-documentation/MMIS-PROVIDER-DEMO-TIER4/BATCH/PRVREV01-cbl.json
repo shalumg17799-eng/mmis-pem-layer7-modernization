@@ -1,0 +1,663 @@
+{
+    "name": "PRVREV01.cbl",
+    "program_name": "PRVREV01.cbl",
+    "generated_at": "2026-11-17T12:37:58Z",
+    "overview": {
+        "total_key_functionalities": 7,
+        "total_rules": 24,
+        "main_flow_diagram": "flowchart TD\n    A([Start: PRVREV01 Program]):::start\n    B[1:Program Initialization\nCapture Today's Date as Reference Point]:::process\n    C[(PRV-MASTER-FILE\nProvider Master File\nVSAM KSDS Indexed)]:::datasource\n    D[2:Provider Master File Sweep\nOpen Provider Master File\nand Revalidation Output Queue]:::process\n    E[(REVAL-OUT-FILE\nRevalidation Output Queue\nSequential File)]:::datasource\n    F{More Provider\nRecords to Read?}:::decision\n    G[Read Next Provider Record]:::process\n    H{3:Active Provider Filter\nIs Provider Status\nCurrently Active?}:::decision\n    I{4:Revalidation Due Date Check\nIs Provider Revalidation\nDue Date on or Before Today?\n42 CFR 455.414 - 5-Year Cycle}:::decision\n    J[5:Queue Provider for Re-screening\nRecord Provider NPI,\nRevalidation Due Date,\nAssign Action: RESCREEN-REQUIRED]:::process\n    K[6:Revalidation Count Tracking\nIncrement Running Count\nof Providers Queued]:::process\n    L[Skip Provider\nNot Active - No Action Required]:::process\n    M[Skip Provider\nRevalidation Not Yet Due]:::process\n    N[7:Revalidation Summary Reporting\nDisplay Total Providers\nQueued for Re-screening]:::process\n    Z([End: Program Complete]):::final\n\n    A --> B\n    B --> D\n    D --> F\n    C -.->|Read Provider Records| G\n    J -.->|Write Revalidation Record| E\n    F -->|Yes - Records Remain| G\n    G --> H\n    H -->|No - Inactive Provider| L\n    L --> F\n    H -->|Yes - Active Provider| I\n    I -->|No - Due Date in Future| M\n    M --> F\n    I -->|Yes - Due Date Passed\nOverdue for Revalidation| J\n    J --> K\n    K --> F\n    F -->|No - All Records Processed| N\n    N --> Z\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313",
+        "rules": [
+            {
+                "rule_id": "R-PRVREV01-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "Program Initialization with Current Date Capture",
+                "rule_description": "At program startup, the system captures the current date to serve as the reference point for all subsequent revalidation due date comparisons throughout the entire program run.",
+                "sub_graph_node_text": "1: Program Initialization\nCapture Today's Date as Reference Point",
+                "acceptance_criteria": {
+                    "Given": "The PRVREV01 revalidation screening program is invoked",
+                    "When": "The program begins execution",
+                    "Then": "Today's date (in YYYYMMDD format) is captured and stored as the reference date that will be used to evaluate every provider's revalidation due date during the current program run"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVREV01-cbl-00002",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Master File and Revalidation Output Queue Initialization",
+                "rule_description": "Before any provider records can be evaluated, both the Provider Master File (source of provider data) and the Revalidation Output Queue (destination for qualifying providers) must be opened and made ready for processing.",
+                "sub_graph_node_text": "2: Provider Master File Sweep\nOpen Provider Master File\nand Revalidation Output Queue",
+                "acceptance_criteria": {
+                    "Given": "Today's date has been captured as the reference point",
+                    "When": "The program prepares to sweep through all provider records",
+                    "Then": "The Provider Master File is opened for reading and the Revalidation Output Queue file is opened for writing, enabling the full provider sweep to begin"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVREV01-cbl-00003",
+                "rule_type": "Decision Rules",
+                "rule_name": "Active Provider Status Filter",
+                "rule_description": "Only providers who are currently in Active status are eligible for revalidation due date evaluation. Inactive providers are immediately excluded from the revalidation process with no further action taken.",
+                "sub_graph_node_text": "3: Active Provider Filter\nIs Provider Status\nCurrently Active?",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been read from the Provider Master File",
+                    "When": "The provider's current status is evaluated",
+                    "Then": "If the provider status is Active, the provider proceeds to the revalidation due date check; if the provider status is NOT Active (inactive), the provider is skipped entirely and no revalidation record is created for that provider"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVREV01-cbl-00004",
+                "rule_type": "Policy Rules",
+                "rule_name": "Revalidation Due Date Eligibility Check",
+                "rule_description": "For Active providers, the system checks whether their revalidation due date has arrived or passed. Per 42 CFR 455.414 (5-Year Revalidation Cycle), only providers whose revalidation due date is on or before today's date are eligible to be queued for rescreening. Providers whose due date falls in the future are not yet due and are skipped.",
+                "sub_graph_node_text": "4: Revalidation Due Date Check\nIs Provider Revalidation\nDue Date on or Before Today?\n42 CFR 455.414 - 5-Year Cycle",
+                "acceptance_criteria": {
+                    "Given": "A provider has been confirmed as Active",
+                    "When": "The provider's Revalidation Due Date is compared against today's reference date",
+                    "Then": "If the Revalidation Due Date is less than or equal to today's date (due date has arrived or is overdue), the provider is queued for rescreening; if the Revalidation Due Date is greater than today's date (due date is in the future), the provider is skipped and no revalidation record is created"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVREV01-cbl-00005",
+                "rule_type": "Action Rules",
+                "rule_name": "Queue Provider for Re-screening with RESCREEN-REQUIRED Action",
+                "rule_description": "When a provider is both Active and has a revalidation due date on or before today, a revalidation output record is created capturing the provider's NPI, their revalidation due date, and a mandatory action code of RESCREEN-REQUIRED, which is then written to the Revalidation Output Queue.",
+                "sub_graph_node_text": "5: Queue Provider for Re-screening\nRecord Provider NPI,\nRevalidation Due Date,\nAssign Action: RESCREEN-REQUIRED",
+                "acceptance_criteria": {
+                    "Given": "A provider is confirmed as Active AND their Revalidation Due Date is on or before today's date",
+                    "When": "The provider is queued for revalidation rescreening",
+                    "Then": "An output record is created in the Revalidation Output Queue containing: (1) the provider's NPI (National Provider Identifier), (2) the provider's Revalidation Due Date, and (3) the action code 'RESCREEN-REQUIRED'; this record is written to the Revalidation Output Queue file"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVREV01-cbl-00006",
+                "rule_type": "Computation Rules",
+                "rule_name": "Revalidation Queue Count Tracking",
+                "rule_description": "Each time a provider is successfully queued for rescreening, a running total counter is incremented by one to track the cumulative number of providers queued during the current program run.",
+                "sub_graph_node_text": "6: Revalidation Count Tracking\nIncrement Running Count\nof Providers Queued",
+                "acceptance_criteria": {
+                    "Given": "A provider revalidation record has been successfully written to the Revalidation Output Queue",
+                    "When": "The provider is confirmed as queued for rescreening",
+                    "Then": "The running count of providers queued for revalidation is incremented by exactly 1"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVREV01-cbl-00007",
+                "rule_type": "Process Rules",
+                "rule_name": "Revalidation Summary Report Display",
+                "rule_description": "After all provider records in the Provider Master File have been evaluated, the program displays a summary showing the total number of providers that were queued for revalidation rescreening during the current run.",
+                "sub_graph_node_text": "7: Revalidation Summary Reporting\nDisplay Total Providers\nQueued for Re-screening",
+                "acceptance_criteria": {
+                    "Given": "All records in the Provider Master File have been read and evaluated",
+                    "When": "The program completes its full sweep of the Provider Master File",
+                    "Then": "The program displays the message 'PRVREV01: PROVIDERS QUEUED FOR REVAL=' followed by the final total count of providers queued for revalidation during the current run, and both the Provider Master File and the Revalidation Output Queue are closed"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "program-initialization",
+            "title": "Program Initialization",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Program Initialization])\n    B[Identify Program as PRVREV01\\nMonth-End Revalidation Sweep]\n    C[Capture Today's Date\\nin YYYY-MM-DD Format]\n    D[Today's Date Stored as\\nReference Point for\\nRevalidation Due Date Comparisons]\n    Z([Proceed to Provider\\nMaster File Sweep])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> Z",
+            "rules": [
+                {
+                    "rule_id": "R-PRVREV01-cbl-00008",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Capture Today's Date as Revalidation Reference Point",
+                    "rule_description": "At program startup, the system captures the current calendar date in YYYY-MM-DD format to serve as the reference point against which all provider revalidation due dates will be compared during the monthly revalidation sweep.",
+                    "sub_graph_node_text": "Capture Today's Date in YYYY-MM-DD Format",
+                    "acceptance_criteria": {
+                        "Given": "The PRVREV01 monthly revalidation sweep program has been initiated",
+                        "When": "The program begins its initialization sequence",
+                        "Then": "The current calendar date must be captured and stored in YYYY-MM-DD (four-digit year, two-digit month, two-digit day) format so that it can be used as the reference point for all subsequent provider revalidation due date comparisons throughout the entire program run"
+                    },
+                    "key_functionality_id": "program-initialization"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00009",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Establish Program Identity as PRVREV01 Revalidation Sweep",
+                    "rule_description": "At the start of execution, the program identifies itself as PRVREV01, the designated month-end provider revalidation sweep program, ensuring correct program identification for tracking, logging, and operational reporting purposes.",
+                    "sub_graph_node_text": "Identify Program as PRVREV01 Month-End Revalidation Sweep",
+                    "acceptance_criteria": {
+                        "Given": "The provider revalidation sweep process is being launched",
+                        "When": "The program begins execution",
+                        "Then": "The program must register its identity as 'PRVREV01' so that all subsequent processing, output, and operational messages are correctly attributed to the PRVREV01 month-end revalidation sweep program"
+                    },
+                    "key_functionality_id": "program-initialization"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00010",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Store Today's Date for Revalidation Due Date Comparisons",
+                    "rule_description": "The captured current date is retained as a persistent reference value that will be used throughout the entire program run to evaluate whether each provider's revalidation due date has been reached or exceeded, ensuring consistent date-based eligibility decisions across all provider records processed.",
+                    "sub_graph_node_text": "Today's Date Stored as Reference Point for Revalidation Due Date Comparisons",
+                    "acceptance_criteria": {
+                        "Given": "The current calendar date has been successfully captured in YYYY-MM-DD format during program initialization",
+                        "When": "The program proceeds to sweep through provider records in the Provider Master File",
+                        "Then": "The captured today's date must remain available and unchanged as the single consistent reference point for all revalidation due date comparisons made against every provider record during the current program run, ensuring no provider is evaluated against a different date than any other provider in the same run"
+                    },
+                    "key_functionality_id": "program-initialization"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Program Initialization"
+        },
+        {
+            "id": "provider-master-file-sweep",
+            "title": "Provider Master File Sweep",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Provider Master File Sweep])\n    B[Retrieve Next Provider Record\\nfrom Provider Master File]\n    C{Has the Last Provider\\nRecord Been Reached?}\n    D[Mark Sweep as Complete\\nNo More Records to Process]\n    E[Send Provider Record\\nfor Revalidation Eligibility Evaluation]\n    F([End of Provider Master File Sweep])\n\n    A --> B\n    B --> C\n    C -->|Yes - End of File Reached| D\n    D --> F\n    C -->|No - Record Retrieved Successfully| E\n    E --> B",
+            "rules": [
+                {
+                    "rule_id": "R-PRVREV01-cbl-00011",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Sequential Sweep of Provider Master File",
+                    "rule_description": "The system must sequentially retrieve every provider record from the Provider Master File, one at a time, to ensure all providers are evaluated for revalidation eligibility without skipping any record.",
+                    "sub_graph_node_text": "Retrieve Next Provider Record from Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File has been opened and is ready for reading, and the sweep has been initiated",
+                        "When": "The system requests the next provider record from the Provider Master File",
+                        "Then": "The next sequential provider record is retrieved and made available for revalidation eligibility evaluation"
+                    },
+                    "key_functionality_id": "provider-master-file-sweep"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00012",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Detection of Last Provider Record in File",
+                    "rule_description": "The system must detect when there are no more provider records remaining in the Provider Master File so that the sweep can be concluded and no further processing is attempted.",
+                    "sub_graph_node_text": "Has the Last Provider Record Been Reached?",
+                    "acceptance_criteria": {
+                        "Given": "The system has retrieved a record (or attempted to retrieve one) from the Provider Master File during the sequential sweep",
+                        "When": "The read operation signals that the end of the Provider Master File has been reached and no more records are available",
+                        "Then": "The system marks the sweep as complete and stops attempting to retrieve further provider records"
+                    },
+                    "key_functionality_id": "provider-master-file-sweep"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00013",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Continuation of Sweep When More Records Exist",
+                    "rule_description": "When a provider record is successfully retrieved from the Provider Master File and the end of file has not been reached, the system must forward that provider record for revalidation eligibility evaluation before retrieving the next record.",
+                    "sub_graph_node_text": "Send Provider Record for Revalidation Eligibility Evaluation",
+                    "acceptance_criteria": {
+                        "Given": "The system has successfully retrieved a provider record from the Provider Master File and the end of file has not been reached",
+                        "When": "The record is confirmed as a valid retrieved record (not an end-of-file condition)",
+                        "Then": "The provider record is sent for revalidation eligibility evaluation, and the system loops back to retrieve the next provider record from the Provider Master File"
+                    },
+                    "key_functionality_id": "provider-master-file-sweep"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00014",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Termination of Provider Master File Sweep",
+                    "rule_description": "Once the end of the Provider Master File is reached, the system must formally mark the sweep as complete, ensuring no further provider records are retrieved or evaluated, and allowing the program to proceed to final reporting.",
+                    "sub_graph_node_text": "Mark Sweep as Complete - No More Records to Process",
+                    "acceptance_criteria": {
+                        "Given": "The system is performing a sequential sweep of the Provider Master File",
+                        "When": "The end of the Provider Master File is detected, indicating all provider records have been processed",
+                        "Then": "The sweep is marked as complete, the loop terminates, no further records are retrieved, and the program proceeds to close files and display the final count of providers queued for revalidation"
+                    },
+                    "key_functionality_id": "provider-master-file-sweep"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Master File Sweep"
+        },
+        {
+            "id": "active-provider-filter",
+            "title": "Active Provider Filter",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Receive Provider Record\\nfrom Master File Sweep])\n    B{Is Provider Status\\nCurrently Active?}\n    C([Pass to Revalidation\\nDue Date Check])\n    D[Skip Provider Record\\nNo Further Processing\\nRequired]\n    E([Return to Read\\nNext Provider Record])\n\n    A --> B\n    B -->|Yes - Provider is Active\\nProceed with Evaluation| C\n    B -->|No - Provider is Inactive\\nExclude from Revalidation| D\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVREV01-cbl-00015",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Active Provider Status Filter for Revalidation Eligibility",
+                    "rule_description": "Each provider record retrieved from the Provider Master File must be evaluated to determine if the provider holds an Active status before being considered for revalidation processing. Only Active providers are eligible to proceed to the Revalidation Due Date check. Providers who are not Active are excluded entirely from revalidation and no further evaluation or output is performed for them.",
+                    "sub_graph_node_text": "Is Provider Status Currently Active?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and is available for evaluation",
+                        "When": "The provider's status field (PRV-ACTIVE) is checked to determine if the provider is currently Active",
+                        "Then": "If the provider status is Active, the provider record is passed forward to the Revalidation Due Date check for further evaluation; If the provider status is NOT Active, the provider record is skipped entirely with no output record created, no revalidation action assigned, and no increment to the revalidation counter, and processing returns to read the next provider record from the Master File"
+                    },
+                    "key_functionality_id": "active-provider-filter"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Active Provider Filter"
+        },
+        {
+            "id": "revalidation-due-date-check",
+            "title": "Revalidation Due Date Check",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter: Revalidation\\nDue Date Check])\n    B[Retrieve Provider's\\nRevalidation Due Date\\nfrom Provider Master Record]\n    C[Retrieve Today's Date\\nas Reference Point]\n    D{Compare:\\nIs Provider Revalidation\\nDue Date on or Before\\nToday's Date?\\n42 CFR 455.414\\n5-Year Revalidation Cycle}\n    E([Provider is Overdue\\nfor Revalidation\\nProceed to Queue\\nfor Re-screening])\n    F([Provider Revalidation\\nNot Yet Due\\nDue Date is in the Future\\nSkip - No Action Required])\n\n    A --> B\n    B --> C\n    C --> D\n    D -->|Yes - Due Date has Passed\\nor is Today\\nProvider is Overdue| E\n    D -->|No - Due Date is\\nStill in the Future\\nRevalidation Not Required| F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVREV01-cbl-00016",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Providers Overdue for Revalidation Based on Due Date",
+                    "rule_description": "Per 42 CFR 455.414 (5-year revalidation cycle), the system compares each active provider's Revalidation Due Date from the Provider Master Record against today's date to determine whether the provider is overdue for revalidation. If the due date is on or before today, the provider is flagged for re-screening. If the due date is still in the future, no action is taken.",
+                    "sub_graph_node_text": "Compare: Is Provider Revalidation Due Date on or Before Today's Date? 42 CFR 455.414 5-Year Revalidation Cycle",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record exists in the Provider Master File with a Revalidation Due Date populated, and today's date has been captured as the reference point for comparison",
+                        "When": "The provider's Revalidation Due Date from the Provider Master Record is compared against today's date",
+                        "Then": "If the Revalidation Due Date is on or before today's date, the provider is determined to be overdue for revalidation and is proceeded to be queued for re-screening with action 'RESCREEN-REQUIRED'; if the Revalidation Due Date is strictly after today's date, the provider's revalidation is not yet due and no action is taken \u2014 the provider record is skipped entirely"
+                    },
+                    "key_functionality_id": "revalidation-due-date-check"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Revalidation Due Date Check"
+        },
+        {
+            "id": "queue-provider-for-re",
+            "title": "Queue Provider for Re",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter: Queue Provider\\nfor Re-screening])\n    B[Capture Provider NPI\\nfrom Provider Master Record]\n    C[Capture Provider\\nRevalidation Due Date\\nfrom Provider Master Record]\n    D[Assign Revalidation Action\\nCode: RESCREEN-REQUIRED]\n    E[/Write Revalidation Record\\nto Output Queue:\\n- Provider NPI\\n- Revalidation Due Date\\n- Action: RESCREEN-REQUIRED/]\n    F[(REVAL-OUT-FILE\\nRevalidation Output Queue)]\n    Z([Return: Provider\\nSuccessfully Queued])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E -.->|Record Written| F\n    E --> Z",
+            "rules": [
+                {
+                    "rule_id": "R-PRVREV01-cbl-00017",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Capture Provider NPI for Revalidation Queue",
+                    "rule_description": "When queuing a provider for re-screening, the provider's National Provider Identifier (NPI) must be retrieved from the Provider Master Record and recorded in the revalidation output entry.",
+                    "sub_graph_node_text": "Capture Provider NPI from Provider Master Record",
+                    "acceptance_criteria": {
+                        "Given": "An active provider whose revalidation due date is on or before today's date has been identified from the Provider Master Record",
+                        "When": "The provider is being prepared for queuing in the revalidation output",
+                        "Then": "The provider's NPI from the Provider Master Record must be captured and assigned to the revalidation output record's NPI field"
+                    },
+                    "key_functionality_id": "queue-provider-for-re"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00018",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Capture Provider Revalidation Due Date for Revalidation Queue",
+                    "rule_description": "When queuing a provider for re-screening, the provider's Revalidation Due Date must be retrieved from the Provider Master Record and recorded in the revalidation output entry to preserve the original due date context.",
+                    "sub_graph_node_text": "Capture Provider Revalidation Due Date from Provider Master Record",
+                    "acceptance_criteria": {
+                        "Given": "An active provider whose revalidation due date is on or before today's date has been identified from the Provider Master Record",
+                        "When": "The provider's NPI has been captured and the revalidation output record is being populated",
+                        "Then": "The provider's Revalidation Due Date from the Provider Master Record must be captured and assigned to the revalidation output record's due date field"
+                    },
+                    "key_functionality_id": "queue-provider-for-re"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00019",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Assign RESCREEN-REQUIRED Action Code to Queued Provider",
+                    "rule_description": "Every provider who is active and whose revalidation due date has passed must be uniformly assigned the action code 'RESCREEN-REQUIRED', indicating that a full re-screening is mandated. No variation in action type is applied based on any other provider attribute.",
+                    "sub_graph_node_text": "Assign Revalidation Action Code: RESCREEN-REQUIRED",
+                    "acceptance_criteria": {
+                        "Given": "An active provider whose revalidation due date is on or before today's date is being queued, and their NPI and revalidation due date have been captured into the revalidation output record",
+                        "When": "The revalidation action is being determined for the provider",
+                        "Then": "The action field in the revalidation output record must be set to 'RESCREEN-REQUIRED', uniformly for all qualifying providers regardless of any other provider attributes"
+                    },
+                    "key_functionality_id": "queue-provider-for-re"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00020",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Write Revalidation Record to Revalidation Output Queue",
+                    "rule_description": "Once the revalidation output record has been fully populated with the provider's NPI, Revalidation Due Date, and the action code 'RESCREEN-REQUIRED', the complete record must be written to the Revalidation Output Queue (REVAL-OUT-FILE) and the total count of providers queued for revalidation must be incremented by one.",
+                    "sub_graph_node_text": "Write Revalidation Record to Output Queue:\n- Provider NPI\n- Revalidation Due Date\n- Action: RESCREEN-REQUIRED",
+                    "acceptance_criteria": {
+                        "Given": "A revalidation output record has been fully populated with the provider's NPI, Revalidation Due Date, and the action code 'RESCREEN-REQUIRED'",
+                        "When": "The provider record is ready to be submitted to the revalidation output queue",
+                        "Then": "The complete revalidation record containing the Provider NPI, Revalidation Due Date, and action 'RESCREEN-REQUIRED' must be written to the Revalidation Output Queue (REVAL-OUT-FILE), and the running total count of providers queued for revalidation must be incremented by 1"
+                    },
+                    "key_functionality_id": "queue-provider-for-re"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Queue Provider for Re"
+        },
+        {
+            "id": "revalidation-count-tracking",
+            "title": "Revalidation Count Tracking",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Provider Successfully\\nQueued for Re-screening])\n    B[Add 1 to Running\\nRevalidation Count]\n    C{More Providers\\nto Process?}\n    D[Continue Sweep\\nto Next Provider Record]\n    E([End of Sweep\\nFinal Count Ready\\nfor Summary Report])\n\n    A --> B\n    B --> C\n    C -->|Yes - Continue Sweep| D\n    D -->|Next Provider\\nQueued for Revalidation| B\n    C -->|No - All Records Processed| E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVREV01-cbl-00021",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Increment Revalidation Count for Each Queued Provider",
+                    "rule_description": "Each time a provider is successfully queued for re-screening, the running revalidation count is incremented by 1 to track the total number of providers identified during the current sweep.",
+                    "sub_graph_node_text": "Add 1 to Running Revalidation Count",
+                    "acceptance_criteria": {
+                        "Given": "A provider record from the Provider Master File has been evaluated and meets all revalidation queuing criteria (provider is Active AND Revalidation Due Date is on or before today's date), and an output revalidation record has been successfully written for that provider",
+                        "When": "The provider is queued for re-screening with action 'RESCREEN-REQUIRED'",
+                        "Then": "The running Revalidation Count is incremented by exactly 1, reflecting the addition of this provider to the revalidation queue for the current sweep"
+                    },
+                    "key_functionality_id": "revalidation-count-tracking"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00022",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Continue Sweep Until All Provider Records Are Processed",
+                    "rule_description": "After each provider record is evaluated (whether queued or skipped), the sweep continues to the next provider record in the Provider Master File until all records have been processed.",
+                    "sub_graph_node_text": "More Providers to Process? / Continue Sweep to Next Provider Record",
+                    "acceptance_criteria": {
+                        "Given": "The revalidation sweep is in progress and the Provider Master File has been opened for sequential reading",
+                        "When": "A provider record has been processed (either queued for revalidation or skipped due to not meeting criteria) and there are more provider records remaining in the Provider Master File",
+                        "Then": "The sweep continues by reading the next provider record from the Provider Master File and evaluating it against the revalidation criteria, without interruption"
+                    },
+                    "key_functionality_id": "revalidation-count-tracking"
+                },
+                {
+                    "rule_id": "R-PRVREV01-cbl-00023",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Finalize Revalidation Count When All Records Are Processed",
+                    "rule_description": "When all provider records in the Provider Master File have been evaluated, the sweep ends and the final accumulated Revalidation Count is made available for the summary report, reflecting the total number of providers queued for re-screening during the sweep.",
+                    "sub_graph_node_text": "End of Sweep Final Count Ready for Summary Report",
+                    "acceptance_criteria": {
+                        "Given": "The revalidation sweep is in progress and the running Revalidation Count has been incremented for each provider successfully queued",
+                        "When": "The end of the Provider Master File is reached and there are no more provider records to process",
+                        "Then": "The sweep concludes, the Revalidation Output File is closed, and the final Revalidation Count is displayed in the summary message 'PRVREV01: PROVIDERS QUEUED FOR REVAL=' followed by the total count, representing all providers queued for revalidation during the sweep"
+                    },
+                    "key_functionality_id": "revalidation-count-tracking"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Revalidation Count Tracking"
+        },
+        {
+            "id": "revalidation-summary-reporting",
+            "title": "Revalidation Summary Reporting",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([All Provider Records\\nHave Been Processed])\n    B[Retrieve Final Count of\\nProviders Queued for\\nRevalidation Re-screening]\n    C[/Display Revalidation Summary Report:\\nTotal Providers Queued for\\nRevalidation Re-screening\\nDuring This Month-End Sweep/]\n    Z([End of Month-End\\nRevalidation Sweep])\n\n    A --> B\n    B --> C\n    C --> Z",
+            "rules": [
+                {
+                    "rule_id": "R-PRVREV01-cbl-00024",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Revalidation Summary Report After Month-End Sweep",
+                    "rule_description": "After all provider records in the Provider Master File have been evaluated during the month-end revalidation sweep, the program must retrieve the final accumulated count of providers that were queued for revalidation re-screening and display it as a summary report to confirm the outcome of the sweep.",
+                    "sub_graph_node_text": "Display Revalidation Summary Report: Total Providers Queued for Revalidation Re-screening During This Month-End Sweep",
+                    "acceptance_criteria": {
+                        "Given": "All records in the Provider Master File have been fully processed during the month-end revalidation sweep, and a running count of providers queued for revalidation re-screening has been maintained throughout the sweep",
+                        "When": "The end of the Provider Master File is reached and no more provider records remain to be evaluated",
+                        "Then": "The program must retrieve the final total count of providers queued for revalidation re-screening and display the following summary message: 'PRVREV01: PROVIDERS QUEUED FOR REVAL=' followed by the final total count of providers queued during this month-end sweep"
+                    },
+                    "key_functionality_id": "revalidation-summary-reporting"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Revalidation Summary Reporting"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The PRVREV01 revalidation screening program is invoked",
+                "When": "The program begins execution",
+                "Then": "Today's date (in YYYYMMDD format) is captured and stored as the reference date that will be used to evaluate every provider's revalidation due date during the current program run"
+            },
+            "Rule_Name": "Program Initialization with Current Date Capture",
+            "Rule_Description": "At program startup, the system captures the current date to serve as the reference point for all subsequent revalidation due date comparisons throughout the entire program run."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00002",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "Today's date has been captured as the reference point",
+                "When": "The program prepares to sweep through all provider records",
+                "Then": "The Provider Master File is opened for reading and the Revalidation Output Queue file is opened for writing, enabling the full provider sweep to begin"
+            },
+            "Rule_Name": "Provider Master File and Revalidation Output Queue Initialization",
+            "Rule_Description": "Before any provider records can be evaluated, both the Provider Master File (source of provider data) and the Revalidation Output Queue (destination for qualifying providers) must be opened and made ready for processing."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00003",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File",
+                "When": "The provider's current status is evaluated",
+                "Then": "If the provider status is Active, the provider proceeds to the revalidation due date check; if the provider status is NOT Active (inactive), the provider is skipped entirely and no revalidation record is created for that provider"
+            },
+            "Rule_Name": "Active Provider Status Filter",
+            "Rule_Description": "Only providers who are currently in Active status are eligible for revalidation due date evaluation. Inactive providers are immediately excluded from the revalidation process with no further action taken."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00004",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider has been confirmed as Active",
+                "When": "The provider's Revalidation Due Date is compared against today's reference date",
+                "Then": "If the Revalidation Due Date is less than or equal to today's date (due date has arrived or is overdue), the provider is queued for rescreening; if the Revalidation Due Date is greater than today's date (due date is in the future), the provider is skipped and no revalidation record is created"
+            },
+            "Rule_Name": "Revalidation Due Date Eligibility Check",
+            "Rule_Description": "For Active providers, the system checks whether their revalidation due date has arrived or passed. Per 42 CFR 455.414 (5-Year Revalidation Cycle), only providers whose revalidation due date is on or before today's date are eligible to be queued for rescreening. Providers whose due date falls in the future are not yet due and are skipped."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00005",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider is confirmed as Active AND their Revalidation Due Date is on or before today's date",
+                "When": "The provider is queued for revalidation rescreening",
+                "Then": "An output record is created in the Revalidation Output Queue containing: (1) the provider's NPI (National Provider Identifier), (2) the provider's Revalidation Due Date, and (3) the action code 'RESCREEN-REQUIRED'; this record is written to the Revalidation Output Queue file"
+            },
+            "Rule_Name": "Queue Provider for Re-screening with RESCREEN-REQUIRED Action",
+            "Rule_Description": "When a provider is both Active and has a revalidation due date on or before today, a revalidation output record is created capturing the provider's NPI, their revalidation due date, and a mandatory action code of RESCREEN-REQUIRED, which is then written to the Revalidation Output Queue."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00006",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider revalidation record has been successfully written to the Revalidation Output Queue",
+                "When": "The provider is confirmed as queued for rescreening",
+                "Then": "The running count of providers queued for revalidation is incremented by exactly 1"
+            },
+            "Rule_Name": "Revalidation Queue Count Tracking",
+            "Rule_Description": "Each time a provider is successfully queued for rescreening, a running total counter is incremented by one to track the cumulative number of providers queued during the current program run."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00007",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All records in the Provider Master File have been read and evaluated",
+                "When": "The program completes its full sweep of the Provider Master File",
+                "Then": "The program displays the message 'PRVREV01: PROVIDERS QUEUED FOR REVAL=' followed by the final total count of providers queued for revalidation during the current run, and both the Provider Master File and the Revalidation Output Queue are closed"
+            },
+            "Rule_Name": "Revalidation Summary Report Display",
+            "Rule_Description": "After all provider records in the Provider Master File have been evaluated, the program displays a summary showing the total number of providers that were queued for revalidation rescreening during the current run."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00008",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The PRVREV01 monthly revalidation sweep program has been initiated",
+                "When": "The program begins its initialization sequence",
+                "Then": "The current calendar date must be captured and stored in YYYY-MM-DD (four-digit year, two-digit month, two-digit day) format so that it can be used as the reference point for all subsequent provider revalidation due date comparisons throughout the entire program run"
+            },
+            "Rule_Name": "Capture Today's Date as Revalidation Reference Point",
+            "Rule_Description": "At program startup, the system captures the current calendar date in YYYY-MM-DD format to serve as the reference point against which all provider revalidation due dates will be compared during the monthly revalidation sweep."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00009",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider revalidation sweep process is being launched",
+                "When": "The program begins execution",
+                "Then": "The program must register its identity as 'PRVREV01' so that all subsequent processing, output, and operational messages are correctly attributed to the PRVREV01 month-end revalidation sweep program"
+            },
+            "Rule_Name": "Establish Program Identity as PRVREV01 Revalidation Sweep",
+            "Rule_Description": "At the start of execution, the program identifies itself as PRVREV01, the designated month-end provider revalidation sweep program, ensuring correct program identification for tracking, logging, and operational reporting purposes."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00010",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The current calendar date has been successfully captured in YYYY-MM-DD format during program initialization",
+                "When": "The program proceeds to sweep through provider records in the Provider Master File",
+                "Then": "The captured today's date must remain available and unchanged as the single consistent reference point for all revalidation due date comparisons made against every provider record during the current program run, ensuring no provider is evaluated against a different date than any other provider in the same run"
+            },
+            "Rule_Name": "Store Today's Date for Revalidation Due Date Comparisons",
+            "Rule_Description": "The captured current date is retained as a persistent reference value that will be used throughout the entire program run to evaluate whether each provider's revalidation due date has been reached or exceeded, ensuring consistent date-based eligibility decisions across all provider records processed."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00011",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File has been opened and is ready for reading, and the sweep has been initiated",
+                "When": "The system requests the next provider record from the Provider Master File",
+                "Then": "The next sequential provider record is retrieved and made available for revalidation eligibility evaluation"
+            },
+            "Rule_Name": "Sequential Sweep of Provider Master File",
+            "Rule_Description": "The system must sequentially retrieve every provider record from the Provider Master File, one at a time, to ensure all providers are evaluated for revalidation eligibility without skipping any record."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00012",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system has retrieved a record (or attempted to retrieve one) from the Provider Master File during the sequential sweep",
+                "When": "The read operation signals that the end of the Provider Master File has been reached and no more records are available",
+                "Then": "The system marks the sweep as complete and stops attempting to retrieve further provider records"
+            },
+            "Rule_Name": "Detection of Last Provider Record in File",
+            "Rule_Description": "The system must detect when there are no more provider records remaining in the Provider Master File so that the sweep can be concluded and no further processing is attempted."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00013",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system has successfully retrieved a provider record from the Provider Master File and the end of file has not been reached",
+                "When": "The record is confirmed as a valid retrieved record (not an end-of-file condition)",
+                "Then": "The provider record is sent for revalidation eligibility evaluation, and the system loops back to retrieve the next provider record from the Provider Master File"
+            },
+            "Rule_Name": "Continuation of Sweep When More Records Exist",
+            "Rule_Description": "When a provider record is successfully retrieved from the Provider Master File and the end of file has not been reached, the system must forward that provider record for revalidation eligibility evaluation before retrieving the next record."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00014",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system is performing a sequential sweep of the Provider Master File",
+                "When": "The end of the Provider Master File is detected, indicating all provider records have been processed",
+                "Then": "The sweep is marked as complete, the loop terminates, no further records are retrieved, and the program proceeds to close files and display the final count of providers queued for revalidation"
+            },
+            "Rule_Name": "Termination of Provider Master File Sweep",
+            "Rule_Description": "Once the end of the Provider Master File is reached, the system must formally mark the sweep as complete, ensuring no further provider records are retrieved or evaluated, and allowing the program to proceed to final reporting."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00015",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and is available for evaluation",
+                "When": "The provider's status field (PRV-ACTIVE) is checked to determine if the provider is currently Active",
+                "Then": "If the provider status is Active, the provider record is passed forward to the Revalidation Due Date check for further evaluation; If the provider status is NOT Active, the provider record is skipped entirely with no output record created, no revalidation action assigned, and no increment to the revalidation counter, and processing returns to read the next provider record from the Master File"
+            },
+            "Rule_Name": "Active Provider Status Filter for Revalidation Eligibility",
+            "Rule_Description": "Each provider record retrieved from the Provider Master File must be evaluated to determine if the provider holds an Active status before being considered for revalidation processing. Only Active providers are eligible to proceed to the Revalidation Due Date check. Providers who are not Active are excluded entirely from revalidation and no further evaluation or output is performed for them."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00016",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record exists in the Provider Master File with a Revalidation Due Date populated, and today's date has been captured as the reference point for comparison",
+                "When": "The provider's Revalidation Due Date from the Provider Master Record is compared against today's date",
+                "Then": "If the Revalidation Due Date is on or before today's date, the provider is determined to be overdue for revalidation and is proceeded to be queued for re-screening with action 'RESCREEN-REQUIRED'; if the Revalidation Due Date is strictly after today's date, the provider's revalidation is not yet due and no action is taken \u2014 the provider record is skipped entirely"
+            },
+            "Rule_Name": "Identify Providers Overdue for Revalidation Based on Due Date",
+            "Rule_Description": "Per 42 CFR 455.414 (5-year revalidation cycle), the system compares each active provider's Revalidation Due Date from the Provider Master Record against today's date to determine whether the provider is overdue for revalidation. If the due date is on or before today, the provider is flagged for re-screening. If the due date is still in the future, no action is taken."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00017",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider whose revalidation due date is on or before today's date has been identified from the Provider Master Record",
+                "When": "The provider is being prepared for queuing in the revalidation output",
+                "Then": "The provider's NPI from the Provider Master Record must be captured and assigned to the revalidation output record's NPI field"
+            },
+            "Rule_Name": "Capture Provider NPI for Revalidation Queue",
+            "Rule_Description": "When queuing a provider for re-screening, the provider's National Provider Identifier (NPI) must be retrieved from the Provider Master Record and recorded in the revalidation output entry."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00018",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider whose revalidation due date is on or before today's date has been identified from the Provider Master Record",
+                "When": "The provider's NPI has been captured and the revalidation output record is being populated",
+                "Then": "The provider's Revalidation Due Date from the Provider Master Record must be captured and assigned to the revalidation output record's due date field"
+            },
+            "Rule_Name": "Capture Provider Revalidation Due Date for Revalidation Queue",
+            "Rule_Description": "When queuing a provider for re-screening, the provider's Revalidation Due Date must be retrieved from the Provider Master Record and recorded in the revalidation output entry to preserve the original due date context."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00019",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider whose revalidation due date is on or before today's date is being queued, and their NPI and revalidation due date have been captured into the revalidation output record",
+                "When": "The revalidation action is being determined for the provider",
+                "Then": "The action field in the revalidation output record must be set to 'RESCREEN-REQUIRED', uniformly for all qualifying providers regardless of any other provider attributes"
+            },
+            "Rule_Name": "Assign RESCREEN-REQUIRED Action Code to Queued Provider",
+            "Rule_Description": "Every provider who is active and whose revalidation due date has passed must be uniformly assigned the action code 'RESCREEN-REQUIRED', indicating that a full re-screening is mandated. No variation in action type is applied based on any other provider attribute."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00020",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A revalidation output record has been fully populated with the provider's NPI, Revalidation Due Date, and the action code 'RESCREEN-REQUIRED'",
+                "When": "The provider record is ready to be submitted to the revalidation output queue",
+                "Then": "The complete revalidation record containing the Provider NPI, Revalidation Due Date, and action 'RESCREEN-REQUIRED' must be written to the Revalidation Output Queue (REVAL-OUT-FILE), and the running total count of providers queued for revalidation must be incremented by 1"
+            },
+            "Rule_Name": "Write Revalidation Record to Revalidation Output Queue",
+            "Rule_Description": "Once the revalidation output record has been fully populated with the provider's NPI, Revalidation Due Date, and the action code 'RESCREEN-REQUIRED', the complete record must be written to the Revalidation Output Queue (REVAL-OUT-FILE) and the total count of providers queued for revalidation must be incremented by one."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00021",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record from the Provider Master File has been evaluated and meets all revalidation queuing criteria (provider is Active AND Revalidation Due Date is on or before today's date), and an output revalidation record has been successfully written for that provider",
+                "When": "The provider is queued for re-screening with action 'RESCREEN-REQUIRED'",
+                "Then": "The running Revalidation Count is incremented by exactly 1, reflecting the addition of this provider to the revalidation queue for the current sweep"
+            },
+            "Rule_Name": "Increment Revalidation Count for Each Queued Provider",
+            "Rule_Description": "Each time a provider is successfully queued for re-screening, the running revalidation count is incremented by 1 to track the total number of providers identified during the current sweep."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00022",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The revalidation sweep is in progress and the Provider Master File has been opened for sequential reading",
+                "When": "A provider record has been processed (either queued for revalidation or skipped due to not meeting criteria) and there are more provider records remaining in the Provider Master File",
+                "Then": "The sweep continues by reading the next provider record from the Provider Master File and evaluating it against the revalidation criteria, without interruption"
+            },
+            "Rule_Name": "Continue Sweep Until All Provider Records Are Processed",
+            "Rule_Description": "After each provider record is evaluated (whether queued or skipped), the sweep continues to the next provider record in the Provider Master File until all records have been processed."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00023",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The revalidation sweep is in progress and the running Revalidation Count has been incremented for each provider successfully queued",
+                "When": "The end of the Provider Master File is reached and there are no more provider records to process",
+                "Then": "The sweep concludes, the Revalidation Output File is closed, and the final Revalidation Count is displayed in the summary message 'PRVREV01: PROVIDERS QUEUED FOR REVAL=' followed by the total count, representing all providers queued for revalidation during the sweep"
+            },
+            "Rule_Name": "Finalize Revalidation Count When All Records Are Processed",
+            "Rule_Description": "When all provider records in the Provider Master File have been evaluated, the sweep ends and the final accumulated Revalidation Count is made available for the summary report, reflecting the total number of providers queued for re-screening during the sweep."
+        },
+        {
+            "Rule_Id": "R-PRVREV01-cbl-00024",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All records in the Provider Master File have been fully processed during the month-end revalidation sweep, and a running count of providers queued for revalidation re-screening has been maintained throughout the sweep",
+                "When": "The end of the Provider Master File is reached and no more provider records remain to be evaluated",
+                "Then": "The program must retrieve the final total count of providers queued for revalidation re-screening and display the following summary message: 'PRVREV01: PROVIDERS QUEUED FOR REVAL=' followed by the final total count of providers queued during this month-end sweep"
+            },
+            "Rule_Name": "Display Revalidation Summary Report After Month-End Sweep",
+            "Rule_Description": "After all provider records in the Provider Master File have been evaluated during the month-end revalidation sweep, the program must retrieve the final accumulated count of providers that were queued for revalidation re-screening and display it as a summary report to confirm the outcome of the sweep."
+        }
+    ],
+    "description": "PRVREV01 is a batch revalidation sweep program (PEM-4) that scans the Provider Master File to identify active providers whose revalidation due date has passed, in compliance with 42 CFR 455.414 (\u22645 years). For each qualifying provider, it writes a rescreen record to the Revalidation Output Queue file and reports the total count of providers queued for revalidation. This program runs as part of the PRVMTH01 month-end batch job (STEP010) and serves as a Main/Driver program with no calling program dependencies.\n\n<br>\n- **Execution Environment**: Batch\n- **Database Access**: VSAM (Indexed), Sequential File\n- **MQ Calls**: No\n- **Module Type**: Main module\n\n<br>\n\n### Key Functionalities:\n\n1: Program Initialization - Capture the current date (today's date) to be used as the reference point for identifying providers whose revalidation due date has passed\n\n2: Provider Master File Sweep - Sequentially read through all provider records in the Provider Master File to evaluate each provider for revalidation eligibility\n\n3: Active Provider Filter - Check each provider record to determine if the provider is currently in Active status; skip inactive providers from revalidation processing\n\n4: Revalidation Due Date Check - Compare the provider's revalidation due date against today's date to identify providers whose revalidation due date has already passed (due date is on or before today), indicating they are overdue for revalidation per 42 CFR 455.414 (5-year revalidation cycle)\n\n5: Queue Provider for Re-screening - For each active provider whose revalidation due date has passed, record the provider's NPI, their revalidation due date, and assign the action 'RESCREEN-REQUIRED' to the revalidation output queue, flagging them for re-screening\n\n6: Revalidation Count Tracking - Maintain a running count of all providers queued for revalidation during the sweep\n\n7: Revalidation Summary Reporting - At the end of processing, display the total number of providers that have been queued for revalidation re-screening during this month-end sweep\n\n"
+}

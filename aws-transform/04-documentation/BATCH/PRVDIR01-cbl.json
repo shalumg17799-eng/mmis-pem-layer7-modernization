@@ -1,0 +1,199 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVDIR01.cbl",
+        "type": "cobol"
+      },
+      "overview": "PRVDIR01 operates within a Medicaid Management Information System (MMIS), specifically under the Provider Enrollment and Management (PEM) application responsible for sanctions and provider directory functions. It runs as part of a nightly batch cycle, producing a flat file consumed by Managed Care Organizations (MCOs) who need an up-to-date listing of active Medicaid providers. The program reads the Provider Master KSDS file sequentially, filters for only active providers, and writes key provider attributes — including Medicaid ID, NPI, provider type, risk tier, and name — to a fixed-length 100-character output file. It solves the operational need for MCOs to receive a daily refresh of the provider directory, enabling them to verify provider participation and eligibility within their networks.",
+      "key_features": [
+        {
+          "feature": "Active Provider Filtering",
+          "description": "Reads all records from the Provider Master file but only extracts providers flagged as active, ensuring MCOs receive a clean, current directory."
+        },
+        {
+          "feature": "Nightly Directory Extract",
+          "description": "Runs as a scheduled nightly batch job to produce a fresh flat file snapshot of the provider directory for downstream MCO consumption."
+        },
+        {
+          "feature": "Sequential Full-File Scan",
+          "description": "Performs a sequential read of the entire Provider Master KSDS from start to finish, processing every record to identify active providers."
+        },
+        {
+          "feature": "Fixed-Length Output Record",
+          "description": "Writes a standardized 100-character flat file record containing Medicaid ID, NPI, provider type, risk tier, and provider name for each active provider."
+        },
+        {
+          "feature": "Risk Tier Inclusion",
+          "description": "Includes the provider risk tier in the directory output, giving MCOs visibility into provider risk classification alongside standard directory attributes."
+        },
+        {
+          "feature": "Row Count Reporting",
+          "description": "Tracks and displays the total number of directory rows written at job completion, supporting operational monitoring and reconciliation."
+        },
+        {
+          "feature": "Cross-Application VSAM Coupling",
+          "description": "Directly reads the Provider Master KSDS owned by a separate application (PEMAPP1), a legacy integration pattern identified as a modernization target toward a live FHIR PractitionerRole API."
+        }
+      ]
+    },
+    "input_output": [
+      {
+        "name": "PRV-MASTER-FILE",
+        "type": "Read",
+        "description": "Provider Master KSDS VSAM file (assigned to PRVMSTR) - sequentially read in dynamic access mode to retrieve all provider records; only records with PRV-ACTIVE enrollment status (value 'A') are selected for output"
+      },
+      {
+        "name": "DIR-OUT-FILE",
+        "type": "Write",
+        "description": "Provider Directory sequential flat file (assigned to DIROUT) - receives 100-character fixed-length records containing Medicaid ID, NPI, provider type code, risk tier, and provider name for each active provider; consumed nightly by Managed Care Organizations (MCOs)"
+      }
+    ],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "Program Initialization",
+          "description": "Sets program identifier, opens the Provider Master KSDS file for sequential input, and opens the directory flat file for output. Initializes end-of-file flag to 'N'.",
+          "records": [
+            "WS-PROGRAM-ID",
+            "WS-PRV-STATUS",
+            "WS-DIR-STATUS",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 2,
+          "process": "Sequential Read of Provider Master",
+          "description": "Reads the next record from the Provider Master KSDS file using DYNAMIC access in sequential (NEXT) mode. Captures file status into WS-PRV-STATUS and WS-FILE-STATUS for EOF and error detection.",
+          "records": [
+            "PRV-MASTER-RECORD",
+            "PRV-NPI",
+            "WS-PRV-STATUS",
+            "WS-FILE-STATUS",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "Active Provider Filter",
+          "description": "Evaluates the PRV-ACTIVE flag on each provider record. Only records where PRV-ACTIVE is true are passed forward for directory output. Inactive providers are silently skipped.",
+          "records": [
+            "PRV-ACTIVE",
+            "PRV-MASTER-RECORD"
+          ]
+        },
+        {
+          "step": 4,
+          "process": "Map Provider Fields to Directory Record",
+          "description": "Maps selected fields from the Provider Master record into the 100-character directory output record layout. PRV-VARIANT is substring-copied (first 60 characters) into DIR-NAME. An 18-byte FILLER is left unpopulated.",
+          "records": [
+            "PRV-MEDICAID-ID",
+            "PRV-NPI",
+            "PRV-TYPE-CODE",
+            "PRV-RISK-TIER",
+            "PRV-VARIANT",
+            "DIR-MEDICAID-ID",
+            "DIR-NPI",
+            "DIR-TYPE",
+            "DIR-RISK-TIER",
+            "DIR-NAME"
+          ]
+        },
+        {
+          "step": 5,
+          "process": "Write Directory Output Record",
+          "description": "Writes the populated 100-character fixed-length directory record to the sequential flat file (DIROUT). Increments the directory row counter by 1 for each successful write.",
+          "records": [
+            "DIR-OUT-RECORD",
+            "WS-DIR-COUNT"
+          ]
+        },
+        {
+          "step": 6,
+          "process": "Loop Until End of File",
+          "description": "Repeats steps 2 through 5 for every record in the Provider Master file until the EOF condition (file status '10') is detected, at which point WS-END-OF-FILE is set to TRUE to terminate the loop.",
+          "records": [
+            "WS-END-OF-FILE-FLAG",
+            "WS-FS-EOF"
+          ]
+        },
+        {
+          "step": 7,
+          "process": "Finalization and Reporting",
+          "description": "Closes both the Provider Master input file and the directory output file. Displays the total count of directory rows written (WS-DIR-COUNT) to the system log, then terminates the program.",
+          "records": [
+            "WS-DIR-COUNT",
+            "WS-PRV-STATUS",
+            "WS-DIR-STATUS"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "Cross-Application VSAM Coupling (PRVMSTR)",
+          "description": "PRVDIR01 (owned by PEMAPP2) directly reads the Provider Master KSDS file (PRVMSTR) that is owned and written by PEMAPP1. There is no intermediary API or handoff layer. Any structural change to PRVRECRD.cpy by PEMAPP1 will silently break field mappings in this program, creating a tight cross-application schema dependency."
+        },
+        {
+          "dependency": "PRV-ACTIVE Flag Validity",
+          "description": "The entire filtering logic depends on the correctness and currency of the PRV-ACTIVE flag in the Provider Master record. If PEMAPP1 fails to update this flag accurately (e.g., due to a failed batch update), inactive or sanctioned providers may be incorrectly included in the MCO directory extract."
+        },
+        {
+          "dependency": "PRVRECRD Copybook Schema Alignment",
+          "description": "The field references PRV-MEDICAID-ID, PRV-NPI, PRV-TYPE-CODE, PRV-RISK-TIER, and PRV-VARIANT are all resolved at compile time via the PRVRECRD copybook. The program has a hard dependency on the exact layout and field names defined in that copybook. Any version mismatch requires recompilation."
+        },
+        {
+          "dependency": "WRKSTORE Copybook Working Storage",
+          "description": "Common working storage variables including WS-END-OF-FILE-FLAG, WS-FS-EOF, WS-FILE-STATUS, and WS-PROGRAM-ID are sourced from the shared WRKSTORE copybook. Changes to flag values, field sizes, or condition-name definitions in WRKSTORE affect program control flow."
+        },
+        {
+          "dependency": "Sequential Access Order Dependency",
+          "description": "The program uses DYNAMIC access mode but reads exclusively via NEXT (sequential scan). The output flat file is written in the physical order of the KSDS, which is keyed by PRV-NPI. MCO consumers of the flat file may have implicit ordering assumptions based on NPI sequence."
+        },
+        {
+          "dependency": "DIR-OUT-FILE Fixed Record Length",
+          "description": "The output record is fixed at exactly 100 characters with an 18-byte trailing FILLER. Any downstream MCO system parsing this flat file is tightly coupled to this fixed positional layout. Changes to field widths in the source (e.g., PRV-VARIANT truncation at 60 bytes) would require coordinated consumer updates."
+        },
+        {
+          "dependency": "No Error Handling on Write or Non-EOF Read Failures",
+          "description": "The EXTRACT-NEXT paragraph only checks for EOF (WS-FS-EOF). Non-EOF read errors (e.g., file status '30', '90') and write errors on DIR-OUT-FILE are not explicitly handled. A mid-run I/O failure would produce a partial directory file with no error indication beyond an abnormal termination."
+        },
+        {
+          "dependency": "Batch Scheduling Dependency on PEMAPP1 Completion",
+          "description": "PRVDIR01 must be scheduled after PEMAPP1's nightly provider master update batch completes. If PRVDIR01 runs concurrently or before PEMAPP1 finishes, the extracted directory will reflect a partially updated provider master, potentially missing new enrollments or active status changes."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "File Operation Errors - EOF Detection",
+        "description": "After each sequential READ of PRV-MASTER-FILE, WS-PRV-STATUS is captured and checked via WS-FS-EOF condition. A status of '10' (EOF) sets WS-END-OF-FILE flag to terminate the read loop. This is the only file status check present in the program."
+      },
+      {
+        "category": "File Operation Errors - Open/Close Failures",
+        "description": "No error handling exists for OPEN or CLOSE operations on either PRV-MASTER-FILE or DIR-OUT-FILE. WS-PRV-STATUS and WS-DIR-STATUS are declared but neither is checked after OPEN or CLOSE statements. A failed open would likely cause an uncontrolled abend."
+      },
+      {
+        "category": "File Operation Errors - Write Failures",
+        "description": "No error handling exists for the WRITE to DIR-OUT-RECORD. WS-DIR-STATUS is declared but never evaluated after the WRITE statement in WRITE-DIR-ROW. A write failure would go undetected and the program would continue processing, silently losing output records."
+      },
+      {
+        "category": "File Operation Errors - Non-EOF Read Errors",
+        "description": "In EXTRACT-NEXT, only the EOF condition is explicitly handled. Any non-zero, non-EOF file status returned from the READ (e.g., '30' invalid key, '91' VSAM logic error) is silently ignored. The record is simply skipped with no error message, abend, or counter increment."
+      },
+      {
+        "category": "Data Filtering - Active Provider Logic",
+        "description": "Records where PRV-ACTIVE is false are silently bypassed with no logging or counter. There is no distinction between inactive, suspended, or otherwise non-active providers in the output or in any error/exception reporting."
+      },
+      {
+        "category": "Abend and Abnormal Termination Handling",
+        "description": "No DECLARATIVES section, no ON EXCEPTION clauses, and no explicit abend-triggering logic (e.g., CALL 'ILBOABN0') are present. The program relies entirely on the runtime environment to handle unexpected conditions, providing no structured recovery or diagnostic output beyond the final row count DISPLAY."
+      },
+      {
+        "category": "Audit and Observability",
+        "description": "Minimal error observability. The only diagnostic output is a single DISPLAY of the total directory row count at normal termination. There are no error counters, no skipped-record counts, no file status displays on failure, and no structured logging to support post-run triage."
+      }
+    ]
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVCICS1.cbl",
+        "type": "cobol"
+      },
+      "overview": "This program operates within a Medicaid Management Information System (MMIS), supporting state analysts who need to verify healthcare provider enrollment status in real time. It serves as a green-screen CICS transaction used by internal agency staff during provider credentialing, claims adjudication support, and compliance review workflows. The program accepts a National Provider Identifier (NPI) entered by an analyst on the PINQ inquiry screen, looks up the provider's record in the PRVPROVN VSAM master file, and returns the provider's current enrollment status and risk tier. It solves the operational need for quick, direct provider record lookups without navigating complex batch reporting, acting as a lightweight point-of-care reference tool for state staff.",
+      "key_features": [
+        {
+          "feature": "NPI-Based Provider Lookup",
+          "description": "Accepts a 10-character NPI entered on the PINQ screen and uses it as the key to retrieve the corresponding provider record from the VSAM master file."
+        },
+        {
+          "feature": "Enrollment Status Display",
+          "description": "Evaluates the provider record and returns a human-readable enrollment status of Active, Terminated, Pending, or Denied to the analyst."
+        },
+        {
+          "feature": "VSAM Error Handling",
+          "description": "Distinguishes between a provider not found condition and a general VSAM read error, returning an appropriate message to the screen in either case."
+        },
+        {
+          "feature": "Conversational Transaction Flow",
+          "description": "Uses CICS COMMAREA to pass the NPI between transaction invocations, enabling a persistent conversational loop so the analyst can perform repeated inquiries without re-entering context."
+        },
+        {
+          "feature": "BMS Map Integration",
+          "description": "Sends and receives data through a BMS map (PRVMAP1/PRVSET1), providing a structured green-screen interface for data entry and results display."
+        },
+        {
+          "feature": "Provider Master File Access",
+          "description": "Reads from the PRVPROVN VSAM file using the PRVRECRD copybook layout, which includes provider enrollment status flags and risk tier information."
+        },
+        {
+          "feature": "Risk Tier Retrieval",
+          "description": "Retrieves risk tier data as part of the provider record, giving analysts visibility into the provider's screening level as required by federal enrollment regulations."
+        }
+      ]
+    },
+    "input_output": [
+      {
+        "name": "PRVPROVN",
+        "type": "Read",
+        "description": "Provider Master VSAM file - keyed by NPI (WS-NPI-IN), read to retrieve provider enrollment status, risk tier, screening flag, effective/revalidation dates, and provider variant data (individual name/license or organization legal/DBA name and owner NPI)"
+      }
+    ],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "COMMAREA Initialization",
+          "description": "If the transaction is re-entered (EIBCALEN > 0), the NPI value passed from the previous pseudo-conversational cycle is moved from DFHCOMMAREA into the working-storage field WS-NPI-IN, seeding the inquiry key.",
+          "records": [
+            "DFHCOMMAREA",
+            "WS-NPI-IN"
+          ]
+        },
+        {
+          "step": 2,
+          "process": "Receive Screen Input",
+          "description": "CICS RECEIVE MAP reads the PRVMAP1 map from the PRVSET1 mapset, capturing the NPI entered by the state analyst on the PINQ green-screen terminal into the mapped fields.",
+          "records": [
+            "WS-NPI-IN",
+            "WS-RESP"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "VSAM Provider Record Read",
+          "description": "A direct CICS READ is issued against the PRVPROVN VSAM KSDS file using WS-NPI-IN as the record identifier (RIDFLD). The matching provider record is read into WS-PROVIDER-AREA, which is laid out by the PRVRECRD copybook.",
+          "records": [
+            "WS-NPI-IN",
+            "WS-PROVIDER-AREA",
+            "WS-RESP",
+            "PRV-ACTIVE",
+            "PRV-TERMINATED",
+            "PRV-PENDING"
+          ]
+        },
+        {
+          "step": 4,
+          "process": "VSAM Response Evaluation",
+          "description": "The CICS response code in WS-RESP is evaluated. A NORMAL response routes processing to FORMAT-PROVIDER; a NOTFND response sets WS-MSG to 'PROVIDER NOT FOUND'; any other response sets WS-MSG to 'VSAM READ ERROR'.",
+          "records": [
+            "WS-RESP",
+            "WS-MSG"
+          ]
+        },
+        {
+          "step": 5,
+          "process": "Provider Status Formatting",
+          "description": "Within the FORMAT-PROVIDER paragraph, the enrollment status flags from WS-PROVIDER-AREA (PRV-ACTIVE, PRV-TERMINATED, PRV-PENDING) are evaluated and a human-readable status string (ACTIVE, TERMINATED, PENDING, or DENIED) is placed into WS-MSG.",
+          "records": [
+            "WS-PROVIDER-AREA",
+            "PRV-ACTIVE",
+            "PRV-TERMINATED",
+            "PRV-PENDING",
+            "WS-MSG"
+          ]
+        },
+        {
+          "step": 6,
+          "process": "Send Screen Output",
+          "description": "CICS SEND MAP writes the populated WS-PROVIDER-AREA and WS-MSG back to the PRVMAP1 map in PRVSET1, displaying enrollment status and risk tier to the analyst's terminal.",
+          "records": [
+            "WS-PROVIDER-AREA",
+            "WS-MSG",
+            "WS-RESP"
+          ]
+        },
+        {
+          "step": 7,
+          "process": "Pseudo-Conversational Return",
+          "description": "CICS RETURN re-queues the PINQ transaction ID and passes WS-NPI-IN as the COMMAREA, enabling the next analyst keystroke to re-enter the program with the previously queried NPI preserved.",
+          "records": [
+            "WS-NPI-IN",
+            "DFHCOMMAREA"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "COMMAREA Length Guard (EIBCALEN)",
+          "description": "The program only moves DFHCOMMAREA to WS-NPI-IN when EIBCALEN > 0. On the very first invocation EIBCALEN is zero, so WS-NPI-IN is populated solely from the map receive. If EIBCALEN is incorrectly set or the COMMAREA is shorter than 10 bytes, the NPI key may be truncated or corrupted, causing a spurious NOTFND on the VSAM read."
+        },
+        {
+          "dependency": "VSAM KSDS Key Alignment",
+          "description": "The RIDFLD for the CICS READ is WS-NPI-IN (PIC X(10)). The PRVPROVN file must be defined with a key of exactly 10 bytes at the same offset as the NPI field in PRVRECRD. Any mismatch in key length or position between the file definition and the copybook will produce VSAM errors or incorrect record retrieval."
+        },
+        {
+          "dependency": "PRVRECRD Copybook Structural Dependency",
+          "description": "WS-PROVIDER-AREA is entirely defined by the PRVRECRD copybook. The FORMAT-PROVIDER paragraph references PRV-ACTIVE, PRV-TERMINATED, and PRV-PENDING condition names from that copybook. Any change to the copybook layout (field offsets, condition values) directly affects both the VSAM read target buffer and the status evaluation logic."
+        },
+        {
+          "dependency": "Map/Mapset Availability (PRVMAP1/PRVSET1)",
+          "description": "Both CICS RECEIVE and SEND operations depend on the PRVMAP1 map within the PRVSET1 mapset being installed and current in the CICS region. If the mapset is not loaded or is at a different version than the program expects, the screen I/O will fail and WS-RESP will reflect a non-NORMAL response."
+        },
+        {
+          "dependency": "Sequential Screen-Before-File Ordering",
+          "description": "The program performs the CICS RECEIVE MAP before the VSAM READ. This means the NPI key used for the file lookup is always taken from the current screen input (overwriting any COMMAREA value implicitly via map field mapping). The COMMAREA pre-load in step 1 only has effect if the map receive does not overwrite WS-NPI-IN, creating a subtle ordering dependency between COMMAREA initialization and map receive field mapping."
+        },
+        {
+          "dependency": "Pseudo-Conversational State via COMMAREA",
+          "description": "The program relies on CICS pseudo-conversational design: state (the NPI) is preserved only through the 10-byte COMMAREA passed on RETURN. There is no server-side session state. If the COMMAREA is lost or the transaction is initiated fresh (e.g., by typing PINQ at a clear screen), the program must rely entirely on the map receive for the NPI, with no fallback validation."
+        },
+        {
+          "dependency": "WS-MSG Overwrite Risk",
+          "description": "WS-MSG is set in both the VSAM response EVALUATE block and the FORMAT-PROVIDER paragraph. If FORMAT-PROVIDER is called, the status message from FORMAT-PROVIDER is the final value. However, WS-MSG is not explicitly cleared before each cycle, so a stale message from a prior transaction could persist if neither branch writes to it (e.g., an unexpected map receive error before the EVALUATE)."
+        }
+      ],
+      "external_system_integrations": [
+        {
+          "system": "IBM CICS",
+          "type": "Online Transaction Processing (OLTP) middleware",
+          "purpose": "Provides the full runtime environment for the PINQ transaction: manages terminal I/O via BMS maps (RECEIVE/SEND MAP), controls access to the PRVPROVN VSAM file (CICS READ), maintains pseudo-conversational state via COMMAREA on RETURN, and supplies the EIBCALEN/DFHRESP condition codes used for flow control."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "CICS Map Receive Errors",
+        "description": "The RECEIVE MAP command captures a response code in WS-RESP, but there is NO evaluation or branching on this response. If the map receive fails (e.g., AID key mismatch, terminal error), the program silently continues to the VSAM read with potentially uninitialized or stale data in WS-NPI-IN. Error is effectively unhandled."
+      },
+      {
+        "category": "VSAM File Read Errors",
+        "description": "The READ against PRVPROVN is the only operation with explicit error handling via an EVALUATE on WS-RESP. Three outcomes are distinguished: NORMAL proceeds to FORMAT-PROVIDER, NOTFND sets WS-MSG to 'PROVIDER NOT FOUND', and any OTHER condition sets WS-MSG to 'VSAM READ ERROR'. No ABEND, logging, or CICS HANDLE CONDITION is invoked; errors surface only as a 40-character message on the map."
+      },
+      {
+        "category": "CICS Map Send Errors",
+        "description": "The SEND MAP command captures a response code in WS-RESP, but there is NO subsequent evaluation. A send failure (e.g., terminal disconnected, mapset not found) is silently ignored and the program proceeds to CICS RETURN, potentially leaving the analyst with a blank or unchanged screen and no indication of failure."
+      },
+      {
+        "category": "Input Validation Errors",
+        "description": "There is no validation of WS-NPI-IN before it is used as the VSAM RIDFLD. The NPI is accepted either from DFHCOMMAREA (if EIBCALEN > 0) or implicitly from the received map without any length, format, numeric, or blank-check validation. An invalid or blank NPI will propagate directly to the file read, relying on VSAM to return NOTFND rather than catching the bad input early."
+      },
+      {
+        "category": "Provider Status Classification Errors",
+        "description": "In FORMAT-PROVIDER, an EVALUATE TRUE checks condition-name flags (PRV-ACTIVE, PRV-TERMINATED, PRV-PENDING) from the copybook. The WHEN OTHER clause defaults to 'DENIED', acting as a catch-all for any unrecognized or unset status flag. No error is raised; unknown statuses are silently classified as denied, which could mask data integrity issues in the VSAM record."
+      },
+      {
+        "category": "CICS RETURN / COMMAREA Errors",
+        "description": "The CICS RETURN passes WS-NPI-IN as the COMMAREA with no response code check. If the return fails or the COMMAREA length mismatches on the next invocation, no handling exists. Additionally, EIBCALEN is checked but not validated against an expected length before moving DFHCOMMAREA to WS-NPI-IN, risking truncation or overlay if the calling transaction passes a differently sized COMMAREA."
+      }
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+{
+    "created_on": "2026-11-17",
+    "name": "PRVVSM02.jcl",
+    "file_path": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM02.jcl",
+    "type": "jcl",
+    "description": "This JCL job (PRVVSM02) initializes two VSAM Key-Sequenced Data Sets (KSDS) used in the Medicaid Management Information System (MMIS) Provider Screening and Sanctioning process. It first removes any existing versions of the files and then recreates them with defined storage and record specifications to ensure a clean, structured environment for screening results and sanction master data.Key Functionalities:\nDeletes the existing MMPRV.SCREEN.RESULTS.KSDS cluster (if present) to allow fresh recreation, suppressing any errors from a non-existent file by resetting the maximum condition code to 0.\nDeletes the existing MMPRV.SANCTION.MASTER.KSDS cluster (if present) to allow fresh recreation, with the same error suppression logic applied.\nRecreates the Screen Results KSDS (MMPRV.SCREEN.RESULTS.KSDS) as an indexed file with an 18-byte key starting at position 0, fixed record size of 67 bytes, and initial allocation of 10 cylinders with 5 cylinder secondary extents.\nRecreates the Sanction Master KSDS (MMPRV.SANCTION.MASTER.KSDS) as an indexed file with a 10-byte key starting at position 0, fixed record size of 80 bytes, and initial allocation of 5 cylinders with 2 cylinder secondary extents.\nBoth files are defined with share options (2,3), allowing concurrent read access across multiple jobs while permitting controlled write access.",
+    "rules": [
+        {
+            "Rule_Id": "R-PRVVSM02-jcl-00001",
+            "Acceptance_Criteria": {
+                "Given": "A batch initialization process is triggered for sanction screening and the Sanction Screening Results data store (MMPRV.SCREEN.RESULTS.KSDS) may or may not exist",
+                "When": "The system processes the deletion of the Sanction Screening Results data store",
+                "Then": "The Sanction Screening Results data store \u2014 including all its screening result records and its lookup index \u2014 is permanently and completely removed, overriding any expiry date or data retention settings that may have been applied to the store"
+            },
+            "Rule_Name": "DEFKSDS - IDCAMS - Delete Sanction Screening Results Data Store Before Batch Cycle",
+            "Rule_Description": "Before a new batch cycle begins, the existing Sanction Screening Results data store must be completely and unconditionally removed to ensure a clean slate for fresh screening data.",
+            "Rule_Type": "Action Rules"
+        },
+        {
+            "Rule_Id": "R-PRVVSM02-jcl-00002",
+            "Acceptance_Criteria": {
+                "Given": "A batch initialization process is triggered for sanction screening and the Sanction Master data store (MMPRV.SANCTION.MASTER.KSDS) may or may not exist",
+                "When": "The system processes the deletion of the Sanction Master reference data store",
+                "Then": "The Sanction Master data store \u2014 including all its sanctioned entity records and its lookup index \u2014 is permanently and completely removed, overriding any expiry date or data retention settings that may have been applied to the store"
+            },
+            "Rule_Name": "DEFKSDS - IDCAMS - Delete Sanction Master Reference Data Store Before Batch Cycle",
+            "Rule_Description": "Before a new batch cycle begins, the existing Sanction Master reference data store must be completely and unconditionally removed to ensure the master list of sanctioned entities is always rebuilt fresh.",
+            "Rule_Type": "Action Rules"
+        },
+        {
+            "Rule_Id": "R-PRVVSM02-jcl-00003",
+            "Acceptance_Criteria": {
+                "Given": "The deletion of the Sanction Screening Results data store and/or the Sanction Master data store has been attempted",
+                "When": "Either or both deletion attempts result in an error because the data stores do not yet exist",
+                "Then": "The error status is explicitly reset to success (0) so that batch initialization continues forward to the data store creation steps without interruption \u2014 ensuring the job executes successfully on both first-time runs and all subsequent runs"
+            },
+            "Rule_Name": "DEFKSDS - IDCAMS - Ensure Uninterrupted Processing When Data Stores Do Not Exist",
+            "Rule_Description": "The batch initialization must continue to create both data stores even if the prior deletion steps fail \u2014 for example, on a first-time run when neither data store has been created yet.",
+            "Rule_Type": "Decision Rules"
+        },
+        {
+            "Rule_Id": "R-PRVVSM02-jcl-00004",
+            "Acceptance_Criteria": {
+                "Given": "The Sanction Screening Results data store has been deleted or does not exist, and the error status has been confirmed as success",
+                "When": "The system creates a new Sanction Screening Results data store named MMPRV.SCREEN.RESULTS.KSDS with its associated data component (MMPRV.SCREEN.RESULTS.DATA) and index component (MMPRV.SCREEN.RESULTS.INDEX)",
+                "Then": "The data store is created as an indexed, key-sequenced store with the following rules enforced: (1) Every screening result record must be exactly 67 bytes in length \u2014 no shorter, no longer; (2) Every screening result record must carry a unique 18-character identifier positioned at the very start of the record (characters 1 through 18), which is used to directly locate any specific screening result; (3) Within the same processing environment, multiple processes may read screening results simultaneously, but only one process is permitted to write at any given time; (4) Across different processing environments, both reading and writing are permitted concurrently; (5) An initial storage capacity of 10 cylinders is reserved, with automatic expansion of 5 additional cylinders whenever the store reaches capacity"
+            },
+            "Rule_Name": "DEFKSDS - IDCAMS - Initialize Sanction Screening Results Data Store Structure",
+            "Rule_Description": "A fresh, empty Sanction Screening Results data store must be created with precisely defined record structure, unique key definition, concurrent access rules, and storage capacity to support sanction screening transaction processing.",
+            "Rule_Type": "Definitional Rules"
+        },
+        {
+            "Rule_Id": "R-PRVVSM02-jcl-00005",
+            "Acceptance_Criteria": {
+                "Given": "The Sanction Master data store has been deleted or does not exist, and the error status has been confirmed as success",
+                "When": "The system creates a new Sanction Master reference data store named MMPRV.SANCTION.MASTER.KSDS with its associated data component (MMPRV.SANCTION.MASTER.DATA) and index component (MMPRV.SANCTION.MASTER.INDEX)",
+                "Then": "The data store is created as an indexed, key-sequenced store with the following rules enforced: (1) Every sanction master record must be exactly 80 bytes in length \u2014 no shorter, no longer; (2) Every sanction master record must carry a unique 10-character identifier positioned at the very start of the record (characters 1 through 10), which is used to directly locate any specific sanctioned entity; (3) Within the same processing environment, multiple processes may read sanction master records simultaneously, but only one process is permitted to write at any given time; (4) Across different processing environments, both reading and writing are permitted concurrently; (5) An initial storage capacity of 5 cylinders is reserved, with automatic expansion of 2 additional cylinders whenever the store reaches capacity"
+            },
+            "Rule_Name": "DEFKSDS - IDCAMS - Initialize Sanction Master Reference Data Store Structure",
+            "Rule_Description": "A fresh, empty Sanction Master reference data store must be created with precisely defined record structure, unique key definition, concurrent access rules, and storage capacity to support sanctioned entity reference lookups.",
+            "Rule_Type": "Definitional Rules"
+        }
+    ],
+    "flow_diagram_code": "flowchart TD\n    classDef start fill:#ff6666,stroke:#333,color:#000,font-weight:bold\n    classDef process fill:#6699ff,stroke:#333,color:#000,font-weight:bold\n    classDef decision fill:#ffcc00,stroke:#333,color:#000,font-weight:bold\n    classDef datasource fill:#66ff66,stroke:#333,color:#000,font-weight:bold\n    classDef final fill:#ae74de,stroke:#333,color:#fff,font-weight:bold\n    classDef success fill:#22c55e,stroke:#333,color:#000,font-weight:bold\n    classDef error fill:#ef4444,stroke:#333,color:#fff,font-weight:bold\n\n    A([JOB START\nSanction Screening Environment Initialization]):::start\n\n    B[DEFKSDS - IDCAMS\nInitialize Sanction Data Stores\nDelete Existing Files & Recreate Fresh]:::process\n\n    C{Does MMPRV.SCREEN.RESULTS.KSDS\nAlready Exist?}:::decision\n\n    D[Purge Existing\nSanction Screening Results File\nForce Delete Regardless of Expiry Date]:::process\n\n    E{Does MMPRV.SANCTION.MASTER.KSDS\nAlready Exist?}:::decision\n\n    F[Purge Existing\nSanction Master Reference File\nForce Delete Regardless of Expiry Date]:::process\n\n    G[Reset Processing Status to Success\nEnsure Clean State Before File Creation\nSET MAXCC = 0]:::success\n\n    H[Create New Empty\nSanction Screening Results File\nRecord Size: 67 Bytes  Key: 18 Chars\nPrimary Space: 10 Cylinders  Secondary: 5 Cylinders]:::process\n\n    KSDS1[(MMPRV.SCREEN.RESULTS.KSDS\nSanction Screening Results Store\nStores Outcomes of Sanction Screening Transactions)]:::datasource\n\n    I[Create New Empty\nSanction Master Reference File\nRecord Size: 80 Bytes  Key: 10 Chars\nPrimary Space: 5 Cylinders  Secondary: 2 Cylinders]:::process\n\n    KSDS2[(MMPRV.SANCTION.MASTER.KSDS\nSanction Master Reference Store\nStores Sanctioned Entity Reference Data)]:::datasource\n\n    J([JOB END\nBoth Sanction Data Stores Successfully\nInitialized and Ready for Downstream Processing]):::final\n\n    A --> B\n    B --> C\n    C -->|Yes - File Exists| D\n    C -->|No - File Does Not Exist\nError Suppressed| E\n    D --> E\n    E -->|Yes - File Exists| F\n    E -->|No - File Does Not Exist\nError Suppressed| G\n    F --> G\n    G --> H\n    H -.->|Create Fresh Empty File| KSDS1\n    KSDS1 -.->|Screening Results Store Ready| I\n    I -.->|Create Fresh Empty File| KSDS2\n    KSDS2 -.->|Sanction Master Store Ready| J"
+}

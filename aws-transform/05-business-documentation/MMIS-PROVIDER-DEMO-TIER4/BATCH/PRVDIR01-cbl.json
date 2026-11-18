@@ -1,0 +1,783 @@
+{
+    "name": "PRVDIR01.cbl",
+    "program_name": "PRVDIR01.cbl",
+    "generated_at": "2026-11-17T12:39:04Z",
+    "overview": {
+        "total_key_functionalities": 7,
+        "total_rules": 29,
+        "main_flow_diagram": "flowchart TD\n    A([Start: PRVDIR01 Program]):::start\n    B[1:Provider Directory Extract Initialization]:::process\n    C[(PRV-MASTER-FILE\nVSAM KSDS Indexed)]:::datasource\n    D[(DIR-OUT-FILE\nSequential Flat File)]:::datasource\n    E[2:Sequential Provider Record Retrieval]:::process\n    F{All Records\nProcessed?}:::decision\n    G[3:Active Provider Filtering]:::process\n    H{Is Provider\nStatus Active?}:::decision\n    I[4:Provider Directory Record Mapping]:::process\n    J[5:Directory Record Output]:::process\n    K[6:Active Provider Count Tracking]:::process\n    L[7:Directory Extract Completion Reporting]:::process\n    Z([End: PRVDIR01 Complete]):::final\n\n    A --> B\n    B --> |Open Input| C\n    B --> |Open Output| D\n    B --> E\n    C -.->|Read Next Record| E\n    E --> F\n    F -->|No - More Records| G\n    F -->|Yes - End of File| L\n    G --> H\n    H -->|No - Inactive/Terminated\nSkip Record| E\n    H -->|Yes - Active Provider| I\n    I --> J\n    J -.->|Write Record| D\n    J --> K\n    K --> E\n    L --> Z\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313",
+        "rules": [
+            {
+                "rule_id": "R-PRVDIR01-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Directory Extract Initialization",
+                "rule_description": "The Provider Directory Extract program (PRVDIR01) initializes by opening the Provider Master File for reading and the Directory Output File for writing, and sets the directory row counter to zero before processing begins.",
+                "sub_graph_node_text": "1:Provider Directory Extract Initialization",
+                "acceptance_criteria": {
+                    "Given": "The PRVDIR01 program is invoked to generate the Provider Directory extract",
+                    "When": "The program starts execution",
+                    "Then": "The Provider Master File (PRV-MASTER-FILE) is opened as the input source, the Directory Output File (DIR-OUT-FILE) is opened as the output destination, the end-of-file flag is set to 'N' (not reached), and the directory row count (WS-DIR-COUNT) is initialized to zero in preparation for sequential record processing"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDIR01-cbl-00002",
+                "rule_type": "Process Rules",
+                "rule_name": "Sequential Provider Record Retrieval",
+                "rule_description": "The program reads provider records one at a time, sequentially from the Provider Master File, advancing through each record in order until all records have been processed.",
+                "sub_graph_node_text": "2:Sequential Provider Record Retrieval",
+                "acceptance_criteria": {
+                    "Given": "The Provider Master File (PRV-MASTER-FILE) is open and available for reading",
+                    "When": "The program requests the next provider record",
+                    "Then": "The next sequential record is retrieved from the Provider Master File into the Provider Master Record (PRV-MASTER-RECORD), and the file status is captured in WS-FILE-STATUS for end-of-file evaluation"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDIR01-cbl-00003",
+                "rule_type": "Decision Rules",
+                "rule_name": "End-of-File Detection for Provider Master File",
+                "rule_description": "After each read attempt on the Provider Master File, the program checks whether all records have been processed. If the end of file is reached, processing stops and the program moves to completion reporting.",
+                "sub_graph_node_text": "2:Sequential Provider Record Retrieval",
+                "acceptance_criteria": {
+                    "Given": "A read operation has been performed on the Provider Master File",
+                    "When": "The file status (WS-FILE-STATUS) indicates end-of-file (WS-FS-EOF is TRUE)",
+                    "Then": "The end-of-file flag (WS-END-OF-FILE) is set to TRUE, the record retrieval loop terminates, and control passes to the Directory Extract Completion Reporting step"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDIR01-cbl-00004",
+                "rule_type": "Decision Rules",
+                "rule_name": "Active Provider Filtering",
+                "rule_description": "Only providers whose status is marked as ACTIVE in the Provider Master Record are eligible for inclusion in the Provider Directory. Inactive or terminated providers are skipped entirely and no directory record is produced for them.",
+                "sub_graph_node_text": "3:Active Provider Filtering",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been successfully retrieved from the Provider Master File",
+                    "When": "The provider's active status indicator (PRV-ACTIVE of PRV-MASTER-RECORD) is evaluated",
+                    "Then": "If the provider status is ACTIVE, the record proceeds to Provider Directory Record Mapping; if the provider status is NOT ACTIVE (inactive or terminated), the record is skipped and the program immediately retrieves the next provider record without writing any output"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDIR01-cbl-00005",
+                "rule_type": "Definitional Rules",
+                "rule_name": "Provider Directory Record Mapping",
+                "rule_description": "For each active provider, specific fields from the Provider Master Record are mapped to the corresponding fields in the Directory Output Record. The provider name is limited to the first 60 characters of the Variant field.",
+                "sub_graph_node_text": "4:Provider Directory Record Mapping",
+                "acceptance_criteria": {
+                    "Given": "A provider record has passed the Active Provider Filter and is confirmed as ACTIVE",
+                    "When": "The directory record is being prepared for output",
+                    "Then": "The following fields are mapped from the Provider Master Record to the Directory Output Record: Medicaid ID (PRV-MEDICAID-ID \u2192 DIR-MEDICAID-ID), National Provider Identifier (PRV-NPI \u2192 DIR-NPI), Provider Type Code (PRV-TYPE-CODE \u2192 DIR-TYPE), Risk Tier (PRV-RISK-TIER \u2192 DIR-RISK-TIER), and Provider Name set to the first 60 characters only of the Provider Variant field (PRV-VARIANT(1:60) \u2192 DIR-NAME)"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDIR01-cbl-00006",
+                "rule_type": "Validation Rules",
+                "rule_name": "Provider Name 60-Character Truncation Rule",
+                "rule_description": "The provider name written to the Directory Output is restricted to the first 60 characters of the Provider Variant field. Any content beyond position 60 is excluded from the directory record.",
+                "sub_graph_node_text": "4:Provider Directory Record Mapping",
+                "acceptance_criteria": {
+                    "Given": "An active provider record is being mapped to the Directory Output Record",
+                    "When": "The Provider Name field (DIR-NAME) is populated from the Provider Variant field (PRV-VARIANT)",
+                    "Then": "Only the first 60 characters of PRV-VARIANT (positions 1 through 60) are moved to DIR-NAME; any characters beyond position 60 in PRV-VARIANT are not included in the directory output"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDIR01-cbl-00007",
+                "rule_type": "Process Rules",
+                "rule_name": "Directory Record Output",
+                "rule_description": "After all required fields have been mapped, the fully populated Directory Output Record is written to the Directory Output File.",
+                "sub_graph_node_text": "5:Directory Record Output",
+                "acceptance_criteria": {
+                    "Given": "The Directory Output Record (DIR-OUT-RECORD) has been fully populated with the active provider's mapped fields",
+                    "When": "The write operation is executed",
+                    "Then": "The Directory Output Record is written to the Directory Output File (DIR-OUT-FILE), making the active provider's information available in the provider directory extract"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDIR01-cbl-00008",
+                "rule_type": "Computation Rules",
+                "rule_name": "Active Provider Count Tracking",
+                "rule_description": "Each time an active provider record is successfully written to the Directory Output File, the directory row counter is incremented by one to maintain an accurate count of all directory records produced.",
+                "sub_graph_node_text": "6:Active Provider Count Tracking",
+                "acceptance_criteria": {
+                    "Given": "An active provider's Directory Output Record has been successfully written to the Directory Output File",
+                    "When": "The write operation completes",
+                    "Then": "The directory row counter (WS-DIR-COUNT) is incremented by 1, reflecting the cumulative total number of active provider records written to the directory extract"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDIR01-cbl-00009",
+                "rule_type": "Process Rules",
+                "rule_name": "Directory Extract Completion Reporting",
+                "rule_description": "Upon processing all records in the Provider Master File, the program closes both files and reports the total number of directory records produced during the extract run.",
+                "sub_graph_node_text": "7:Directory Extract Completion Reporting",
+                "acceptance_criteria": {
+                    "Given": "The end-of-file condition has been reached on the Provider Master File and all provider records have been evaluated",
+                    "When": "The program completes its processing loop",
+                    "Then": "The Provider Master File (PRV-MASTER-FILE) and the Directory Output File (DIR-OUT-FILE) are both closed, and the total directory row count is displayed in the format 'PRVDIR01: DIRECTORY ROWS=' followed by the value of WS-DIR-COUNT, after which the program terminates"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "provider-directory-extract-initialization",
+            "title": "Provider Directory Extract Initialization",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Nightly Directory Extract\\nPRVDIR01]) \n    B[Identify Program\\nas PRVDIR01]\n    C[Open Provider Master File\\nas Input Source]\n    D{Provider Master\\nFile Available?}\n    E[Open Provider Directory\\nFlat File as Output]\n    F{Provider Directory\\nOutput File Ready?}\n    G[Initialize Processing\\nFlags for Extract Run]\n    H([Proceed to\\nProvider Record Retrieval])\n\n    A --> B\n    B --> C\n    C --> D\n    D -->|Yes - File Accessible| E\n    D -->|No - File Unavailable| Z([Halt Extract Process])\n    E --> F\n    F -->|Yes - File Ready| G\n    F -->|No - File Unavailable| Z\n    G --> H",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00010",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Identify Nightly Directory Extract Program",
+                    "rule_description": "The nightly directory extract process must identify itself as program PRVDIR01 before any processing begins, establishing the program identity for tracking and reporting purposes.",
+                    "sub_graph_node_text": "Identify Program as PRVDIR01",
+                    "acceptance_criteria": {
+                        "Given": "The nightly Provider Directory extract process is initiated",
+                        "When": "The program begins execution",
+                        "Then": "The program identifies itself as PRVDIR01 so that all subsequent processing, logging, and reporting are attributed to this extract job"
+                    },
+                    "key_functionality_id": "provider-directory-extract-initialization"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00011",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Open Provider Master File as Input Source",
+                    "rule_description": "The Provider Master File must be successfully opened as the input data source before any provider records can be read and evaluated for inclusion in the Provider Directory.",
+                    "sub_graph_node_text": "Open Provider Master File as Input Source",
+                    "acceptance_criteria": {
+                        "Given": "The nightly Provider Directory extract process has identified itself as PRVDIR01",
+                        "When": "The program attempts to open the Provider Master File as the input source",
+                        "Then": "If the Provider Master File is accessible and available, the file is opened successfully and the process proceeds to open the Provider Directory output file; if the Provider Master File is unavailable or cannot be accessed, the extract process is halted immediately and no directory output is produced"
+                    },
+                    "key_functionality_id": "provider-directory-extract-initialization"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00012",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Open Provider Directory Flat File as Output Destination",
+                    "rule_description": "The Provider Directory flat file must be successfully opened as the output destination before any provider directory records can be written. This file will receive all active provider records extracted from the Provider Master File.",
+                    "sub_graph_node_text": "Open Provider Directory Flat File as Output",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File has been successfully opened as the input source",
+                        "When": "The program attempts to open the Provider Directory flat file as the output destination",
+                        "Then": "If the Provider Directory output file is ready and accessible, the file is opened successfully and the process proceeds to initialize processing flags; if the Provider Directory output file is unavailable or cannot be opened, the extract process is halted immediately and no directory output is produced"
+                    },
+                    "key_functionality_id": "provider-directory-extract-initialization"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00013",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Initialize Processing Flags for Extract Run",
+                    "rule_description": "Before reading any provider records, the extract process must initialize all processing control flags to their starting state to ensure the sequential read loop operates correctly from the first record through to the last.",
+                    "sub_graph_node_text": "Initialize Processing Flags for Extract Run",
+                    "acceptance_criteria": {
+                        "Given": "Both the Provider Master File and the Provider Directory output file have been successfully opened",
+                        "When": "The program initializes the processing flags for the extract run",
+                        "Then": "The end-of-file indicator is set to 'N' (Not Reached), signaling that provider records are available to be read, and the process proceeds to begin sequential retrieval of provider records from the Provider Master File"
+                    },
+                    "key_functionality_id": "provider-directory-extract-initialization"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00014",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Proceed to Provider Record Retrieval After Successful Initialization",
+                    "rule_description": "Once all initialization steps are complete \u2014 program identification, both files opened, and processing flags set \u2014 the extract process transitions to the provider record retrieval phase to begin evaluating provider records for directory inclusion.",
+                    "sub_graph_node_text": "Proceed to Provider Record Retrieval",
+                    "acceptance_criteria": {
+                        "Given": "The program has been identified as PRVDIR01, the Provider Master File is open as input, the Provider Directory flat file is open as output, and the end-of-file flag is initialized to 'N'",
+                        "When": "All initialization steps complete successfully",
+                        "Then": "The process transitions to the provider record retrieval loop, where provider records will be read sequentially from the Provider Master File and evaluated for inclusion in the Provider Directory output"
+                    },
+                    "key_functionality_id": "provider-directory-extract-initialization"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Directory Extract Initialization"
+        },
+        {
+            "id": "sequential-provider-record-retrieval",
+            "title": "Sequential Provider Record Retrieval",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Sequential Record Retrieval])\n    B[Read Next Provider Record\\nfrom Provider Master File]\n    C{End of File\\nReached?}\n    D[Pass Record for\\nActive Provider Filtering]\n    E([All Provider Records\\nProcessed - Exit])\n\n    A --> B\n    B --> C\n    C -->|No - Record Available| D\n    D --> B\n    C -->|Yes - No More Records| E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00015",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Sequential Processing of All Provider Records",
+                    "rule_description": "The system must read and process every provider record from the Provider Master File one at a time, in sequence, from the first record to the last, ensuring no provider record is skipped or processed out of order.",
+                    "sub_graph_node_text": "Read Next Provider Record from Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File is open and available for reading, and sequential record retrieval has been initiated",
+                        "When": "The system requests the next provider record from the Provider Master File",
+                        "Then": "The system retrieves exactly one provider record at a time in the order they appear in the Provider Master File, and that record is made available for subsequent Active Provider filtering"
+                    },
+                    "key_functionality_id": "sequential-provider-record-retrieval"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00016",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "End of File Detection to Halt Provider Record Processing",
+                    "rule_description": "The system must detect when there are no more provider records remaining in the Provider Master File and stop the sequential retrieval process, ensuring all records have been evaluated exactly once.",
+                    "sub_graph_node_text": "End of File Reached?",
+                    "acceptance_criteria": {
+                        "Given": "The system is sequentially reading provider records from the Provider Master File",
+                        "When": "A read attempt is made and the Provider Master File signals that no more records are available (end of file condition is reached)",
+                        "Then": "The sequential record retrieval process is terminated and the system exits the record processing loop, indicating that all provider records have been processed"
+                    },
+                    "key_functionality_id": "sequential-provider-record-retrieval"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00017",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Continue Processing When Provider Record Is Available",
+                    "rule_description": "When a valid provider record is successfully retrieved from the Provider Master File (i.e., end of file has not been reached), the record must be passed forward for Active Provider status filtering to determine eligibility for directory inclusion.",
+                    "sub_graph_node_text": "Pass Record for Active Provider Filtering",
+                    "acceptance_criteria": {
+                        "Given": "The system has just read a provider record from the Provider Master File",
+                        "When": "The read operation returns a valid provider record and the end of file condition has NOT been reached",
+                        "Then": "The retrieved provider record is passed to the Active Provider filtering step for evaluation, and the system subsequently loops back to read the next provider record after filtering is complete"
+                    },
+                    "key_functionality_id": "sequential-provider-record-retrieval"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Sequential Provider Record Retrieval"
+        },
+        {
+            "id": "active-provider-filtering",
+            "title": "Active Provider Filtering",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Evaluate Provider Record])\n    B{Is Provider\\nStatus\\nActive?}\n    C[Include Provider\\nin Directory Extract]\n    D[Exclude Provider\\nfrom Directory\\nNo Record Written]\n    E([Return: Get Next\\nProvider Record])\n\n    A --> B\n    B -->|Yes - Active Status| C\n    B -->|No - Inactive or\\nTerminated Status| D\n    C --> E\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00018",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Active Provider Status Filter for Directory Inclusion",
+                    "rule_description": "Evaluates each provider record from the Provider Master File to determine whether the provider holds an Active status. Only providers with an Active status are selected and written to the Provider Directory extract. Providers with any other status (inactive, terminated, etc.) are bypassed with no directory record produced.",
+                    "sub_graph_node_text": "Is Provider Status Active?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File",
+                        "When": "The provider's status field is evaluated to determine if it is marked as Active",
+                        "Then": "If the provider status is Active, the provider is included in the Directory extract and a directory record is written; if the provider status is not Active (inactive, terminated, or any other non-active status), the provider is excluded from the Directory extract and no directory record is written for that provider"
+                    },
+                    "key_functionality_id": "active-provider-filtering"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Active Provider Filtering"
+        },
+        {
+            "id": "provider-directory-record-mapping",
+            "title": "Provider Directory Record Mapping",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Map Active Provider Record])\n    B[Map Medicaid ID\\nfrom Provider Master\\nto Directory Record]\n    C[Map NPI\\nNational Provider Identifier\\nfrom Provider Master\\nto Directory Record]\n    D[Map Provider Type Code\\nfrom Provider Master\\nto Directory Record]\n    E[Map Risk Tier\\nfrom Provider Master\\nto Directory Record]\n    F[Map Provider Name\\nFirst 60 Characters Only\\nfrom Provider Master\\nto Directory Record]\n    G([Directory Output Record\\nFully Mapped & Ready])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n    F --> G",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00019",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Map Medicaid ID to Provider Directory Record",
+                    "rule_description": "For each active provider being written to the Provider Directory, the provider's Medicaid ID must be sourced from the Provider Master record and placed into the corresponding field of the Directory output record.",
+                    "sub_graph_node_text": "Map Medicaid ID\nfrom Provider Master\nto Directory Record",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been identified from the Provider Master File and is being prepared for inclusion in the Provider Directory",
+                        "When": "The Provider Directory output record is being assembled for the active provider",
+                        "Then": "The Medicaid ID from the Provider Master record must be mapped to the Medicaid ID field of the Provider Directory output record, ensuring the directory reflects the provider's official Medicaid identifier"
+                    },
+                    "key_functionality_id": "provider-directory-record-mapping"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00020",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Map NPI to Provider Directory Record",
+                    "rule_description": "For each active provider being written to the Provider Directory, the provider's National Provider Identifier (NPI) must be sourced from the Provider Master record and placed into the corresponding field of the Directory output record.",
+                    "sub_graph_node_text": "Map NPI\nNational Provider Identifier\nfrom Provider Master\nto Directory Record",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been identified from the Provider Master File and the Medicaid ID has already been mapped to the Directory output record",
+                        "When": "The Provider Directory output record is being assembled for the active provider",
+                        "Then": "The NPI (National Provider Identifier) from the Provider Master record must be mapped to the NPI field of the Provider Directory output record, ensuring the directory reflects the provider's federally assigned unique identifier"
+                    },
+                    "key_functionality_id": "provider-directory-record-mapping"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00021",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Map Provider Type Code to Provider Directory Record",
+                    "rule_description": "For each active provider being written to the Provider Directory, the provider's Type Code must be sourced from the Provider Master record and placed into the corresponding field of the Directory output record.",
+                    "sub_graph_node_text": "Map Provider Type Code\nfrom Provider Master\nto Directory Record",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been identified from the Provider Master File and the Medicaid ID and NPI have already been mapped to the Directory output record",
+                        "When": "The Provider Directory output record is being assembled for the active provider",
+                        "Then": "The Provider Type Code from the Provider Master record must be mapped to the Provider Type field of the Provider Directory output record, ensuring the directory correctly classifies the category or specialty of the provider"
+                    },
+                    "key_functionality_id": "provider-directory-record-mapping"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00022",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Map Risk Tier to Provider Directory Record",
+                    "rule_description": "For each active provider being written to the Provider Directory, the provider's Risk Tier must be sourced from the Provider Master record and placed into the corresponding field of the Directory output record.",
+                    "sub_graph_node_text": "Map Risk Tier\nfrom Provider Master\nto Directory Record",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been identified from the Provider Master File and the Medicaid ID, NPI, and Provider Type Code have already been mapped to the Directory output record",
+                        "When": "The Provider Directory output record is being assembled for the active provider",
+                        "Then": "The Risk Tier from the Provider Master record must be mapped to the Risk Tier field of the Provider Directory output record, ensuring the directory reflects the provider's assigned risk classification level"
+                    },
+                    "key_functionality_id": "provider-directory-record-mapping"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00023",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Map Provider Name (First 60 Characters) to Provider Directory Record",
+                    "rule_description": "For each active provider being written to the Provider Directory, the provider's name must be sourced from the Provider Variant field in the Provider Master record. Only the first 60 characters of this field are permitted in the Directory output \u2014 any characters beyond position 60 are excluded.",
+                    "sub_graph_node_text": "Map Provider Name\nFirst 60 Characters Only\nfrom Provider Master\nto Directory Record",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been identified from the Provider Master File and the Medicaid ID, NPI, Provider Type Code, and Risk Tier have already been mapped to the Directory output record",
+                        "When": "The Provider Name is being mapped from the Provider Master record to the Provider Directory output record",
+                        "Then": "Only the first 60 characters of the Provider Variant field from the Provider Master record must be mapped to the Provider Name field of the Provider Directory output record; any content beyond the 60th character position must be excluded from the directory entry"
+                    },
+                    "key_functionality_id": "provider-directory-record-mapping"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Directory Record Mapping"
+        },
+        {
+            "id": "directory-record-output",
+            "title": "Directory Record Output",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Write Directory Record])\n    B[Assemble Provider Directory Output Record\\nwith all mapped provider attributes]\n    C{Output Record\\nComplete?}\n    D[Write Formatted Provider Record\\nto Nightly Provider Directory Flat File]\n    E[(DIR-OUT-FILE\\nNightly Provider Directory\\nFlat File for MCOs)]\n    F([Return: Record Written Successfully])\n\n    A --> B\n    B --> C\n    C -->|Yes - All Fields Populated| D\n    D -.->|Output Record Written| E\n    D --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00024",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Assemble Provider Directory Output Record with All Mapped Provider Attributes",
+                    "rule_description": "When writing an active provider to the nightly Provider Directory flat file, all required provider attributes must be mapped from the Provider Master Record into the corresponding Directory Output Record fields before the record is written.",
+                    "sub_graph_node_text": "Assemble Provider Directory Output Record with all mapped provider attributes",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been identified from the Provider Master File with the following attributes: Medicaid ID, NPI (National Provider Identifier), Provider Type Code, Risk Tier, and Provider Variant (Name)",
+                        "When": "The system assembles the Provider Directory Output Record for the active provider",
+                        "Then": "The system must map: Provider Medicaid ID from the Provider Master Record to the Directory Medicaid ID field; Provider NPI from the Provider Master Record to the Directory NPI field; Provider Type Code from the Provider Master Record to the Directory Type field; Provider Risk Tier from the Provider Master Record to the Directory Risk Tier field; and the first 60 characters of the Provider Variant field from the Provider Master Record to the Directory Name field \u2014 all fields must be populated before the record is written"
+                    },
+                    "key_functionality_id": "directory-record-output"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00025",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Provider Name Truncation to 60 Characters in Directory Output",
+                    "rule_description": "The provider name written to the Provider Directory is restricted to the first 60 characters of the Provider Variant field from the Provider Master Record. Any characters beyond position 60 are excluded from the directory output.",
+                    "sub_graph_node_text": "Assemble Provider Directory Output Record with all mapped provider attributes",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record exists in the Provider Master File with a Variant field that may contain more than 60 characters of provider name data",
+                        "When": "The system maps the provider name to the Directory Output Record",
+                        "Then": "Only the first 60 characters of the Provider Variant field are written to the Directory Name field; any content beyond character position 60 is not included in the Provider Directory output record"
+                    },
+                    "key_functionality_id": "directory-record-output"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00026",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Write Formatted Provider Record to Nightly Provider Directory Flat File for MCOs",
+                    "rule_description": "Once all provider attributes have been assembled into the Directory Output Record, the fully populated record is written to the nightly Provider Directory flat file, which is consumed by Managed Care Organizations (MCOs).",
+                    "sub_graph_node_text": "Write Formatted Provider Record to Nightly Provider Directory Flat File",
+                    "acceptance_criteria": {
+                        "Given": "A fully assembled Provider Directory Output Record exists with all required fields populated: Medicaid ID, NPI, Provider Type Code, Risk Tier, and Provider Name (first 60 characters of Variant)",
+                        "When": "The system writes the assembled record to the nightly Provider Directory flat file",
+                        "Then": "The formatted provider record is successfully written to the nightly Provider Directory flat file (DIR-OUT-FILE) that is distributed to and consumed by Managed Care Organizations (MCOs)"
+                    },
+                    "key_functionality_id": "directory-record-output"
+                },
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00027",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Increment Provider Directory Row Count Upon Successful Record Write",
+                    "rule_description": "Each time an active provider record is successfully written to the Provider Directory flat file, the total directory row count is incremented by one to track the volume of records produced in the nightly run.",
+                    "sub_graph_node_text": "Write Formatted Provider Record to Nightly Provider Directory Flat File",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been successfully written to the nightly Provider Directory flat file",
+                        "When": "The write operation for the directory record completes",
+                        "Then": "The Provider Directory row count is incremented by 1, accurately reflecting the cumulative number of provider records written to the directory during the current processing run"
+                    },
+                    "key_functionality_id": "directory-record-output"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Directory Record Output"
+        },
+        {
+            "id": "active-provider-count-tracking",
+            "title": "Active Provider Count Tracking",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Active Provider Record\\nSuccessfully Written to Directory])\n    B[Increment Active Provider\\nCount by 1]\n    C[(WS-DIR-COUNT\\nRunning Total)]\n    D{More Provider\\nRecords to Process?}\n    E([Proceed to\\nCompletion Reporting])\n\n    A --> B\n    B --> C\n    C --> D\n    D -->|Yes - Continue Processing| A\n    D -->|No - All Records Processed| E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00028",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Active Provider Directory Count Tracking",
+                    "rule_description": "Each time an active provider record is successfully written to the Provider Directory output file, a running total counter is incremented by 1 to track the total number of active providers included in the directory extract.",
+                    "sub_graph_node_text": "Increment Active Provider Count by 1",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record from the Provider Master File has been successfully written to the Provider Directory output file",
+                        "When": "The write operation for the active provider directory row completes",
+                        "Then": "The Active Provider Directory Row Count (WS-DIR-COUNT) is incremented by 1, reflecting the cumulative total of all active provider records written to the directory during the current extract run"
+                    },
+                    "key_functionality_id": "active-provider-count-tracking"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Active Provider Count Tracking"
+        },
+        {
+            "id": "directory-extract-completion-reporting",
+            "title": "Directory Extract Completion Reporting",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([All Provider Records Processed])\n    B[Close Provider Master File\\nand Directory Output File]\n    C[Report Total Provider Directory\\nRows Written to Output File\\nPRVDIR01: DIRECTORY ROWS = WS-DIR-COUNT]\n    D([Extract Process Complete])\n\n    A --> B\n    B --> C\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDIR01-cbl-00029",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Provider Directory Extract Completion Reporting",
+                    "rule_description": "Upon completion of processing all provider records from the Provider Master File, the total number of active provider directory rows successfully written to the Directory Output File must be reported for reconciliation and audit purposes.",
+                    "sub_graph_node_text": "Report Total Provider Directory Rows Written to Output File\nPRVDIR01: DIRECTORY ROWS = WS-DIR-COUNT",
+                    "acceptance_criteria": {
+                        "Given": "All records in the Provider Master File have been read and evaluated, and the Directory Output File has been closed after writing all eligible active provider records",
+                        "When": "The Provider Directory extract process reaches the end of all provider records and finalizes the output",
+                        "Then": "The system must report the total count of provider directory rows written to the output file, displayed as 'PRVDIR01: DIRECTORY ROWS = [total count]', where the total count reflects only the active provider records that were successfully written to the Directory Output File"
+                    },
+                    "key_functionality_id": "directory-extract-completion-reporting"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Directory Extract Completion Reporting"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The PRVDIR01 program is invoked to generate the Provider Directory extract",
+                "When": "The program starts execution",
+                "Then": "The Provider Master File (PRV-MASTER-FILE) is opened as the input source, the Directory Output File (DIR-OUT-FILE) is opened as the output destination, the end-of-file flag is set to 'N' (not reached), and the directory row count (WS-DIR-COUNT) is initialized to zero in preparation for sequential record processing"
+            },
+            "Rule_Name": "Provider Directory Extract Initialization",
+            "Rule_Description": "The Provider Directory Extract program (PRVDIR01) initializes by opening the Provider Master File for reading and the Directory Output File for writing, and sets the directory row counter to zero before processing begins."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00002",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File (PRV-MASTER-FILE) is open and available for reading",
+                "When": "The program requests the next provider record",
+                "Then": "The next sequential record is retrieved from the Provider Master File into the Provider Master Record (PRV-MASTER-RECORD), and the file status is captured in WS-FILE-STATUS for end-of-file evaluation"
+            },
+            "Rule_Name": "Sequential Provider Record Retrieval",
+            "Rule_Description": "The program reads provider records one at a time, sequentially from the Provider Master File, advancing through each record in order until all records have been processed."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00003",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A read operation has been performed on the Provider Master File",
+                "When": "The file status (WS-FILE-STATUS) indicates end-of-file (WS-FS-EOF is TRUE)",
+                "Then": "The end-of-file flag (WS-END-OF-FILE) is set to TRUE, the record retrieval loop terminates, and control passes to the Directory Extract Completion Reporting step"
+            },
+            "Rule_Name": "End-of-File Detection for Provider Master File",
+            "Rule_Description": "After each read attempt on the Provider Master File, the program checks whether all records have been processed. If the end of file is reached, processing stops and the program moves to completion reporting."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00004",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider Master File",
+                "When": "The provider's active status indicator (PRV-ACTIVE of PRV-MASTER-RECORD) is evaluated",
+                "Then": "If the provider status is ACTIVE, the record proceeds to Provider Directory Record Mapping; if the provider status is NOT ACTIVE (inactive or terminated), the record is skipped and the program immediately retrieves the next provider record without writing any output"
+            },
+            "Rule_Name": "Active Provider Filtering",
+            "Rule_Description": "Only providers whose status is marked as ACTIVE in the Provider Master Record are eligible for inclusion in the Provider Directory. Inactive or terminated providers are skipped entirely and no directory record is produced for them."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00005",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has passed the Active Provider Filter and is confirmed as ACTIVE",
+                "When": "The directory record is being prepared for output",
+                "Then": "The following fields are mapped from the Provider Master Record to the Directory Output Record: Medicaid ID (PRV-MEDICAID-ID \u2192 DIR-MEDICAID-ID), National Provider Identifier (PRV-NPI \u2192 DIR-NPI), Provider Type Code (PRV-TYPE-CODE \u2192 DIR-TYPE), Risk Tier (PRV-RISK-TIER \u2192 DIR-RISK-TIER), and Provider Name set to the first 60 characters only of the Provider Variant field (PRV-VARIANT(1:60) \u2192 DIR-NAME)"
+            },
+            "Rule_Name": "Provider Directory Record Mapping",
+            "Rule_Description": "For each active provider, specific fields from the Provider Master Record are mapped to the corresponding fields in the Directory Output Record. The provider name is limited to the first 60 characters of the Variant field."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00006",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record is being mapped to the Directory Output Record",
+                "When": "The Provider Name field (DIR-NAME) is populated from the Provider Variant field (PRV-VARIANT)",
+                "Then": "Only the first 60 characters of PRV-VARIANT (positions 1 through 60) are moved to DIR-NAME; any characters beyond position 60 in PRV-VARIANT are not included in the directory output"
+            },
+            "Rule_Name": "Provider Name 60-Character Truncation Rule",
+            "Rule_Description": "The provider name written to the Directory Output is restricted to the first 60 characters of the Provider Variant field. Any content beyond position 60 is excluded from the directory record."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00007",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Directory Output Record (DIR-OUT-RECORD) has been fully populated with the active provider's mapped fields",
+                "When": "The write operation is executed",
+                "Then": "The Directory Output Record is written to the Directory Output File (DIR-OUT-FILE), making the active provider's information available in the provider directory extract"
+            },
+            "Rule_Name": "Directory Record Output",
+            "Rule_Description": "After all required fields have been mapped, the fully populated Directory Output Record is written to the Directory Output File."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00008",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider's Directory Output Record has been successfully written to the Directory Output File",
+                "When": "The write operation completes",
+                "Then": "The directory row counter (WS-DIR-COUNT) is incremented by 1, reflecting the cumulative total number of active provider records written to the directory extract"
+            },
+            "Rule_Name": "Active Provider Count Tracking",
+            "Rule_Description": "Each time an active provider record is successfully written to the Directory Output File, the directory row counter is incremented by one to maintain an accurate count of all directory records produced."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00009",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The end-of-file condition has been reached on the Provider Master File and all provider records have been evaluated",
+                "When": "The program completes its processing loop",
+                "Then": "The Provider Master File (PRV-MASTER-FILE) and the Directory Output File (DIR-OUT-FILE) are both closed, and the total directory row count is displayed in the format 'PRVDIR01: DIRECTORY ROWS=' followed by the value of WS-DIR-COUNT, after which the program terminates"
+            },
+            "Rule_Name": "Directory Extract Completion Reporting",
+            "Rule_Description": "Upon processing all records in the Provider Master File, the program closes both files and reports the total number of directory records produced during the extract run."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00010",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The nightly Provider Directory extract process is initiated",
+                "When": "The program begins execution",
+                "Then": "The program identifies itself as PRVDIR01 so that all subsequent processing, logging, and reporting are attributed to this extract job"
+            },
+            "Rule_Name": "Identify Nightly Directory Extract Program",
+            "Rule_Description": "The nightly directory extract process must identify itself as program PRVDIR01 before any processing begins, establishing the program identity for tracking and reporting purposes."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00011",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The nightly Provider Directory extract process has identified itself as PRVDIR01",
+                "When": "The program attempts to open the Provider Master File as the input source",
+                "Then": "If the Provider Master File is accessible and available, the file is opened successfully and the process proceeds to open the Provider Directory output file; if the Provider Master File is unavailable or cannot be accessed, the extract process is halted immediately and no directory output is produced"
+            },
+            "Rule_Name": "Open Provider Master File as Input Source",
+            "Rule_Description": "The Provider Master File must be successfully opened as the input data source before any provider records can be read and evaluated for inclusion in the Provider Directory."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00012",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File has been successfully opened as the input source",
+                "When": "The program attempts to open the Provider Directory flat file as the output destination",
+                "Then": "If the Provider Directory output file is ready and accessible, the file is opened successfully and the process proceeds to initialize processing flags; if the Provider Directory output file is unavailable or cannot be opened, the extract process is halted immediately and no directory output is produced"
+            },
+            "Rule_Name": "Open Provider Directory Flat File as Output Destination",
+            "Rule_Description": "The Provider Directory flat file must be successfully opened as the output destination before any provider directory records can be written. This file will receive all active provider records extracted from the Provider Master File."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00013",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "Both the Provider Master File and the Provider Directory output file have been successfully opened",
+                "When": "The program initializes the processing flags for the extract run",
+                "Then": "The end-of-file indicator is set to 'N' (Not Reached), signaling that provider records are available to be read, and the process proceeds to begin sequential retrieval of provider records from the Provider Master File"
+            },
+            "Rule_Name": "Initialize Processing Flags for Extract Run",
+            "Rule_Description": "Before reading any provider records, the extract process must initialize all processing control flags to their starting state to ensure the sequential read loop operates correctly from the first record through to the last."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00014",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The program has been identified as PRVDIR01, the Provider Master File is open as input, the Provider Directory flat file is open as output, and the end-of-file flag is initialized to 'N'",
+                "When": "All initialization steps complete successfully",
+                "Then": "The process transitions to the provider record retrieval loop, where provider records will be read sequentially from the Provider Master File and evaluated for inclusion in the Provider Directory output"
+            },
+            "Rule_Name": "Proceed to Provider Record Retrieval After Successful Initialization",
+            "Rule_Description": "Once all initialization steps are complete \u2014 program identification, both files opened, and processing flags set \u2014 the extract process transitions to the provider record retrieval phase to begin evaluating provider records for directory inclusion."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00015",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File is open and available for reading, and sequential record retrieval has been initiated",
+                "When": "The system requests the next provider record from the Provider Master File",
+                "Then": "The system retrieves exactly one provider record at a time in the order they appear in the Provider Master File, and that record is made available for subsequent Active Provider filtering"
+            },
+            "Rule_Name": "Sequential Processing of All Provider Records",
+            "Rule_Description": "The system must read and process every provider record from the Provider Master File one at a time, in sequence, from the first record to the last, ensuring no provider record is skipped or processed out of order."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00016",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system is sequentially reading provider records from the Provider Master File",
+                "When": "A read attempt is made and the Provider Master File signals that no more records are available (end of file condition is reached)",
+                "Then": "The sequential record retrieval process is terminated and the system exits the record processing loop, indicating that all provider records have been processed"
+            },
+            "Rule_Name": "End of File Detection to Halt Provider Record Processing",
+            "Rule_Description": "The system must detect when there are no more provider records remaining in the Provider Master File and stop the sequential retrieval process, ensuring all records have been evaluated exactly once."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00017",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system has just read a provider record from the Provider Master File",
+                "When": "The read operation returns a valid provider record and the end of file condition has NOT been reached",
+                "Then": "The retrieved provider record is passed to the Active Provider filtering step for evaluation, and the system subsequently loops back to read the next provider record after filtering is complete"
+            },
+            "Rule_Name": "Continue Processing When Provider Record Is Available",
+            "Rule_Description": "When a valid provider record is successfully retrieved from the Provider Master File (i.e., end of file has not been reached), the record must be passed forward for Active Provider status filtering to determine eligibility for directory inclusion."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00018",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File",
+                "When": "The provider's status field is evaluated to determine if it is marked as Active",
+                "Then": "If the provider status is Active, the provider is included in the Directory extract and a directory record is written; if the provider status is not Active (inactive, terminated, or any other non-active status), the provider is excluded from the Directory extract and no directory record is written for that provider"
+            },
+            "Rule_Name": "Active Provider Status Filter for Directory Inclusion",
+            "Rule_Description": "Evaluates each provider record from the Provider Master File to determine whether the provider holds an Active status. Only providers with an Active status are selected and written to the Provider Directory extract. Providers with any other status (inactive, terminated, etc.) are bypassed with no directory record produced."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00019",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been identified from the Provider Master File and is being prepared for inclusion in the Provider Directory",
+                "When": "The Provider Directory output record is being assembled for the active provider",
+                "Then": "The Medicaid ID from the Provider Master record must be mapped to the Medicaid ID field of the Provider Directory output record, ensuring the directory reflects the provider's official Medicaid identifier"
+            },
+            "Rule_Name": "Map Medicaid ID to Provider Directory Record",
+            "Rule_Description": "For each active provider being written to the Provider Directory, the provider's Medicaid ID must be sourced from the Provider Master record and placed into the corresponding field of the Directory output record."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00020",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been identified from the Provider Master File and the Medicaid ID has already been mapped to the Directory output record",
+                "When": "The Provider Directory output record is being assembled for the active provider",
+                "Then": "The NPI (National Provider Identifier) from the Provider Master record must be mapped to the NPI field of the Provider Directory output record, ensuring the directory reflects the provider's federally assigned unique identifier"
+            },
+            "Rule_Name": "Map NPI to Provider Directory Record",
+            "Rule_Description": "For each active provider being written to the Provider Directory, the provider's National Provider Identifier (NPI) must be sourced from the Provider Master record and placed into the corresponding field of the Directory output record."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00021",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been identified from the Provider Master File and the Medicaid ID and NPI have already been mapped to the Directory output record",
+                "When": "The Provider Directory output record is being assembled for the active provider",
+                "Then": "The Provider Type Code from the Provider Master record must be mapped to the Provider Type field of the Provider Directory output record, ensuring the directory correctly classifies the category or specialty of the provider"
+            },
+            "Rule_Name": "Map Provider Type Code to Provider Directory Record",
+            "Rule_Description": "For each active provider being written to the Provider Directory, the provider's Type Code must be sourced from the Provider Master record and placed into the corresponding field of the Directory output record."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00022",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been identified from the Provider Master File and the Medicaid ID, NPI, and Provider Type Code have already been mapped to the Directory output record",
+                "When": "The Provider Directory output record is being assembled for the active provider",
+                "Then": "The Risk Tier from the Provider Master record must be mapped to the Risk Tier field of the Provider Directory output record, ensuring the directory reflects the provider's assigned risk classification level"
+            },
+            "Rule_Name": "Map Risk Tier to Provider Directory Record",
+            "Rule_Description": "For each active provider being written to the Provider Directory, the provider's Risk Tier must be sourced from the Provider Master record and placed into the corresponding field of the Directory output record."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00023",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been identified from the Provider Master File and the Medicaid ID, NPI, Provider Type Code, and Risk Tier have already been mapped to the Directory output record",
+                "When": "The Provider Name is being mapped from the Provider Master record to the Provider Directory output record",
+                "Then": "Only the first 60 characters of the Provider Variant field from the Provider Master record must be mapped to the Provider Name field of the Provider Directory output record; any content beyond the 60th character position must be excluded from the directory entry"
+            },
+            "Rule_Name": "Map Provider Name (First 60 Characters) to Provider Directory Record",
+            "Rule_Description": "For each active provider being written to the Provider Directory, the provider's name must be sourced from the Provider Variant field in the Provider Master record. Only the first 60 characters of this field are permitted in the Directory output \u2014 any characters beyond position 60 are excluded."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00024",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been identified from the Provider Master File with the following attributes: Medicaid ID, NPI (National Provider Identifier), Provider Type Code, Risk Tier, and Provider Variant (Name)",
+                "When": "The system assembles the Provider Directory Output Record for the active provider",
+                "Then": "The system must map: Provider Medicaid ID from the Provider Master Record to the Directory Medicaid ID field; Provider NPI from the Provider Master Record to the Directory NPI field; Provider Type Code from the Provider Master Record to the Directory Type field; Provider Risk Tier from the Provider Master Record to the Directory Risk Tier field; and the first 60 characters of the Provider Variant field from the Provider Master Record to the Directory Name field \u2014 all fields must be populated before the record is written"
+            },
+            "Rule_Name": "Assemble Provider Directory Output Record with All Mapped Provider Attributes",
+            "Rule_Description": "When writing an active provider to the nightly Provider Directory flat file, all required provider attributes must be mapped from the Provider Master Record into the corresponding Directory Output Record fields before the record is written."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00025",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record exists in the Provider Master File with a Variant field that may contain more than 60 characters of provider name data",
+                "When": "The system maps the provider name to the Directory Output Record",
+                "Then": "Only the first 60 characters of the Provider Variant field are written to the Directory Name field; any content beyond character position 60 is not included in the Provider Directory output record"
+            },
+            "Rule_Name": "Provider Name Truncation to 60 Characters in Directory Output",
+            "Rule_Description": "The provider name written to the Provider Directory is restricted to the first 60 characters of the Provider Variant field from the Provider Master Record. Any characters beyond position 60 are excluded from the directory output."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00026",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A fully assembled Provider Directory Output Record exists with all required fields populated: Medicaid ID, NPI, Provider Type Code, Risk Tier, and Provider Name (first 60 characters of Variant)",
+                "When": "The system writes the assembled record to the nightly Provider Directory flat file",
+                "Then": "The formatted provider record is successfully written to the nightly Provider Directory flat file (DIR-OUT-FILE) that is distributed to and consumed by Managed Care Organizations (MCOs)"
+            },
+            "Rule_Name": "Write Formatted Provider Record to Nightly Provider Directory Flat File for MCOs",
+            "Rule_Description": "Once all provider attributes have been assembled into the Directory Output Record, the fully populated record is written to the nightly Provider Directory flat file, which is consumed by Managed Care Organizations (MCOs)."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00027",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been successfully written to the nightly Provider Directory flat file",
+                "When": "The write operation for the directory record completes",
+                "Then": "The Provider Directory row count is incremented by 1, accurately reflecting the cumulative number of provider records written to the directory during the current processing run"
+            },
+            "Rule_Name": "Increment Provider Directory Row Count Upon Successful Record Write",
+            "Rule_Description": "Each time an active provider record is successfully written to the Provider Directory flat file, the total directory row count is incremented by one to track the volume of records produced in the nightly run."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00028",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record from the Provider Master File has been successfully written to the Provider Directory output file",
+                "When": "The write operation for the active provider directory row completes",
+                "Then": "The Active Provider Directory Row Count (WS-DIR-COUNT) is incremented by 1, reflecting the cumulative total of all active provider records written to the directory during the current extract run"
+            },
+            "Rule_Name": "Active Provider Directory Count Tracking",
+            "Rule_Description": "Each time an active provider record is successfully written to the Provider Directory output file, a running total counter is incremented by 1 to track the total number of active providers included in the directory extract."
+        },
+        {
+            "Rule_Id": "R-PRVDIR01-cbl-00029",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All records in the Provider Master File have been read and evaluated, and the Directory Output File has been closed after writing all eligible active provider records",
+                "When": "The Provider Directory extract process reaches the end of all provider records and finalizes the output",
+                "Then": "The system must report the total count of provider directory rows written to the output file, displayed as 'PRVDIR01: DIRECTORY ROWS = [total count]', where the total count reflects only the active provider records that were successfully written to the Directory Output File"
+            },
+            "Rule_Name": "Provider Directory Extract Completion Reporting",
+            "Rule_Description": "Upon completion of processing all provider records from the Provider Master File, the total number of active provider directory rows successfully written to the Directory Output File must be reported for reconciliation and audit purposes."
+        }
+    ],
+    "description": "PRVDIR01 is a batch program that reads the Provider Master indexed file and extracts all active providers to produce a nightly directory flat file consumed by Managed Care Organizations (MCOs). For each active provider record, it writes key provider attributes \u2014 including Medicaid ID, NPI, provider type, risk tier, and name \u2014 to the output directory file, and reports the total count of directory rows written upon completion.\n\n<br>\n\n- **Execution Environment**: Batch\n- **Database Access**: VSAM (Indexed), Sequential File\n- **MQ Calls**: No\n- **Module Type**: Main module\n\n<br>\n\n### Key Functionalities:\n\n1: Provider Directory Extract Initialization - Open the Provider Master file as input source and the Provider Directory flat file as output destination to begin the nightly directory extract process\n\n2: Sequential Provider Record Retrieval - Read through all provider records in the Provider Master file sequentially, one record at a time, until all records have been processed\n\n3: Active Provider Filtering - Evaluate each provider record and select only those providers whose status is marked as Active, excluding inactive or terminated providers from the directory\n\n4: Provider Directory Record Mapping - For each active provider, map the following provider attributes to the directory output record: Medicaid ID, NPI (National Provider Identifier), Provider Type Code, Risk Tier, and Provider Name (first 60 characters)\n\n5: Directory Record Output - Write the mapped active provider information as a formatted record to the nightly Provider Directory flat file that is consumed by Managed Care Organizations (MCOs)\n\n6: Active Provider Count Tracking - Maintain a running count of all active provider records written to the directory file during the extract process\n\n7: Directory Extract Completion Reporting - Upon processing all provider records, report the total number of provider directory rows written to the output file for reconciliation and audit purposes\n\n"
+}

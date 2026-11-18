@@ -1,0 +1,76 @@
+{
+    "created_on": "2026-11-17",
+    "name": "PRVDAY01.jcl",
+    "file_path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVDAY01.jcl",
+    "type": "jcl",
+    "description": "This JCL job (PRVDAY01) performs the daily provider enrollment processing for the Medicaid Management Information System (MMIS). It enrolls new provider applications into the Provider Master file, then screens and assesses risk for unscreened providers, executing all screening and risk steps only when the enrollment step completes successfully.Key Functionalities:\nExecutes the provider enrollment program (PRVENR01) using a batch date parameter, reading daily provider applications and updating the Provider Master KSDS file, while writing any enrollment errors to a date-stamped error file with a fixed-block record length of 250 bytes.\nIf the enrollment step completes with a return code of 0, sorts all unscreened providers (where screening flag = 'U' in position 23) from the Provider Master file by NPI (positions 1\u201310, ascending) into a temporary work file for downstream processing.\nPasses the sorted unscreened provider records to the provider screening program (PRVSCR01), which reads the Provider Master file and writes screening results to a date-stamped output file with a fixed-block record length of 67 bytes.\nExecutes the provider risk assessment program (PRVRSK01) against the Provider Master file to evaluate and assign risk levels to providers, completing the conditional processing block initiated after successful enrollment.\nRuns a final cleanup/dummy step (IEFBR14) conditioned on a non-zero return code to handle any job-level wrap-up processing.",
+    "rules": [
+        {
+            "Rule_Id": "R-PRVDAY01-jcl-00001",
+            "Acceptance_Criteria": {
+                "Given": "A batch of new provider enrollment applications exists in the Provider Application Input File (APPINPUT: MMPRV.PROV.APPS.D&DATE) for the current processing date, AND the Provider Master File (PRVMSTR: MMPRV.PROVIDER.MASTER.KSDS) is available, AND the current batch processing date is identified by BATCH_ID=&BATCH_DATE",
+                "When": "The Provider Enrollment program (PRVENR01) is executed for the given batch date",
+                "Then": "1. All provider applications in the daily input file are processed and validated against enrollment business rules, AND 2. Approved provider applications are enrolled into the Provider Master File (PRVMSTR), AND 3. Any rejected or failed provider applications are written to the Provider Application Error File (APPERROR: MMPRV.PROV.ERRORS.D&DATE) with a fixed record length of 250 bytes per rejected application, AND 4. If enrollment processing completes successfully (Return Code = 0), the Provider Application Error File is permanently catalogued and retained for review, AND all downstream steps (provider screening and risk assessment) are permitted to execute, AND 5. If enrollment processing fails (Return Code \u2260 0), the Provider Application Error File is automatically deleted to prevent retention of incomplete error data, AND all downstream provider screening and risk assessment steps are blocked from executing"
+            },
+            "Rule_Name": "STEP010 - PRVENR01 - Daily Provider Enrollment Processing",
+            "Rule_Description": "This step invokes the Provider Enrollment program (PRVENR01) to process daily provider applications for a given batch date. It reads new provider applications, validates them, enrolls approved providers into the Provider Master File, and captures rejected applications in a date-stamped error file. Successful completion of this step is the gateway condition for all downstream screening and risk assessment processing.",
+            "Rule_Type": "Action Rule"
+        },
+        {
+            "Rule_Id": "R-PRVDAY01-jcl-00002",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File (MMPRV.PROVIDER.MASTER.KSDS) contains provider records with varying Provider Screening Flag (PRV-SCREEN-FLAG) values",
+                "When": "The daily enrollment job extracts provider records from the Provider Master File for screening preparation",
+                "Then": "Only provider records where the Provider Screening Flag (PRV-SCREEN-FLAG) at position 23 is equal to 'U' (Unscreened) must be selected; all provider records where PRV-SCREEN-FLAG is any value other than 'U' must be excluded from the output"
+            },
+            "Rule_Name": "STEP020 - SORT - Filter Unscreened Providers from Provider Master File",
+            "Rule_Description": "Only providers who have not yet been screened (PRV-SCREEN-FLAG = 'U') are eligible to be selected from the Provider Master File for the screening process. All already-screened providers are excluded from further processing in this cycle.",
+            "Rule_Type": "Validation Rules"
+        },
+        {
+            "Rule_Id": "R-PRVDAY01-jcl-00003",
+            "Acceptance_Criteria": {
+                "Given": "A set of provider records has been filtered from the Provider Master File where PRV-SCREEN-FLAG = 'U' (Unscreened)",
+                "When": "The filtered unscreened provider records are prepared for the screening process",
+                "Then": "The selected provider records must be sorted in ascending order by NPI (National Provider Identifier), which occupies positions 1 through 10 of each provider record, and the sorted result must be passed forward to the next processing step"
+            },
+            "Rule_Name": "STEP020 - SORT - Order Unscreened Providers by NPI Ascending",
+            "Rule_Description": "All unscreened providers selected from the Provider Master File must be arranged in ascending order by their National Provider Identifier (NPI) before being passed to the screening step, ensuring orderly and sequential provider screening processing.",
+            "Rule_Type": "Process Rules"
+        },
+        {
+            "Rule_Id": "R-PRVDAY01-jcl-00004",
+            "Acceptance_Criteria": {
+                "Given": "Provider enrollment (STEP010) has completed successfully, the Provider Master File (MMPRV.PROVIDER.MASTER.KSDS) is available with enrolled provider records, and a new date-stamped Provider Screening Results File (MMPRV.SCREEN.RESULTS.D&DATE) is ready to be created for the current processing date",
+                "When": "The Provider Screening program (PRVSCR01) is executed and reads provider records from the Provider Master File to evaluate each provider against applicable screening criteria",
+                "Then": "The screening outcome for each evaluated provider is written as a fixed-length 67-byte record into the Provider Screening Results File; if screening completes successfully the results file is permanently catalogued and retained for compliance and reporting use; if screening fails the results file is deleted to prevent incomplete or partial screening data from being retained"
+            },
+            "Rule_Name": "STEP030 - PRVSCR01 - Provider Screening Evaluation",
+            "Rule_Description": "When provider enrollment completes successfully, the Provider Screening program (PRVSCR01) evaluates enrolled providers against screening criteria by reading from the Provider Master File and records each provider's screening outcome into a date-stamped Screening Results File. The results file is retained only if screening completes successfully; otherwise it is discarded.",
+            "Rule_Type": "Action Rules"
+        },
+        {
+            "Rule_Id": "R-PRVDAY01-jcl-00005",
+            "Acceptance_Criteria": {
+                "Given": "The daily provider enrollment step (STEP010) has completed successfully with Return Code = 0, and the Provider Master File (MMPRV.PROVIDER.MASTER.KSDS) is available and contains current enrolled provider records updated during the same daily batch run",
+                "When": "The Provider Risk Assessment program (PRVRSK01) is executed and reads each provider record from the Provider Master File to evaluate the provider against defined risk criteria",
+                "Then": "Each provider in the Provider Master File is assigned a risk level (Limited Risk, Moderate Risk, or High Risk) based on the risk evaluation outcome, and the assigned risk level is written back directly into the provider's record in the Provider Master File (MMPRV.PROVIDER.MASTER.KSDS), permanently updating the master record with the current risk classification"
+            },
+            "Rule_Name": "STEP040 - PRVRSK01 - Provider Risk Level Assessment and Assignment",
+            "Rule_Description": "When daily provider enrollment processing has completed successfully, the Provider Risk Assessment program (PRVRSK01) evaluates all enrolled providers in the Provider Master File and assigns an appropriate risk level (Limited, Moderate, or High) to each provider. This step executes exclusively within the successful enrollment conditional block, ensuring risk assessment is only performed on a valid and up-to-date Provider Master File.",
+            "Rule_Type": "Action Rules"
+        },
+        {
+            "Rule_Id": "R-PRVDAY01-jcl-00006",
+            "Acceptance_Criteria": {
+                "Given": "The daily provider enrollment job (PRVDAY01) has executed all applicable steps \u2014 Provider Enrollment (STEP010), Unscreened Provider Sort (STEP020), Provider Screening (STEP030), and Provider Risk Assessment (STEP040)",
+                "When": "All prior steps in the daily enrollment cycle have completed successfully with a return code of 0 (no errors in any step)",
+                "Then": "The daily enrollment cycle completion marker step (STEP099) executes, confirming that the full daily provider enrollment, screening, and risk assessment cycle has completed successfully and the job ends in a successful state; IF any prior step returned a return code greater than 0 (indicating an error in enrollment, screening preparation, screening, or risk assessment), THEN STEP099 is bypassed and the job ends in an error state, signaling that the daily enrollment cycle did not complete fully and requires operational review"
+            },
+            "Rule_Name": "STEP099 - IEFBR14 - Daily Enrollment Cycle Completion Validation",
+            "Rule_Description": "Determines whether the entire daily provider enrollment cycle \u2014 including enrollment, screening preparation, provider screening, and risk assessment \u2014 has completed fully and successfully. The job is marked as successfully completed only when all prior steps finish without any errors. If any step in the cycle encountered an error, the completion marker is bypassed and the job ends in an error state.",
+            "Rule_Type": "Decision Rules"
+        }
+    ],
+    "flow_diagram_code": "flowchart TD\n    classDef start fill:#ff6666,color:#fff\n    classDef process fill:#6699ff,color:#fff\n    classDef decision fill:#ffcc00,color:#000\n    classDef datasource fill:#66ff66,color:#000\n    classDef final fill:#ae74de,color:#fff\n    classDef success fill:#22c55e,color:#fff\n    classDef error fill:#ef4444,color:#fff\n\n    START([Job Start\nProvider Enrollment & Screening Batch]):::start\n\n    %% \u2500\u2500 Job Steps \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n    STEP010[STEP010 - PRVENR01\nProvider Enrollment Processing]:::process\n    STEP010_COND{STEP010 Return Code = 0?\nEnrollment Completed Successfully?}:::decision\n    STEP020[STEP020 - SORT Utility\nSort & Filter Unscreened Providers by NPI]:::process\n    STEP030[STEP030 - PRVSCR01\nProvider Screening Results Processing]:::process\n    STEP040[STEP040 - PRVRSK01\nProvider Risk Assessment Processing]:::process\n    STEP099_COND{Any Prior Step\nReturn Code Greater Than 0?}:::decision\n    STEP099[STEP099 - IEFBR14\nEnd-of-Job Finalization]:::process\n\n    %% \u2500\u2500 Datasources \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n    APP_INPUT[(APP-INPUT-FILE\nProvider Application Input File)]:::datasource\n    PRV_MASTER[(MMPRV.PROVIDER.MASTER.KSDS\nProvider Master File)]:::datasource\n    APP_ERROR[(APP-ERROR-FILE\nProvider Application Error File)]:::datasource\n    SCREEN_OUT[(SCREEN-OUT-FILE\nProvider Screening Results File)]:::datasource\n\n    %% \u2500\u2500 End Nodes \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n    END_SUCCESS([Job End\nAll Steps Completed Successfully]):::success\n    END_ERROR([Job End\nProcessing Errors Detected - Operational Review Required]):::error\n\n    %% \u2500\u2500 Main Flow \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n    START --> STEP010\n\n    %% STEP010 Data Interactions\n    APP_INPUT -.->|Read: New Provider Enrollment Applications| STEP010\n    PRV_MASTER -.->|Read & Update: Enroll Valid Providers into Master File| STEP010\n    STEP010 -.->|Write: Rejected or Failed Applications| APP_ERROR\n\n    %% STEP010 Condition Check\n    STEP010 --> STEP010_COND\n    STEP010_COND -->|Yes - Enrollment Successful\nProceed to Screening Preparation| STEP020\n    STEP010_COND -->|No - Enrollment Failed\nHalt All Further Processing| END_ERROR\n\n    %% STEP020 Data Interactions\n    PRV_MASTER -.->|Read: Extract Providers with Screening Flag = U\nUnscreened Providers Only - Sorted by NPI| STEP020\n\n    %% STEP020 to STEP030\n    STEP020 --> STEP030\n\n    %% STEP030 Data Interactions\n    PRV_MASTER -.->|Read: Retrieve Provider Details\nfor Screening Evaluation| STEP030\n    STEP030 -.->|Write: Provider Screening Outcomes\nApproved / Rejected / Pending Review| SCREEN_OUT\n\n    %% STEP030 to STEP040\n    STEP030 --> STEP040\n\n    %% STEP040 Data Interactions\n    PRV_MASTER -.->|Read & Update: Assign Provider Risk Levels\nLimited / Moderate / High Risk| STEP040\n\n    %% STEP040 to STEP099 Condition\n    STEP040 --> STEP099_COND\n    STEP099_COND -->|Yes - Errors Detected in Prior Steps\nBypass Finalization| END_ERROR\n    STEP099_COND -->|No - All Steps Successful\nProceed to Finalization| STEP099\n\n    STEP099 --> END_SUCCESS"
+}

@@ -1,0 +1,6 @@
+2026-11-17 11:23:20,175 [main] INFO : Starting homonyms analysis
+2026-11-17 11:23:20,177 [main] INFO : Homonyms analysis started at: 11:23:20 (version 20260724160607)
+2026-11-17 11:23:20,223 [main] INFO : Analysis successful, finished at: 11:23:20
+2026-11-17 11:23:20,224 [main] INFO : 22 files processed
+2026-11-17 11:23:20,224 [main] INFO : Global duration: 0 sec
+2026-11-17 11:23:20,224 [main] INFO : Homonyms found: 0

@@ -1,0 +1,1487 @@
+{
+    "name": "PRVTMS01.cbl",
+    "program_name": "PRVTMS01.cbl",
+    "generated_at": "2026-11-17T12:41:27Z",
+    "overview": {
+        "total_key_functionalities": 15,
+        "total_rules": 55,
+        "main_flow_diagram": "flowchart TD\n    A([Start: Monthly T-MSIS Provider Extract]):::start\n    B[1: Program Initialization - Capture current date as Julian format YYDDD as submission period identifier]:::process\n    C[2: Julian Date Decomposition - Break down Julian date into Year YY and Day-of-Year DDD components]:::process\n    D[3: Provider Master File Sequential Read - Read next provider record from Provider Master file]:::process\n    E{All Records Processed?}:::decision\n    F[14: Extraction Summary Reporting - Display total provider rows written to T-MSIS submission file]:::process\n    G[15: File Closure and Process Completion - Close Provider Master and T-MSIS output files]:::process\n    H([End: Monthly Provider Extract Complete]):::final\n    I{4: Active Provider Filtering - Is provider status Active?}:::decision\n    J[Skip Inactive Provider - Return to read next record]:::process\n    K[5: Enrollment Date Future-Year Validation - Extract 2-digit year from enrollment date and compare to current year]:::process\n    L{Enrollment Year greater than Current Year?}:::decision\n    M[6: Future Enrollment Alert - Display warning message with NPI flagging potential data quality issue]:::process\n    N[7: Provider Medicaid ID Mapping - Copy Medicaid ID into T-MSIS output record]:::process\n    O[8: Provider NPI Mapping - Copy NPI into T-MSIS output record]:::process\n    P[9: Provider Active Status Assignment - Set status field to A Active in T-MSIS output record]:::process\n    Q[10: Submission Period Assignment - Populate reporting period field with today's Julian date YYDDD]:::process\n    R[11: T-MSIS Record Formatting - Assemble complete T-MSIS record with type PRV01 provider ID NPI status and period]:::process\n    S[12: T-MSIS Output Record Writing - Write formatted provider record to T-MSIS Provider Submission output file]:::process\n    T[13: Extracted Record Count Tracking - Increment running counter for successfully written records]:::process\n\n    PRV_MASTER[(PRV-MASTER-FILE: VSAM Indexed Provider Master File)]:::datasource\n    TMSIS_OUT[(TMSIS-OUT-FILE: Sequential T-MSIS Output File)]:::datasource\n\n    A --> B\n    B --> C\n    C --> D\n    PRV_MASTER -.->|Read Provider Record| D\n    D --> E\n    E -->|Yes - End of File| F\n    E -->|No - Record Available| I\n    I -->|No - Inactive| J\n    J --> D\n    I -->|Yes - Active| K\n    K --> L\n    L -->|Yes - Future Year Detected| M\n    M --> N\n    L -->|No - Valid Year| N\n    N --> O\n    O --> P\n    P --> Q\n    Q --> R\n    R --> S\n    S -.->|Write Provider Record| TMSIS_OUT\n    S --> T\n    T --> D\n    F --> G\n    G --> H\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313",
+        "rules": [
+            {
+                "rule_id": "R-PRVTMS01-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "Program Initialization - Capture Current Date as Submission Period",
+                "rule_description": "At the start of the monthly T-MSIS Provider Extract process, the system captures today's date in Julian format (YYDDD) to be used as the submission period identifier throughout the extract run.",
+                "sub_graph_node_text": "1: Program Initialization - Capture current date as Julian format YYDDD as submission period identifier",
+                "acceptance_criteria": {
+                    "Given": "The monthly T-MSIS Provider Extract process is initiated",
+                    "When": "The program starts execution",
+                    "Then": "Today's date is captured in Julian format (YYDDD) and stored as the submission period identifier to be used for all provider records written during this extract run"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00002",
+                "rule_type": "Computation Rules",
+                "rule_name": "Julian Date Decomposition into Year and Day Components",
+                "rule_description": "The captured Julian date (YYDDD) is decomposed into two separate components: a 2-digit year (YY) and a 3-digit day-of-year (DDD), which are used independently in downstream validation and output population steps.",
+                "sub_graph_node_text": "2: Julian Date Decomposition - Break down Julian date into Year YY and Day-of-Year DDD components",
+                "acceptance_criteria": {
+                    "Given": "Today's date has been captured in Julian format (YYDDD)",
+                    "When": "The Julian date is decomposed",
+                    "Then": "The first 2 characters of the Julian date are extracted and stored as the current 2-digit year (YY), and the remaining 3 characters are extracted and stored as the current day-of-year (DDD)"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00003",
+                "rule_type": "Process Rules",
+                "rule_name": "Sequential Read of Provider Master File",
+                "rule_description": "The system reads provider records one at a time sequentially from the Provider Master File. This process continues in a loop until all records have been processed or the end of the file is reached.",
+                "sub_graph_node_text": "3: Provider Master File Sequential Read - Read next provider record from Provider Master file",
+                "acceptance_criteria": {
+                    "Given": "The Provider Master File is open and available for reading",
+                    "When": "The system requests the next provider record",
+                    "Then": "The next sequential provider record is retrieved from the Provider Master File for processing; if no more records exist, the end-of-file condition is set to true and the extraction loop terminates"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00004",
+                "rule_type": "Decision Rules",
+                "rule_name": "Active Provider Filtering - Exclude Inactive Providers",
+                "rule_description": "Only providers whose status is marked as Active in the Provider Master File are eligible for inclusion in the T-MSIS submission. Providers with any other status are skipped and not written to the output file.",
+                "sub_graph_node_text": "4: Active Provider Filtering - Is provider status Active?",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been read from the Provider Master File",
+                    "When": "The provider's active status flag is evaluated",
+                    "Then": "If the provider is marked as Active, the record proceeds to enrollment date validation and T-MSIS output processing; if the provider is not Active (inactive), the record is skipped entirely and the system reads the next provider record without writing any output"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00005",
+                "rule_type": "Validation Rules",
+                "rule_name": "Enrollment Date Future-Year Validation",
+                "rule_description": "For each active provider, the 2-digit year portion of the provider's enrollment effective date is extracted and compared against the current 2-digit year to detect potential future-dated enrollment records that may indicate a data quality issue.",
+                "sub_graph_node_text": "5: Enrollment Date Future-Year Validation - Extract 2-digit year from enrollment date and compare to current year",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been identified as Active",
+                    "When": "The enrollment effective date is evaluated",
+                    "Then": "The 2-digit year is extracted from positions 3 and 4 of the provider's enrollment effective date field and compared to the current 2-digit year (YY) captured at program initialization"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00006",
+                "rule_type": "Validation Rules",
+                "rule_name": "Future Enrollment Year Alert - Data Quality Warning",
+                "rule_description": "When an active provider's enrollment effective year is greater than the current year, a data quality warning is raised identifying the provider by their NPI. The warning does not prevent the record from being written to the T-MSIS output file.",
+                "sub_graph_node_text": "6: Future Enrollment Alert - Display warning message with NPI flagging potential data quality issue",
+                "acceptance_criteria": {
+                    "Given": "An active provider's enrollment effective year has been extracted and compared to the current year",
+                    "When": "The enrollment effective year is greater than the current 2-digit year",
+                    "Then": "A warning message 'PRVTMS01: FUTURE ENROLLMENT? NPI [provider NPI]' is displayed to flag the potential data quality issue, and processing continues \u2014 the provider record is still written to the T-MSIS output file"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00007",
+                "rule_type": "Definitional Rules",
+                "rule_name": "Provider Medicaid ID Mapping to T-MSIS Output Record",
+                "rule_description": "The provider's Medicaid ID from the Provider Master File is mapped directly into the Provider ID field of the T-MSIS output record.",
+                "sub_graph_node_text": "7: Provider Medicaid ID Mapping - Copy Medicaid ID into T-MSIS output record",
+                "acceptance_criteria": {
+                    "Given": "An active provider record is being prepared for T-MSIS output",
+                    "When": "The Provider ID field of the T-MSIS output record is populated",
+                    "Then": "The Medicaid ID value from the Provider Master File record is copied exactly into the Provider ID field of the T-MSIS output record"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00008",
+                "rule_type": "Definitional Rules",
+                "rule_name": "Provider NPI Mapping to T-MSIS Output Record",
+                "rule_description": "The provider's National Provider Identifier (NPI) from the Provider Master File is mapped directly into the NPI field of the T-MSIS output record.",
+                "sub_graph_node_text": "8: Provider NPI Mapping - Copy NPI into T-MSIS output record",
+                "acceptance_criteria": {
+                    "Given": "An active provider record is being prepared for T-MSIS output",
+                    "When": "The NPI field of the T-MSIS output record is populated",
+                    "Then": "The NPI value from the Provider Master File record is copied exactly into the NPI field of the T-MSIS output record"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00009",
+                "rule_type": "Policy Rules",
+                "rule_name": "Provider Active Status Assignment in T-MSIS Output",
+                "rule_description": "All providers written to the T-MSIS output file are assigned a status of 'A' (Active), reflecting that only active providers are included in the T-MSIS submission.",
+                "sub_graph_node_text": "9: Provider Active Status Assignment - Set status field to A Active in T-MSIS output record",
+                "acceptance_criteria": {
+                    "Given": "An active provider record is being prepared for T-MSIS output",
+                    "When": "The status field of the T-MSIS output record is populated",
+                    "Then": "The status field in the T-MSIS output record is set to the fixed value 'A', representing Active status"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00010",
+                "rule_type": "Process Rules",
+                "rule_name": "Submission Period Assignment Using Today's Julian Date",
+                "rule_description": "The reporting period field in the T-MSIS output record is populated with today's Julian date (YYDDD), ensuring each provider record is associated with the correct submission period for the extract run.",
+                "sub_graph_node_text": "10: Submission Period Assignment - Populate reporting period field with today's Julian date YYDDD",
+                "acceptance_criteria": {
+                    "Given": "An active provider record is being prepared for T-MSIS output",
+                    "When": "The reporting period field of the T-MSIS output record is populated",
+                    "Then": "Today's Julian date (YYDDD), captured at program initialization, is copied into the reporting period field of the T-MSIS output record"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00011",
+                "rule_type": "Process Rules",
+                "rule_name": "T-MSIS Provider Record Assembly and Formatting",
+                "rule_description": "All individually mapped fields \u2014 Provider ID (Medicaid ID), NPI, Active Status ('A'), and Reporting Period (Julian date) \u2014 are assembled together into a complete, formatted T-MSIS provider output record ready for writing.",
+                "sub_graph_node_text": "11: T-MSIS Record Formatting - Assemble complete T-MSIS record with type PRV01 provider ID NPI status and period",
+                "acceptance_criteria": {
+                    "Given": "All individual T-MSIS output fields have been populated for an active provider",
+                    "When": "The complete T-MSIS record is assembled",
+                    "Then": "The fully populated T-MSIS detail record \u2014 containing Provider ID, NPI, Status 'A', and Reporting Period \u2014 is assembled into the T-MSIS output record structure ready for writing to the output file"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00012",
+                "rule_type": "Process Rules",
+                "rule_name": "T-MSIS Output Record Writing to Submission File",
+                "rule_description": "The fully assembled and formatted T-MSIS provider record is written to the T-MSIS Provider Submission output file.",
+                "sub_graph_node_text": "12: T-MSIS Output Record Writing - Write formatted provider record to T-MSIS Provider Submission output file",
+                "acceptance_criteria": {
+                    "Given": "A complete T-MSIS provider record has been assembled with all required fields",
+                    "When": "The record is submitted to the T-MSIS output file",
+                    "Then": "The formatted T-MSIS provider record is written as a new record to the T-MSIS Provider Submission output file"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00013",
+                "rule_type": "Computation Rules",
+                "rule_name": "Extracted Record Count Tracking",
+                "rule_description": "Each time a provider record is successfully written to the T-MSIS output file, a running counter is incremented by 1 to track the total number of provider records included in the submission.",
+                "sub_graph_node_text": "13: Extracted Record Count Tracking - Increment running counter for successfully written records",
+                "acceptance_criteria": {
+                    "Given": "A T-MSIS provider record has been successfully written to the output file",
+                    "When": "The record write operation completes",
+                    "Then": "The running total count of successfully written T-MSIS provider records is incremented by 1"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00014",
+                "rule_type": "Process Rules",
+                "rule_name": "Extraction Summary Reporting at Process Completion",
+                "rule_description": "Upon completion of all record processing, the system displays a summary message showing the total number of provider rows written to the T-MSIS submission file during the extract run.",
+                "sub_graph_node_text": "14: Extraction Summary Reporting - Display total provider rows written to T-MSIS submission file",
+                "acceptance_criteria": {
+                    "Given": "All records in the Provider Master File have been processed and the end-of-file condition has been reached",
+                    "When": "The extraction loop terminates",
+                    "Then": "A summary message 'PRVTMS01: T-MSIS PROVIDER ROWS= [count]' is displayed, reporting the total number of provider records successfully written to the T-MSIS output file"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVTMS01-cbl-00015",
+                "rule_type": "Process Rules",
+                "rule_name": "File Closure and Process Completion",
+                "rule_description": "After the extraction summary is reported, both the Provider Master File and the T-MSIS output file are closed, and the monthly T-MSIS Provider Extract process is completed.",
+                "sub_graph_node_text": "15: File Closure and Process Completion - Close Provider Master and T-MSIS output files",
+                "acceptance_criteria": {
+                    "Given": "The extraction summary has been displayed and all provider records have been processed",
+                    "When": "The program finalizes",
+                    "Then": "The Provider Master File and the T-MSIS Provider Submission output file are both closed, and the monthly T-MSIS Provider Extract process terminates successfully"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "program-initialization",
+            "title": "Program Initialization",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Program Initialization])\n    B[Identify Program as Monthly T-MSIS Provider Extract - PRVTMS01]\n    C[Retrieve Today's Date from System Calendar]\n    D[Store Date in Julian Format YYDDD\\n2-digit Year followed by 3-digit Day-of-Year]\n    E[Julian Date is now available as the\\nT-MSIS Submission Period Identifier]\n    F([Initialization Complete])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00016",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Identify Program as Monthly T-MSIS Provider Extract",
+                    "rule_description": "The system identifies itself as the monthly T-MSIS Provider Extract program (PRVTMS01) at the start of execution to establish the processing context for all subsequent operations.",
+                    "sub_graph_node_text": "Identify Program as Monthly T-MSIS Provider Extract - PRVTMS01",
+                    "acceptance_criteria": {
+                        "Given": "The T-MSIS Provider Extract process is being initiated",
+                        "When": "The program begins execution",
+                        "Then": "The program must register its identity as 'PRVTMS01' \u2014 the monthly T-MSIS Provider Extract \u2014 so that all processing, logging, and output can be attributed to this specific extract program"
+                    },
+                    "key_functionality_id": "program-initialization"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00017",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Retrieve Today's Date from System Calendar",
+                    "rule_description": "The system retrieves the current date from the system calendar at program startup to establish the reference date for the T-MSIS submission period.",
+                    "sub_graph_node_text": "Retrieve Today's Date from System Calendar",
+                    "acceptance_criteria": {
+                        "Given": "The T-MSIS Provider Extract program (PRVTMS01) has been identified and is initializing",
+                        "When": "The program requests the current date from the system calendar",
+                        "Then": "Today's date must be retrieved from the system calendar in Julian format (YYDDD) and stored internally for use throughout the extract process"
+                    },
+                    "key_functionality_id": "program-initialization"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00018",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Store Date in Julian Format YYDDD",
+                    "rule_description": "The system captures and stores today's date in Julian format, separating the 2-digit year and the 3-digit day-of-year components, to be used as the T-MSIS submission period identifier.",
+                    "sub_graph_node_text": "Store Date in Julian Format YYDDD\n2-digit Year followed by 3-digit Day-of-Year",
+                    "acceptance_criteria": {
+                        "Given": "Today's date has been retrieved from the system calendar in Julian format (YYDDD)",
+                        "When": "The date is parsed and stored",
+                        "Then": "The date must be stored as a 5-character Julian date where: the first 2 characters represent the 2-digit year (YY) stored as the current year identifier, and the last 3 characters represent the day-of-year (DDD) stored as the current day identifier \u2014 both components must be individually accessible for downstream comparisons and output"
+                    },
+                    "key_functionality_id": "program-initialization"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00019",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Julian Date Designated as T-MSIS Submission Period Identifier",
+                    "rule_description": "The full Julian date (YYDDD) captured at program startup is designated as the T-MSIS Submission Period Identifier and must be stamped on every provider record written to the T-MSIS output file.",
+                    "sub_graph_node_text": "Julian Date is now available as the\nT-MSIS Submission Period Identifier",
+                    "acceptance_criteria": {
+                        "Given": "Today's date has been successfully captured and stored in Julian format (YYDDD) with the 2-digit year and 3-digit day-of-year components",
+                        "When": "The T-MSIS Provider Extract process prepares output records",
+                        "Then": "The full 5-character Julian date (YYDDD) must be used as the T-MSIS Submission Period Identifier and must be populated in the reporting period field of every T-MSIS provider output record produced during this execution"
+                    },
+                    "key_functionality_id": "program-initialization"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Program Initialization"
+        },
+        {
+            "id": "julian-date-decomposition",
+            "title": "Julian Date Decomposition",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Julian Date Decomposition])\n    B[Receive Today's Julian Date in YYDDD format\\ne.g. 25143 = Year 25, Day 143]\n    C[Extract First 2 Characters from Julian Date\\nas Current Year Component YY\\ne.g. 25]\n    D[Extract Last 3 Characters from Julian Date\\nas Current Day-of-Year Component DDD\\ne.g. 143]\n    E[(Store Current Year YY\\nfor Enrollment Year Comparison)]\n    F[(Store Current Day-of-Year DDD\\nfor Enrollment Age Validation)]\n    G([End: Year and Day Components Ready\\nfor Enrollment Validation])\n\n    A --> B\n    B --> C\n    B --> D\n    C --> E\n    D --> F\n    E --> G\n    F --> G",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00020",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Capture Today's Date in Julian Format for Enrollment Validation",
+                    "rule_description": "The system obtains today's date in Julian format (YYDDD), where the first two digits represent the 2-digit year and the last three digits represent the day-of-year. This date is used as the reference point for all subsequent enrollment date validations.",
+                    "sub_graph_node_text": "Receive Today's Julian Date in YYDDD format\ne.g. 25143 = Year 25, Day 143",
+                    "acceptance_criteria": {
+                        "Given": "The T-MSIS Provider extract process (PRVTMS01) is initiated",
+                        "When": "The system retrieves the current date from the operating environment",
+                        "Then": "Today's date is captured and stored in Julian format (YYDDD), where the 5-character value represents a 2-digit year followed by a 3-digit day-of-year (e.g., 25143 = Year 25, Day 143), and this value is made available for enrollment year and day-of-year comparisons"
+                    },
+                    "key_functionality_id": "julian-date-decomposition"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00021",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Extract Current Year Component from Julian Date",
+                    "rule_description": "The system isolates the 2-digit year portion from the 5-character Julian date by reading the first two characters. This current year value is stored separately and used to detect future enrollment effective dates on provider records.",
+                    "sub_graph_node_text": "Extract First 2 Characters from Julian Date\nas Current Year Component YY\ne.g. 25",
+                    "acceptance_criteria": {
+                        "Given": "Today's date has been captured in Julian format (YYDDD) as a 5-character value",
+                        "When": "The system decomposes the Julian date",
+                        "Then": "The first 2 characters (positions 1\u20132) of the Julian date are extracted and stored as the Current Year (YY) component (e.g., from '25143', the value '25' is stored as the current year for use in enrollment year comparison)"
+                    },
+                    "key_functionality_id": "julian-date-decomposition"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00022",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Extract Current Day-of-Year Component from Julian Date",
+                    "rule_description": "The system isolates the 3-digit day-of-year portion from the 5-character Julian date by reading the last three characters. This day-of-year value is stored separately and is available for enrollment age or period-based validations.",
+                    "sub_graph_node_text": "Extract Last 3 Characters from Julian Date\nas Current Day-of-Year Component DDD\ne.g. 143",
+                    "acceptance_criteria": {
+                        "Given": "Today's date has been captured in Julian format (YYDDD) as a 5-character value",
+                        "When": "The system decomposes the Julian date",
+                        "Then": "The last 3 characters (positions 3\u20135) of the Julian date are extracted and stored as the Current Day-of-Year (DDD) component (e.g., from '25143', the value '143' is stored as the current day-of-year for use in enrollment period validation)"
+                    },
+                    "key_functionality_id": "julian-date-decomposition"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00023",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Store Current Year for Provider Enrollment Year Comparison",
+                    "rule_description": "The extracted 2-digit current year (YY) is retained in the system's working storage so that it can be compared against the enrollment effective year on each active provider record to identify future-dated enrollments.",
+                    "sub_graph_node_text": "Store Current Year YY\nfor Enrollment Year Comparison",
+                    "acceptance_criteria": {
+                        "Given": "The 2-digit current year (YY) has been extracted from today's Julian date",
+                        "When": "The system stores the current year component",
+                        "Then": "The 2-digit current year value (YY) is stored and remains available throughout the entire provider record processing loop, so that each active provider's enrollment effective year can be compared against it to detect future enrollment dates"
+                    },
+                    "key_functionality_id": "julian-date-decomposition"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00024",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Store Current Day-of-Year for Enrollment Period Stamping",
+                    "rule_description": "The extracted 3-digit day-of-year (DDD) is retained in the system's working storage. Together with the current year (YY), the full Julian date (YYDDD) is used to stamp the reporting period on every T-MSIS provider output record.",
+                    "sub_graph_node_text": "Store Current Day-of-Year DDD\nfor Enrollment Age Validation",
+                    "acceptance_criteria": {
+                        "Given": "The 3-digit current day-of-year (DDD) has been extracted from today's Julian date",
+                        "When": "The system stores the day-of-year component",
+                        "Then": "The 3-digit day-of-year value (DDD) is stored and remains available throughout the entire provider record processing loop, so that the full Julian date (YYDDD) can be used to populate the Reporting Period field on each T-MSIS output record written"
+                    },
+                    "key_functionality_id": "julian-date-decomposition"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Julian Date Decomposition"
+        },
+        {
+            "id": "provider-master-file-sequential-read",
+            "title": "Provider Master File Sequential Read",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Provider Master File Sequential Read])\n    B[Initialize End-of-File Flag to Not Reached]\n    C[Read Next Provider Record from Provider Master File]\n    D{End of File Reached?}\n    E[Mark All Records as Processed - Set End-of-File Flag]\n    F[Provider Record Available for Processing]\n    G([All Provider Records Processed - Exit Read Loop])\n\n    A --> B\n    B --> C\n    C --> D\n    D -->|Yes - No More Records| E\n    E --> G\n    D -->|No - Record Retrieved| F\n    F -->|Continue Reading| C",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00025",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Initialize Provider File Processing State",
+                    "rule_description": "Before reading any provider records, the system must initialize the processing state to indicate that records are still available for processing.",
+                    "sub_graph_node_text": "Initialize End-of-File Flag to Not Reached",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File sequential read process is about to begin",
+                        "When": "The system initializes the Provider Master File read loop",
+                        "Then": "The End-of-File flag is set to 'N' (Not Reached), indicating that provider records are available and processing should continue"
+                    },
+                    "key_functionality_id": "provider-master-file-sequential-read"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00026",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Read Next Provider Record Sequentially",
+                    "rule_description": "The system must read provider records one at a time in sequential order from the Provider Master File to ensure every provider record is evaluated for T-MSIS reporting.",
+                    "sub_graph_node_text": "Read Next Provider Record from Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File is open for input and the End-of-File flag is set to 'Not Reached'",
+                        "When": "The system requests the next record from the Provider Master File",
+                        "Then": "The next sequential provider record is retrieved from the Provider Master File and made available for processing"
+                    },
+                    "key_functionality_id": "provider-master-file-sequential-read"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00027",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Detect End of Provider Master File",
+                    "rule_description": "After each read attempt from the Provider Master File, the system must check whether all records have been processed to determine if the read loop should continue or terminate.",
+                    "sub_graph_node_text": "End of File Reached?",
+                    "acceptance_criteria": {
+                        "Given": "A read attempt has been made on the Provider Master File",
+                        "When": "The system evaluates the file status returned after the read operation",
+                        "Then": "If the file status indicates End-of-File (no more records exist), the system marks all records as processed and exits the read loop; if the file status indicates a record was successfully retrieved, the provider record is made available for further processing and the loop continues"
+                    },
+                    "key_functionality_id": "provider-master-file-sequential-read"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00028",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Mark All Provider Records as Processed",
+                    "rule_description": "When no more provider records exist in the Provider Master File, the system must formally mark the processing as complete to stop further read attempts.",
+                    "sub_graph_node_text": "Mark All Records as Processed - Set End-of-File Flag",
+                    "acceptance_criteria": {
+                        "Given": "A read attempt on the Provider Master File has returned an End-of-File condition",
+                        "When": "The system detects that no more provider records are available",
+                        "Then": "The End-of-File flag is set to TRUE, signaling that all provider records have been processed and the sequential read loop should terminate"
+                    },
+                    "key_functionality_id": "provider-master-file-sequential-read"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00029",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Continue Processing Available Provider Record",
+                    "rule_description": "When a provider record is successfully retrieved from the Provider Master File, it must be passed forward for business evaluation and potential inclusion in the T-MSIS output.",
+                    "sub_graph_node_text": "Provider Record Available for Processing",
+                    "acceptance_criteria": {
+                        "Given": "A read attempt on the Provider Master File has successfully retrieved a provider record",
+                        "When": "The system confirms the record is available (no End-of-File condition)",
+                        "Then": "The retrieved provider record is made available for downstream business processing, and the system loops back to read the next record after processing is complete"
+                    },
+                    "key_functionality_id": "provider-master-file-sequential-read"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Master File Sequential Read"
+        },
+        {
+            "id": "active-provider-filtering",
+            "title": "Active Provider Filtering",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Evaluate Provider Record])\n    B{Is Provider Status marked as Active?}\n    C[Select Provider Record for T-MSIS Extraction]\n    D[Skip Provider Record - No further action taken]\n    E([End: Return to Read Next Provider Record])\n\n    A --> B\n    B -->|Yes - Active Provider| C\n    B -->|No - Inactive Provider| D\n    C --> E\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00030",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Active Provider Selection for T-MSIS Extraction",
+                    "rule_description": "Determines whether a provider record from the Provider Master File should be included in the T-MSIS extract based on the provider's active status. Only providers with an Active status are selected for further processing and output; all others are skipped.",
+                    "sub_graph_node_text": "Is Provider Status marked as Active?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File",
+                        "When": "The provider's status in the Provider Master File is evaluated",
+                        "Then": "If the provider status is marked as Active, the provider record is selected and processed for T-MSIS extraction; if the provider status is not marked as Active, the provider record is skipped and no further action is taken for that record"
+                    },
+                    "key_functionality_id": "active-provider-filtering"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00031",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Include Active Provider in T-MSIS Output",
+                    "rule_description": "When a provider record is confirmed as Active, it is forwarded to the T-MSIS output writing process. This ensures that only Active providers contribute to the T-MSIS provider extract file.",
+                    "sub_graph_node_text": "Select Provider Record for T-MSIS Extraction",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and its status has been evaluated",
+                        "When": "The provider's status is confirmed as Active",
+                        "Then": "The provider record is selected and passed to the T-MSIS row writing process, where it will be written to the T-MSIS output file and counted toward the total output record count"
+                    },
+                    "key_functionality_id": "active-provider-filtering"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00032",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Exclude Inactive Provider from T-MSIS Output",
+                    "rule_description": "When a provider record is identified as not Active, it is entirely excluded from the T-MSIS extract. No output record is created, no warning is issued, and the record count is not incremented for inactive providers.",
+                    "sub_graph_node_text": "Skip Provider Record - No further action taken",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and its status has been evaluated",
+                        "When": "The provider's status is not marked as Active",
+                        "Then": "The provider record is skipped entirely \u2014 no T-MSIS output record is created, no warning message is generated, and the output record counter is not incremented; processing continues with the next provider record"
+                    },
+                    "key_functionality_id": "active-provider-filtering"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Active Provider Filtering"
+        },
+        {
+            "id": "enrollment-date-future",
+            "title": "Enrollment Date Future",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Enrollment Date Future-Year Validation])\n    B[Extract 2-digit Year from Provider's Effective Enrollment Date\\n Position 3 and 4 of Effective Date field]\n    C[Retrieve Current Year\\n 2-digit Year captured at Program Start]\n    D{Is Provider Enrollment Year\\ngreater than Current Year?}\n    E[Flag Provider Record as\\nPotential Future Enrollment]\n    F[6: Trigger Future Enrollment Alert\\nDisplay Warning with Provider NPI]\n    G[Proceed to Provider\\nData Mapping]\n    H([End: Enrollment Date Validation Complete])\n\n    A --> B\n    B --> C\n    C --> D\n    D -->|Yes - Enrollment Year is in the Future| E\n    E --> F\n    F --> G\n    D -->|No - Enrollment Year is Valid| G\n    G --> H",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00033",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Extract Enrollment Year from Provider Effective Date",
+                    "rule_description": "The system extracts the 2-digit year component from the provider's enrollment effective date field to enable comparison against the current year for future-enrollment detection.",
+                    "sub_graph_node_text": "Extract 2-digit Year from Provider's Effective Enrollment Date Position 3 and 4 of Effective Date field",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been read from the Provider Master File and contains a valid Effective Enrollment Date field",
+                        "When": "The system processes the provider record for T-MSIS output",
+                        "Then": "The system extracts characters at positions 3 and 4 of the Provider Effective Enrollment Date field as the 2-digit enrollment year (WS-ENROLL-YY) for use in the future-year validation"
+                    },
+                    "key_functionality_id": "enrollment-date-future"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00034",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Retrieve Current Year for Enrollment Validation",
+                    "rule_description": "The system uses the 2-digit current year that was captured from the system Julian date at program startup as the reference year for validating provider enrollment dates.",
+                    "sub_graph_node_text": "Retrieve Current Year 2-digit Year captured at Program Start",
+                    "acceptance_criteria": {
+                        "Given": "The program has started and accepted today's Julian date (YYDDD format) from the system",
+                        "When": "The enrollment year validation is performed for an active provider record",
+                        "Then": "The system uses the 2-digit year (WS-TODAY-YY) extracted from positions 1 and 2 of today's Julian date as the reference current year for comparison against the provider's enrollment year"
+                    },
+                    "key_functionality_id": "enrollment-date-future"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00035",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Detect Future Enrollment Year",
+                    "rule_description": "The system compares the provider's enrollment effective year against the current year to identify providers whose enrollment year appears to be dated in the future, which may indicate a data quality issue.",
+                    "sub_graph_node_text": "Is Provider Enrollment Year greater than Current Year?",
+                    "acceptance_criteria": {
+                        "Given": "The 2-digit enrollment year (WS-ENROLL-YY) has been extracted from the provider's Effective Enrollment Date, and the 2-digit current year (WS-TODAY-YY) is available from the system date captured at program start",
+                        "When": "The system evaluates whether the provider's enrollment year is greater than the current year",
+                        "Then": "If the provider's enrollment year (WS-ENROLL-YY) is strictly greater than the current year (WS-TODAY-YY), the provider record is identified as a potential future enrollment and a warning alert is triggered; otherwise, the record proceeds directly to provider data mapping without any warning"
+                    },
+                    "key_functionality_id": "enrollment-date-future"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00036",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Trigger Future Enrollment Warning Alert",
+                    "rule_description": "When a provider's enrollment year is detected as being in the future, the system issues a warning message identifying the specific provider by their National Provider Identifier (NPI) to alert business users of a potential data quality issue.",
+                    "sub_graph_node_text": "6: Trigger Future Enrollment Alert Display Warning with Provider NPI",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been evaluated and its enrollment effective year (WS-ENROLL-YY) is greater than the current year (WS-TODAY-YY)",
+                        "When": "The future enrollment condition is confirmed",
+                        "Then": "The system displays the warning message 'PRVTMS01: FUTURE ENROLLMENT? NPI' followed by the provider's NPI (PRV-NPI) from the Provider Master Record to identify the specific provider with the suspect enrollment date; the provider record continues to be processed and written to the T-MSIS output file regardless of this warning"
+                    },
+                    "key_functionality_id": "enrollment-date-future"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Enrollment Date Future"
+        },
+        {
+            "id": "future-enrollment-alert",
+            "title": "Future Enrollment Alert",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter: Future Enrollment Year Check])\n    B[Extract 2-digit Year from Provider's Enrollment Effective Date]\n    C{Is Provider Enrollment Year\\ngreater than Current Year?}\n    D[/_\u26a0\ufe0f Display Warning Message:\\n'FUTURE ENROLLMENT? NPI: [Provider NPI]'\\nFlag as Potential Data Quality Issue_/]\n    E([Exit: Continue to Provider Record Mapping])\n\n    A --> B\n    B --> C\n    C -->|Yes - Enrollment Year is in the Future| D\n    D --> E\n    C -->|No - Enrollment Year is Valid| E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00037",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "Provider Future Enrollment Year Detection",
+                    "rule_description": "When processing an active provider record for T-MSIS reporting, the system checks whether the provider's enrollment effective year is greater than the current year. If so, a warning message is displayed identifying the provider's NPI as a potential data quality issue. Processing continues regardless of the outcome.",
+                    "sub_graph_node_text": "Is Provider Enrollment Year greater than Current Year?",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been selected from the Provider Master File, and the current 2-digit year has been derived from today's Julian date",
+                        "When": "The 2-digit year extracted from positions 3-4 of the provider's Enrollment Effective Date is compared against the current 2-digit year",
+                        "Then": "If the provider's enrollment effective year is greater than the current year, a warning message is displayed in the format 'PRVTMS01: FUTURE ENROLLMENT? NPI [Provider NPI]' to flag the record as a potential data quality issue; if the enrollment effective year is less than or equal to the current year, no warning is issued; in both cases, processing continues to write the provider record to the T-MSIS output file"
+                    },
+                    "key_functionality_id": "future-enrollment-alert"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Future Enrollment Alert"
+        },
+        {
+            "id": "provider-medicaid-id-mapping",
+            "title": "Provider Medicaid ID Mapping",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Medicaid ID Mapping])\n    B[Retrieve Medicaid ID from Provider Master Record]\n    C[Copy Medicaid ID into T-MSIS Output Record as Provider Identifier Field]\n    D([End: Provider Identifier Field Populated])\n\n    PRV_MASTER[(PRV-MASTER-FILE: Provider Master Record)]\n    TMSIS_OUT[(TMSIS-OUT-FILE: T-MSIS Output Record)]\n\n    A --> B\n    PRV_MASTER -.->|Source: Provider Medicaid ID| B\n    B --> C\n    C -.->|Target: Provider Identifier Field| TMSIS_OUT\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00038",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Provider Medicaid ID to T-MSIS Provider Identifier Mapping",
+                    "rule_description": "When building a T-MSIS output record for an active provider, the provider's Medicaid ID from the Provider Master record must be copied directly into the Provider Identifier field of the T-MSIS output record, establishing the authoritative provider identity in the T-MSIS submission.",
+                    "sub_graph_node_text": "Copy Medicaid ID into T-MSIS Output Record as Provider Identifier Field",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been retrieved from the Provider Master File and a T-MSIS output record is being constructed for that provider",
+                        "When": "The T-MSIS output record is being populated with provider details",
+                        "Then": "The Medicaid ID value from the Provider Master record must be copied exactly as-is into the Provider Identifier field of the T-MSIS output record, with no transformation or modification applied"
+                    },
+                    "key_functionality_id": "provider-medicaid-id-mapping"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Medicaid ID Mapping"
+        },
+        {
+            "id": "provider-npi-mapping",
+            "title": "Provider NPI Mapping",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider NPI Mapping])\n    B[(PRV-MASTER-FILE:\\nProvider Master Record)]\n    C[Read Provider's National Provider Identifier\\nNPI from Provider Master Record]\n    D[Copy NPI value into\\nT-MSIS Output Record NPI Field]\n    E[(TMSIS-OUT-FILE:\\nT-MSIS Output Record\\nNPI Field Populated)]\n    F([End: NPI Successfully Mapped\\nto T-MSIS Output Record])\n\n    A --> C\n    B -.->|Source: PRV-NPI| C\n    C --> D\n    D -.->|Target: WS-T-NPI| E\n    D --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00039",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Provider NPI Mapping to T-MSIS Output Record",
+                    "rule_description": "When building the T-MSIS output record for an active provider, the provider's National Provider Identifier (NPI) must be sourced directly from the Provider Master record and mapped into the corresponding NPI field of the T-MSIS output record without transformation.",
+                    "sub_graph_node_text": "Copy NPI value into T-MSIS Output Record NPI Field",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been read from the Provider Master File and the provider's National Provider Identifier (NPI) is present in the Provider Master record (PRV-NPI field)",
+                        "When": "The T-MSIS output record is being constructed for the qualifying active provider",
+                        "Then": "The provider's National Provider Identifier (NPI) value is copied exactly as-is from the Provider Master record (PRV-NPI) into the NPI field of the T-MSIS output record (WS-T-NPI), with no modification or transformation applied"
+                    },
+                    "key_functionality_id": "provider-npi-mapping"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider NPI Mapping"
+        },
+        {
+            "id": "provider-active-status-assignment",
+            "title": "Provider Active Status Assignment",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Active Status Assignment])\n    B[Provider has already passed Active status filter]\n    C[Set Provider Status field in T-MSIS output record to 'A' - Active]\n    D([End: T-MSIS Status Field Ready])\n\n    A --> B\n    B --> C\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00040",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Active Status Assignment for T-MSIS Provider Extract",
+                    "rule_description": "For every provider record that has passed the Active status filter and is being extracted to the T-MSIS output file, the Provider Status field in the output record must be hardcoded to 'A' (Active). This ensures that all providers included in the T-MSIS extract are uniformly identified as Active, reflecting their eligibility status at the time of extraction.",
+                    "sub_graph_node_text": "Set Provider Status field in T-MSIS output record to 'A' - Active",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and has passed the Active provider filter (i.e., the provider is marked as Active in the Provider Master File)",
+                        "When": "The T-MSIS output record is being constructed for the qualifying provider",
+                        "Then": "The Provider Status field in the T-MSIS output record must be set to the value 'A', representing Active status, regardless of any other attributes of the provider record"
+                    },
+                    "key_functionality_id": "provider-active-status-assignment"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Active Status Assignment"
+        },
+        {
+            "id": "submission-period-assignment",
+            "title": "Submission Period Assignment",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Submission Period Assignment])\n    B[Retrieve Today's Julian Date in YYDDD format\\ncaptured at program initialization]\n    C[Populate T-MSIS Output Record Reporting Period Field\\nwith Today's Julian Date in YYDDD format]\n    D[Reporting Period Field now identifies\\nthe Monthly CMS Submission Period]\n    E([End: Submission Period Assigned])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00041",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Submission Period Source Identification",
+                    "rule_description": "The reporting period used for the T-MSIS monthly CMS submission is sourced from the Julian date captured once at program startup, ensuring all records in a single run share the same consistent submission period identifier.",
+                    "sub_graph_node_text": "Retrieve Today's Julian Date in YYDDD format captured at program initialization",
+                    "acceptance_criteria": {
+                        "Given": "The monthly T-MSIS Provider Extract process has been initiated and the program has captured today's date in Julian format (YYDDD, where YY is the 2-digit year and DDD is the 3-digit day-of-year) at program initialization",
+                        "When": "A provider record is being prepared for writing to the T-MSIS output file",
+                        "Then": "The Julian date value (YYDDD) that was captured at program startup is retrieved and made available to populate the T-MSIS output record's reporting period field, ensuring all records in the same extraction run share the identical submission period date"
+                    },
+                    "key_functionality_id": "submission-period-assignment"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00042",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "T-MSIS Reporting Period Field Population with Julian Date",
+                    "rule_description": "For every active provider record written to the T-MSIS submission file, the reporting period field must be populated with today's Julian date in YYDDD format to identify the monthly CMS submission period.",
+                    "sub_graph_node_text": "Populate T-MSIS Output Record Reporting Period Field with Today's Julian Date in YYDDD format",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has passed all validations and is ready to be written to the T-MSIS Provider Submission output file, and today's Julian date in YYDDD format (2-digit year followed by 3-digit day-of-year) is available from program initialization",
+                        "When": "The T-MSIS output record is being assembled for the active provider",
+                        "Then": "The T-MSIS output record's reporting period field (WS-T-PERIOD-YYDD) is populated with today's Julian date in YYDDD format, so that the record is correctly tagged with the monthly CMS submission period for that extraction run"
+                    },
+                    "key_functionality_id": "submission-period-assignment"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00043",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Submission Period as Monthly CMS Identifier",
+                    "rule_description": "The Julian date (YYDDD) stored in the T-MSIS output record's reporting period field serves as the official monthly submission period identifier for CMS, linking each extracted provider record to the specific reporting month in which it was submitted.",
+                    "sub_graph_node_text": "Reporting Period Field now identifies the Monthly CMS Submission Period",
+                    "acceptance_criteria": {
+                        "Given": "The T-MSIS output record's reporting period field has been populated with today's Julian date in YYDDD format",
+                        "When": "The T-MSIS Provider Submission output file is reviewed or processed by CMS",
+                        "Then": "The reporting period field value (YYDDD) uniquely identifies the monthly submission period for CMS, associating every provider record in the file with the correct reporting month and year of the T-MSIS submission"
+                    },
+                    "key_functionality_id": "submission-period-assignment"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Submission Period Assignment"
+        },
+        {
+            "id": "t",
+            "title": "T",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Assemble T-MSIS Provider Record])\n    B[Set Record Type Identifier to PRV01 in T-MSIS Detail Structure]\n    C[Place Provider Medicaid ID into T-MSIS Provider ID Field]\n    D[Place Provider NPI into T-MSIS NPI Field]\n    E[Place Active Status 'A' into T-MSIS Status Field]\n    F[Place Julian Date YYDDD into T-MSIS Submission Period Field]\n    G[Consolidate All Fields into Complete T-MSIS Output Record]\n    H([End: T-MSIS Provider Record Fully Assembled and Ready for Output])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n    F --> G\n    G --> H",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00044",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Assign Record Type Identifier to T-MSIS Provider Record",
+                    "rule_description": "When assembling a T-MSIS provider output record, the record type identifier must be set to 'PRV01' to classify the record as a provider submission within the T-MSIS reporting structure.",
+                    "sub_graph_node_text": "Set Record Type Identifier to PRV01 in T-MSIS Detail Structure",
+                    "acceptance_criteria": {
+                        "Given": "A T-MSIS provider output record is being assembled for an active provider",
+                        "When": "The T-MSIS detail structure is being populated",
+                        "Then": "The record type identifier field in the T-MSIS detail structure must be set to the value 'PRV01'"
+                    },
+                    "key_functionality_id": "t"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00045",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Populate T-MSIS Provider ID from Medicaid ID",
+                    "rule_description": "The provider's Medicaid ID from the Provider Master File must be mapped to the Provider ID field in the T-MSIS output record to uniquely identify the provider in the T-MSIS submission.",
+                    "sub_graph_node_text": "Place Provider Medicaid ID into T-MSIS Provider ID Field",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been read from the Provider Master File and contains a Medicaid ID",
+                        "When": "The T-MSIS provider output record is being assembled",
+                        "Then": "The Provider Medicaid ID from the Provider Master Record must be placed into the T-MSIS Provider ID field of the output record"
+                    },
+                    "key_functionality_id": "t"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00046",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Populate T-MSIS NPI from Provider Master NPI",
+                    "rule_description": "The provider's National Provider Identifier (NPI) from the Provider Master File must be mapped to the NPI field in the T-MSIS output record to support federal provider identification requirements.",
+                    "sub_graph_node_text": "Place Provider NPI into T-MSIS NPI Field",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been read from the Provider Master File and contains an NPI",
+                        "When": "The T-MSIS provider output record is being assembled",
+                        "Then": "The NPI from the Provider Master Record must be placed into the T-MSIS NPI field of the output record"
+                    },
+                    "key_functionality_id": "t"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00047",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Set T-MSIS Provider Status to Active",
+                    "rule_description": "All providers written to the T-MSIS output file are assigned a status of 'A' (Active), reflecting that only active providers from the Provider Master File are included in the T-MSIS submission.",
+                    "sub_graph_node_text": "Place Active Status 'A' into T-MSIS Status Field",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has passed the active provider filter and is being written to the T-MSIS output file",
+                        "When": "The T-MSIS provider output record is being assembled",
+                        "Then": "The T-MSIS Status field must be hardcoded to the value 'A' representing Active status, regardless of any other status values present in the source record"
+                    },
+                    "key_functionality_id": "t"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00048",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Set T-MSIS Submission Period to Current Julian Date",
+                    "rule_description": "The T-MSIS submission period field must reflect the current processing date in Julian format (YYDDD), where YY is the 2-digit year and DDD is the 3-digit day of the year, to indicate when the provider data was submitted.",
+                    "sub_graph_node_text": "Place Julian Date YYDDD into T-MSIS Submission Period Field",
+                    "acceptance_criteria": {
+                        "Given": "The current Julian date (YYDDD format) has been captured at program start, where YY represents the 2-digit current year and DDD represents the 3-digit day of the year",
+                        "When": "The T-MSIS provider output record is being assembled",
+                        "Then": "The T-MSIS Submission Period field must be populated with today's Julian date in YYDDD format"
+                    },
+                    "key_functionality_id": "t"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00049",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Consolidate All Fields into Complete T-MSIS Output Record",
+                    "rule_description": "Once all individual fields (record type 'PRV01', Provider Medicaid ID, NPI, Active status 'A', and Julian submission period) have been populated in the T-MSIS detail structure, the complete structure must be moved into the T-MSIS output record before writing to the T-MSIS output file.",
+                    "sub_graph_node_text": "Consolidate All Fields into Complete T-MSIS Output Record",
+                    "acceptance_criteria": {
+                        "Given": "All required T-MSIS provider fields have been populated in the T-MSIS detail working storage structure, including record type 'PRV01', Provider Medicaid ID, NPI, status 'A', and Julian date submission period",
+                        "When": "The T-MSIS provider output record assembly is finalized",
+                        "Then": "The fully populated T-MSIS detail structure must be consolidated and moved into the T-MSIS output record, making it ready to be written to the T-MSIS output file"
+                    },
+                    "key_functionality_id": "t"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "T"
+        },
+        {
+            "id": "t",
+            "title": "T",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: T-MSIS Output Record Writing])\n    B[Transfer fully assembled T-MSIS provider detail into the T-MSIS output record structure]\n    C[Write the T-MSIS output record to the monthly CMS T-MSIS Provider Submission file]\n    TMSIS_OUT[(TMSIS-OUT-FILE: Monthly CMS T-MSIS Provider Submission File)]\n    D([End: Provider Record Successfully Written])\n\n    A --> B\n    B --> C\n    C -.->|Provider Record Written| TMSIS_OUT\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00050",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Assemble and Write Active Provider Record to T-MSIS Submission File",
+                    "rule_description": "When an active provider record has been fully prepared with all required T-MSIS fields (Medicaid ID, NPI, Active status, and reporting period), the assembled detail is transferred into the T-MSIS output record structure before being written to the monthly CMS T-MSIS Provider Submission file.",
+                    "sub_graph_node_text": "Transfer fully assembled T-MSIS provider detail into the T-MSIS output record structure",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record has been selected from the Provider Master File and all T-MSIS output fields have been populated: Provider Medicaid ID, NPI, Status set to 'A' (Active), and Reporting Period set to today's Julian date (YYDDD format)",
+                        "When": "The fully assembled T-MSIS provider detail record is transferred into the T-MSIS output record structure",
+                        "Then": "The T-MSIS output record structure contains the complete provider detail ready for submission, with all fields accurately reflecting the source provider master data and the current reporting period"
+                    },
+                    "key_functionality_id": "t"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00051",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Write Formatted Provider Record to Monthly CMS T-MSIS Provider Submission File",
+                    "rule_description": "Once the T-MSIS output record structure is fully populated, the provider record is physically written to the monthly CMS T-MSIS Provider Submission output file and the total output record count is incremented by one.",
+                    "sub_graph_node_text": "Write the T-MSIS output record to the monthly CMS T-MSIS Provider Submission file",
+                    "acceptance_criteria": {
+                        "Given": "The T-MSIS output record structure has been fully populated with the active provider's Medicaid ID, NPI, Active status ('A'), and today's Julian date as the reporting period",
+                        "When": "The T-MSIS output record is written to the monthly CMS T-MSIS Provider Submission file",
+                        "Then": "The provider record is successfully appended to the T-MSIS Provider Submission output file, and the total count of T-MSIS provider rows written is incremented by 1"
+                    },
+                    "key_functionality_id": "t"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "T"
+        },
+        {
+            "id": "extracted-record-count-tracking",
+            "title": "Extracted Record Count Tracking",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Record Count Tracking])\n    B{Was Provider Record Successfully Written to T-MSIS Output File?}\n    C[Increment Running Provider Record Counter by 1]\n    D[Return to Process Next Provider Record]\n    E([End: Count Updated])\n\n    A --> B\n    B -->|Yes - Record Written| C\n    C --> E\n    E --> D\n    B -->|No - Record Not Written| D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00052",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "T-MSIS Provider Record Count Tracking",
+                    "rule_description": "Each time an active provider record is successfully written to the T-MSIS output file, a running counter is incremented by 1 to track the total number of provider records extracted. This count is reported at the end of the process.",
+                    "sub_graph_node_text": "Increment Running Provider Record Counter by 1",
+                    "acceptance_criteria": {
+                        "Given": "An active provider record from the Provider Master File has been processed and all required T-MSIS output fields have been populated (Provider Medicaid ID, NPI, Status set to 'A', and Reporting Period set to today's Julian date)",
+                        "When": "The provider record is successfully written to the T-MSIS output file",
+                        "Then": "The running T-MSIS provider record counter is incremented by exactly 1, and the updated count reflects the total number of provider records successfully written to the T-MSIS output file during the current execution"
+                    },
+                    "key_functionality_id": "extracted-record-count-tracking"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Extracted Record Count Tracking"
+        },
+        {
+            "id": "extraction-summary-reporting",
+            "title": "Extraction Summary Reporting",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Extraction Complete - All Provider Records Processed])\n    B[Retrieve Final Total Count of Provider Records Successfully Written to T-MSIS Submission File]\n    C[Display Extraction Summary Message with Total Provider Row Count]\n    D([Proceed to File Closure and Process Completion])\n\n    A --> B\n    B --> C\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00053",
+                    "rule_type": "Process Rules",
+                    "rule_name": "T-MSIS Provider Extraction Summary Reporting",
+                    "rule_description": "Upon completion of processing all provider records from the Provider Master File, the system reports the total number of active provider records successfully written to the T-MSIS submission file as a final extraction summary.",
+                    "sub_graph_node_text": "Display Extraction Summary Message with Total Provider Row Count",
+                    "acceptance_criteria": {
+                        "Given": "All records in the Provider Master File have been processed and the T-MSIS extraction run is complete",
+                        "When": "The extraction process reaches its completion point after writing all qualifying active provider records to the T-MSIS submission file",
+                        "Then": "The system displays a summary message identified by program name 'PRVTMS01' showing the label 'T-MSIS PROVIDER ROWS=' followed by the final total count (WS-OUT-COUNT) of provider records successfully written to the T-MSIS submission file during the extraction run"
+                    },
+                    "key_functionality_id": "extraction-summary-reporting"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Extraction Summary Reporting"
+        },
+        {
+            "id": "file-closure-and-process-completion",
+            "title": "File Closure and Process Completion",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([All Provider Records Processed])\n    B[Display Total Number of Provider Rows Written to T-MSIS Submission File]\n    C[Close Provider Master Input File]\n    D[Close T-MSIS Provider Submission Output File]\n    E([Monthly Provider Extract Process Complete])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00054",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Total T-MSIS Provider Records Written",
+                    "rule_description": "After all provider records from the Provider Master File have been processed, the total number of provider rows successfully written to the T-MSIS Provider Submission Output File is displayed as a final summary of the monthly extract run.",
+                    "sub_graph_node_text": "Display Total Number of Provider Rows Written to T-MSIS Submission File",
+                    "acceptance_criteria": {
+                        "Given": "All records in the Provider Master File have been read and processed, and eligible active provider records have been written to the T-MSIS Provider Submission Output File",
+                        "When": "The monthly provider extract process reaches completion after exhausting all Provider Master File records",
+                        "Then": "The system displays the message 'PRVTMS01: T-MSIS PROVIDER ROWS=' followed by the total count of provider rows written to the T-MSIS Provider Submission Output File during the current extract run"
+                    },
+                    "key_functionality_id": "file-closure-and-process-completion"
+                },
+                {
+                    "rule_id": "R-PRVTMS01-cbl-00055",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Close Provider Master Input File and T-MSIS Output File at Process Completion",
+                    "rule_description": "Upon completion of all provider record processing and after displaying the final record count, both the Provider Master Input File and the T-MSIS Provider Submission Output File must be formally closed to finalize the monthly provider extract process.",
+                    "sub_graph_node_text": "Close Provider Master Input File and Close T-MSIS Provider Submission Output File",
+                    "acceptance_criteria": {
+                        "Given": "All provider records have been processed, eligible active provider records have been written to the T-MSIS Provider Submission Output File, and the total output record count has been displayed",
+                        "When": "The monthly provider extract process is ready to terminate",
+                        "Then": "The Provider Master Input File is closed first, followed by the closure of the T-MSIS Provider Submission Output File, and the monthly provider extract process ends successfully"
+                    },
+                    "key_functionality_id": "file-closure-and-process-completion"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "File Closure and Process Completion"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The monthly T-MSIS Provider Extract process is initiated",
+                "When": "The program starts execution",
+                "Then": "Today's date is captured in Julian format (YYDDD) and stored as the submission period identifier to be used for all provider records written during this extract run"
+            },
+            "Rule_Name": "Program Initialization - Capture Current Date as Submission Period",
+            "Rule_Description": "At the start of the monthly T-MSIS Provider Extract process, the system captures today's date in Julian format (YYDDD) to be used as the submission period identifier throughout the extract run."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00002",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "Today's date has been captured in Julian format (YYDDD)",
+                "When": "The Julian date is decomposed",
+                "Then": "The first 2 characters of the Julian date are extracted and stored as the current 2-digit year (YY), and the remaining 3 characters are extracted and stored as the current day-of-year (DDD)"
+            },
+            "Rule_Name": "Julian Date Decomposition into Year and Day Components",
+            "Rule_Description": "The captured Julian date (YYDDD) is decomposed into two separate components: a 2-digit year (YY) and a 3-digit day-of-year (DDD), which are used independently in downstream validation and output population steps."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00003",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File is open and available for reading",
+                "When": "The system requests the next provider record",
+                "Then": "The next sequential provider record is retrieved from the Provider Master File for processing; if no more records exist, the end-of-file condition is set to true and the extraction loop terminates"
+            },
+            "Rule_Name": "Sequential Read of Provider Master File",
+            "Rule_Description": "The system reads provider records one at a time sequentially from the Provider Master File. This process continues in a loop until all records have been processed or the end of the file is reached."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00004",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File",
+                "When": "The provider's active status flag is evaluated",
+                "Then": "If the provider is marked as Active, the record proceeds to enrollment date validation and T-MSIS output processing; if the provider is not Active (inactive), the record is skipped entirely and the system reads the next provider record without writing any output"
+            },
+            "Rule_Name": "Active Provider Filtering - Exclude Inactive Providers",
+            "Rule_Description": "Only providers whose status is marked as Active in the Provider Master File are eligible for inclusion in the T-MSIS submission. Providers with any other status are skipped and not written to the output file."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00005",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been identified as Active",
+                "When": "The enrollment effective date is evaluated",
+                "Then": "The 2-digit year is extracted from positions 3 and 4 of the provider's enrollment effective date field and compared to the current 2-digit year (YY) captured at program initialization"
+            },
+            "Rule_Name": "Enrollment Date Future-Year Validation",
+            "Rule_Description": "For each active provider, the 2-digit year portion of the provider's enrollment effective date is extracted and compared against the current 2-digit year to detect potential future-dated enrollment records that may indicate a data quality issue."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00006",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider's enrollment effective year has been extracted and compared to the current year",
+                "When": "The enrollment effective year is greater than the current 2-digit year",
+                "Then": "A warning message 'PRVTMS01: FUTURE ENROLLMENT? NPI [provider NPI]' is displayed to flag the potential data quality issue, and processing continues \u2014 the provider record is still written to the T-MSIS output file"
+            },
+            "Rule_Name": "Future Enrollment Year Alert - Data Quality Warning",
+            "Rule_Description": "When an active provider's enrollment effective year is greater than the current year, a data quality warning is raised identifying the provider by their NPI. The warning does not prevent the record from being written to the T-MSIS output file."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00007",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record is being prepared for T-MSIS output",
+                "When": "The Provider ID field of the T-MSIS output record is populated",
+                "Then": "The Medicaid ID value from the Provider Master File record is copied exactly into the Provider ID field of the T-MSIS output record"
+            },
+            "Rule_Name": "Provider Medicaid ID Mapping to T-MSIS Output Record",
+            "Rule_Description": "The provider's Medicaid ID from the Provider Master File is mapped directly into the Provider ID field of the T-MSIS output record."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00008",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record is being prepared for T-MSIS output",
+                "When": "The NPI field of the T-MSIS output record is populated",
+                "Then": "The NPI value from the Provider Master File record is copied exactly into the NPI field of the T-MSIS output record"
+            },
+            "Rule_Name": "Provider NPI Mapping to T-MSIS Output Record",
+            "Rule_Description": "The provider's National Provider Identifier (NPI) from the Provider Master File is mapped directly into the NPI field of the T-MSIS output record."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00009",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record is being prepared for T-MSIS output",
+                "When": "The status field of the T-MSIS output record is populated",
+                "Then": "The status field in the T-MSIS output record is set to the fixed value 'A', representing Active status"
+            },
+            "Rule_Name": "Provider Active Status Assignment in T-MSIS Output",
+            "Rule_Description": "All providers written to the T-MSIS output file are assigned a status of 'A' (Active), reflecting that only active providers are included in the T-MSIS submission."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00010",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record is being prepared for T-MSIS output",
+                "When": "The reporting period field of the T-MSIS output record is populated",
+                "Then": "Today's Julian date (YYDDD), captured at program initialization, is copied into the reporting period field of the T-MSIS output record"
+            },
+            "Rule_Name": "Submission Period Assignment Using Today's Julian Date",
+            "Rule_Description": "The reporting period field in the T-MSIS output record is populated with today's Julian date (YYDDD), ensuring each provider record is associated with the correct submission period for the extract run."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00011",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All individual T-MSIS output fields have been populated for an active provider",
+                "When": "The complete T-MSIS record is assembled",
+                "Then": "The fully populated T-MSIS detail record \u2014 containing Provider ID, NPI, Status 'A', and Reporting Period \u2014 is assembled into the T-MSIS output record structure ready for writing to the output file"
+            },
+            "Rule_Name": "T-MSIS Provider Record Assembly and Formatting",
+            "Rule_Description": "All individually mapped fields \u2014 Provider ID (Medicaid ID), NPI, Active Status ('A'), and Reporting Period (Julian date) \u2014 are assembled together into a complete, formatted T-MSIS provider output record ready for writing."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00012",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A complete T-MSIS provider record has been assembled with all required fields",
+                "When": "The record is submitted to the T-MSIS output file",
+                "Then": "The formatted T-MSIS provider record is written as a new record to the T-MSIS Provider Submission output file"
+            },
+            "Rule_Name": "T-MSIS Output Record Writing to Submission File",
+            "Rule_Description": "The fully assembled and formatted T-MSIS provider record is written to the T-MSIS Provider Submission output file."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00013",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A T-MSIS provider record has been successfully written to the output file",
+                "When": "The record write operation completes",
+                "Then": "The running total count of successfully written T-MSIS provider records is incremented by 1"
+            },
+            "Rule_Name": "Extracted Record Count Tracking",
+            "Rule_Description": "Each time a provider record is successfully written to the T-MSIS output file, a running counter is incremented by 1 to track the total number of provider records included in the submission."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00014",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All records in the Provider Master File have been processed and the end-of-file condition has been reached",
+                "When": "The extraction loop terminates",
+                "Then": "A summary message 'PRVTMS01: T-MSIS PROVIDER ROWS= [count]' is displayed, reporting the total number of provider records successfully written to the T-MSIS output file"
+            },
+            "Rule_Name": "Extraction Summary Reporting at Process Completion",
+            "Rule_Description": "Upon completion of all record processing, the system displays a summary message showing the total number of provider rows written to the T-MSIS submission file during the extract run."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00015",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The extraction summary has been displayed and all provider records have been processed",
+                "When": "The program finalizes",
+                "Then": "The Provider Master File and the T-MSIS Provider Submission output file are both closed, and the monthly T-MSIS Provider Extract process terminates successfully"
+            },
+            "Rule_Name": "File Closure and Process Completion",
+            "Rule_Description": "After the extraction summary is reported, both the Provider Master File and the T-MSIS output file are closed, and the monthly T-MSIS Provider Extract process is completed."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00016",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "The T-MSIS Provider Extract process is being initiated",
+                "When": "The program begins execution",
+                "Then": "The program must register its identity as 'PRVTMS01' \u2014 the monthly T-MSIS Provider Extract \u2014 so that all processing, logging, and output can be attributed to this specific extract program"
+            },
+            "Rule_Name": "Identify Program as Monthly T-MSIS Provider Extract",
+            "Rule_Description": "The system identifies itself as the monthly T-MSIS Provider Extract program (PRVTMS01) at the start of execution to establish the processing context for all subsequent operations."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00017",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The T-MSIS Provider Extract program (PRVTMS01) has been identified and is initializing",
+                "When": "The program requests the current date from the system calendar",
+                "Then": "Today's date must be retrieved from the system calendar in Julian format (YYDDD) and stored internally for use throughout the extract process"
+            },
+            "Rule_Name": "Retrieve Today's Date from System Calendar",
+            "Rule_Description": "The system retrieves the current date from the system calendar at program startup to establish the reference date for the T-MSIS submission period."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00018",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "Today's date has been retrieved from the system calendar in Julian format (YYDDD)",
+                "When": "The date is parsed and stored",
+                "Then": "The date must be stored as a 5-character Julian date where: the first 2 characters represent the 2-digit year (YY) stored as the current year identifier, and the last 3 characters represent the day-of-year (DDD) stored as the current day identifier \u2014 both components must be individually accessible for downstream comparisons and output"
+            },
+            "Rule_Name": "Store Date in Julian Format YYDDD",
+            "Rule_Description": "The system captures and stores today's date in Julian format, separating the 2-digit year and the 3-digit day-of-year components, to be used as the T-MSIS submission period identifier."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00019",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "Today's date has been successfully captured and stored in Julian format (YYDDD) with the 2-digit year and 3-digit day-of-year components",
+                "When": "The T-MSIS Provider Extract process prepares output records",
+                "Then": "The full 5-character Julian date (YYDDD) must be used as the T-MSIS Submission Period Identifier and must be populated in the reporting period field of every T-MSIS provider output record produced during this execution"
+            },
+            "Rule_Name": "Julian Date Designated as T-MSIS Submission Period Identifier",
+            "Rule_Description": "The full Julian date (YYDDD) captured at program startup is designated as the T-MSIS Submission Period Identifier and must be stamped on every provider record written to the T-MSIS output file."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00020",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The T-MSIS Provider extract process (PRVTMS01) is initiated",
+                "When": "The system retrieves the current date from the operating environment",
+                "Then": "Today's date is captured and stored in Julian format (YYDDD), where the 5-character value represents a 2-digit year followed by a 3-digit day-of-year (e.g., 25143 = Year 25, Day 143), and this value is made available for enrollment year and day-of-year comparisons"
+            },
+            "Rule_Name": "Capture Today's Date in Julian Format for Enrollment Validation",
+            "Rule_Description": "The system obtains today's date in Julian format (YYDDD), where the first two digits represent the 2-digit year and the last three digits represent the day-of-year. This date is used as the reference point for all subsequent enrollment date validations."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00021",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "Today's date has been captured in Julian format (YYDDD) as a 5-character value",
+                "When": "The system decomposes the Julian date",
+                "Then": "The first 2 characters (positions 1\u20132) of the Julian date are extracted and stored as the Current Year (YY) component (e.g., from '25143', the value '25' is stored as the current year for use in enrollment year comparison)"
+            },
+            "Rule_Name": "Extract Current Year Component from Julian Date",
+            "Rule_Description": "The system isolates the 2-digit year portion from the 5-character Julian date by reading the first two characters. This current year value is stored separately and used to detect future enrollment effective dates on provider records."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00022",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "Today's date has been captured in Julian format (YYDDD) as a 5-character value",
+                "When": "The system decomposes the Julian date",
+                "Then": "The last 3 characters (positions 3\u20135) of the Julian date are extracted and stored as the Current Day-of-Year (DDD) component (e.g., from '25143', the value '143' is stored as the current day-of-year for use in enrollment period validation)"
+            },
+            "Rule_Name": "Extract Current Day-of-Year Component from Julian Date",
+            "Rule_Description": "The system isolates the 3-digit day-of-year portion from the 5-character Julian date by reading the last three characters. This day-of-year value is stored separately and is available for enrollment age or period-based validations."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00023",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "The 2-digit current year (YY) has been extracted from today's Julian date",
+                "When": "The system stores the current year component",
+                "Then": "The 2-digit current year value (YY) is stored and remains available throughout the entire provider record processing loop, so that each active provider's enrollment effective year can be compared against it to detect future enrollment dates"
+            },
+            "Rule_Name": "Store Current Year for Provider Enrollment Year Comparison",
+            "Rule_Description": "The extracted 2-digit current year (YY) is retained in the system's working storage so that it can be compared against the enrollment effective year on each active provider record to identify future-dated enrollments."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00024",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "The 3-digit current day-of-year (DDD) has been extracted from today's Julian date",
+                "When": "The system stores the day-of-year component",
+                "Then": "The 3-digit day-of-year value (DDD) is stored and remains available throughout the entire provider record processing loop, so that the full Julian date (YYDDD) can be used to populate the Reporting Period field on each T-MSIS output record written"
+            },
+            "Rule_Name": "Store Current Day-of-Year for Enrollment Period Stamping",
+            "Rule_Description": "The extracted 3-digit day-of-year (DDD) is retained in the system's working storage. Together with the current year (YY), the full Julian date (YYDDD) is used to stamp the reporting period on every T-MSIS provider output record."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00025",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File sequential read process is about to begin",
+                "When": "The system initializes the Provider Master File read loop",
+                "Then": "The End-of-File flag is set to 'N' (Not Reached), indicating that provider records are available and processing should continue"
+            },
+            "Rule_Name": "Initialize Provider File Processing State",
+            "Rule_Description": "Before reading any provider records, the system must initialize the processing state to indicate that records are still available for processing."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00026",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File is open for input and the End-of-File flag is set to 'Not Reached'",
+                "When": "The system requests the next record from the Provider Master File",
+                "Then": "The next sequential provider record is retrieved from the Provider Master File and made available for processing"
+            },
+            "Rule_Name": "Read Next Provider Record Sequentially",
+            "Rule_Description": "The system must read provider records one at a time in sequential order from the Provider Master File to ensure every provider record is evaluated for T-MSIS reporting."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00027",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A read attempt has been made on the Provider Master File",
+                "When": "The system evaluates the file status returned after the read operation",
+                "Then": "If the file status indicates End-of-File (no more records exist), the system marks all records as processed and exits the read loop; if the file status indicates a record was successfully retrieved, the provider record is made available for further processing and the loop continues"
+            },
+            "Rule_Name": "Detect End of Provider Master File",
+            "Rule_Description": "After each read attempt from the Provider Master File, the system must check whether all records have been processed to determine if the read loop should continue or terminate."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00028",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A read attempt on the Provider Master File has returned an End-of-File condition",
+                "When": "The system detects that no more provider records are available",
+                "Then": "The End-of-File flag is set to TRUE, signaling that all provider records have been processed and the sequential read loop should terminate"
+            },
+            "Rule_Name": "Mark All Provider Records as Processed",
+            "Rule_Description": "When no more provider records exist in the Provider Master File, the system must formally mark the processing as complete to stop further read attempts."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00029",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A read attempt on the Provider Master File has successfully retrieved a provider record",
+                "When": "The system confirms the record is available (no End-of-File condition)",
+                "Then": "The retrieved provider record is made available for downstream business processing, and the system loops back to read the next record after processing is complete"
+            },
+            "Rule_Name": "Continue Processing Available Provider Record",
+            "Rule_Description": "When a provider record is successfully retrieved from the Provider Master File, it must be passed forward for business evaluation and potential inclusion in the T-MSIS output."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00030",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File",
+                "When": "The provider's status in the Provider Master File is evaluated",
+                "Then": "If the provider status is marked as Active, the provider record is selected and processed for T-MSIS extraction; if the provider status is not marked as Active, the provider record is skipped and no further action is taken for that record"
+            },
+            "Rule_Name": "Active Provider Selection for T-MSIS Extraction",
+            "Rule_Description": "Determines whether a provider record from the Provider Master File should be included in the T-MSIS extract based on the provider's active status. Only providers with an Active status are selected for further processing and output; all others are skipped."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00031",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and its status has been evaluated",
+                "When": "The provider's status is confirmed as Active",
+                "Then": "The provider record is selected and passed to the T-MSIS row writing process, where it will be written to the T-MSIS output file and counted toward the total output record count"
+            },
+            "Rule_Name": "Include Active Provider in T-MSIS Output",
+            "Rule_Description": "When a provider record is confirmed as Active, it is forwarded to the T-MSIS output writing process. This ensures that only Active providers contribute to the T-MSIS provider extract file."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00032",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and its status has been evaluated",
+                "When": "The provider's status is not marked as Active",
+                "Then": "The provider record is skipped entirely \u2014 no T-MSIS output record is created, no warning message is generated, and the output record counter is not incremented; processing continues with the next provider record"
+            },
+            "Rule_Name": "Exclude Inactive Provider from T-MSIS Output",
+            "Rule_Description": "When a provider record is identified as not Active, it is entirely excluded from the T-MSIS extract. No output record is created, no warning is issued, and the record count is not incremented for inactive providers."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00033",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been read from the Provider Master File and contains a valid Effective Enrollment Date field",
+                "When": "The system processes the provider record for T-MSIS output",
+                "Then": "The system extracts characters at positions 3 and 4 of the Provider Effective Enrollment Date field as the 2-digit enrollment year (WS-ENROLL-YY) for use in the future-year validation"
+            },
+            "Rule_Name": "Extract Enrollment Year from Provider Effective Date",
+            "Rule_Description": "The system extracts the 2-digit year component from the provider's enrollment effective date field to enable comparison against the current year for future-enrollment detection."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00034",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "The program has started and accepted today's Julian date (YYDDD format) from the system",
+                "When": "The enrollment year validation is performed for an active provider record",
+                "Then": "The system uses the 2-digit year (WS-TODAY-YY) extracted from positions 1 and 2 of today's Julian date as the reference current year for comparison against the provider's enrollment year"
+            },
+            "Rule_Name": "Retrieve Current Year for Enrollment Validation",
+            "Rule_Description": "The system uses the 2-digit current year that was captured from the system Julian date at program startup as the reference year for validating provider enrollment dates."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00035",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The 2-digit enrollment year (WS-ENROLL-YY) has been extracted from the provider's Effective Enrollment Date, and the 2-digit current year (WS-TODAY-YY) is available from the system date captured at program start",
+                "When": "The system evaluates whether the provider's enrollment year is greater than the current year",
+                "Then": "If the provider's enrollment year (WS-ENROLL-YY) is strictly greater than the current year (WS-TODAY-YY), the provider record is identified as a potential future enrollment and a warning alert is triggered; otherwise, the record proceeds directly to provider data mapping without any warning"
+            },
+            "Rule_Name": "Detect Future Enrollment Year",
+            "Rule_Description": "The system compares the provider's enrollment effective year against the current year to identify providers whose enrollment year appears to be dated in the future, which may indicate a data quality issue."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00036",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been evaluated and its enrollment effective year (WS-ENROLL-YY) is greater than the current year (WS-TODAY-YY)",
+                "When": "The future enrollment condition is confirmed",
+                "Then": "The system displays the warning message 'PRVTMS01: FUTURE ENROLLMENT? NPI' followed by the provider's NPI (PRV-NPI) from the Provider Master Record to identify the specific provider with the suspect enrollment date; the provider record continues to be processed and written to the T-MSIS output file regardless of this warning"
+            },
+            "Rule_Name": "Trigger Future Enrollment Warning Alert",
+            "Rule_Description": "When a provider's enrollment year is detected as being in the future, the system issues a warning message identifying the specific provider by their National Provider Identifier (NPI) to alert business users of a potential data quality issue."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00037",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been selected from the Provider Master File, and the current 2-digit year has been derived from today's Julian date",
+                "When": "The 2-digit year extracted from positions 3-4 of the provider's Enrollment Effective Date is compared against the current 2-digit year",
+                "Then": "If the provider's enrollment effective year is greater than the current year, a warning message is displayed in the format 'PRVTMS01: FUTURE ENROLLMENT? NPI [Provider NPI]' to flag the record as a potential data quality issue; if the enrollment effective year is less than or equal to the current year, no warning is issued; in both cases, processing continues to write the provider record to the T-MSIS output file"
+            },
+            "Rule_Name": "Provider Future Enrollment Year Detection",
+            "Rule_Description": "When processing an active provider record for T-MSIS reporting, the system checks whether the provider's enrollment effective year is greater than the current year. If so, a warning message is displayed identifying the provider's NPI as a potential data quality issue. Processing continues regardless of the outcome."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00038",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been retrieved from the Provider Master File and a T-MSIS output record is being constructed for that provider",
+                "When": "The T-MSIS output record is being populated with provider details",
+                "Then": "The Medicaid ID value from the Provider Master record must be copied exactly as-is into the Provider Identifier field of the T-MSIS output record, with no transformation or modification applied"
+            },
+            "Rule_Name": "Provider Medicaid ID to T-MSIS Provider Identifier Mapping",
+            "Rule_Description": "When building a T-MSIS output record for an active provider, the provider's Medicaid ID from the Provider Master record must be copied directly into the Provider Identifier field of the T-MSIS output record, establishing the authoritative provider identity in the T-MSIS submission."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00039",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been read from the Provider Master File and the provider's National Provider Identifier (NPI) is present in the Provider Master record (PRV-NPI field)",
+                "When": "The T-MSIS output record is being constructed for the qualifying active provider",
+                "Then": "The provider's National Provider Identifier (NPI) value is copied exactly as-is from the Provider Master record (PRV-NPI) into the NPI field of the T-MSIS output record (WS-T-NPI), with no modification or transformation applied"
+            },
+            "Rule_Name": "Provider NPI Mapping to T-MSIS Output Record",
+            "Rule_Description": "When building the T-MSIS output record for an active provider, the provider's National Provider Identifier (NPI) must be sourced directly from the Provider Master record and mapped into the corresponding NPI field of the T-MSIS output record without transformation."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00040",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and has passed the Active provider filter (i.e., the provider is marked as Active in the Provider Master File)",
+                "When": "The T-MSIS output record is being constructed for the qualifying provider",
+                "Then": "The Provider Status field in the T-MSIS output record must be set to the value 'A', representing Active status, regardless of any other attributes of the provider record"
+            },
+            "Rule_Name": "Active Status Assignment for T-MSIS Provider Extract",
+            "Rule_Description": "For every provider record that has passed the Active status filter and is being extracted to the T-MSIS output file, the Provider Status field in the output record must be hardcoded to 'A' (Active). This ensures that all providers included in the T-MSIS extract are uniformly identified as Active, reflecting their eligibility status at the time of extraction."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00041",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The monthly T-MSIS Provider Extract process has been initiated and the program has captured today's date in Julian format (YYDDD, where YY is the 2-digit year and DDD is the 3-digit day-of-year) at program initialization",
+                "When": "A provider record is being prepared for writing to the T-MSIS output file",
+                "Then": "The Julian date value (YYDDD) that was captured at program startup is retrieved and made available to populate the T-MSIS output record's reporting period field, ensuring all records in the same extraction run share the identical submission period date"
+            },
+            "Rule_Name": "Submission Period Source Identification",
+            "Rule_Description": "The reporting period used for the T-MSIS monthly CMS submission is sourced from the Julian date captured once at program startup, ensuring all records in a single run share the same consistent submission period identifier."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00042",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has passed all validations and is ready to be written to the T-MSIS Provider Submission output file, and today's Julian date in YYDDD format (2-digit year followed by 3-digit day-of-year) is available from program initialization",
+                "When": "The T-MSIS output record is being assembled for the active provider",
+                "Then": "The T-MSIS output record's reporting period field (WS-T-PERIOD-YYDD) is populated with today's Julian date in YYDDD format, so that the record is correctly tagged with the monthly CMS submission period for that extraction run"
+            },
+            "Rule_Name": "T-MSIS Reporting Period Field Population with Julian Date",
+            "Rule_Description": "For every active provider record written to the T-MSIS submission file, the reporting period field must be populated with today's Julian date in YYDDD format to identify the monthly CMS submission period."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00043",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "The T-MSIS output record's reporting period field has been populated with today's Julian date in YYDDD format",
+                "When": "The T-MSIS Provider Submission output file is reviewed or processed by CMS",
+                "Then": "The reporting period field value (YYDDD) uniquely identifies the monthly submission period for CMS, associating every provider record in the file with the correct reporting month and year of the T-MSIS submission"
+            },
+            "Rule_Name": "Submission Period as Monthly CMS Identifier",
+            "Rule_Description": "The Julian date (YYDDD) stored in the T-MSIS output record's reporting period field serves as the official monthly submission period identifier for CMS, linking each extracted provider record to the specific reporting month in which it was submitted."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00044",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "A T-MSIS provider output record is being assembled for an active provider",
+                "When": "The T-MSIS detail structure is being populated",
+                "Then": "The record type identifier field in the T-MSIS detail structure must be set to the value 'PRV01'"
+            },
+            "Rule_Name": "Assign Record Type Identifier to T-MSIS Provider Record",
+            "Rule_Description": "When assembling a T-MSIS provider output record, the record type identifier must be set to 'PRV01' to classify the record as a provider submission within the T-MSIS reporting structure."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00045",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been read from the Provider Master File and contains a Medicaid ID",
+                "When": "The T-MSIS provider output record is being assembled",
+                "Then": "The Provider Medicaid ID from the Provider Master Record must be placed into the T-MSIS Provider ID field of the output record"
+            },
+            "Rule_Name": "Populate T-MSIS Provider ID from Medicaid ID",
+            "Rule_Description": "The provider's Medicaid ID from the Provider Master File must be mapped to the Provider ID field in the T-MSIS output record to uniquely identify the provider in the T-MSIS submission."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00046",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been read from the Provider Master File and contains an NPI",
+                "When": "The T-MSIS provider output record is being assembled",
+                "Then": "The NPI from the Provider Master Record must be placed into the T-MSIS NPI field of the output record"
+            },
+            "Rule_Name": "Populate T-MSIS NPI from Provider Master NPI",
+            "Rule_Description": "The provider's National Provider Identifier (NPI) from the Provider Master File must be mapped to the NPI field in the T-MSIS output record to support federal provider identification requirements."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00047",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has passed the active provider filter and is being written to the T-MSIS output file",
+                "When": "The T-MSIS provider output record is being assembled",
+                "Then": "The T-MSIS Status field must be hardcoded to the value 'A' representing Active status, regardless of any other status values present in the source record"
+            },
+            "Rule_Name": "Set T-MSIS Provider Status to Active",
+            "Rule_Description": "All providers written to the T-MSIS output file are assigned a status of 'A' (Active), reflecting that only active providers from the Provider Master File are included in the T-MSIS submission."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00048",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The current Julian date (YYDDD format) has been captured at program start, where YY represents the 2-digit current year and DDD represents the 3-digit day of the year",
+                "When": "The T-MSIS provider output record is being assembled",
+                "Then": "The T-MSIS Submission Period field must be populated with today's Julian date in YYDDD format"
+            },
+            "Rule_Name": "Set T-MSIS Submission Period to Current Julian Date",
+            "Rule_Description": "The T-MSIS submission period field must reflect the current processing date in Julian format (YYDDD), where YY is the 2-digit year and DDD is the 3-digit day of the year, to indicate when the provider data was submitted."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00049",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All required T-MSIS provider fields have been populated in the T-MSIS detail working storage structure, including record type 'PRV01', Provider Medicaid ID, NPI, status 'A', and Julian date submission period",
+                "When": "The T-MSIS provider output record assembly is finalized",
+                "Then": "The fully populated T-MSIS detail structure must be consolidated and moved into the T-MSIS output record, making it ready to be written to the T-MSIS output file"
+            },
+            "Rule_Name": "Consolidate All Fields into Complete T-MSIS Output Record",
+            "Rule_Description": "Once all individual fields (record type 'PRV01', Provider Medicaid ID, NPI, Active status 'A', and Julian submission period) have been populated in the T-MSIS detail structure, the complete structure must be moved into the T-MSIS output record before writing to the T-MSIS output file."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00050",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record has been selected from the Provider Master File and all T-MSIS output fields have been populated: Provider Medicaid ID, NPI, Status set to 'A' (Active), and Reporting Period set to today's Julian date (YYDDD format)",
+                "When": "The fully assembled T-MSIS provider detail record is transferred into the T-MSIS output record structure",
+                "Then": "The T-MSIS output record structure contains the complete provider detail ready for submission, with all fields accurately reflecting the source provider master data and the current reporting period"
+            },
+            "Rule_Name": "Assemble and Write Active Provider Record to T-MSIS Submission File",
+            "Rule_Description": "When an active provider record has been fully prepared with all required T-MSIS fields (Medicaid ID, NPI, Active status, and reporting period), the assembled detail is transferred into the T-MSIS output record structure before being written to the monthly CMS T-MSIS Provider Submission file."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00051",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The T-MSIS output record structure has been fully populated with the active provider's Medicaid ID, NPI, Active status ('A'), and today's Julian date as the reporting period",
+                "When": "The T-MSIS output record is written to the monthly CMS T-MSIS Provider Submission file",
+                "Then": "The provider record is successfully appended to the T-MSIS Provider Submission output file, and the total count of T-MSIS provider rows written is incremented by 1"
+            },
+            "Rule_Name": "Write Formatted Provider Record to Monthly CMS T-MSIS Provider Submission File",
+            "Rule_Description": "Once the T-MSIS output record structure is fully populated, the provider record is physically written to the monthly CMS T-MSIS Provider Submission output file and the total output record count is incremented by one."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00052",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "An active provider record from the Provider Master File has been processed and all required T-MSIS output fields have been populated (Provider Medicaid ID, NPI, Status set to 'A', and Reporting Period set to today's Julian date)",
+                "When": "The provider record is successfully written to the T-MSIS output file",
+                "Then": "The running T-MSIS provider record counter is incremented by exactly 1, and the updated count reflects the total number of provider records successfully written to the T-MSIS output file during the current execution"
+            },
+            "Rule_Name": "T-MSIS Provider Record Count Tracking",
+            "Rule_Description": "Each time an active provider record is successfully written to the T-MSIS output file, a running counter is incremented by 1 to track the total number of provider records extracted. This count is reported at the end of the process."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00053",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All records in the Provider Master File have been processed and the T-MSIS extraction run is complete",
+                "When": "The extraction process reaches its completion point after writing all qualifying active provider records to the T-MSIS submission file",
+                "Then": "The system displays a summary message identified by program name 'PRVTMS01' showing the label 'T-MSIS PROVIDER ROWS=' followed by the final total count (WS-OUT-COUNT) of provider records successfully written to the T-MSIS submission file during the extraction run"
+            },
+            "Rule_Name": "T-MSIS Provider Extraction Summary Reporting",
+            "Rule_Description": "Upon completion of processing all provider records from the Provider Master File, the system reports the total number of active provider records successfully written to the T-MSIS submission file as a final extraction summary."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00054",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All records in the Provider Master File have been read and processed, and eligible active provider records have been written to the T-MSIS Provider Submission Output File",
+                "When": "The monthly provider extract process reaches completion after exhausting all Provider Master File records",
+                "Then": "The system displays the message 'PRVTMS01: T-MSIS PROVIDER ROWS=' followed by the total count of provider rows written to the T-MSIS Provider Submission Output File during the current extract run"
+            },
+            "Rule_Name": "Display Total T-MSIS Provider Records Written",
+            "Rule_Description": "After all provider records from the Provider Master File have been processed, the total number of provider rows successfully written to the T-MSIS Provider Submission Output File is displayed as a final summary of the monthly extract run."
+        },
+        {
+            "Rule_Id": "R-PRVTMS01-cbl-00055",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All provider records have been processed, eligible active provider records have been written to the T-MSIS Provider Submission Output File, and the total output record count has been displayed",
+                "When": "The monthly provider extract process is ready to terminate",
+                "Then": "The Provider Master Input File is closed first, followed by the closure of the T-MSIS Provider Submission Output File, and the monthly provider extract process ends successfully"
+            },
+            "Rule_Name": "Close Provider Master Input File and T-MSIS Output File at Process Completion",
+            "Rule_Description": "Upon completion of all provider record processing and after displaying the final record count, both the Provider Master Input File and the T-MSIS Provider Submission Output File must be formally closed to finalize the monthly provider extract process."
+        }
+    ],
+    "description": "PRVTMS01 is a batch program that extracts active Medicaid providers from the Provider Master File and writes them into the monthly CMS T-MSIS (Transformed Medicaid Statistical Information System) Provider Submission File (PEM-10). For each active provider record, it populates a T-MSIS detail row containing the provider's Medicaid ID, NPI, active status, and current reporting period, then counts and displays the total number of records written.\n\n<br>\n\n- **Execution Environment**: Batch\n- **Database Access**: VSAM (Indexed), Sequential File\n- **MQ Calls**: No\n- **Module Type**: Main/Driver module\n\n<br>\n\n### Key Functionalities:\n\n1: Program Initialization - Capture the current date as the reporting period date in Julian format (YYDDD with 2-digit year) to be used as the T-MSIS submission period identifier\n\n2: Julian Date Decomposition - Break down today's Julian date into its year component (YY) and day-of-year component (DDD) for use in enrollment age validation\n\n3: Provider Master File Sequential Read - Read all provider records sequentially from the Provider Master file one at a time until all records are processed\n\n4: Active Provider Filtering - Evaluate each provider record and select only those providers whose status is marked as Active; skip all inactive providers\n\n5: Enrollment Date Future-Year Validation - Extract the 2-digit year from the provider's effective (enrollment) date and compare it against the current year to detect providers whose enrollment year appears to be in the future\n\n6: Future Enrollment Alert - Display a warning message identifying the NPI of any provider whose enrollment year is greater than the current year, flagging potential data quality issues\n\n7: Provider Medicaid ID Mapping - Copy the provider's Medicaid ID from the Provider Master record into the T-MSIS output record as the provider identifier field\n\n8: Provider NPI Mapping - Copy the provider's National Provider Identifier (NPI) from the Provider Master record into the T-MSIS output record\n\n9: Provider Active Status Assignment - Set the provider status field in the T-MSIS output record to 'A' (Active) for all providers being extracted\n\n10: Submission Period Assignment - Populate the T-MSIS output record's reporting period field with today's Julian date (YYDDD), identifying the monthly submission period for CMS\n\n11: T-MSIS Record Formatting - Assemble the complete T-MSIS provider output record with record type identifier 'PRV01', provider ID, NPI, status, and submission period\n\n12: T-MSIS Output Record Writing - Write the formatted provider record to the monthly CMS T-MSIS Provider Submission output file\n\n13: Extracted Record Count Tracking - Increment a running counter each time a provider record is successfully written to the T-MSIS output file\n\n14: Extraction Summary Reporting - Display the total number of provider rows written to the T-MSIS submission file upon completion of the extraction process\n\n15: File Closure and Process Completion - Close the Provider Master input file and the T-MSIS output file and end the monthly provider extract process\n\n"
+}

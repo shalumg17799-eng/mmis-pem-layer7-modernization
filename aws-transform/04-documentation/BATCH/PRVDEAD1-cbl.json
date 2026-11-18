@@ -1,0 +1,118 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVDEAD1.cbl",
+        "type": "cobol"
+      },
+      "overview": "PRVDEAD1 is a legacy program from a state Medicaid Management Information System (MMIS) provider enrollment workflow, originally designed to support high-risk provider background check processing via paper fingerprint cards submitted to a mailroom queue. It was part of the compliance intake pipeline ensuring providers underwent fingerprint-based identity verification before enrollment approval. The program is entirely obsolete: it was superseded in 2019 when the state transitioned to electronic LiveScan fingerprinting via a third-party vendor, and it is no longer scheduled by any JCL in the current estate. Even if executed, its sole processing path is permanently disabled by a hardcoded flag, making the core logic unreachable dead code that survives only due to organizational inertia.",
+      "key_features": [
+        {
+          "feature": "Paper Fingerprint Card Intake",
+          "description": "Originally intended to log and queue paper fingerprint cards submitted by high-risk providers to a mailroom processing queue for background check compliance."
+        },
+        {
+          "feature": "Hardcoded Disabled Flag",
+          "description": "WS-PAPER-FP-ENABLED is permanently set to 'N', meaning the paper card processing logic can never execute regardless of runtime conditions."
+        },
+        {
+          "feature": "Unreachable Processing Paragraph",
+          "description": "The PROCESS-PAPER-CARD paragraph is dead code — it is syntactically present but logically unreachable due to the permanently false conditional flag."
+        },
+        {
+          "feature": "Card Count Tracking",
+          "description": "Contains a counter (WS-CARD-COUNT) intended to track the number of paper fingerprint cards queued, but this logic is never reached."
+        },
+        {
+          "feature": "LiveScan Redirect Messaging",
+          "description": "When run, the program displays a message directing users to the LiveScan electronic fingerprinting system, reflecting the 2019 workflow migration."
+        },
+        {
+          "feature": "Orphaned Program",
+          "description": "No JCL in the current environment references or schedules PRVDEAD1, making it an orphaned node with no active execution path in the production estate."
+        },
+        {
+          "feature": "Legacy Compliance Workflow Artifact",
+          "description": "Represents a discontinued regulatory compliance step for high-risk provider enrollment, preserved in the codebase without active use or maintenance."
+        }
+      ]
+    },
+    "input_output": [],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "Program Entry and Banner Display",
+          "description": "Program begins execution at MAIN-CONTROL and displays a legacy identification message indicating paper fingerprint intake context.",
+          "records": []
+        },
+        {
+          "step": 2,
+          "process": "Feature Flag Evaluation",
+          "description": "Evaluates the 88-level condition WS-PAPER-FP-ON against WS-PAPER-FP-ENABLED, which is hardcoded to 'N'. This condition is permanently false, making the true branch unreachable at runtime.",
+          "records": [
+            "WS-PAPER-FP-ENABLED",
+            "WS-PAPER-FP-ON"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "Disabled Path Notification",
+          "description": "Because the feature flag is always 'N', execution always falls to the ELSE branch, displaying a message directing users to the LiveScan electronic fingerprinting system. This is the only reachable runtime output path.",
+          "records": []
+        },
+        {
+          "step": 4,
+          "process": "Program Termination",
+          "description": "STOP RUN is executed unconditionally after the IF/ELSE block, terminating the program. No data is written, no files are accessed, and no external systems are invoked.",
+          "records": []
+        },
+        {
+          "step": 5,
+          "process": "Paper Card Processing (UNREACHABLE)",
+          "description": "PROCESS-PAPER-CARD paragraph is permanently unreachable. If it were ever reached, it would display a mailroom queue logging message and increment WS-CARD-COUNT by 1. This workflow was discontinued in 2019 when the state migrated to LiveScan electronic fingerprinting.",
+          "records": [
+            "WS-CARD-COUNT"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "Hardcoded Feature Flag",
+          "description": "WS-PAPER-FP-ENABLED is initialized to 'N' with no mechanism to change it at runtime (no file input, no parameter, no SET statement). The 88-level condition WS-PAPER-FP-ON can never be true, creating a permanent compile-time dead branch. The entire PROCESS-PAPER-CARD paragraph is therefore a dead code block."
+        },
+        {
+          "dependency": "Orphaned Program Node",
+          "description": "No JCL in the estate references PRVDEAD1 as a job step. The program is never scheduled or invoked by any parent process, making it an orphaned node. Even if the feature flag were corrected, the program would still not execute without JCL scheduling."
+        },
+        {
+          "dependency": "WS-CARD-COUNT Accumulator",
+          "description": "WS-CARD-COUNT is initialized to ZERO and incremented within PROCESS-PAPER-CARD. Because that paragraph is unreachable, this counter is never modified. It holds no operational value and is never written to any output or file."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "Runtime/Logic Errors",
+        "description": "No formal error handling exists. The program relies solely on a hardcoded flag (WS-PAPER-FP-ENABLED = 'N') that permanently routes execution to the ELSE branch, displaying a static informational message. No error codes, return codes, or abend handling are implemented."
+      },
+      {
+        "category": "Input Validation Errors",
+        "description": "No input validation is present. The program accepts no input parameters, reads no files, and performs no data validation of any kind."
+      },
+      {
+        "category": "File Operation Errors",
+        "description": "No file I/O operations exist in the program. There are no file definitions, no OPEN/READ/WRITE/CLOSE statements, and therefore no file error handling (no FILE STATUS checks, no AT END or INVALID KEY clauses)."
+      },
+      {
+        "category": "Transaction Processing Errors",
+        "description": "No transaction processing logic is implemented. The only processing attempted (PROCESS-PAPER-CARD) is permanently unreachable dead code due to the hardcoded 'N' flag, so no transaction error handling is possible."
+      },
+      {
+        "category": "Program Termination Handling",
+        "description": "Program termination is handled only by a simple STOP RUN with no cleanup, rollback, return code setting, or notification mechanism. No GOBACK, no condition code setting, and no structured shutdown logic are present."
+      }
+    ]
+  }
+}

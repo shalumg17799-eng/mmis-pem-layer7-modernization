@@ -1,0 +1,3 @@
+# OIG List of Excluded Individuals/Entities (federal exclusion feed)
+# npi|exclusion_type|exclusion_date
+1990000111|1128(a)(1) PROGRAM-RELATED FRAUD|20230115

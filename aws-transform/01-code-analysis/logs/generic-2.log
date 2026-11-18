@@ -1,0 +1,13 @@
+2026-11-17 11:23:10,538 [main] INFO : Starting generic analysis
+2026-11-17 11:23:10,540 [main] INFO : Generic analysis started at: 11:23:10 (version 20260724160636)
+2026-11-17 11:23:10,869 [main] INFO : Analysis successful, finished at: 11:23:10
+2026-11-17 11:23:10,870 [main] INFO : 22 files processed
+2026-11-17 11:23:10,870 [main] INFO : Global duration: 0 sec
+2026-11-17 11:23:10,870 [main] INFO : Outcome:
+2026-11-17 11:23:10,870 [main] INFO : - jcl: 4
+2026-11-17 11:23:10,870 [main] INFO : - proc: 1
+2026-11-17 11:23:10,870 [main] INFO : - REXX: 1
+2026-11-17 11:23:10,871 [main] INFO : - cob: 9
+2026-11-17 11:23:10,871 [main] INFO : - md: 1
+2026-11-17 11:23:10,871 [main] INFO : - cpy: 5
+2026-11-17 11:23:10,871 [main] INFO : - sql: 1

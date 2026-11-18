@@ -1,0 +1,22 @@
+Name,Type,Path,Parents,Link Types
+PINQ,Missing CICS Transaction Definition,-,PRVCICS1.cbl,Exec CICS Return transaction
+PRVNTGEN,Missing Program,-,PRVSAN01.cbl,Call; [Dynamic] Call
+PRVNTRST,Missing Program,-,PRVSAN01.cbl,Call; [Dynamic] Call
+PRVNTSUS,Missing Program,-,PRVSAN01.cbl,Call; [Dynamic] Call
+PRVNTTRM,Missing Program,-,PRVSAN01.cbl,Call; [Dynamic] Call
+MMPRV.PROV.APPS.D&DATE,Missing Dataset,-,PRVDAY01.jcl,Read Dataset; Resolved Symbol
+MMPRV.PROV.ERRORS.D&DATE,Missing Dataset,-,PRVDAY01.jcl,Resolved Symbol; Write Dataset
+MMPRV.REVAL.QUEUE.D&DATE,Missing Dataset,-,PRVMTH01.jcl,Resolved Symbol; Write Dataset
+MMPRV.SCREEN.RESULTS.D&DATE,Missing Dataset,-,PRVDAY01.jcl,Resolved Symbol; Write Dataset
+MMPRV.TMSIS.ARCHIVE(+1),Missing Dataset,-,PRVMTH01.jcl,Write Dataset
+MMPRV.TMSIS.PROVIDER.D&DATE,Missing Dataset,-,PRVMTH01.jcl,Read Dataset; Resolved Symbol; Write Dataset
+APPERROR,Missing Source File,-,PRVENR01.cbl,Assignment clause
+APPINPUT,Missing Source File,-,PRVENR01.cbl,Assignment clause
+DIROUT,Missing Source File,-,PRVDIR01.cbl,Assignment clause
+PRVMSTR,Missing Source File,-,"PRVREV01.cbl, PRVENR01.cbl, PRVSAN01.cbl, PRVRSK01.cbl, PRVSCR01.cbl, PRVDIR01.cbl, PRVTMS01.cbl","Assignment clause, Assignment clause, Assignment clause, Assignment clause, Assignment clause, Assignment clause, Assignment clause"
+PRVPROVN,Missing CICS Dataset Definition,-,PRVCICS1.cbl,Exec CICS Read file
+PRVSET1,Missing BMS,-,PRVCICS1.cbl,Exec CICS map
+REVALQ,Missing Source File,-,PRVREV01.cbl,Assignment clause
+SANCIN,Missing Source File,-,PRVSAN01.cbl,Assignment clause
+SCRNOUT,Missing Source File,-,PRVSCR01.cbl,Assignment clause
+TMSISOUT,Missing Source File,-,PRVTMS01.cbl,Assignment clause

@@ -1,0 +1,1269 @@
+{
+    "name": "PRVRSK01.cbl",
+    "program_name": "PRVRSK01.cbl",
+    "generated_at": "2026-11-17T12:39:39Z",
+    "overview": {
+        "total_key_functionalities": 10,
+        "total_rules": 48,
+        "main_flow_diagram": "flowchart TD\n    A([Start: Provider Risk Screening Classification]):::start\n    B[1:Provider File Initialization\nOpen Provider Master File\nInitialize Processing Flags]:::process\n    PRV1[(PRV-MASTER-FILE\nVSAM Indexed)]:::datasource\n    C{All Provider\nRecords Processed?}:::decision\n    D[2:Sequential Provider Record Retrieval\nRead Next Provider Record]:::process\n    E[3:Provider Taxonomy Group Extraction\nExtract First 3 Characters\nof Taxonomy Code]:::process\n    F{Taxonomy Group\nCode Match?}:::decision\n    G[4:High Risk Tier Assignment\nTaxonomy 332 or 251\nAssign HIGH Risk Tier\nper 42 CFR 455.450]:::process\n    H[5:Moderate Risk Tier Assignment\nTaxonomy 341, 291, or 225\nAssign MODERATE Risk Tier\nper 42 CFR 455.450]:::process\n    I[6:Limited Risk Tier Assignment\nAll Other Taxonomy Codes\nAssign LIMITED Risk Tier\nper 42 CFR 455.450]:::process\n    J[7:Risk Tier Flag Update on Provider Record\nSet Risk Tier Indicator\nLIMITED / MODERATE / HIGH\non Provider Master Record]:::process\n    K[8:Revalidation Due Date Calculation\nAdd 5 Years to Current Date\nDetermine Correct Century\nForm 8-Digit Due Date\nper 42 CFR 455.414]:::process\n    L[9:Revalidation Due Date Assignment\nStore 5-Year Revalidation\nDue Date on Provider Record]:::process\n    M[10:Provider Record Update\nWrite Updated Provider Record\nBack to Master File with\nRisk Tier and Revalidation Date]:::process\n    N([End: All Providers Classified]):::final\n\n    A --> B\n    B --> PRV1\n    PRV1 -.->|Open File| B\n    B --> C\n    C -->|No - More Records| D\n    D -.->|Read Record| PRV1\n    PRV1 -.->|Provider Record| D\n    D --> E\n    E --> F\n    F -->|HIGH: 332 or 251| G\n    F -->|MODERATE: 341, 291, or 225| H\n    F -->|All Others| I\n    G --> J\n    H --> J\n    I --> J\n    J --> K\n    K --> L\n    L --> M\n    M -.->|Rewrite Updated Record| PRV1\n    M --> C\n    C -->|Yes - End of File| N\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313",
+        "rules": [
+            {
+                "rule_id": "R-PRVRSK01-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Master File Initialization for Risk Screening",
+                "rule_description": "Before any provider records can be classified, the Provider Master File must be opened for read and update access, and all processing control flags must be initialized to their starting state.",
+                "sub_graph_node_text": "1:Provider File Initialization\nOpen Provider Master File\nInitialize Processing Flags",
+                "acceptance_criteria": {
+                    "Given": "The Provider Risk Screening Classification program is invoked",
+                    "When": "The program begins execution",
+                    "Then": "The Provider Master File (PRV-MASTER-FILE) is opened for read and update (I-O) access, and the End-of-File processing flag (WS-END-OF-FILE-FLAG) is initialized to 'N' (Not Ended), enabling sequential record retrieval to begin"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00002",
+                "rule_type": "Process Rules",
+                "rule_name": "Sequential Provider Record Retrieval from Master File",
+                "rule_description": "Provider records are retrieved one at a time in sequential order from the Provider Master File. The retrieval loop continues until all records have been processed or the end of the file is reached.",
+                "sub_graph_node_text": "2:Sequential Provider Record Retrieval\nRead Next Provider Record",
+                "acceptance_criteria": {
+                    "Given": "The Provider Master File is open and the End-of-File flag is set to 'N' (Not Ended)",
+                    "When": "The program attempts to read the next provider record from the Provider Master File",
+                    "Then": "If the read is successful, the provider record is made available for classification processing; if the end of the file is detected, the End-of-File flag (WS-END-OF-FILE-FLAG) is set to TRUE, halting further record retrieval and ending the classification run"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00003",
+                "rule_type": "Definitional Rules",
+                "rule_name": "Provider Taxonomy Group Extraction from Taxonomy Code",
+                "rule_description": "The provider's risk tier classification is driven by their taxonomy group, which is identified by extracting the first 3 characters of the full Taxonomy Code stored on the Provider Master Record.",
+                "sub_graph_node_text": "3:Provider Taxonomy Group Extraction\nExtract First 3 Characters\nof Taxonomy Code",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been successfully retrieved from the Provider Master File and contains a Taxonomy Code (PRV-TAXONOMY)",
+                    "When": "The program prepares to classify the provider's risk tier",
+                    "Then": "The first 3 characters of the provider's Taxonomy Code (PRV-TAXONOMY positions 1 through 3) are extracted and stored as the Taxonomy Group (WS-TAXONOMY-GROUP), which will be used to determine the appropriate risk tier"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00004",
+                "rule_type": "Decision Rules",
+                "rule_name": "High Risk Tier Assignment for Taxonomy Groups 332 and 251",
+                "rule_description": "Providers whose Taxonomy Code begins with '332' or '251' are classified as High Risk per 42 CFR 455.450, indicating the highest level of screening scrutiny is required for these provider types.",
+                "sub_graph_node_text": "4:High Risk Tier Assignment\nTaxonomy 332 or 251\nAssign HIGH Risk Tier\nper 42 CFR 455.450",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been retrieved and the first 3 characters of the Taxonomy Code (WS-TAXONOMY-GROUP) have been extracted",
+                    "When": "The Taxonomy Group is '332' OR the Taxonomy Group is '251'",
+                    "Then": "The provider's Risk Tier is designated as HIGH (PRV-RISK-HIGH on the Provider Master Record is set to TRUE), per 42 CFR 455.450 high-risk screening requirements"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00005",
+                "rule_type": "Decision Rules",
+                "rule_name": "Moderate Risk Tier Assignment for Taxonomy Groups 341, 291, and 225",
+                "rule_description": "Providers whose Taxonomy Code begins with '341', '291', or '225' are classified as Moderate Risk per 42 CFR 455.450, indicating a medium level of screening scrutiny is required for these provider types.",
+                "sub_graph_node_text": "5:Moderate Risk Tier Assignment\nTaxonomy 341, 291, or 225\nAssign MODERATE Risk Tier\nper 42 CFR 455.450",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been retrieved and the first 3 characters of the Taxonomy Code (WS-TAXONOMY-GROUP) have been extracted, and the Taxonomy Group is NOT '332' or '251'",
+                    "When": "The Taxonomy Group is '341' OR the Taxonomy Group is '291' OR the Taxonomy Group is '225'",
+                    "Then": "The provider's Risk Tier is designated as MODERATE (PRV-RISK-MODERATE on the Provider Master Record is set to TRUE), per 42 CFR 455.450 moderate-risk screening requirements"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00006",
+                "rule_type": "Decision Rules",
+                "rule_name": "Limited Risk Tier Assignment as Default for All Other Taxonomy Groups",
+                "rule_description": "Providers whose Taxonomy Code prefix does not match any specifically designated High or Moderate risk taxonomy group are defaulted to Limited Risk per 42 CFR 455.450, representing the lowest level of screening scrutiny.",
+                "sub_graph_node_text": "6:Limited Risk Tier Assignment\nAll Other Taxonomy Codes\nAssign LIMITED Risk Tier\nper 42 CFR 455.450",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been retrieved and the first 3 characters of the Taxonomy Code (WS-TAXONOMY-GROUP) have been extracted, and the Taxonomy Group is NOT '332', '251', '341', '291', or '225'",
+                    "When": "The Taxonomy Group does not match any of the specifically designated High or Moderate risk taxonomy group codes",
+                    "Then": "The provider's Risk Tier is designated as LIMITED by default (PRV-RISK-LIMITED on the Provider Master Record is set to TRUE), per 42 CFR 455.450 limited-risk screening requirements"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00007",
+                "rule_type": "Validation Rules",
+                "rule_name": "Mutual Exclusivity of Risk Tier Flag on Provider Master Record",
+                "rule_description": "Each provider is assigned exactly one risk tier indicator on their Master Record. The risk tier flag (LIMITED, MODERATE, or HIGH) is set exclusively based on the outcome of the taxonomy group evaluation, ensuring no provider holds more than one risk classification simultaneously.",
+                "sub_graph_node_text": "7:Risk Tier Flag Update on Provider Record\nSet Risk Tier Indicator\nLIMITED / MODERATE / HIGH\non Provider Master Record",
+                "acceptance_criteria": {
+                    "Given": "The provider's Taxonomy Group has been evaluated and the appropriate risk tier (HIGH, MODERATE, or LIMITED) has been determined",
+                    "When": "The risk tier indicator is applied to the Provider Master Record",
+                    "Then": "Exactly one of the three mutually exclusive risk tier flags is set to TRUE on the Provider Master Record: either PRV-RISK-HIGH, PRV-RISK-MODERATE, or PRV-RISK-LIMITED \u2014 and only one flag is active at a time per provider record"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00008",
+                "rule_type": "Computation Rules",
+                "rule_name": "Five-Year Revalidation Due Date Calculation per 42 CFR 455.414",
+                "rule_description": "Per 42 CFR 455.414, every provider must be revalidated within 5 years. The revalidation due date is computed by adding exactly 5 years to the current date, preserving the same month and day, and forming a complete 8-digit date (YYYYMMDD). A century windowing rule is applied to correctly determine whether the resulting year falls in the 1900s or 2000s.",
+                "sub_graph_node_text": "8:Revalidation Due Date Calculation\nAdd 5 Years to Current Date\nDetermine Correct Century\nForm 8-Digit Due Date\nper 42 CFR 455.414",
+                "acceptance_criteria": {
+                    "Given": "The provider's risk tier has been assigned and the current system date is available in YYYYMMDD format",
+                    "When": "The revalidation due date is being calculated",
+                    "Then": "The following computation is performed: (1) The current 2-digit year (positions 3-4 of YYYYMMDD) is extracted as WS-CURR-YY; (2) The current month and day (positions 5-8 of YYYYMMDD) are extracted as WS-CURR-MMDD; (3) The due 2-digit year is computed as MOD(WS-CURR-YY + 5, 100), wrapping at 100; (4) If the resulting 2-digit due year is less than 70, the full 4-digit due year is formed as 2000 + WS-DUE-YY (2000s century); if the resulting 2-digit due year is 70 or greater, the full 4-digit due year is formed as 1900 + WS-DUE-YY (1900s century); (5) The final 8-digit revalidation due date is formed as (WS-DUE-CCYY \u00d7 10000) + WS-CURR-MMDD, resulting in a YYYYMMDD formatted date exactly 5 years from today with the same month and day"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00009",
+                "rule_type": "Action Rules",
+                "rule_name": "Revalidation Due Date Storage on Provider Master Record",
+                "rule_description": "Once the 5-year revalidation due date has been calculated, it is stored on the Provider Master Record in the designated revalidation due date field, making it available for downstream revalidation tracking and compliance monitoring.",
+                "sub_graph_node_text": "9:Revalidation Due Date Assignment\nStore 5-Year Revalidation\nDue Date on Provider Record",
+                "acceptance_criteria": {
+                    "Given": "The 5-year revalidation due date (WS-DUE-DATE) has been successfully computed in YYYYMMDD format",
+                    "When": "The revalidation due date is assigned to the provider record",
+                    "Then": "The computed 8-digit revalidation due date (WS-DUE-DATE) is moved into the PRV-REVAL-DUE-DATE field of the Provider Master Record, recording the exact date by which the provider must complete revalidation per 42 CFR 455.414"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVRSK01-cbl-00010",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Master Record Update with Risk Tier and Revalidation Date",
+                "rule_description": "After both the risk tier classification and the revalidation due date have been applied to the provider record, the updated record is written back to the Provider Master File, permanently persisting both the risk tier indicator and the revalidation due date for the provider.",
+                "sub_graph_node_text": "10:Provider Record Update\nWrite Updated Provider Record\nBack to Master File with\nRisk Tier and Revalidation Date",
+                "acceptance_criteria": {
+                    "Given": "The provider's Master Record has been updated with the assigned risk tier flag (PRV-RISK-LIMITED, PRV-RISK-MODERATE, or PRV-RISK-HIGH) and the computed 5-year revalidation due date (PRV-REVAL-DUE-DATE)",
+                    "When": "The program completes processing for the current provider record",
+                    "Then": "The updated Provider Master Record is rewritten back to the Provider Master File (PRV-MASTER-FILE), replacing the existing record with the new values for risk tier and revalidation due date; processing then continues to the next provider record in the file"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "provider-file-initialization",
+            "title": "Provider File Initialization",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Program PRVRSK01\\nProvider Risk Screening])\n    B[Open Provider Master File\\nfor Read and Update Access]\n    C[Initialize End-of-File Flag\\nto NOT REACHED]\n    D[/Provider Master File\\nReady for Sequential Processing/]\n    E([Proceed to Sequential\\nProvider Record Retrieval])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00011",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Provider Master File Opened for Read and Update Access",
+                    "rule_description": "The Provider Master File must be opened with both read and update (I-O) access before any provider risk screening classification can begin, ensuring all provider records are accessible for retrieval and subsequent update.",
+                    "sub_graph_node_text": "Open Provider Master File\nfor Read and Update Access",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Risk Screening program PRVRSK01 has been initiated",
+                        "When": "The program begins execution",
+                        "Then": "The Provider Master File must be opened with simultaneous read and update access so that provider records can be both retrieved for classification and updated with risk tier and revalidation date results"
+                    },
+                    "key_functionality_id": "provider-file-initialization"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00012",
+                    "rule_type": "Process Rules",
+                    "rule_name": "End-of-File Processing Flag Initialized Before Sequential Screening Begins",
+                    "rule_description": "Before sequential processing of provider records begins, the end-of-file indicator must be set to its initial state of 'NOT REACHED' (value 'N'), ensuring the processing loop will commence and continue until all provider records have been screened.",
+                    "sub_graph_node_text": "Initialize End-of-File Flag\nto NOT REACHED",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File has been successfully opened for read and update access",
+                        "When": "The program prepares to begin sequential provider record retrieval",
+                        "Then": "The End-of-File Flag must be initialized to 'N' (NOT REACHED), indicating that the end of the provider file has not yet been encountered and that sequential record processing should proceed"
+                    },
+                    "key_functionality_id": "provider-file-initialization"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00013",
+                    "rule_type": "Process Rules",
+                    "rule_name": "All Provider Records Must Be Sequentially Retrieved and Classified",
+                    "rule_description": "Once the Provider Master File is open and the end-of-file flag is initialized, the program must sequentially process every provider record in the file for risk classification \u2014 no provider record is skipped or filtered. Processing continues until the end of the file is reached.",
+                    "sub_graph_node_text": "Provider Master File\nReady for Sequential Processing",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File is open for read and update access and the End-of-File Flag is set to 'N' (NOT REACHED)",
+                        "When": "Sequential provider record retrieval and classification is triggered",
+                        "Then": "The program must repeatedly retrieve and classify each provider record one at a time, continuing this loop until the End-of-File Flag is set to TRUE (end of file is reached), ensuring every provider record in the master file is processed for risk screening classification"
+                    },
+                    "key_functionality_id": "provider-file-initialization"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider File Initialization"
+        },
+        {
+            "id": "sequential-provider-record-retrieval",
+            "title": "Sequential Provider Record Retrieval",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Sequential Provider Record Retrieval])\n    B[Retrieve Next Provider Record\\nfrom Provider Master File]\n    PRV1[(PRV-MASTER-FILE\\nVSAM Indexed)]\n    C{Provider Record\\nSuccessfully Retrieved?}\n    D[Mark All Provider Records\\nas Processed\\nStop Retrieval Loop]\n    E[Pass Provider Record\\nForward for\\nClassification Processing]\n    F([End: No More Provider\\nRecords to Process])\n    G([Return: Continue to\\nNext Provider Record])\n\n    A --> B\n    B -.->|Read Next Record\\nSequentially| PRV1\n    PRV1 -.->|Provider Record| B\n    B --> C\n    C -->|No - End of File Reached| D\n    C -->|Yes - Record Available| E\n    D --> F\n    E --> G",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00014",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Sequential Retrieval of Provider Records from Provider Master File",
+                    "rule_description": "Each provider record must be retrieved one at a time in sequential order from the Provider Master File to ensure all providers are evaluated for risk classification.",
+                    "sub_graph_node_text": "Retrieve Next Provider Record from Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File is open and available for sequential reading, and the end-of-file condition has not yet been reached",
+                        "When": "The system retrieves the next provider record sequentially from the Provider Master File",
+                        "Then": "One provider record is made available for classification processing, and the system is ready to evaluate that provider's taxonomy and risk tier"
+                    },
+                    "key_functionality_id": "sequential-provider-record-retrieval"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00015",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "End-of-File Detection Stops Provider Record Retrieval Loop",
+                    "rule_description": "When no more provider records exist in the Provider Master File, the retrieval loop must be terminated and all providers are considered fully processed.",
+                    "sub_graph_node_text": "Mark All Provider Records as Processed\nStop Retrieval Loop",
+                    "acceptance_criteria": {
+                        "Given": "The system is sequentially reading provider records from the Provider Master File",
+                        "When": "The read operation reaches the end of the Provider Master File and no further provider records are available",
+                        "Then": "The end-of-file flag (WS-END-OF-FILE-FLAG) is set to TRUE, the retrieval loop is terminated, no further provider records are read, and the program proceeds to close the Provider Master File and stop"
+                    },
+                    "key_functionality_id": "sequential-provider-record-retrieval"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00016",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Successfully Retrieved Provider Record Passed Forward for Classification",
+                    "rule_description": "When a provider record is successfully retrieved from the Provider Master File, it must be immediately forwarded for risk classification processing before the next record is retrieved.",
+                    "sub_graph_node_text": "Pass Provider Record Forward for Classification Processing",
+                    "acceptance_criteria": {
+                        "Given": "The system has attempted to read the next provider record from the Provider Master File",
+                        "When": "The provider record is successfully retrieved and the end-of-file condition has NOT been reached",
+                        "Then": "The retrieved provider record is passed forward to the classification process (CLASSIFY-ONE), where the provider's taxonomy code and risk tier will be evaluated and updated"
+                    },
+                    "key_functionality_id": "sequential-provider-record-retrieval"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00017",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "All Provider Records in Master File Must Be Processed Without Skipping",
+                    "rule_description": "The retrieval process must continue looping through every provider record in the Provider Master File sequentially until the end of file is reached, ensuring no provider is skipped.",
+                    "sub_graph_node_text": "Retrieve Next Provider Record from Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File has been opened and the retrieval loop has been initiated",
+                        "When": "The system processes provider records sequentially",
+                        "Then": "Every provider record in the Provider Master File is retrieved and processed exactly once, in sequential order, with no filtering, skipping, or selective exclusion of any provider record, until the end-of-file condition is detected"
+                    },
+                    "key_functionality_id": "sequential-provider-record-retrieval"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Sequential Provider Record Retrieval"
+        },
+        {
+            "id": "provider-taxonomy-group-extraction",
+            "title": "Provider Taxonomy Group Extraction",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Taxonomy Group Extraction])\n    B[Retrieve Full Taxonomy Code\\nfrom Provider Master Record]\n    C[Extract First 3 Characters\\nof Taxonomy Code]\n    D[Store 3-Character Code\\nas Taxonomy Group Identifier]\n    E([End: Taxonomy Group Ready\\nfor Risk Classification])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00018",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Provider Taxonomy Group Extraction from Master Record",
+                    "rule_description": "The system retrieves the provider's full taxonomy code stored in the Provider Master Record as the source data for specialty/category group identification prior to risk classification.",
+                    "sub_graph_node_text": "Retrieve Full Taxonomy Code\nfrom Provider Master Record",
+                    "acceptance_criteria": {
+                        "Given": "A Provider Master Record is being processed for risk classification",
+                        "When": "The system accesses the Provider Master Record to obtain the provider's taxonomy code",
+                        "Then": "The full taxonomy code field (PRV-TAXONOMY) from the Provider Master Record is made available for further processing"
+                    },
+                    "key_functionality_id": "provider-taxonomy-group-extraction"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00019",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Extraction of First Three Characters of Provider Taxonomy Code",
+                    "rule_description": "The system extracts only the first 3 characters from the provider's full taxonomy code. These 3 characters represent the provider's specialty or category group and serve as the basis for risk tier classification.",
+                    "sub_graph_node_text": "Extract First 3 Characters\nof Taxonomy Code",
+                    "acceptance_criteria": {
+                        "Given": "The full taxonomy code has been retrieved from the Provider Master Record",
+                        "When": "The system processes the taxonomy code field",
+                        "Then": "The first 3 characters (positions 1 through 3) of the taxonomy code are extracted as the taxonomy group identifier, discarding any remaining characters beyond position 3"
+                    },
+                    "key_functionality_id": "provider-taxonomy-group-extraction"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00020",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Storage of Taxonomy Group Identifier for Risk Classification",
+                    "rule_description": "The extracted 3-character taxonomy prefix is stored as the Taxonomy Group Identifier, which will be used as the sole input to determine the provider's risk tier classification.",
+                    "sub_graph_node_text": "Store 3-Character Code\nas Taxonomy Group Identifier",
+                    "acceptance_criteria": {
+                        "Given": "The first 3 characters of the provider's taxonomy code have been extracted",
+                        "When": "The extraction is complete",
+                        "Then": "The 3-character value is stored as the Taxonomy Group Identifier (WS-TAXONOMY-GROUP) and is ready to be evaluated against known taxonomy group codes (332, 251, 341, 291, 225) to determine the provider's risk classification tier"
+                    },
+                    "key_functionality_id": "provider-taxonomy-group-extraction"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Taxonomy Group Extraction"
+        },
+        {
+            "id": "high-risk-tier-assignment",
+            "title": "High Risk Tier Assignment",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: High Risk Tier Assignment])\n    B{Is Taxonomy\\nGroup Code\\n'332'?\\nSubstance Abuse\\nFacilities}\n    C{Is Taxonomy\\nGroup Code\\n'251'?\\nHome Health\\nAgencies}\n    D[Provider Qualifies for\\nHIGH Risk Screening Tier\\nper 42 CFR 455.450]\n    E[Set HIGH Risk Tier\\nIndicator on\\nProvider Master Record]\n    F([End: HIGH Risk Tier Assigned])\n    G([Exit: Route to\\nModerate/Limited\\nTier Evaluation])\n\n    A --> B\n    B -->|Yes - Code 332\\nSubstance Abuse Facility| D\n    B -->|No| C\n    C -->|Yes - Code 251\\nHome Health Agency| D\n    C -->|No| G\n    D --> E\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00021",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Extract Provider Taxonomy Group Code for Risk Tier Evaluation",
+                    "rule_description": "Before any risk tier can be assigned, the system must derive the Provider Taxonomy Group Code by extracting the first 3 characters of the full Taxonomy Code stored on the Provider Master Record. This derived value drives all subsequent tier classification decisions.",
+                    "sub_graph_node_text": "Start: High Risk Tier Assignment",
+                    "acceptance_criteria": {
+                        "Given": "A Provider Master Record exists with a Taxonomy Code field populated on the Provider Master File",
+                        "When": "The system begins the risk tier classification process for a provider",
+                        "Then": "The system extracts the first 3 characters of the Provider Taxonomy Code and stores them as the Taxonomy Group Code, which will be used as the basis for all risk tier assignment decisions"
+                    },
+                    "key_functionality_id": "high-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00022",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Substance Abuse Facility Providers for High Risk Tier",
+                    "rule_description": "Providers whose Taxonomy Group Code begins with '332' are classified as Substance Abuse Facilities and must be assigned the HIGH risk screening tier in compliance with 42 CFR 455.450. This rule evaluates the first condition in the High Risk tier check.",
+                    "sub_graph_node_text": "Is Taxonomy Group Code '332'? Substance Abuse Facilities",
+                    "acceptance_criteria": {
+                        "Given": "A Provider Master Record has been read from the Provider Master File and the Taxonomy Group Code has been derived as the first 3 characters of the Provider Taxonomy Code",
+                        "When": "The derived Taxonomy Group Code is equal to '332' (Substance Abuse Facility)",
+                        "Then": "The provider qualifies for the HIGH risk screening tier per 42 CFR 455.450, and the system proceeds to set the HIGH risk tier indicator on the Provider Master Record"
+                    },
+                    "key_functionality_id": "high-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00023",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Home Health Agency Providers for High Risk Tier",
+                    "rule_description": "Providers whose Taxonomy Group Code begins with '251' are classified as Home Health Agencies and must be assigned the HIGH risk screening tier in compliance with 42 CFR 455.450. This rule evaluates the second condition in the High Risk tier check, applied only when the Taxonomy Group Code is not '332'.",
+                    "sub_graph_node_text": "Is Taxonomy Group Code '251'? Home Health Agencies",
+                    "acceptance_criteria": {
+                        "Given": "A Provider Master Record has been read from the Provider Master File, the Taxonomy Group Code has been derived as the first 3 characters of the Provider Taxonomy Code, and the Taxonomy Group Code is NOT '332'",
+                        "When": "The derived Taxonomy Group Code is equal to '251' (Home Health Agency)",
+                        "Then": "The provider qualifies for the HIGH risk screening tier per 42 CFR 455.450, and the system proceeds to set the HIGH risk tier indicator on the Provider Master Record"
+                    },
+                    "key_functionality_id": "high-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00024",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Assign HIGH Risk Tier Indicator on Provider Master Record",
+                    "rule_description": "Once a provider has been confirmed to qualify for the HIGH risk screening tier (Taxonomy Group Code '332' or '251'), the system must set the HIGH risk tier indicator flag on the Provider Master Record. This flag is mutually exclusive \u2014 only one risk tier indicator (High, Moderate, or Limited) can be active on a provider record at any time.",
+                    "sub_graph_node_text": "Set HIGH Risk Tier Indicator on Provider Master Record",
+                    "acceptance_criteria": {
+                        "Given": "A provider has been determined to qualify for the HIGH risk screening tier because their Taxonomy Group Code is either '332' (Substance Abuse Facility) or '251' (Home Health Agency)",
+                        "When": "The system applies the risk tier assignment to the Provider Master Record",
+                        "Then": "The HIGH risk tier indicator is set to TRUE on the Provider Master Record, and no other risk tier indicator (Moderate or Limited) is active for this provider"
+                    },
+                    "key_functionality_id": "high-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00025",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Route Non-High-Risk Providers to Moderate or Limited Tier Evaluation",
+                    "rule_description": "When a provider's Taxonomy Group Code does not match any HIGH risk tier code ('332' or '251'), the system must route the provider to the next evaluation stage to determine whether they qualify for MODERATE risk tier (codes '341', '291', '225') or default to LIMITED risk tier (all other codes).",
+                    "sub_graph_node_text": "Exit: Route to Moderate/Limited Tier Evaluation",
+                    "acceptance_criteria": {
+                        "Given": "A Provider Master Record has been read from the Provider Master File and the Taxonomy Group Code has been derived as the first 3 characters of the Provider Taxonomy Code",
+                        "When": "The derived Taxonomy Group Code is neither '332' (Substance Abuse Facility) nor '251' (Home Health Agency)",
+                        "Then": "The system exits the HIGH risk tier evaluation and routes the provider to the Moderate and Limited risk tier evaluation, where Taxonomy Group Codes '341', '291', or '225' result in MODERATE risk tier assignment, and all other codes result in LIMITED risk tier assignment"
+                    },
+                    "key_functionality_id": "high-risk-tier-assignment"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "High Risk Tier Assignment"
+        },
+        {
+            "id": "moderate-risk-tier-assignment",
+            "title": "Moderate Risk Tier Assignment",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Moderate Risk Tier Assignment])\n    B{Is Taxonomy\\nGroup Code\\n'341'?}\n    C{Is Taxonomy\\nGroup Code\\n'291'?}\n    D{Is Taxonomy\\nGroup Code\\n'225'?}\n    E[Provider Qualifies for\\nMODERATE Risk Tier\\nper 42 CFR 455.450]\n    F[Set MODERATE Risk\\nScreening Tier Flag\\non Provider Record]\n    G([End: Moderate Risk\\nTier Assigned])\n    H([Exit: No Moderate\\nTier Match - Proceed\\nto Other Tier Check])\n\n    A --> B\n    B -->|Yes - Taxonomy 341\\nHome Health/Rehab Agencies| E\n    B -->|No| C\n    C -->|Yes - Taxonomy 291\\nLaboratory Services| E\n    C -->|No| D\n    D -->|Yes - Taxonomy 225\\nPhysical/Occupational Therapy| E\n    D -->|No - No Match Found| H\n    E --> F\n    F --> G",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00026",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Home Health and Rehabilitation Agency Providers for Moderate Risk Tier",
+                    "rule_description": "Determines whether a provider's taxonomy group code prefix '341' qualifies them for Moderate Risk screening tier classification per 42 CFR 455.450, representing Home Health and Rehabilitation Agency provider types.",
+                    "sub_graph_node_text": "Is Taxonomy Group Code '341'?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record exists in the Provider Master File with a Taxonomy Code whose first 3 characters (Taxonomy Group Code) are available for evaluation",
+                        "When": "The first 3 characters of the provider's Taxonomy Code equal '341'",
+                        "Then": "The provider is identified as qualifying for the MODERATE Risk Screening Tier, and processing continues to set the Moderate Risk flag on the Provider Master Record"
+                    },
+                    "key_functionality_id": "moderate-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00027",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Laboratory Services Providers for Moderate Risk Tier",
+                    "rule_description": "Determines whether a provider's taxonomy group code prefix '291' qualifies them for Moderate Risk screening tier classification per 42 CFR 455.450, representing Laboratory Services provider types.",
+                    "sub_graph_node_text": "Is Taxonomy Group Code '291'?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record exists in the Provider Master File with a Taxonomy Code whose first 3 characters (Taxonomy Group Code) are available for evaluation, and the Taxonomy Group Code has already been confirmed as NOT equal to '341'",
+                        "When": "The first 3 characters of the provider's Taxonomy Code equal '291'",
+                        "Then": "The provider is identified as qualifying for the MODERATE Risk Screening Tier, and processing continues to set the Moderate Risk flag on the Provider Master Record"
+                    },
+                    "key_functionality_id": "moderate-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00028",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Physical and Occupational Therapy Providers for Moderate Risk Tier",
+                    "rule_description": "Determines whether a provider's taxonomy group code prefix '225' qualifies them for Moderate Risk screening tier classification per 42 CFR 455.450, representing Physical and Occupational Therapy provider types.",
+                    "sub_graph_node_text": "Is Taxonomy Group Code '225'?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record exists in the Provider Master File with a Taxonomy Code whose first 3 characters (Taxonomy Group Code) are available for evaluation, and the Taxonomy Group Code has already been confirmed as NOT equal to '341' and NOT equal to '291'",
+                        "When": "The first 3 characters of the provider's Taxonomy Code equal '225'",
+                        "Then": "The provider is identified as qualifying for the MODERATE Risk Screening Tier, and processing continues to set the Moderate Risk flag on the Provider Master Record"
+                    },
+                    "key_functionality_id": "moderate-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00029",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Assign Moderate Risk Screening Tier Flag to Qualifying Provider Record",
+                    "rule_description": "Sets the Moderate Risk Screening Tier indicator on the Provider Master Record for any provider whose Taxonomy Group Code matched '341', '291', or '225', in compliance with 42 CFR 455.450 risk-based screening requirements.",
+                    "sub_graph_node_text": "Set MODERATE Risk Screening Tier Flag on Provider Record",
+                    "acceptance_criteria": {
+                        "Given": "A provider record in the Provider Master File has been evaluated and their Taxonomy Group Code (first 3 characters of Taxonomy Code) matched one of the Moderate Risk qualifying codes: '341' (Home Health/Rehab Agencies), '291' (Laboratory Services), or '225' (Physical/Occupational Therapy)",
+                        "When": "The Moderate Risk Tier assignment is executed for the qualifying provider",
+                        "Then": "The MODERATE Risk Screening Tier flag is set to TRUE on the Provider Master Record, overwriting any previously held risk tier value, ensuring the provider is marked exclusively as Moderate Risk"
+                    },
+                    "key_functionality_id": "moderate-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00030",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Exit Moderate Risk Tier Check When No Taxonomy Match Found",
+                    "rule_description": "When a provider's Taxonomy Group Code does not match any of the three Moderate Risk qualifying codes ('341', '291', '225'), the provider is excluded from Moderate Risk classification and processing proceeds to evaluate eligibility for other risk tiers (High or Limited).",
+                    "sub_graph_node_text": "Exit: No Moderate Tier Match - Proceed to Other Tier Check",
+                    "acceptance_criteria": {
+                        "Given": "A provider record exists in the Provider Master File with a Taxonomy Code whose first 3 characters (Taxonomy Group Code) are available for evaluation",
+                        "When": "The first 3 characters of the provider's Taxonomy Code do NOT equal '341', AND do NOT equal '291', AND do NOT equal '225'",
+                        "Then": "The provider does NOT qualify for the MODERATE Risk Screening Tier, no Moderate Risk flag is set on the Provider Master Record, and the provider's Taxonomy Group Code is forwarded for evaluation against other risk tier criteria (High Risk or Limited Risk)"
+                    },
+                    "key_functionality_id": "moderate-risk-tier-assignment"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Moderate Risk Tier Assignment"
+        },
+        {
+            "id": "limited-risk-tier-assignment",
+            "title": "Limited Risk Tier Assignment",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Limited Risk Tier Assignment])\n    B{Does Provider Taxonomy Group\\nMatch Any HIGH Risk Code?\\n332 or 251}\n    C{Does Provider Taxonomy Group\\nMatch Any MODERATE Risk Code?\\n341, 291, or 225}\n    D[Provider Taxonomy Group Does\\nNot Match Any Defined\\nHIGH or MODERATE Risk Code]\n    E[Assign LIMITED Risk Screening Tier\\nto Provider Record\\nper 42 CFR 455.450]\n    F([End: Provider Assigned\\nLIMITED Risk Tier])\n    G([Exit: Handled by\\nHIGH Risk Process])\n    H([Exit: Handled by\\nMODERATE Risk Process])\n\n    A --> B\n    B -->|Yes - Taxonomy Matches HIGH| G\n    B -->|No - No HIGH Match| C\n    C -->|Yes - Taxonomy Matches MODERATE| H\n    C -->|No - No MODERATE Match| D\n    D --> E\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00031",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Evaluate Provider Taxonomy Group Against HIGH Risk Codes Before LIMITED Assignment",
+                    "rule_description": "Before assigning a LIMITED risk tier, the system must first verify that the provider's taxonomy group does not match any HIGH risk taxonomy code (332 or 251). If it matches, the provider is routed to the HIGH risk process and LIMITED tier assignment is bypassed.",
+                    "sub_graph_node_text": "Does Provider Taxonomy Group Match Any HIGH Risk Code? 332 or 251",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                        "When": "The provider's Taxonomy Group is evaluated and it matches either '332' or '251'",
+                        "Then": "The provider is routed to the HIGH Risk Tier assignment process and the LIMITED Risk Tier assignment process is not executed for this provider"
+                    },
+                    "key_functionality_id": "limited-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00032",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Evaluate Provider Taxonomy Group Against MODERATE Risk Codes Before LIMITED Assignment",
+                    "rule_description": "After confirming no HIGH risk match, the system must verify that the provider's taxonomy group does not match any MODERATE risk taxonomy code (341, 291, or 225). If it matches, the provider is routed to the MODERATE risk process and LIMITED tier assignment is bypassed.",
+                    "sub_graph_node_text": "Does Provider Taxonomy Group Match Any MODERATE Risk Code? 341, 291, or 225",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File, the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group, and the Taxonomy Group has already been confirmed as NOT matching any HIGH risk code (332 or 251)",
+                        "When": "The provider's Taxonomy Group is evaluated and it matches any one of '341', '291', or '225'",
+                        "Then": "The provider is routed to the MODERATE Risk Tier assignment process and the LIMITED Risk Tier assignment process is not executed for this provider"
+                    },
+                    "key_functionality_id": "limited-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00033",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Provider Taxonomy Group as Non-Matching for HIGH and MODERATE Risk Codes",
+                    "rule_description": "When a provider's taxonomy group does not match any of the specifically defined HIGH risk codes (332, 251) or MODERATE risk codes (341, 291, 225), the provider is identified as having no defined elevated risk taxonomy and is eligible for LIMITED risk tier assignment.",
+                    "sub_graph_node_text": "Provider Taxonomy Group Does Not Match Any Defined HIGH or MODERATE Risk Code",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                        "When": "The provider's Taxonomy Group does not match '332' or '251' (HIGH risk codes) AND does not match '341', '291', or '225' (MODERATE risk codes) \u2014 falling into the WHEN OTHER condition",
+                        "Then": "The provider is identified as having a taxonomy group that does not correspond to any defined HIGH or MODERATE risk classification and is eligible to be assigned the LIMITED risk screening tier"
+                    },
+                    "key_functionality_id": "limited-risk-tier-assignment"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00034",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Assign LIMITED Risk Screening Tier to Provider Record per 42 CFR 455.450",
+                    "rule_description": "Providers whose taxonomy group does not match any HIGH or MODERATE risk taxonomy codes must be assigned the LIMITED risk screening tier on their Provider Master Record, in compliance with 42 CFR 455.450. This is the default risk classification for all providers not explicitly categorized as HIGH or MODERATE risk.",
+                    "sub_graph_node_text": "Assign LIMITED Risk Screening Tier to Provider Record per 42 CFR 455.450",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File, the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group, and the Taxonomy Group has been confirmed as NOT matching any HIGH risk code (332 or 251) AND NOT matching any MODERATE risk code (341, 291, or 225)",
+                        "When": "The system processes the provider record for risk tier assignment and the taxonomy group falls into the default 'OTHER' category",
+                        "Then": "The LIMITED risk screening tier flag is set to TRUE on the Provider Master Record, overwriting any previously held risk tier value, in compliance with 42 CFR 455.450, and the record is subsequently updated in the Provider Master File"
+                    },
+                    "key_functionality_id": "limited-risk-tier-assignment"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Limited Risk Tier Assignment"
+        },
+        {
+            "id": "risk-tier-flag-update-on-provider-record",
+            "title": "Risk Tier Flag Update on Provider Record",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Risk Tier Flag Update])\n    B{Which Risk Tier\\nWas Determined\\nfrom Taxonomy Group?}\n    C[Set HIGH Risk\\nTier Indicator\\non Provider Record]\n    D[Set MODERATE Risk\\nTier Indicator\\non Provider Record]\n    E[Set LIMITED Risk\\nTier Indicator\\non Provider Record]\n    F([End: Risk Tier Flag\\nUpdated on Provider Record])\n\n    A --> B\n    B -->|HIGH Tier\\nTaxonomy 332 or 251| C\n    B -->|MODERATE Tier\\nTaxonomy 341, 291, or 225| D\n    B -->|LIMITED Tier\\nAll Other Taxonomy Codes| E\n    C --> F\n    D --> F\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00035",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Assign HIGH Risk Tier Indicator to Provider Record for Taxonomy Groups 332 and 251",
+                    "rule_description": "When a provider's taxonomy code prefix is identified as belonging to the HIGH risk tier group (332 or 251), the HIGH risk tier indicator must be set on the provider's master record to reflect the elevated risk classification.",
+                    "sub_graph_node_text": "Set HIGH Risk Tier Indicator on Provider Record",
+                    "acceptance_criteria": {
+                        "Given": "A provider master record has been read and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                        "When": "The Taxonomy Group is '332' OR the Taxonomy Group is '251'",
+                        "Then": "The HIGH Risk Tier Indicator (PRV-RISK-HIGH) on the Provider Master Record is set to TRUE, and no other risk tier indicator (MODERATE or LIMITED) is set for this provider"
+                    },
+                    "key_functionality_id": "risk-tier-flag-update-on-provider-record"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00036",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Assign MODERATE Risk Tier Indicator to Provider Record for Taxonomy Groups 341, 291, and 225",
+                    "rule_description": "When a provider's taxonomy code prefix is identified as belonging to the MODERATE risk tier group (341, 291, or 225), the MODERATE risk tier indicator must be set on the provider's master record to reflect the intermediate risk classification.",
+                    "sub_graph_node_text": "Set MODERATE Risk Tier Indicator on Provider Record",
+                    "acceptance_criteria": {
+                        "Given": "A provider master record has been read and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                        "When": "The Taxonomy Group is '341' OR the Taxonomy Group is '291' OR the Taxonomy Group is '225'",
+                        "Then": "The MODERATE Risk Tier Indicator (PRV-RISK-MODERATE) on the Provider Master Record is set to TRUE, and no other risk tier indicator (HIGH or LIMITED) is set for this provider"
+                    },
+                    "key_functionality_id": "risk-tier-flag-update-on-provider-record"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00037",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Assign LIMITED Risk Tier Indicator to Provider Record for All Other Taxonomy Groups",
+                    "rule_description": "When a provider's taxonomy code prefix does not match any of the specifically designated HIGH or MODERATE risk tier taxonomy groups, the provider is defaulted to the LIMITED risk tier and the LIMITED risk tier indicator is set on the provider's master record.",
+                    "sub_graph_node_text": "Set LIMITED Risk Tier Indicator on Provider Record",
+                    "acceptance_criteria": {
+                        "Given": "A provider master record has been read and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                        "When": "The Taxonomy Group does NOT match any of the HIGH tier codes ('332', '251') AND does NOT match any of the MODERATE tier codes ('341', '291', '225') \u2014 i.e., the Taxonomy Group is any other value",
+                        "Then": "The LIMITED Risk Tier Indicator (PRV-RISK-LIMITED) on the Provider Master Record is set to TRUE, and no other risk tier indicator (HIGH or MODERATE) is set for this provider"
+                    },
+                    "key_functionality_id": "risk-tier-flag-update-on-provider-record"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00038",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Enforce Mutual Exclusivity of Risk Tier Indicators on Provider Record",
+                    "rule_description": "A provider must be assigned exactly one risk tier classification \u2014 HIGH, MODERATE, or LIMITED. The three risk tier indicators are mutually exclusive; setting one tier indicator implicitly means the other two are not active for that provider record.",
+                    "sub_graph_node_text": "Which Risk Tier Was Determined from Taxonomy Group?",
+                    "acceptance_criteria": {
+                        "Given": "A provider master record is being classified and the Taxonomy Group has been evaluated against all defined tier groupings",
+                        "When": "The risk tier determination is complete and exactly one tier path (HIGH, MODERATE, or LIMITED) has been selected based on the Taxonomy Group evaluation",
+                        "Then": "Exactly one risk tier indicator is set to TRUE on the Provider Master Record \u2014 either PRV-RISK-HIGH, PRV-RISK-MODERATE, or PRV-RISK-LIMITED \u2014 and the remaining two risk tier indicators are not set, ensuring no provider holds more than one active risk tier classification"
+                    },
+                    "key_functionality_id": "risk-tier-flag-update-on-provider-record"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Risk Tier Flag Update on Provider Record"
+        },
+        {
+            "id": "revalidation-due-date-calculation",
+            "title": "Revalidation Due Date Calculation",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Revalidation Due Date Calculation\\nper 42 CFR 455.414])\n    B[Retrieve Today's Full Date\\nin YYYYMMDD Format]\n    C[Extract 2-Digit Year\\nfrom Current Date]\n    D[Extract Month and Day\\nfrom Current Date]\n    E[Add 5 Years to\\nCurrent 2-Digit Year\\nand Keep Last 2 Digits]\n    F{Is the Resulting\\n2-Digit Due Year\\nLess Than 70?}\n    G[Assign Century as 2000s\\nDue Year = 2000 + 2-Digit Year\\ne.g. 2025, 2026...]\n    H[Assign Century as 1900s\\nDue Year = 1900 + 2-Digit Year\\ne.g. 1970, 1975...]\n    I[Combine Full 4-Digit Due Year\\nwith Original Month and Day\\nto Form 8-Digit Due Date\\nFormat: YYYYMMDD]\n    J([End: 8-Digit Revalidation\\nDue Date Calculated])\n\n    A --> B\n    B --> C\n    B --> D\n    C --> E\n    E --> F\n    F -->|Yes - Next Century| G\n    F -->|No - Current Century| H\n    G --> I\n    H --> I\n    D --> I\n    I --> J",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00039",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Retrieve Today's Full Date for Revalidation Calculation",
+                    "rule_description": "As part of the revalidation due date calculation required under 42 CFR 455.414, the system must obtain the current calendar date in a full 8-digit format (YYYYMMDD) to serve as the baseline for computing the provider's next revalidation due date.",
+                    "sub_graph_node_text": "Retrieve Today's Full Date in YYYYMMDD Format",
+                    "acceptance_criteria": {
+                        "Given": "The system is processing a provider record and needs to calculate the revalidation due date per 42 CFR 455.414",
+                        "When": "The revalidation due date calculation process is initiated for a provider",
+                        "Then": "The system retrieves today's full calendar date in YYYYMMDD format (e.g., 20240315 for March 15, 2024) and stores it as the current date baseline for all subsequent revalidation date computations"
+                    },
+                    "key_functionality_id": "revalidation-due-date-calculation"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00040",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Extract 2-Digit Year Component from Current Date",
+                    "rule_description": "The system extracts only the 2-digit year portion from the current full date to enable the 5-year addition calculation. The 2-digit year occupies positions 3 and 4 of the YYYYMMDD formatted current date (e.g., from 20240315, the value '24' is extracted as the 2-digit year).",
+                    "sub_graph_node_text": "Extract 2-Digit Year from Current Date",
+                    "acceptance_criteria": {
+                        "Given": "The current date has been retrieved in YYYYMMDD format (e.g., 20240315)",
+                        "When": "The system extracts the year component from the current date",
+                        "Then": "The system isolates characters at positions 3 and 4 of the YYYYMMDD date string as the 2-digit current year (e.g., from 20240315, the 2-digit year extracted is '24'), which will be used as the basis for adding 5 years"
+                    },
+                    "key_functionality_id": "revalidation-due-date-calculation"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00041",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Extract Month and Day Components from Current Date",
+                    "rule_description": "The system extracts the month and day portion (MMDD) from the current full date. These values remain unchanged in the revalidation due date \u2014 only the year advances by 5. The month and day occupy positions 5 through 8 of the YYYYMMDD formatted current date (e.g., from 20240315, the value '0315' is extracted).",
+                    "sub_graph_node_text": "Extract Month and Day from Current Date",
+                    "acceptance_criteria": {
+                        "Given": "The current date has been retrieved in YYYYMMDD format (e.g., 20240315)",
+                        "When": "The system extracts the month and day components from the current date",
+                        "Then": "The system isolates characters at positions 5 through 8 of the YYYYMMDD date string as the 4-digit month-and-day value (e.g., from 20240315, the month-day extracted is '0315'), which will be preserved unchanged in the final revalidation due date"
+                    },
+                    "key_functionality_id": "revalidation-due-date-calculation"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00042",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Calculate 5-Year Revalidation Due Year (2-Digit)",
+                    "rule_description": "Per 42 CFR 455.414, provider revalidation is required every 5 years. The system calculates the 2-digit due year by adding 5 to the current 2-digit year and retaining only the last 2 digits of the result (using modulo 100). For example, if the current 2-digit year is 97, adding 5 gives 102, and keeping the last 2 digits yields 02.",
+                    "sub_graph_node_text": "Add 5 Years to Current 2-Digit Year and Keep Last 2 Digits",
+                    "acceptance_criteria": {
+                        "Given": "The 2-digit current year has been extracted from today's date (e.g., current 2-digit year = 24)",
+                        "When": "The system computes the revalidation due year",
+                        "Then": "The system adds 5 to the current 2-digit year and applies modulo 100 to retain only the last 2 digits of the result as the 2-digit due year (e.g., 24 + 5 = 29, MOD 100 = 29; or 97 + 5 = 102, MOD 100 = 02), which is then used for century determination"
+                    },
+                    "key_functionality_id": "revalidation-due-date-calculation"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00043",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Determine Century for Revalidation Due Year \u2014 2000s Assignment",
+                    "rule_description": "After computing the 2-digit revalidation due year, the system must determine the correct century to form a valid 4-digit year. If the resulting 2-digit due year is less than 70, the century is assigned as 2000s, producing a full 4-digit year in the range 2000\u20132069 (e.g., due year 29 \u2192 full year 2029).",
+                    "sub_graph_node_text": "Is the Resulting 2-Digit Due Year Less Than 70?",
+                    "acceptance_criteria": {
+                        "Given": "The 2-digit revalidation due year has been calculated (e.g., due year = 29)",
+                        "When": "The 2-digit due year is less than 70 (i.e., values 00 through 69)",
+                        "Then": "The system assigns the century as 2000s by computing the full 4-digit due year as 2000 plus the 2-digit due year (e.g., 2000 + 29 = 2029), placing the revalidation date in the 21st century"
+                    },
+                    "key_functionality_id": "revalidation-due-date-calculation"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00044",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Determine Century for Revalidation Due Year \u2014 1900s Assignment",
+                    "rule_description": "After computing the 2-digit revalidation due year, if the resulting value is 70 or greater, the century is assigned as 1900s, producing a full 4-digit year in the range 1970\u20131999 (e.g., due year 72 \u2192 full year 1972). This represents a date windowing boundary in the calculation logic.",
+                    "sub_graph_node_text": "Is the Resulting 2-Digit Due Year Less Than 70?",
+                    "acceptance_criteria": {
+                        "Given": "The 2-digit revalidation due year has been calculated (e.g., due year = 72)",
+                        "When": "The 2-digit due year is 70 or greater (i.e., values 70 through 99)",
+                        "Then": "The system assigns the century as 1900s by computing the full 4-digit due year as 1900 plus the 2-digit due year (e.g., 1900 + 72 = 1972), placing the revalidation date in the 20th century"
+                    },
+                    "key_functionality_id": "revalidation-due-date-calculation"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00045",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Form Complete 8-Digit Revalidation Due Date in YYYYMMDD Format",
+                    "rule_description": "Once the full 4-digit due year and the original month-and-day values are determined, the system combines them into a single 8-digit revalidation due date in YYYYMMDD format. The full 4-digit year is multiplied by 10000 and added to the 4-digit month-day value to produce the final date. This completed date is then stored on the Provider Master Record as the provider's next revalidation due date per 42 CFR 455.414.",
+                    "sub_graph_node_text": "Combine Full 4-Digit Due Year with Original Month and Day to Form 8-Digit Due Date Format: YYYYMMDD",
+                    "acceptance_criteria": {
+                        "Given": "The full 4-digit revalidation due year (e.g., 2029) and the original month-and-day value (e.g., 0315) have both been determined",
+                        "When": "The system forms the final revalidation due date",
+                        "Then": "The system computes the 8-digit revalidation due date by multiplying the 4-digit due year by 10000 and adding the 4-digit month-day value (e.g., 2029 \u00d7 10000 + 0315 = 20290315), and stores this complete YYYYMMDD date as the Revalidation Due Date on the Provider Master Record"
+                    },
+                    "key_functionality_id": "revalidation-due-date-calculation"
+                },
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00046",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Revalidation Due Date Must Preserve Original Month and Day",
+                    "rule_description": "Per 42 CFR 455.414, the revalidation due date is set exactly 5 years from the current date. The month and day of the revalidation due date must be identical to the month and day of the date on which the classification is run \u2014 only the year component changes. This ensures the anniversary-based revalidation cycle is maintained.",
+                    "sub_graph_node_text": "Combine Full 4-Digit Due Year with Original Month and Day to Form 8-Digit Due Date Format: YYYYMMDD",
+                    "acceptance_criteria": {
+                        "Given": "The revalidation due date is being calculated for a provider on any given processing date (e.g., processing date is 20240315)",
+                        "When": "The system constructs the final 8-digit revalidation due date",
+                        "Then": "The month and day portion of the revalidation due date must exactly match the month and day of today's processing date (e.g., if today is March 15, the revalidation due date must also fall on March 15 of the due year), with only the year advancing by 5 years"
+                    },
+                    "key_functionality_id": "revalidation-due-date-calculation"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Revalidation Due Date Calculation"
+        },
+        {
+            "id": "revalidation-due-date-assignment",
+            "title": "Revalidation Due Date Assignment",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Revalidation Due Date Assignment])\n    B[Receive Computed 5-Year\\nRevalidation Due Date\\nfrom Calculation Step]\n    C[Store Revalidation Due Date\\ninto Provider Master Record\\nField: PRV-REVAL-DUE-DATE]\n    D[(PRV-MASTER-FILE\\nVSAM Indexed)]\n    E([End: Revalidation Due Date\\nStored on Provider Record])\n\n    A --> B\n    B --> C\n    C -.->|Update Due Date Field| D\n    C --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00047",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Store Computed Revalidation Due Date onto Provider Master Record",
+                    "rule_description": "Once the 5-year revalidation due date has been computed, it must be permanently recorded on the provider's master record so that the provider's revalidation schedule is officially captured and available for future reference and compliance tracking.",
+                    "sub_graph_node_text": "Store Revalidation Due Date into Provider Master Record Field: PRV-REVAL-DUE-DATE",
+                    "acceptance_criteria": {
+                        "Given": "A provider's 5-year revalidation due date has been successfully computed in YYYYMMDD format, representing the same month and day as today but 5 years into the future, and the provider's master record is open and available for update",
+                        "When": "The revalidation due date assignment step is executed for the current provider record",
+                        "Then": "The computed revalidation due date value in YYYYMMDD format is stored into the Revalidation Due Date field (PRV-REVAL-DUE-DATE) on the provider's master record, overwriting any previously held value in that field, and the updated provider master record is saved back to the Provider Master File"
+                    },
+                    "key_functionality_id": "revalidation-due-date-assignment"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Revalidation Due Date Assignment"
+        },
+        {
+            "id": "provider-record-update",
+            "title": "Provider Record Update",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Record Update])\n    B[Consolidate Updated Provider Record\\nwith Newly Assigned Risk Screening Tier\\nand Revalidation Due Date]\n    C[(PRV-MASTER-FILE\\nVSAM Indexed)]\n    D[Write Updated Provider Record\\nBack to Provider Master File]\n    E[Provider Classification\\nCompleted for This Record]\n    F([End: Return to Process\\nNext Provider Record])\n\n    A --> B\n    B --> D\n    D -.->|Rewrite Record| C\n    C -.->|Confirm Record Updated| D\n    D --> E\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVRSK01-cbl-00048",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Consolidate and Persist Updated Provider Classification Record",
+                    "rule_description": "After a provider's risk screening tier and revalidation due date have been determined, the updated provider master record \u2014 containing both the newly assigned risk tier (High, Moderate, or Limited) and the calculated revalidation due date \u2014 must be written back to the Provider Master File to complete the classification for that provider.",
+                    "sub_graph_node_text": "Consolidate Updated Provider Record\nwith Newly Assigned Risk Screening Tier\nand Revalidation Due Date",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and has been updated with a newly assigned risk screening tier (High, Moderate, or Limited) and a calculated revalidation due date (set to 5 years from the current date, same month and day)",
+                        "When": "The classification process for the current provider record is complete and all updates have been applied to the in-memory provider record",
+                        "Then": "The updated provider master record \u2014 containing the assigned risk screening tier flag and the revalidation due date \u2014 is written back to the Provider Master File, replacing the existing record for that provider, thereby completing the classification for that provider record"
+                    },
+                    "key_functionality_id": "provider-record-update"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Record Update"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Risk Screening Classification program is invoked",
+                "When": "The program begins execution",
+                "Then": "The Provider Master File (PRV-MASTER-FILE) is opened for read and update (I-O) access, and the End-of-File processing flag (WS-END-OF-FILE-FLAG) is initialized to 'N' (Not Ended), enabling sequential record retrieval to begin"
+            },
+            "Rule_Name": "Provider Master File Initialization for Risk Screening",
+            "Rule_Description": "Before any provider records can be classified, the Provider Master File must be opened for read and update access, and all processing control flags must be initialized to their starting state."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00002",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File is open and the End-of-File flag is set to 'N' (Not Ended)",
+                "When": "The program attempts to read the next provider record from the Provider Master File",
+                "Then": "If the read is successful, the provider record is made available for classification processing; if the end of the file is detected, the End-of-File flag (WS-END-OF-FILE-FLAG) is set to TRUE, halting further record retrieval and ending the classification run"
+            },
+            "Rule_Name": "Sequential Provider Record Retrieval from Master File",
+            "Rule_Description": "Provider records are retrieved one at a time in sequential order from the Provider Master File. The retrieval loop continues until all records have been processed or the end of the file is reached."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00003",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider Master File and contains a Taxonomy Code (PRV-TAXONOMY)",
+                "When": "The program prepares to classify the provider's risk tier",
+                "Then": "The first 3 characters of the provider's Taxonomy Code (PRV-TAXONOMY positions 1 through 3) are extracted and stored as the Taxonomy Group (WS-TAXONOMY-GROUP), which will be used to determine the appropriate risk tier"
+            },
+            "Rule_Name": "Provider Taxonomy Group Extraction from Taxonomy Code",
+            "Rule_Description": "The provider's risk tier classification is driven by their taxonomy group, which is identified by extracting the first 3 characters of the full Taxonomy Code stored on the Provider Master Record."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00004",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been retrieved and the first 3 characters of the Taxonomy Code (WS-TAXONOMY-GROUP) have been extracted",
+                "When": "The Taxonomy Group is '332' OR the Taxonomy Group is '251'",
+                "Then": "The provider's Risk Tier is designated as HIGH (PRV-RISK-HIGH on the Provider Master Record is set to TRUE), per 42 CFR 455.450 high-risk screening requirements"
+            },
+            "Rule_Name": "High Risk Tier Assignment for Taxonomy Groups 332 and 251",
+            "Rule_Description": "Providers whose Taxonomy Code begins with '332' or '251' are classified as High Risk per 42 CFR 455.450, indicating the highest level of screening scrutiny is required for these provider types."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00005",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been retrieved and the first 3 characters of the Taxonomy Code (WS-TAXONOMY-GROUP) have been extracted, and the Taxonomy Group is NOT '332' or '251'",
+                "When": "The Taxonomy Group is '341' OR the Taxonomy Group is '291' OR the Taxonomy Group is '225'",
+                "Then": "The provider's Risk Tier is designated as MODERATE (PRV-RISK-MODERATE on the Provider Master Record is set to TRUE), per 42 CFR 455.450 moderate-risk screening requirements"
+            },
+            "Rule_Name": "Moderate Risk Tier Assignment for Taxonomy Groups 341, 291, and 225",
+            "Rule_Description": "Providers whose Taxonomy Code begins with '341', '291', or '225' are classified as Moderate Risk per 42 CFR 455.450, indicating a medium level of screening scrutiny is required for these provider types."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00006",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been retrieved and the first 3 characters of the Taxonomy Code (WS-TAXONOMY-GROUP) have been extracted, and the Taxonomy Group is NOT '332', '251', '341', '291', or '225'",
+                "When": "The Taxonomy Group does not match any of the specifically designated High or Moderate risk taxonomy group codes",
+                "Then": "The provider's Risk Tier is designated as LIMITED by default (PRV-RISK-LIMITED on the Provider Master Record is set to TRUE), per 42 CFR 455.450 limited-risk screening requirements"
+            },
+            "Rule_Name": "Limited Risk Tier Assignment as Default for All Other Taxonomy Groups",
+            "Rule_Description": "Providers whose Taxonomy Code prefix does not match any specifically designated High or Moderate risk taxonomy group are defaulted to Limited Risk per 42 CFR 455.450, representing the lowest level of screening scrutiny."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00007",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's Taxonomy Group has been evaluated and the appropriate risk tier (HIGH, MODERATE, or LIMITED) has been determined",
+                "When": "The risk tier indicator is applied to the Provider Master Record",
+                "Then": "Exactly one of the three mutually exclusive risk tier flags is set to TRUE on the Provider Master Record: either PRV-RISK-HIGH, PRV-RISK-MODERATE, or PRV-RISK-LIMITED \u2014 and only one flag is active at a time per provider record"
+            },
+            "Rule_Name": "Mutual Exclusivity of Risk Tier Flag on Provider Master Record",
+            "Rule_Description": "Each provider is assigned exactly one risk tier indicator on their Master Record. The risk tier flag (LIMITED, MODERATE, or HIGH) is set exclusively based on the outcome of the taxonomy group evaluation, ensuring no provider holds more than one risk classification simultaneously."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00008",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's risk tier has been assigned and the current system date is available in YYYYMMDD format",
+                "When": "The revalidation due date is being calculated",
+                "Then": "The following computation is performed: (1) The current 2-digit year (positions 3-4 of YYYYMMDD) is extracted as WS-CURR-YY; (2) The current month and day (positions 5-8 of YYYYMMDD) are extracted as WS-CURR-MMDD; (3) The due 2-digit year is computed as MOD(WS-CURR-YY + 5, 100), wrapping at 100; (4) If the resulting 2-digit due year is less than 70, the full 4-digit due year is formed as 2000 + WS-DUE-YY (2000s century); if the resulting 2-digit due year is 70 or greater, the full 4-digit due year is formed as 1900 + WS-DUE-YY (1900s century); (5) The final 8-digit revalidation due date is formed as (WS-DUE-CCYY \u00d7 10000) + WS-CURR-MMDD, resulting in a YYYYMMDD formatted date exactly 5 years from today with the same month and day"
+            },
+            "Rule_Name": "Five-Year Revalidation Due Date Calculation per 42 CFR 455.414",
+            "Rule_Description": "Per 42 CFR 455.414, every provider must be revalidated within 5 years. The revalidation due date is computed by adding exactly 5 years to the current date, preserving the same month and day, and forming a complete 8-digit date (YYYYMMDD). A century windowing rule is applied to correctly determine whether the resulting year falls in the 1900s or 2000s."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00009",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The 5-year revalidation due date (WS-DUE-DATE) has been successfully computed in YYYYMMDD format",
+                "When": "The revalidation due date is assigned to the provider record",
+                "Then": "The computed 8-digit revalidation due date (WS-DUE-DATE) is moved into the PRV-REVAL-DUE-DATE field of the Provider Master Record, recording the exact date by which the provider must complete revalidation per 42 CFR 455.414"
+            },
+            "Rule_Name": "Revalidation Due Date Storage on Provider Master Record",
+            "Rule_Description": "Once the 5-year revalidation due date has been calculated, it is stored on the Provider Master Record in the designated revalidation due date field, making it available for downstream revalidation tracking and compliance monitoring."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00010",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's Master Record has been updated with the assigned risk tier flag (PRV-RISK-LIMITED, PRV-RISK-MODERATE, or PRV-RISK-HIGH) and the computed 5-year revalidation due date (PRV-REVAL-DUE-DATE)",
+                "When": "The program completes processing for the current provider record",
+                "Then": "The updated Provider Master Record is rewritten back to the Provider Master File (PRV-MASTER-FILE), replacing the existing record with the new values for risk tier and revalidation due date; processing then continues to the next provider record in the file"
+            },
+            "Rule_Name": "Provider Master Record Update with Risk Tier and Revalidation Date",
+            "Rule_Description": "After both the risk tier classification and the revalidation due date have been applied to the provider record, the updated record is written back to the Provider Master File, permanently persisting both the risk tier indicator and the revalidation due date for the provider."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00011",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Risk Screening program PRVRSK01 has been initiated",
+                "When": "The program begins execution",
+                "Then": "The Provider Master File must be opened with simultaneous read and update access so that provider records can be both retrieved for classification and updated with risk tier and revalidation date results"
+            },
+            "Rule_Name": "Provider Master File Opened for Read and Update Access",
+            "Rule_Description": "The Provider Master File must be opened with both read and update (I-O) access before any provider risk screening classification can begin, ensuring all provider records are accessible for retrieval and subsequent update."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00012",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File has been successfully opened for read and update access",
+                "When": "The program prepares to begin sequential provider record retrieval",
+                "Then": "The End-of-File Flag must be initialized to 'N' (NOT REACHED), indicating that the end of the provider file has not yet been encountered and that sequential record processing should proceed"
+            },
+            "Rule_Name": "End-of-File Processing Flag Initialized Before Sequential Screening Begins",
+            "Rule_Description": "Before sequential processing of provider records begins, the end-of-file indicator must be set to its initial state of 'NOT REACHED' (value 'N'), ensuring the processing loop will commence and continue until all provider records have been screened."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00013",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File is open for read and update access and the End-of-File Flag is set to 'N' (NOT REACHED)",
+                "When": "Sequential provider record retrieval and classification is triggered",
+                "Then": "The program must repeatedly retrieve and classify each provider record one at a time, continuing this loop until the End-of-File Flag is set to TRUE (end of file is reached), ensuring every provider record in the master file is processed for risk screening classification"
+            },
+            "Rule_Name": "All Provider Records Must Be Sequentially Retrieved and Classified",
+            "Rule_Description": "Once the Provider Master File is open and the end-of-file flag is initialized, the program must sequentially process every provider record in the file for risk classification \u2014 no provider record is skipped or filtered. Processing continues until the end of the file is reached."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00014",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File is open and available for sequential reading, and the end-of-file condition has not yet been reached",
+                "When": "The system retrieves the next provider record sequentially from the Provider Master File",
+                "Then": "One provider record is made available for classification processing, and the system is ready to evaluate that provider's taxonomy and risk tier"
+            },
+            "Rule_Name": "Sequential Retrieval of Provider Records from Provider Master File",
+            "Rule_Description": "Each provider record must be retrieved one at a time in sequential order from the Provider Master File to ensure all providers are evaluated for risk classification."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00015",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system is sequentially reading provider records from the Provider Master File",
+                "When": "The read operation reaches the end of the Provider Master File and no further provider records are available",
+                "Then": "The end-of-file flag (WS-END-OF-FILE-FLAG) is set to TRUE, the retrieval loop is terminated, no further provider records are read, and the program proceeds to close the Provider Master File and stop"
+            },
+            "Rule_Name": "End-of-File Detection Stops Provider Record Retrieval Loop",
+            "Rule_Description": "When no more provider records exist in the Provider Master File, the retrieval loop must be terminated and all providers are considered fully processed."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00016",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system has attempted to read the next provider record from the Provider Master File",
+                "When": "The provider record is successfully retrieved and the end-of-file condition has NOT been reached",
+                "Then": "The retrieved provider record is passed forward to the classification process (CLASSIFY-ONE), where the provider's taxonomy code and risk tier will be evaluated and updated"
+            },
+            "Rule_Name": "Successfully Retrieved Provider Record Passed Forward for Classification",
+            "Rule_Description": "When a provider record is successfully retrieved from the Provider Master File, it must be immediately forwarded for risk classification processing before the next record is retrieved."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00017",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File has been opened and the retrieval loop has been initiated",
+                "When": "The system processes provider records sequentially",
+                "Then": "Every provider record in the Provider Master File is retrieved and processed exactly once, in sequential order, with no filtering, skipping, or selective exclusion of any provider record, until the end-of-file condition is detected"
+            },
+            "Rule_Name": "All Provider Records in Master File Must Be Processed Without Skipping",
+            "Rule_Description": "The retrieval process must continue looping through every provider record in the Provider Master File sequentially until the end of file is reached, ensuring no provider is skipped."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00018",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "A Provider Master Record is being processed for risk classification",
+                "When": "The system accesses the Provider Master Record to obtain the provider's taxonomy code",
+                "Then": "The full taxonomy code field (PRV-TAXONOMY) from the Provider Master Record is made available for further processing"
+            },
+            "Rule_Name": "Provider Taxonomy Group Extraction from Master Record",
+            "Rule_Description": "The system retrieves the provider's full taxonomy code stored in the Provider Master Record as the source data for specialty/category group identification prior to risk classification."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00019",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The full taxonomy code has been retrieved from the Provider Master Record",
+                "When": "The system processes the taxonomy code field",
+                "Then": "The first 3 characters (positions 1 through 3) of the taxonomy code are extracted as the taxonomy group identifier, discarding any remaining characters beyond position 3"
+            },
+            "Rule_Name": "Extraction of First Three Characters of Provider Taxonomy Code",
+            "Rule_Description": "The system extracts only the first 3 characters from the provider's full taxonomy code. These 3 characters represent the provider's specialty or category group and serve as the basis for risk tier classification."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00020",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "The first 3 characters of the provider's taxonomy code have been extracted",
+                "When": "The extraction is complete",
+                "Then": "The 3-character value is stored as the Taxonomy Group Identifier (WS-TAXONOMY-GROUP) and is ready to be evaluated against known taxonomy group codes (332, 251, 341, 291, 225) to determine the provider's risk classification tier"
+            },
+            "Rule_Name": "Storage of Taxonomy Group Identifier for Risk Classification",
+            "Rule_Description": "The extracted 3-character taxonomy prefix is stored as the Taxonomy Group Identifier, which will be used as the sole input to determine the provider's risk tier classification."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00021",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "A Provider Master Record exists with a Taxonomy Code field populated on the Provider Master File",
+                "When": "The system begins the risk tier classification process for a provider",
+                "Then": "The system extracts the first 3 characters of the Provider Taxonomy Code and stores them as the Taxonomy Group Code, which will be used as the basis for all risk tier assignment decisions"
+            },
+            "Rule_Name": "Extract Provider Taxonomy Group Code for Risk Tier Evaluation",
+            "Rule_Description": "Before any risk tier can be assigned, the system must derive the Provider Taxonomy Group Code by extracting the first 3 characters of the full Taxonomy Code stored on the Provider Master Record. This derived value drives all subsequent tier classification decisions."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00022",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A Provider Master Record has been read from the Provider Master File and the Taxonomy Group Code has been derived as the first 3 characters of the Provider Taxonomy Code",
+                "When": "The derived Taxonomy Group Code is equal to '332' (Substance Abuse Facility)",
+                "Then": "The provider qualifies for the HIGH risk screening tier per 42 CFR 455.450, and the system proceeds to set the HIGH risk tier indicator on the Provider Master Record"
+            },
+            "Rule_Name": "Identify Substance Abuse Facility Providers for High Risk Tier",
+            "Rule_Description": "Providers whose Taxonomy Group Code begins with '332' are classified as Substance Abuse Facilities and must be assigned the HIGH risk screening tier in compliance with 42 CFR 455.450. This rule evaluates the first condition in the High Risk tier check."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00023",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A Provider Master Record has been read from the Provider Master File, the Taxonomy Group Code has been derived as the first 3 characters of the Provider Taxonomy Code, and the Taxonomy Group Code is NOT '332'",
+                "When": "The derived Taxonomy Group Code is equal to '251' (Home Health Agency)",
+                "Then": "The provider qualifies for the HIGH risk screening tier per 42 CFR 455.450, and the system proceeds to set the HIGH risk tier indicator on the Provider Master Record"
+            },
+            "Rule_Name": "Identify Home Health Agency Providers for High Risk Tier",
+            "Rule_Description": "Providers whose Taxonomy Group Code begins with '251' are classified as Home Health Agencies and must be assigned the HIGH risk screening tier in compliance with 42 CFR 455.450. This rule evaluates the second condition in the High Risk tier check, applied only when the Taxonomy Group Code is not '332'."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00024",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider has been determined to qualify for the HIGH risk screening tier because their Taxonomy Group Code is either '332' (Substance Abuse Facility) or '251' (Home Health Agency)",
+                "When": "The system applies the risk tier assignment to the Provider Master Record",
+                "Then": "The HIGH risk tier indicator is set to TRUE on the Provider Master Record, and no other risk tier indicator (Moderate or Limited) is active for this provider"
+            },
+            "Rule_Name": "Assign HIGH Risk Tier Indicator on Provider Master Record",
+            "Rule_Description": "Once a provider has been confirmed to qualify for the HIGH risk screening tier (Taxonomy Group Code '332' or '251'), the system must set the HIGH risk tier indicator flag on the Provider Master Record. This flag is mutually exclusive \u2014 only one risk tier indicator (High, Moderate, or Limited) can be active on a provider record at any time."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00025",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A Provider Master Record has been read from the Provider Master File and the Taxonomy Group Code has been derived as the first 3 characters of the Provider Taxonomy Code",
+                "When": "The derived Taxonomy Group Code is neither '332' (Substance Abuse Facility) nor '251' (Home Health Agency)",
+                "Then": "The system exits the HIGH risk tier evaluation and routes the provider to the Moderate and Limited risk tier evaluation, where Taxonomy Group Codes '341', '291', or '225' result in MODERATE risk tier assignment, and all other codes result in LIMITED risk tier assignment"
+            },
+            "Rule_Name": "Route Non-High-Risk Providers to Moderate or Limited Tier Evaluation",
+            "Rule_Description": "When a provider's Taxonomy Group Code does not match any HIGH risk tier code ('332' or '251'), the system must route the provider to the next evaluation stage to determine whether they qualify for MODERATE risk tier (codes '341', '291', '225') or default to LIMITED risk tier (all other codes)."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00026",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record exists in the Provider Master File with a Taxonomy Code whose first 3 characters (Taxonomy Group Code) are available for evaluation",
+                "When": "The first 3 characters of the provider's Taxonomy Code equal '341'",
+                "Then": "The provider is identified as qualifying for the MODERATE Risk Screening Tier, and processing continues to set the Moderate Risk flag on the Provider Master Record"
+            },
+            "Rule_Name": "Identify Home Health and Rehabilitation Agency Providers for Moderate Risk Tier",
+            "Rule_Description": "Determines whether a provider's taxonomy group code prefix '341' qualifies them for Moderate Risk screening tier classification per 42 CFR 455.450, representing Home Health and Rehabilitation Agency provider types."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00027",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record exists in the Provider Master File with a Taxonomy Code whose first 3 characters (Taxonomy Group Code) are available for evaluation, and the Taxonomy Group Code has already been confirmed as NOT equal to '341'",
+                "When": "The first 3 characters of the provider's Taxonomy Code equal '291'",
+                "Then": "The provider is identified as qualifying for the MODERATE Risk Screening Tier, and processing continues to set the Moderate Risk flag on the Provider Master Record"
+            },
+            "Rule_Name": "Identify Laboratory Services Providers for Moderate Risk Tier",
+            "Rule_Description": "Determines whether a provider's taxonomy group code prefix '291' qualifies them for Moderate Risk screening tier classification per 42 CFR 455.450, representing Laboratory Services provider types."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00028",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record exists in the Provider Master File with a Taxonomy Code whose first 3 characters (Taxonomy Group Code) are available for evaluation, and the Taxonomy Group Code has already been confirmed as NOT equal to '341' and NOT equal to '291'",
+                "When": "The first 3 characters of the provider's Taxonomy Code equal '225'",
+                "Then": "The provider is identified as qualifying for the MODERATE Risk Screening Tier, and processing continues to set the Moderate Risk flag on the Provider Master Record"
+            },
+            "Rule_Name": "Identify Physical and Occupational Therapy Providers for Moderate Risk Tier",
+            "Rule_Description": "Determines whether a provider's taxonomy group code prefix '225' qualifies them for Moderate Risk screening tier classification per 42 CFR 455.450, representing Physical and Occupational Therapy provider types."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00029",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record in the Provider Master File has been evaluated and their Taxonomy Group Code (first 3 characters of Taxonomy Code) matched one of the Moderate Risk qualifying codes: '341' (Home Health/Rehab Agencies), '291' (Laboratory Services), or '225' (Physical/Occupational Therapy)",
+                "When": "The Moderate Risk Tier assignment is executed for the qualifying provider",
+                "Then": "The MODERATE Risk Screening Tier flag is set to TRUE on the Provider Master Record, overwriting any previously held risk tier value, ensuring the provider is marked exclusively as Moderate Risk"
+            },
+            "Rule_Name": "Assign Moderate Risk Screening Tier Flag to Qualifying Provider Record",
+            "Rule_Description": "Sets the Moderate Risk Screening Tier indicator on the Provider Master Record for any provider whose Taxonomy Group Code matched '341', '291', or '225', in compliance with 42 CFR 455.450 risk-based screening requirements."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00030",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record exists in the Provider Master File with a Taxonomy Code whose first 3 characters (Taxonomy Group Code) are available for evaluation",
+                "When": "The first 3 characters of the provider's Taxonomy Code do NOT equal '341', AND do NOT equal '291', AND do NOT equal '225'",
+                "Then": "The provider does NOT qualify for the MODERATE Risk Screening Tier, no Moderate Risk flag is set on the Provider Master Record, and the provider's Taxonomy Group Code is forwarded for evaluation against other risk tier criteria (High Risk or Limited Risk)"
+            },
+            "Rule_Name": "Exit Moderate Risk Tier Check When No Taxonomy Match Found",
+            "Rule_Description": "When a provider's Taxonomy Group Code does not match any of the three Moderate Risk qualifying codes ('341', '291', '225'), the provider is excluded from Moderate Risk classification and processing proceeds to evaluate eligibility for other risk tiers (High or Limited)."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00031",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                "When": "The provider's Taxonomy Group is evaluated and it matches either '332' or '251'",
+                "Then": "The provider is routed to the HIGH Risk Tier assignment process and the LIMITED Risk Tier assignment process is not executed for this provider"
+            },
+            "Rule_Name": "Evaluate Provider Taxonomy Group Against HIGH Risk Codes Before LIMITED Assignment",
+            "Rule_Description": "Before assigning a LIMITED risk tier, the system must first verify that the provider's taxonomy group does not match any HIGH risk taxonomy code (332 or 251). If it matches, the provider is routed to the HIGH risk process and LIMITED tier assignment is bypassed."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00032",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File, the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group, and the Taxonomy Group has already been confirmed as NOT matching any HIGH risk code (332 or 251)",
+                "When": "The provider's Taxonomy Group is evaluated and it matches any one of '341', '291', or '225'",
+                "Then": "The provider is routed to the MODERATE Risk Tier assignment process and the LIMITED Risk Tier assignment process is not executed for this provider"
+            },
+            "Rule_Name": "Evaluate Provider Taxonomy Group Against MODERATE Risk Codes Before LIMITED Assignment",
+            "Rule_Description": "After confirming no HIGH risk match, the system must verify that the provider's taxonomy group does not match any MODERATE risk taxonomy code (341, 291, or 225). If it matches, the provider is routed to the MODERATE risk process and LIMITED tier assignment is bypassed."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00033",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                "When": "The provider's Taxonomy Group does not match '332' or '251' (HIGH risk codes) AND does not match '341', '291', or '225' (MODERATE risk codes) \u2014 falling into the WHEN OTHER condition",
+                "Then": "The provider is identified as having a taxonomy group that does not correspond to any defined HIGH or MODERATE risk classification and is eligible to be assigned the LIMITED risk screening tier"
+            },
+            "Rule_Name": "Identify Provider Taxonomy Group as Non-Matching for HIGH and MODERATE Risk Codes",
+            "Rule_Description": "When a provider's taxonomy group does not match any of the specifically defined HIGH risk codes (332, 251) or MODERATE risk codes (341, 291, 225), the provider is identified as having no defined elevated risk taxonomy and is eligible for LIMITED risk tier assignment."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00034",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File, the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group, and the Taxonomy Group has been confirmed as NOT matching any HIGH risk code (332 or 251) AND NOT matching any MODERATE risk code (341, 291, or 225)",
+                "When": "The system processes the provider record for risk tier assignment and the taxonomy group falls into the default 'OTHER' category",
+                "Then": "The LIMITED risk screening tier flag is set to TRUE on the Provider Master Record, overwriting any previously held risk tier value, in compliance with 42 CFR 455.450, and the record is subsequently updated in the Provider Master File"
+            },
+            "Rule_Name": "Assign LIMITED Risk Screening Tier to Provider Record per 42 CFR 455.450",
+            "Rule_Description": "Providers whose taxonomy group does not match any HIGH or MODERATE risk taxonomy codes must be assigned the LIMITED risk screening tier on their Provider Master Record, in compliance with 42 CFR 455.450. This is the default risk classification for all providers not explicitly categorized as HIGH or MODERATE risk."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00035",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider master record has been read and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                "When": "The Taxonomy Group is '332' OR the Taxonomy Group is '251'",
+                "Then": "The HIGH Risk Tier Indicator (PRV-RISK-HIGH) on the Provider Master Record is set to TRUE, and no other risk tier indicator (MODERATE or LIMITED) is set for this provider"
+            },
+            "Rule_Name": "Assign HIGH Risk Tier Indicator to Provider Record for Taxonomy Groups 332 and 251",
+            "Rule_Description": "When a provider's taxonomy code prefix is identified as belonging to the HIGH risk tier group (332 or 251), the HIGH risk tier indicator must be set on the provider's master record to reflect the elevated risk classification."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00036",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider master record has been read and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                "When": "The Taxonomy Group is '341' OR the Taxonomy Group is '291' OR the Taxonomy Group is '225'",
+                "Then": "The MODERATE Risk Tier Indicator (PRV-RISK-MODERATE) on the Provider Master Record is set to TRUE, and no other risk tier indicator (HIGH or LIMITED) is set for this provider"
+            },
+            "Rule_Name": "Assign MODERATE Risk Tier Indicator to Provider Record for Taxonomy Groups 341, 291, and 225",
+            "Rule_Description": "When a provider's taxonomy code prefix is identified as belonging to the MODERATE risk tier group (341, 291, or 225), the MODERATE risk tier indicator must be set on the provider's master record to reflect the intermediate risk classification."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00037",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider master record has been read and the first 3 characters of the provider's Taxonomy Code have been extracted as the Taxonomy Group",
+                "When": "The Taxonomy Group does NOT match any of the HIGH tier codes ('332', '251') AND does NOT match any of the MODERATE tier codes ('341', '291', '225') \u2014 i.e., the Taxonomy Group is any other value",
+                "Then": "The LIMITED Risk Tier Indicator (PRV-RISK-LIMITED) on the Provider Master Record is set to TRUE, and no other risk tier indicator (HIGH or MODERATE) is set for this provider"
+            },
+            "Rule_Name": "Assign LIMITED Risk Tier Indicator to Provider Record for All Other Taxonomy Groups",
+            "Rule_Description": "When a provider's taxonomy code prefix does not match any of the specifically designated HIGH or MODERATE risk tier taxonomy groups, the provider is defaulted to the LIMITED risk tier and the LIMITED risk tier indicator is set on the provider's master record."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00038",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider master record is being classified and the Taxonomy Group has been evaluated against all defined tier groupings",
+                "When": "The risk tier determination is complete and exactly one tier path (HIGH, MODERATE, or LIMITED) has been selected based on the Taxonomy Group evaluation",
+                "Then": "Exactly one risk tier indicator is set to TRUE on the Provider Master Record \u2014 either PRV-RISK-HIGH, PRV-RISK-MODERATE, or PRV-RISK-LIMITED \u2014 and the remaining two risk tier indicators are not set, ensuring no provider holds more than one active risk tier classification"
+            },
+            "Rule_Name": "Enforce Mutual Exclusivity of Risk Tier Indicators on Provider Record",
+            "Rule_Description": "A provider must be assigned exactly one risk tier classification \u2014 HIGH, MODERATE, or LIMITED. The three risk tier indicators are mutually exclusive; setting one tier indicator implicitly means the other two are not active for that provider record."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00039",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system is processing a provider record and needs to calculate the revalidation due date per 42 CFR 455.414",
+                "When": "The revalidation due date calculation process is initiated for a provider",
+                "Then": "The system retrieves today's full calendar date in YYYYMMDD format (e.g., 20240315 for March 15, 2024) and stores it as the current date baseline for all subsequent revalidation date computations"
+            },
+            "Rule_Name": "Retrieve Today's Full Date for Revalidation Calculation",
+            "Rule_Description": "As part of the revalidation due date calculation required under 42 CFR 455.414, the system must obtain the current calendar date in a full 8-digit format (YYYYMMDD) to serve as the baseline for computing the provider's next revalidation due date."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00040",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The current date has been retrieved in YYYYMMDD format (e.g., 20240315)",
+                "When": "The system extracts the year component from the current date",
+                "Then": "The system isolates characters at positions 3 and 4 of the YYYYMMDD date string as the 2-digit current year (e.g., from 20240315, the 2-digit year extracted is '24'), which will be used as the basis for adding 5 years"
+            },
+            "Rule_Name": "Extract 2-Digit Year Component from Current Date",
+            "Rule_Description": "The system extracts only the 2-digit year portion from the current full date to enable the 5-year addition calculation. The 2-digit year occupies positions 3 and 4 of the YYYYMMDD formatted current date (e.g., from 20240315, the value '24' is extracted as the 2-digit year)."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00041",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The current date has been retrieved in YYYYMMDD format (e.g., 20240315)",
+                "When": "The system extracts the month and day components from the current date",
+                "Then": "The system isolates characters at positions 5 through 8 of the YYYYMMDD date string as the 4-digit month-and-day value (e.g., from 20240315, the month-day extracted is '0315'), which will be preserved unchanged in the final revalidation due date"
+            },
+            "Rule_Name": "Extract Month and Day Components from Current Date",
+            "Rule_Description": "The system extracts the month and day portion (MMDD) from the current full date. These values remain unchanged in the revalidation due date \u2014 only the year advances by 5. The month and day occupy positions 5 through 8 of the YYYYMMDD formatted current date (e.g., from 20240315, the value '0315' is extracted)."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00042",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The 2-digit current year has been extracted from today's date (e.g., current 2-digit year = 24)",
+                "When": "The system computes the revalidation due year",
+                "Then": "The system adds 5 to the current 2-digit year and applies modulo 100 to retain only the last 2 digits of the result as the 2-digit due year (e.g., 24 + 5 = 29, MOD 100 = 29; or 97 + 5 = 102, MOD 100 = 02), which is then used for century determination"
+            },
+            "Rule_Name": "Calculate 5-Year Revalidation Due Year (2-Digit)",
+            "Rule_Description": "Per 42 CFR 455.414, provider revalidation is required every 5 years. The system calculates the 2-digit due year by adding 5 to the current 2-digit year and retaining only the last 2 digits of the result (using modulo 100). For example, if the current 2-digit year is 97, adding 5 gives 102, and keeping the last 2 digits yields 02."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00043",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The 2-digit revalidation due year has been calculated (e.g., due year = 29)",
+                "When": "The 2-digit due year is less than 70 (i.e., values 00 through 69)",
+                "Then": "The system assigns the century as 2000s by computing the full 4-digit due year as 2000 plus the 2-digit due year (e.g., 2000 + 29 = 2029), placing the revalidation date in the 21st century"
+            },
+            "Rule_Name": "Determine Century for Revalidation Due Year \u2014 2000s Assignment",
+            "Rule_Description": "After computing the 2-digit revalidation due year, the system must determine the correct century to form a valid 4-digit year. If the resulting 2-digit due year is less than 70, the century is assigned as 2000s, producing a full 4-digit year in the range 2000\u20132069 (e.g., due year 29 \u2192 full year 2029)."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00044",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The 2-digit revalidation due year has been calculated (e.g., due year = 72)",
+                "When": "The 2-digit due year is 70 or greater (i.e., values 70 through 99)",
+                "Then": "The system assigns the century as 1900s by computing the full 4-digit due year as 1900 plus the 2-digit due year (e.g., 1900 + 72 = 1972), placing the revalidation date in the 20th century"
+            },
+            "Rule_Name": "Determine Century for Revalidation Due Year \u2014 1900s Assignment",
+            "Rule_Description": "After computing the 2-digit revalidation due year, if the resulting value is 70 or greater, the century is assigned as 1900s, producing a full 4-digit year in the range 1970\u20131999 (e.g., due year 72 \u2192 full year 1972). This represents a date windowing boundary in the calculation logic."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00045",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The full 4-digit revalidation due year (e.g., 2029) and the original month-and-day value (e.g., 0315) have both been determined",
+                "When": "The system forms the final revalidation due date",
+                "Then": "The system computes the 8-digit revalidation due date by multiplying the 4-digit due year by 10000 and adding the 4-digit month-day value (e.g., 2029 \u00d7 10000 + 0315 = 20290315), and stores this complete YYYYMMDD date as the Revalidation Due Date on the Provider Master Record"
+            },
+            "Rule_Name": "Form Complete 8-Digit Revalidation Due Date in YYYYMMDD Format",
+            "Rule_Description": "Once the full 4-digit due year and the original month-and-day values are determined, the system combines them into a single 8-digit revalidation due date in YYYYMMDD format. The full 4-digit year is multiplied by 10000 and added to the 4-digit month-day value to produce the final date. This completed date is then stored on the Provider Master Record as the provider's next revalidation due date per 42 CFR 455.414."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00046",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "The revalidation due date is being calculated for a provider on any given processing date (e.g., processing date is 20240315)",
+                "When": "The system constructs the final 8-digit revalidation due date",
+                "Then": "The month and day portion of the revalidation due date must exactly match the month and day of today's processing date (e.g., if today is March 15, the revalidation due date must also fall on March 15 of the due year), with only the year advancing by 5 years"
+            },
+            "Rule_Name": "Revalidation Due Date Must Preserve Original Month and Day",
+            "Rule_Description": "Per 42 CFR 455.414, the revalidation due date is set exactly 5 years from the current date. The month and day of the revalidation due date must be identical to the month and day of the date on which the classification is run \u2014 only the year component changes. This ensures the anniversary-based revalidation cycle is maintained."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00047",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider's 5-year revalidation due date has been successfully computed in YYYYMMDD format, representing the same month and day as today but 5 years into the future, and the provider's master record is open and available for update",
+                "When": "The revalidation due date assignment step is executed for the current provider record",
+                "Then": "The computed revalidation due date value in YYYYMMDD format is stored into the Revalidation Due Date field (PRV-REVAL-DUE-DATE) on the provider's master record, overwriting any previously held value in that field, and the updated provider master record is saved back to the Provider Master File"
+            },
+            "Rule_Name": "Store Computed Revalidation Due Date onto Provider Master Record",
+            "Rule_Description": "Once the 5-year revalidation due date has been computed, it must be permanently recorded on the provider's master record so that the provider's revalidation schedule is officially captured and available for future reference and compliance tracking."
+        },
+        {
+            "Rule_Id": "R-PRVRSK01-cbl-00048",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and has been updated with a newly assigned risk screening tier (High, Moderate, or Limited) and a calculated revalidation due date (set to 5 years from the current date, same month and day)",
+                "When": "The classification process for the current provider record is complete and all updates have been applied to the in-memory provider record",
+                "Then": "The updated provider master record \u2014 containing the assigned risk screening tier flag and the revalidation due date \u2014 is written back to the Provider Master File, replacing the existing record for that provider, thereby completing the classification for that provider record"
+            },
+            "Rule_Name": "Consolidate and Persist Updated Provider Classification Record",
+            "Rule_Description": "After a provider's risk screening tier and revalidation due date have been determined, the updated provider master record \u2014 containing both the newly assigned risk tier (High, Moderate, or Limited) and the calculated revalidation due date \u2014 must be written back to the Provider Master File to complete the classification for that provider."
+        }
+    ],
+    "description": "PRVRSK01 is a batch risk-based screening classifier program that reads each provider record from the Provider Master File and assigns a screening risk tier (Limited, Moderate, or High) based on the provider's taxonomy group code, in compliance with 42 CFR 455.450. It also calculates and sets the next revalidation due date (5 years from the current date) per 42 CFR 455.414, then rewrites the updated record back to the master file.\n\n<br>\n\n- **Execution Environment**: Batch\n- **Database Access**: VSAM (Indexed)\n- **MQ Calls**: No\n- **Module Type**: Main module\n\n<br>\n\n### Key Functionalities:\n\n1: Provider File Initialization - Open the provider master file and initialize processing flags to begin sequential screening classification of all provider records\n\n2: Sequential Provider Record Retrieval - Read each provider record sequentially from the provider master file one at a time until all records have been processed\n\n3: Provider Taxonomy Group Extraction - Extract the first 3 characters of the provider's taxonomy code to identify the provider's specialty/category group for risk classification purposes\n\n4: High Risk Tier Assignment - Identify providers with taxonomy group codes '332' (e.g., substance abuse facilities) or '251' (e.g., home health agencies) and assign them a HIGH risk screening tier per 42 CFR 455.450\n\n5: Moderate Risk Tier Assignment - Identify providers with taxonomy group codes '341', '291', or '225' and assign them a MODERATE risk screening tier per 42 CFR 455.450\n\n6: Limited Risk Tier Assignment - Assign all remaining providers whose taxonomy group does not match any HIGH or MODERATE risk codes to the LIMITED risk screening tier per 42 CFR 455.450\n\n7: Risk Tier Flag Update on Provider Record - Set the appropriate risk tier indicator (LIMITED, MODERATE, or HIGH) on the provider's master record based on the classification determined from the taxonomy group\n\n8: Revalidation Due Date Calculation - Calculate the provider's next revalidation due date by adding 5 years to the current date, determining the correct century for the resulting year, and forming a complete 8-digit due date per 42 CFR 455.414\n\n9: Revalidation Due Date Assignment - Store the computed 5-year revalidation due date onto the provider's master record\n\n10: Provider Record Update - Write the updated provider master record back to the file with the newly assigned risk screening tier and revalidation due date, completing the classification for that provider\n\n"
+}

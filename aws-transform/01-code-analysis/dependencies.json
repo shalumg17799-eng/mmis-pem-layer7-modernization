@@ -1,0 +1,1396 @@
+[
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Exec program",
+        "name": "IDCAMS",
+        "path": null,
+        "properties": {
+          "lineNo": "7",
+          "lineIndex": "0"
+        },
+        "type": "System"
+      },
+      {
+        "dependencyType": "Define DATASET",
+        "name": "MMPRV.SANCTION.MASTER.KSDS",
+        "path": "Global:DATASET:MMPRV.SANCTION.MASTER.KSDS",
+        "type": "VSAM KSDS DATASET"
+      },
+      {
+        "dependencyType": "Define DATASET",
+        "name": "MMPRV.SCREEN.RESULTS.KSDS",
+        "path": "Global:DATASET:MMPRV.SCREEN.RESULTS.KSDS",
+        "type": "VSAM KSDS DATASET"
+      }
+    ],
+    "name": "PRVVSM02.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM02.jcl",
+    "type": "JCL"
+  },
+  {
+    "name": "MMPRV.SANCTION.MASTER.KSDS",
+    "path": "Global:DATASET:MMPRV.SANCTION.MASTER.KSDS",
+    "type": "VSAM KSDS DATASET",
+    "dependencies": []
+  },
+  {
+    "name": "MMPRV.SCREEN.RESULTS.KSDS",
+    "path": "Global:DATASET:MMPRV.SCREEN.RESULTS.KSDS",
+    "type": "VSAM KSDS DATASET",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Copy",
+        "name": "ERRCODES.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/ERRCODES.cpy",
+        "properties": {
+          "lineNo": "22",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "SCRNREC.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/SCRNREC.cpy",
+        "properties": {
+          "lineNo": "21",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      }
+    ],
+    "name": "WRKSTORE.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+    "type": "CPY"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Close file; Open file; Read file",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "69;65;75"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "PRVMSTR",
+        "path": null,
+        "properties": {
+          "lineNo": "26",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "PRVRECRD.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+        "properties": {
+          "lineNo": "43",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Open file; Write file",
+        "name": "REVAL-OUT-FILE",
+        "path": "Global:FILE_DEFINITION:REVAL-OUT-FILE",
+        "properties": {
+          "lineNo": "66;92"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "REVALQ",
+        "path": null,
+        "properties": {
+          "lineNo": "33",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "WRKSTORE.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+        "properties": {
+          "lineNo": "55",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      }
+    ],
+    "name": "PRVREV01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVREV01.cbl",
+    "type": "COB"
+  },
+  {
+    "name": "REVAL-OUT-FILE",
+    "path": "Global:FILE_DEFINITION:REVAL-OUT-FILE",
+    "type": "FILE_DEFINITION",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Exec program",
+        "name": "IDCAMS",
+        "path": null,
+        "properties": {
+          "lineNo": "7",
+          "lineIndex": "0"
+        },
+        "type": "System"
+      },
+      {
+        "dependencyType": "Define DATASET",
+        "name": "MMPRV.PROVIDER.MASTER.AIX",
+        "path": "Global:DATASET:MMPRV.PROVIDER.MASTER.AIX",
+        "type": "VSAM AIX DATASET"
+      },
+      {
+        "dependencyType": "Define DATASET",
+        "name": "MMPRV.PROVIDER.MASTER.KSDS",
+        "path": "Global:DATASET:MMPRV.PROVIDER.MASTER.KSDS",
+        "type": "VSAM KSDS DATASET"
+      }
+    ],
+    "name": "PRVVSM01.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM01.jcl",
+    "type": "JCL"
+  },
+  {
+    "name": "MMPRV.PROVIDER.MASTER.KSDS",
+    "path": "Global:DATASET:MMPRV.PROVIDER.MASTER.KSDS",
+    "type": "VSAM KSDS DATASET",
+    "dependencies": []
+  },
+  {
+    "name": "MMPRV.PROVIDER.MASTER.AIX",
+    "path": "Global:DATASET:MMPRV.PROVIDER.MASTER.AIX",
+    "type": "VSAM AIX DATASET",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Open file; Write file",
+        "name": "APP-ERROR-FILE",
+        "path": "Global:FILE_DEFINITION:APP-ERROR-FILE",
+        "properties": {
+          "lineNo": "93;178"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Close file; Open file; Read file",
+        "name": "APP-INPUT-FILE",
+        "path": "Global:FILE_DEFINITION:APP-INPUT-FILE",
+        "properties": {
+          "lineNo": "181;91;102"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "APPERROR",
+        "path": null,
+        "properties": {
+          "lineNo": "43",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "APPINPUT",
+        "path": null,
+        "properties": {
+          "lineNo": "30",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Open file; Write file",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "92;158"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "PRVMSTR",
+        "path": null,
+        "properties": {
+          "lineNo": "36",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "PRVRECRD.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+        "properties": {
+          "lineNo": "59",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "WRKSTORE.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+        "properties": {
+          "lineNo": "67",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      }
+    ],
+    "name": "PRVENR01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVENR01.cbl",
+    "type": "COB"
+  },
+  {
+    "name": "APP-ERROR-FILE",
+    "path": "Global:FILE_DEFINITION:APP-ERROR-FILE",
+    "type": "FILE_DEFINITION",
+    "dependencies": []
+  },
+  {
+    "name": "APP-INPUT-FILE",
+    "path": "Global:FILE_DEFINITION:APP-INPUT-FILE",
+    "type": "FILE_DEFINITION",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Exec program",
+        "name": "IEBGENER",
+        "path": null,
+        "properties": {
+          "JCL.ddnameToDataset": "STEP030.SYSUT2=MMPRV.TMSIS.ARCHIVE(+1)",
+          "lineNo": "37",
+          "lineIndex": "0"
+        },
+        "type": "System"
+      },
+      {
+        "dependencyType": "PDS use",
+        "name": "MMPRV.PROD.LOADLIB",
+        "path": null,
+        "properties": {
+          "lineNo": "10",
+          "lineIndex": "0"
+        },
+        "type": "System"
+      },
+      {
+        "dependencyType": "Read Dataset",
+        "name": "MMPRV.PROVIDER.MASTER.KSDS",
+        "path": "Global:DATASET:MMPRV.PROVIDER.MASTER.KSDS",
+        "properties": {
+          "lineNo": "16",
+          "lineIndex": "0"
+        },
+        "type": "VSAM KSDS DATASET"
+      },
+      {
+        "dependencyType": "Resolved Symbol; Write Dataset",
+        "name": "MMPRV.REVAL.QUEUE.D&DATE",
+        "path": null,
+        "properties": {
+          "symbolic": "MMPRV.REVAL.QUEUE.D&DATE",
+          "lineNo": "17;17"
+        },
+        "type": "Missing Dataset"
+      },
+      {
+        "dependencyType": "Write Dataset",
+        "name": "MMPRV.TMSIS.ARCHIVE(+1)",
+        "path": null,
+        "properties": {
+          "lineNo": "39",
+          "lineIndex": "0"
+        },
+        "type": "Missing Dataset"
+      },
+      {
+        "dependencyType": "Read Dataset; Resolved Symbol; Write Dataset",
+        "name": "MMPRV.TMSIS.PROVIDER.D&DATE",
+        "path": null,
+        "properties": {
+          "symbolic": "MMPRV.TMSIS.PROVIDER.D&DATE",
+          "lineNo": "38;[28 38];28"
+        },
+        "type": "Missing Dataset"
+      },
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "16",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Exec program",
+        "name": "PRVREV01.cbl",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVREV01.cbl",
+        "properties": {
+          "JCL.ddnameToDataset": "STEP010.PRVMSTR=MMPRV.PROVIDER.MASTER.KSDS",
+          "lineNo": "15",
+          "lineIndex": "0"
+        },
+        "type": "COB"
+      },
+      {
+        "dependencyType": "Exec program",
+        "name": "PRVTMS01.cbl",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVTMS01.cbl",
+        "properties": {
+          "JCL.ddnameToDataset": "STEP020.PRVMSTR=MMPRV.PROVIDER.MASTER.KSDS",
+          "lineNo": "26",
+          "lineIndex": "0"
+        },
+        "type": "COB"
+      },
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "REVAL-OUT-FILE",
+        "path": "Global:FILE_DEFINITION:REVAL-OUT-FILE",
+        "properties": {
+          "lineNo": "17",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "TMSIS-OUT-FILE",
+        "path": "Global:FILE_DEFINITION:TMSIS-OUT-FILE",
+        "properties": {
+          "lineNo": "28",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      }
+    ],
+    "name": "PRVMTH01.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVMTH01.jcl",
+    "type": "JCL"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Close file; Open file; Read file; Rewrite file",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "84;80;95;114"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "PRVMSTR",
+        "path": null,
+        "properties": {
+          "lineNo": "32",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Call; [Dynamic] Call",
+        "name": "PRVNTGEN",
+        "path": null,
+        "properties": {
+          "variableName": "WS-NOTICE-PGM",
+          "lineNo": "133;133"
+        },
+        "type": "Missing Program"
+      },
+      {
+        "dependencyType": "Call; [Dynamic] Call",
+        "name": "PRVNTRST",
+        "path": null,
+        "properties": {
+          "variableName": "WS-NOTICE-PGM",
+          "lineNo": "133;133"
+        },
+        "type": "Missing Program"
+      },
+      {
+        "dependencyType": "Call; [Dynamic] Call",
+        "name": "PRVNTSUS",
+        "path": null,
+        "properties": {
+          "variableName": "WS-NOTICE-PGM",
+          "lineNo": "133;133"
+        },
+        "type": "Missing Program"
+      },
+      {
+        "dependencyType": "Call; [Dynamic] Call",
+        "name": "PRVNTTRM",
+        "path": null,
+        "properties": {
+          "variableName": "WS-NOTICE-PGM",
+          "lineNo": "133;133"
+        },
+        "type": "Missing Program"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "PRVRECRD.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+        "properties": {
+          "lineNo": "50",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "SANCIN",
+        "path": null,
+        "properties": {
+          "lineNo": "39",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Open file; Read file",
+        "name": "SANCTION-IN-FILE",
+        "path": "Global:FILE_DEFINITION:SANCTION-IN-FILE",
+        "properties": {
+          "lineNo": "81;89"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "WRKSTORE.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+        "properties": {
+          "lineNo": "66",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      }
+    ],
+    "name": "PRVSAN01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSAN01.cbl",
+    "type": "COB"
+  },
+  {
+    "name": "SANCTION-IN-FILE",
+    "path": "Global:FILE_DEFINITION:SANCTION-IN-FILE",
+    "type": "FILE_DEFINITION",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Exec CICS Return transaction",
+        "name": "PINQ",
+        "path": null,
+        "properties": {
+          "lineNo": "57",
+          "lineIndex": "0"
+        },
+        "type": "Missing CICS Transaction Definition"
+      },
+      {
+        "dependencyType": "Exec CICS Read file",
+        "name": "PRVPROVN",
+        "path": null,
+        "properties": {
+          "lineNo": "36",
+          "lineIndex": "0"
+        },
+        "type": "Missing CICS Dataset Definition"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "PRVRECRD.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+        "properties": {
+          "lineNo": "21",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Exec CICS map",
+        "name": "PRVSET1",
+        "path": null,
+        "properties": {
+          "lineNo": "32",
+          "lineIndex": "0"
+        },
+        "type": "Missing BMS"
+      }
+    ],
+    "name": "PRVCICS1.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/ONLINE/PRVCICS1.cbl",
+    "type": "COB"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Close file; Open file; Read file; Rewrite file",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "65;62;69;96"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "PRVMSTR",
+        "path": null,
+        "properties": {
+          "lineNo": "30",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "PRVRECRD.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+        "properties": {
+          "lineNo": "42",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "WRKSTORE.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+        "properties": {
+          "lineNo": "45",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      }
+    ],
+    "name": "PRVRSK01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVRSK01.cbl",
+    "type": "COB"
+  },
+  {
+    "name": "PRV-MASTER-FILE",
+    "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+    "type": "FILE_DEFINITION",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Close file; Open file; Read file; Rewrite file",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "79;75;84;113"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "PRVMSTR",
+        "path": null,
+        "properties": {
+          "lineNo": "27",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "PRVRECRD.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+        "properties": {
+          "lineNo": "45",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Open file; Write file",
+        "name": "SCREEN-OUT-FILE",
+        "path": "Global:FILE_DEFINITION:SCREEN-OUT-FILE",
+        "properties": {
+          "lineNo": "76;148"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "SCRNOUT",
+        "path": null,
+        "properties": {
+          "lineNo": "34",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "SCRNREC.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/SCRNREC.cpy",
+        "properties": {
+          "lineNo": "51",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "WRKSTORE.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+        "properties": {
+          "lineNo": "54",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      }
+    ],
+    "name": "PRVSCR01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSCR01.cbl",
+    "type": "COB"
+  },
+  {
+    "name": "SCREEN-OUT-FILE",
+    "path": "Global:FILE_DEFINITION:SCREEN-OUT-FILE",
+    "type": "FILE_DEFINITION",
+    "dependencies": []
+  },
+  {
+    "name": "PRVRECRD.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+    "type": "CPY",
+    "dependencies": []
+  },
+  {
+    "name": "PRVDEAD1.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDEAD1.cbl",
+    "type": "COB",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Define [SQL]TABLE",
+        "name": "MMPRV.PROVIDER",
+        "path": "Global:TABLE:MMPRV.PROVIDER",
+        "type": "[SQL]TABLE"
+      },
+      {
+        "dependencyType": "Define [SQL]TABLE",
+        "name": "MMPRV.PROVIDER_OWNER",
+        "path": "Global:TABLE:MMPRV.PROVIDER_OWNER",
+        "type": "[SQL]TABLE"
+      },
+      {
+        "dependencyType": "Define [SQL]TABLE",
+        "name": "MMPRV.SANCTION",
+        "path": "Global:TABLE:MMPRV.SANCTION",
+        "type": "[SQL]TABLE"
+      },
+      {
+        "dependencyType": "Define [SQL]TABLE",
+        "name": "MMPRV.SCREENING",
+        "path": "Global:TABLE:MMPRV.SCREENING",
+        "type": "[SQL]TABLE"
+      },
+      {
+        "dependencyType": "Define [SQL]DATABASE",
+        "name": "MMPRVDB",
+        "path": "Global:DATABASE:MMPRVDB",
+        "type": "[SQL]DATABASE"
+      },
+      {
+        "dependencyType": "Define [SQL]INDEX",
+        "name": "PROVIDER_MCD",
+        "path": "Global:INDEX:PROVIDER_MCD",
+        "type": "[SQL]INDEX"
+      },
+      {
+        "dependencyType": "Define [SQL]INDEX",
+        "name": "PROVIDER_REVAL",
+        "path": "Global:INDEX:PROVIDER_REVAL",
+        "type": "[SQL]INDEX"
+      },
+      {
+        "dependencyType": "Define [SQL]TABLESPACE",
+        "name": "PROVTS",
+        "path": "Global:TABLESPACE:PROVTS",
+        "type": "[SQL]TABLESPACE"
+      }
+    ],
+    "name": "PRVDDL01.sql",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/DB2/PRVDDL01.sql",
+    "type": "SQL"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Create in query",
+        "name": "PROVTS",
+        "path": "Global:TABLESPACE:PROVTS",
+        "properties": {
+          "lineNo": "62",
+          "lineIndex": "0"
+        },
+        "type": "[SQL]TABLESPACE"
+      }
+    ],
+    "name": "MMPRV.SANCTION",
+    "path": "Global:TABLE:MMPRV.SANCTION",
+    "type": "[SQL]TABLE"
+  },
+  {
+    "name": "MMPRVDB",
+    "path": "Global:DATABASE:MMPRVDB",
+    "type": "[SQL]DATABASE",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Create in query",
+        "name": "PROVTS",
+        "path": "Global:TABLESPACE:PROVTS",
+        "properties": {
+          "lineNo": "18",
+          "lineIndex": "0"
+        },
+        "type": "[SQL]TABLESPACE"
+      }
+    ],
+    "name": "MMPRV.PROVIDER",
+    "path": "Global:TABLE:MMPRV.PROVIDER",
+    "type": "[SQL]TABLE"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Create in query",
+        "name": "MMPRVDB",
+        "path": "Global:DATABASE:MMPRVDB",
+        "properties": {
+          "lineNo": "13",
+          "lineIndex": "0"
+        },
+        "type": "[SQL]DATABASE"
+      }
+    ],
+    "name": "PROVTS",
+    "path": "Global:TABLESPACE:PROVTS",
+    "type": "[SQL]TABLESPACE"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Create in query",
+        "name": "PROVTS",
+        "path": "Global:TABLESPACE:PROVTS",
+        "properties": {
+          "lineNo": "36",
+          "lineIndex": "0"
+        },
+        "type": "[SQL]TABLESPACE"
+      }
+    ],
+    "name": "MMPRV.PROVIDER_OWNER",
+    "path": "Global:TABLE:MMPRV.PROVIDER_OWNER",
+    "type": "[SQL]TABLE"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Create in query",
+        "name": "PROVTS",
+        "path": "Global:TABLESPACE:PROVTS",
+        "properties": {
+          "lineNo": "49",
+          "lineIndex": "0"
+        },
+        "type": "[SQL]TABLESPACE"
+      }
+    ],
+    "name": "MMPRV.SCREENING",
+    "path": "Global:TABLE:MMPRV.SCREENING",
+    "type": "[SQL]TABLE"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Create in query",
+        "name": "MMPRV.PROVIDER",
+        "path": "Global:TABLE:MMPRV.PROVIDER",
+        "properties": {
+          "lineNo": "73",
+          "lineIndex": "0"
+        },
+        "type": "[SQL]TABLE"
+      }
+    ],
+    "name": "PROVIDER_REVAL",
+    "path": "Global:INDEX:PROVIDER_REVAL",
+    "type": "[SQL]INDEX"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Create in query",
+        "name": "MMPRV.PROVIDER",
+        "path": "Global:TABLE:MMPRV.PROVIDER",
+        "properties": {
+          "lineNo": "72",
+          "lineIndex": "0"
+        },
+        "type": "[SQL]TABLE"
+      }
+    ],
+    "name": "PROVIDER_MCD",
+    "path": "Global:INDEX:PROVIDER_MCD",
+    "type": "[SQL]INDEX"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Open file; Write file",
+        "name": "DIR-OUT-FILE",
+        "path": "Global:FILE_DEFINITION:DIR-OUT-FILE",
+        "properties": {
+          "lineNo": "64;88"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "DIROUT",
+        "path": null,
+        "properties": {
+          "lineNo": "31",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Close file; Open file; Read file",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "67;63;72"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "PRVMSTR",
+        "path": null,
+        "properties": {
+          "lineNo": "24",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "PRVRECRD.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+        "properties": {
+          "lineNo": "41",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "WRKSTORE.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+        "properties": {
+          "lineNo": "55",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      }
+    ],
+    "name": "PRVDIR01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDIR01.cbl",
+    "type": "COB"
+  },
+  {
+    "name": "DIR-OUT-FILE",
+    "path": "Global:FILE_DEFINITION:DIR-OUT-FILE",
+    "type": "FILE_DEFINITION",
+    "dependencies": []
+  },
+  {
+    "name": "ERRCODES.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/ERRCODES.cpy",
+    "type": "CPY",
+    "dependencies": []
+  },
+  {
+    "name": "README.md",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/README.md",
+    "type": "md",
+    "dependencies": []
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "13",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Exec program",
+        "name": "PRVSCR01.cbl",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSCR01.cbl",
+        "properties": {
+          "lineNo": "11",
+          "lineIndex": "0"
+        },
+        "type": "COB"
+      },
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "SCREEN-OUT-FILE",
+        "path": "Global:FILE_DEFINITION:SCREEN-OUT-FILE",
+        "properties": {
+          "lineNo": "14",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      }
+    ],
+    "name": "PRVSCRPR.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS/PRVSCRPR.jcl",
+    "type": "PROC"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "APP-ERROR-FILE",
+        "path": "Global:FILE_DEFINITION:APP-ERROR-FILE",
+        "properties": {
+          "lineNo": "26",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "APP-INPUT-FILE",
+        "path": "Global:FILE_DEFINITION:APP-INPUT-FILE",
+        "properties": {
+          "lineNo": "21",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Exec program",
+        "name": "IEFBR14",
+        "path": null,
+        "properties": {
+          "lineNo": "73",
+          "lineIndex": "0"
+        },
+        "type": "System"
+      },
+      {
+        "dependencyType": "PDS use",
+        "name": "MMPRV.PROD.LOADLIB",
+        "path": null,
+        "properties": {
+          "lineNo": "13",
+          "lineIndex": "0"
+        },
+        "type": "System"
+      },
+      {
+        "dependencyType": "Read Dataset; Resolved Symbol",
+        "name": "MMPRV.PROV.APPS.D&DATE",
+        "path": null,
+        "properties": {
+          "symbolic": "MMPRV.PROV.APPS.D&DATE",
+          "lineNo": "21;21"
+        },
+        "type": "Missing Dataset"
+      },
+      {
+        "dependencyType": "Resolved Symbol; Write Dataset",
+        "name": "MMPRV.PROV.ERRORS.D&DATE",
+        "path": null,
+        "properties": {
+          "symbolic": "MMPRV.PROV.ERRORS.D&DATE",
+          "lineNo": "26;26"
+        },
+        "type": "Missing Dataset"
+      },
+      {
+        "dependencyType": "Read Dataset; Read Write Dataset",
+        "name": "MMPRV.PROVIDER.MASTER.KSDS",
+        "path": "Global:DATASET:MMPRV.PROVIDER.MASTER.KSDS",
+        "properties": {
+          "lineNo": "24;24"
+        },
+        "type": "VSAM KSDS DATASET"
+      },
+      {
+        "dependencyType": "Resolved Symbol; Write Dataset",
+        "name": "MMPRV.SCREEN.RESULTS.D&DATE",
+        "path": null,
+        "properties": {
+          "symbolic": "MMPRV.SCREEN.RESULTS.D&DATE",
+          "lineNo": "58;58"
+        },
+        "type": "Missing Dataset"
+      },
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "24",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Exec program",
+        "name": "PRVENR01.cbl",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVENR01.cbl",
+        "properties": {
+          "JCL.ddnameToDataset": "STEP010.PRVMSTR=MMPRV.PROVIDER.MASTER.KSDS;STEP010.STEPLIB=MMPRV.PROD.LOADLIB",
+          "lineNo": "18",
+          "lineIndex": "0"
+        },
+        "type": "COB"
+      },
+      {
+        "dependencyType": "Exec program",
+        "name": "PRVRSK01.cbl",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVRSK01.cbl",
+        "properties": {
+          "JCL.ddnameToDataset": "STEP040.PRVMSTR=MMPRV.PROVIDER.MASTER.KSDS",
+          "lineNo": "67",
+          "lineIndex": "0"
+        },
+        "type": "COB"
+      },
+      {
+        "dependencyType": "Exec program",
+        "name": "PRVSCR01.cbl",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSCR01.cbl",
+        "properties": {
+          "JCL.ddnameToDataset": "STEP030.PRVMSTR=MMPRV.PROVIDER.MASTER.KSDS",
+          "lineNo": "56",
+          "lineIndex": "0"
+        },
+        "type": "COB"
+      },
+      {
+        "dependencyType": "File declaration assignement",
+        "name": "SCREEN-OUT-FILE",
+        "path": "Global:FILE_DEFINITION:SCREEN-OUT-FILE",
+        "properties": {
+          "lineNo": "58",
+          "lineIndex": "0"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Exec program",
+        "name": "SORT",
+        "path": null,
+        "properties": {
+          "JCL.ddnameToDataset": "STEP020.SORTIN=MMPRV.PROVIDER.MASTER.KSDS",
+          "lineNo": "42",
+          "lineIndex": "0"
+        },
+        "type": "System"
+      }
+    ],
+    "name": "PRVDAY01.jcl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVDAY01.jcl",
+    "type": "JCL"
+  },
+  {
+    "dependencies": [
+      {
+        "dependencyType": "Close file; Open file; Read file",
+        "name": "PRV-MASTER-FILE",
+        "path": "Global:FILE_DEFINITION:PRV-MASTER-FILE",
+        "properties": {
+          "lineNo": "86;82;91"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "PRVMSTR",
+        "path": null,
+        "properties": {
+          "lineNo": "27",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "PRVRECRD.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+        "properties": {
+          "lineNo": "44",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      },
+      {
+        "dependencyType": "Open file; Write file",
+        "name": "TMSIS-OUT-FILE",
+        "path": "Global:FILE_DEFINITION:TMSIS-OUT-FILE",
+        "properties": {
+          "lineNo": "83;115"
+        },
+        "type": "FILE_DEFINITION"
+      },
+      {
+        "dependencyType": "Assignment clause",
+        "name": "TMSISOUT",
+        "path": null,
+        "properties": {
+          "lineNo": "34",
+          "lineIndex": "0"
+        },
+        "type": "Missing Source File"
+      },
+      {
+        "dependencyType": "Copy",
+        "name": "WRKSTORE.cpy",
+        "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+        "properties": {
+          "lineNo": "52",
+          "lineIndex": "0"
+        },
+        "type": "CPY"
+      }
+    ],
+    "name": "PRVTMS01.cbl",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVTMS01.cbl",
+    "type": "COB"
+  },
+  {
+    "name": "TMSIS-OUT-FILE",
+    "path": "Global:FILE_DEFINITION:TMSIS-OUT-FILE",
+    "type": "FILE_DEFINITION",
+    "dependencies": []
+  },
+  {
+    "name": "SCRNREC.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/SCRNREC.cpy",
+    "type": "CPY",
+    "dependencies": []
+  },
+  {
+    "name": "DCLPROV.cpy",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/DCLPROV.cpy",
+    "type": "CPY",
+    "dependencies": []
+  },
+  {
+    "name": "PRVAUTOM.rexx",
+    "path": "MMIS-PROVIDER-DEMO-TIER4/REXX/PRVAUTOM.rexx",
+    "type": "REXX",
+    "dependencies": []
+  },
+  {
+    "name": "APPERROR",
+    "type": "Missing Source File",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "APPINPUT",
+    "type": "Missing Source File",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "DIROUT",
+    "type": "Missing Source File",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "IDCAMS",
+    "type": "System",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "IEBGENER",
+    "type": "System",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "IEFBR14",
+    "type": "System",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "MMPRV.PROD.LOADLIB",
+    "type": "System",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "MMPRV.PROV.APPS.D&DATE",
+    "type": "Missing Dataset",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "MMPRV.PROV.ERRORS.D&DATE",
+    "type": "Missing Dataset",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "MMPRV.REVAL.QUEUE.D&DATE",
+    "type": "Missing Dataset",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "MMPRV.SCREEN.RESULTS.D&DATE",
+    "type": "Missing Dataset",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "MMPRV.TMSIS.ARCHIVE(+1)",
+    "type": "Missing Dataset",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "MMPRV.TMSIS.PROVIDER.D&DATE",
+    "type": "Missing Dataset",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "PINQ",
+    "type": "Missing CICS Transaction Definition",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "PRVMSTR",
+    "type": "Missing Source File",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "PRVNTGEN",
+    "type": "Missing Program",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "PRVNTRST",
+    "type": "Missing Program",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "PRVNTSUS",
+    "type": "Missing Program",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "PRVNTTRM",
+    "type": "Missing Program",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "PRVPROVN",
+    "type": "Missing CICS Dataset Definition",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "PRVSET1",
+    "type": "Missing BMS",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "REVALQ",
+    "type": "Missing Source File",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "SANCIN",
+    "type": "Missing Source File",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "SCRNOUT",
+    "type": "Missing Source File",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "SORT",
+    "type": "System",
+    "dependencies": [],
+    "path": null
+  },
+  {
+    "name": "TMSISOUT",
+    "type": "Missing Source File",
+    "dependencies": [],
+    "path": null
+  }
+]

@@ -1,0 +1,83 @@
+{
+    "created_on": "2026-11-17",
+    "document_title": "PRVVSM01.jcl Batch Documentation",
+    "type": "entry_point",
+    "document_name": "PRVVSM01.jcl",
+    "summary": {
+        "overview": "This job initializes the Provider Master File infrastructure by rebuilding the primary indexed file and its alternate lookup structures from scratch. It enables provider records to be accessed both by their primary provider identifier and by a secondary identifier, supporting multiple access paths for downstream provider processing.",
+        "business_functions": [
+            "Delete Existing Provider Master File - Removes any previously existing Provider Master data to ensure a clean foundation before recreating the file structures",
+            "Create Primary Provider Master File - Establishes the main indexed storage for provider records, each uniquely identified by a 10-character primary provider key with fixed-length 121-character records",
+            "Create Alternate Index - Builds a secondary lookup index allowing provider records to be retrieved by a 9-character alternate identifier (such as a group ID or taxonomy code), supporting non-unique key access where multiple providers may share the same alternate key",
+            "Create Access Path - Defines a named navigation route linked to the alternate index, enabling downstream programs to easily search and retrieve provider records using the secondary identifier without directly referencing the alternate index"
+        ],
+        "environment_summary": {
+            "workload_type": "Batch",
+            "database_types": [
+                "VSAM"
+            ],
+            "integration_components": [
+                "N/A"
+            ],
+            "dataset_types": [
+                "VSAM KSDS",
+                "VSAM AIX",
+                "VSAM PATH"
+            ]
+        }
+    },
+    "functionality_flow": {
+        "PRVVSM01.jcl": [
+            {
+                "program_name": "IDCAMS",
+                "program_overview": "IBM system utility that creates, deletes, and manages VSAM file structures including the Provider Master primary file, alternate index, and access path",
+                "called_programs": []
+            }
+        ]
+    },
+    "datasource_summary": [
+        {
+            "name": "Provider Master File (MMPRV.PROVIDER.MASTER.KSDS)",
+            "original_name": "MMPRV.PROVIDER.MASTER.KSDS",
+            "business_name": "Provider Master File",
+            "type": "VSAM_KSDS",
+            "function": "Primary Provider Master file that stores core provider information. This file is deleted and recreated during the job, holding fixed-length provider records uniquely identified by a 10-byte provider key. It serves as the central repository for all provider master data used across the organization.",
+            "used_by_programs": [
+                "PRVVSM01.jcl"
+            ],
+            "accessType": [
+                "WRITE"
+            ]
+        },
+        {
+            "name": "Provider Master Alternate Index (MMPRV.PROVIDER.MASTER.AIX)",
+            "original_name": "MMPRV.PROVIDER.MASTER.AIX",
+            "business_name": "Provider Master Alternate Index",
+            "type": "VSAM_KSDS",
+            "function": "Alternate Index built on the Provider Master file, allowing provider records to be looked up using a secondary 9-byte key (e.g., a provider group or network identifier) rather than the primary provider key. Supports non-unique key lookups, meaning multiple providers can share the same alternate key value.",
+            "used_by_programs": [
+                "PRVVSM01.jcl"
+            ],
+            "accessType": [
+                "WRITE"
+            ]
+        },
+        {
+            "name": "Provider Master Alternate Access Path (MMPRV.PROVIDER.MASTER.PATH)",
+            "original_name": "MMPRV.PROVIDER.MASTER.PATH",
+            "business_name": "Provider Master Alternate Access Path",
+            "type": "VSAM_KSDS",
+            "function": "Access path defined over the Provider Master Alternate Index, enabling business applications to retrieve provider records using the alternate key. This path simplifies access for programs that need to search or process providers by their secondary identifier rather than their primary provider key.",
+            "used_by_programs": [
+                "PRVVSM01.jcl"
+            ],
+            "accessType": [
+                "WRITE"
+            ]
+        }
+    ],
+    "program_paths": {
+        "PRVVSM01.jcl": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM01.jcl"
+    },
+    "flow_diagram_code": "flowchart TD\n    IDCAMS[\"IBM system utility that creates, deletes, and manages VSAM file structures including the Provider Master primary file, alternate index, and access path (IDCAMS) \"]\n"
+}

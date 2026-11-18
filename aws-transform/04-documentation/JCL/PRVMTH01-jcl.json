@@ -1,0 +1,115 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVMTH01.jcl",
+        "type": "jcl"
+      },
+      "overview": "This JCL job, PRVMTH01, performs month-end processing for a Medicaid Management Information System (MMIS) provider database. It executes a federally mandated revalidation sweep of providers per 42 CFR 455.414 regulations, extracts provider data into the T-MSIS (Transformed Medicaid Statistical Information System) reporting format, and archives the extract to a Generation Data Group (GDG) on tape for historical retention. The job ensures regulatory compliance by identifying providers due for revalidation while simultaneously fulfilling federal T-MSIS reporting requirements for Medicaid provider data.",
+      "parameters": [
+        {
+          "name": "JOB",
+          "value": "(MMIS,PROVIDER),'MONTH-END PROVIDER'",
+          "description": "The JOB statement marks the beginning of the job and defines the job name as PRVMTH01. The accounting information (MMIS,PROVIDER) is used for billing and resource tracking purposes. The programmer name 'MONTH-END PROVIDER' is a descriptive label identifying the job's purpose."
+        },
+        {
+          "name": "CLASS",
+          "value": "A",
+          "description": "Assigns the job to input job class A, which determines the job's execution queue and priority on the system. Class A typically designates a specific workload category that the JES scheduler uses to route and prioritize the job for execution."
+        },
+        {
+          "name": "MSGCLASS",
+          "value": "X",
+          "description": "Specifies the output class X for the job's system messages and JCL listing. This controls where the job log, allocation messages, and other system output are directed, typically to a held output queue for review before printing or deletion."
+        },
+        {
+          "name": "MSGLEVEL",
+          "value": "(1,1)",
+          "description": "Controls the level of JCL and system messages printed in the job log. The first value (1) causes all JCL statements including cataloged procedure expansions to be printed. The second value (1) causes all system allocation and termination messages to be printed, providing full diagnostic information for the job run."
+        },
+        {
+          "name": "NOTIFY",
+          "value": "&SYSUID",
+          "description": "Specifies that the user who submitted the job (resolved from the symbolic &SYSUID to the submitting user's TSO user ID) will receive a TSO notification message upon job completion or failure, allowing the submitter to be immediately informed of the job's outcome."
+        },
+        {
+          "name": "REGION",
+          "value": "0M",
+          "description": "Specifies the maximum amount of virtual storage available to the entire job. A value of 0M indicates that the job is allowed to use the maximum available region size as defined by the system, effectively removing memory constraints and allowing all steps in the job to use as much virtual storage as needed."
+        },
+        {
+          "name": "JOBLIB",
+          "value": "MMPRV.PROD.LOADLIB",
+          "description": "Defines a job-level library concatenation that applies to all steps in the job. The dataset MMPRV.PROD.LOADLIB is searched before the system link libraries when locating executable load modules (programs) for each step. This ensures that all steps use the production versions of programs such as PRVREV01 and PRVTMS01 without requiring a STEPLIB in each individual step."
+        }
+      ]
+    },
+    "job_details": [
+      {
+        "step": "STEP010",
+        "purpose": "Performs a month-end revalidation sweep of provider records in compliance with 42 CFR 455.414, identifying providers due for revalidation and writing them to a revalidation queue dataset.",
+        "programs": "PRVREV01",
+        "inputs": "MMPRV.PROVIDER.MASTER.KSDS (PRVMSTR - Provider Master KSDS file)",
+        "outputs": "MMPRV.REVAL.QUEUE.D&DATE (REVALQ - Revalidation queue, new cataloged dataset, FB/80/8000); SYSOUT (execution messages)"
+      },
+      {
+        "step": "STEP020",
+        "purpose": "Extracts provider data from the Provider Master file and produces a T-MSIS (Transformed Medicaid Statistical Information System) provider extract file for federal reporting.",
+        "programs": "PRVTMS01",
+        "inputs": "MMPRV.PROVIDER.MASTER.KSDS (PRVMSTR - Provider Master KSDS file)",
+        "outputs": "MMPRV.TMSIS.PROVIDER.D&DATE (TMSISOUT - T-MSIS provider extract, new cataloged dataset, FB/120/12000); SYSOUT (execution messages)"
+      },
+      {
+        "step": "STEP030",
+        "purpose": "Archives the T-MSIS provider extract file to a new generation of a Generation Data Group (GDG) on tape, preserving a historical copy of the monthly T-MSIS provider data.",
+        "programs": "IEBGENER*",
+        "inputs": "MMPRV.TMSIS.PROVIDER.D&DATE (SYSUT1 - T-MSIS provider extract file created in STEP020); SYSIN (DUMMY - no control statements)",
+        "outputs": "MMPRV.TMSIS.ARCHIVE(+1) (SYSUT2 - new GDG generation written to tape with standard labels); SYSPRINT (utility messages); SYSOUT (execution messages)"
+      }
+    ],
+    "data_operations": [
+      {
+        "step": "STEP010",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.KSDS",
+        "operations": "READ",
+        "description": "PRVREV01 reads the Provider Master KSDS file to perform the revalidation sweep per 42 CFR 455.414"
+      },
+      {
+        "step": "STEP010",
+        "type": "Dataset",
+        "objects": "MMPRV.REVAL.QUEUE.D&DATE",
+        "operations": "WRITE",
+        "description": "PRVREV01 writes providers requiring revalidation to a new date-stamped revalidation queue file (FB, LRECL=80)"
+      },
+      {
+        "step": "STEP020",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.KSDS",
+        "operations": "READ",
+        "description": "PRVTMS01 reads the Provider Master KSDS file to extract provider data for T-MSIS reporting"
+      },
+      {
+        "step": "STEP020",
+        "type": "Dataset",
+        "objects": "MMPRV.TMSIS.PROVIDER.D&DATE",
+        "operations": "WRITE",
+        "description": "PRVTMS01 writes the T-MSIS provider extract to a new date-stamped output file (FB, LRECL=120)"
+      },
+      {
+        "step": "STEP030",
+        "type": "Dataset",
+        "objects": "MMPRV.TMSIS.PROVIDER.D&DATE",
+        "operations": "READ",
+        "description": "IEBGENER reads the T-MSIS provider extract file created in STEP020 as the copy source"
+      },
+      {
+        "step": "STEP030",
+        "type": "Dataset",
+        "objects": "MMPRV.TMSIS.ARCHIVE(+1)",
+        "operations": "WRITE",
+        "description": "IEBGENER copies the T-MSIS provider extract to a new GDG generation on tape (SL label) for archival"
+      }
+    ]
+  }
+}

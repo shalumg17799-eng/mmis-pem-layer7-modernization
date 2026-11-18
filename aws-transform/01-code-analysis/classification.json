@@ -1,0 +1,113 @@
+[
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDEAD1.cbl",
+    "name": "PRVDEAD1.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDIR01.cbl",
+    "name": "PRVDIR01.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVENR01.cbl",
+    "name": "PRVENR01.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVREV01.cbl",
+    "name": "PRVREV01.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVRSK01.cbl",
+    "name": "PRVRSK01.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSAN01.cbl",
+    "name": "PRVSAN01.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSCR01.cbl",
+    "name": "PRVSCR01.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVTMS01.cbl",
+    "name": "PRVTMS01.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/DCLPROV.cpy",
+    "name": "DCLPROV.cpy",
+    "fileType": "cpy"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/ERRCODES.cpy",
+    "name": "ERRCODES.cpy",
+    "fileType": "cpy"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy",
+    "name": "PRVRECRD.cpy",
+    "fileType": "cpy"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/SCRNREC.cpy",
+    "name": "SCRNREC.cpy",
+    "fileType": "cpy"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy",
+    "name": "WRKSTORE.cpy",
+    "fileType": "cpy"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/DB2/PRVDDL01.sql",
+    "name": "PRVDDL01.sql",
+    "fileType": "sql"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PROCS/PRVSCRPR.jcl",
+    "name": "PRVSCRPR.jcl",
+    "fileType": "proc"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVDAY01.jcl",
+    "name": "PRVDAY01.jcl",
+    "fileType": "jcl"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVMTH01.jcl",
+    "name": "PRVMTH01.jcl",
+    "fileType": "jcl"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/ONLINE/PRVCICS1.cbl",
+    "name": "PRVCICS1.cbl",
+    "fileType": "cob"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/README.md",
+    "name": "README.md",
+    "fileType": "Unknown",
+    "reason": "DETECTOR_UNKNOWN (a detector assigned the Unknown type)"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/REXX/PRVAUTOM.rexx",
+    "name": "PRVAUTOM.rexx",
+    "fileType": "REXX"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM01.jcl",
+    "name": "PRVVSM01.jcl",
+    "fileType": "jcl"
+  },
+  {
+    "path": "MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM02.jcl",
+    "name": "PRVVSM02.jcl",
+    "fileType": "jcl"
+  }
+]

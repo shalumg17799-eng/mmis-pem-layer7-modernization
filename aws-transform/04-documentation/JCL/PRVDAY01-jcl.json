@@ -1,0 +1,148 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVDAY01.jcl",
+        "type": "jcl"
+      },
+      "overview": "This JCL job (PRVDAY01) implements a daily provider enrollment pipeline for a Medicaid Management Information System (MMIS), processing new provider applications and updating the provider master file. It loads incoming provider applications, sorts unscreened providers by their National Provider Identifier (NPI), performs screening and verification, and assigns risk-tier classifications along with revalidation due dates. Steps 2 through 4 execute conditionally only when the initial application load completes successfully, ensuring downstream processing is skipped if the enrollment loader encounters errors.",
+      "parameters": [
+        {
+          "name": "JOB Name",
+          "value": "PRVDAY01",
+          "description": "The name assigned to this batch job, used by the operating system and JES to identify, track, and manage the job throughout its lifecycle in the job queue and output listings."
+        },
+        {
+          "name": "Accounting Information",
+          "value": "(MMIS,PROVIDER)",
+          "description": "Accounting parameters passed to the installation accounting routine. 'MMIS' identifies the system or project being charged, and 'PROVIDER' identifies the sub-account or functional area, used for resource tracking and billing purposes."
+        },
+        {
+          "name": "Programmer Name",
+          "value": "DAILY ENROLLMENT",
+          "description": "A descriptive label appearing on job output separator pages and logs, identifying the job's purpose. It has no impact on execution but aids in identifying output in the JES spool."
+        },
+        {
+          "name": "CLASS",
+          "value": "A",
+          "description": "Specifies the job class, which routes the job to a specific initiator class defined by the installation. Class A typically designates a standard production batch class, determining which initiators can pick up and execute the job and influencing scheduling priority."
+        },
+        {
+          "name": "MSGCLASS",
+          "value": "X",
+          "description": "Specifies the output class for the job log (JES message log), which includes JCL listings, allocation/termination messages, and system messages. Class X typically routes output to a held spool class for online review rather than immediate printing."
+        },
+        {
+          "name": "MSGLEVEL",
+          "value": "(1,1)",
+          "description": "Controls the level of JCL and system messages written to the job log. The first value '1' causes all JCL statements including cataloged procedure expansions to be printed. The second value '1' causes all system allocation and termination messages to be printed, providing full diagnostic detail."
+        },
+        {
+          "name": "NOTIFY",
+          "value": "&SYSUID",
+          "description": "Specifies the TSO user ID to be notified via a system message when the job completes. The symbolic parameter &SYSUID resolves to the user ID of the person who submitted the job, enabling the submitter to receive immediate notification of job completion or failure."
+        },
+        {
+          "name": "REGION",
+          "value": "0M",
+          "description": "Specifies the maximum amount of virtual storage available to the entire job. A value of 0M instructs the system to allocate the maximum available region size, removing memory constraints and allowing all steps in the job to use as much virtual storage as the system can provide."
+        }
+      ]
+    },
+    "job_details": [
+      {
+        "step": "STEP010",
+        "purpose": "Loads daily provider enrollment applications into the provider master file, processing new application records and capturing any errors encountered during the load process.",
+        "programs": "PRVENR01",
+        "inputs": "MMPRV.PROV.APPS.D&DATE (daily provider application input file), MMPRV.PROVIDER.MASTER.KSDS (provider master KSDS file)",
+        "outputs": "MMPRV.PROV.ERRORS.D&DATE (error records file, FB/250/25000, new cataloged); SYSOUT, SYSPRINT (job log output)"
+      },
+      {
+        "step": "STEP020",
+        "purpose": "Sorts provider records from the provider master KSDS by NPI (columns 1-10, ascending), filtering to include only records where the provider screen flag (column 23) equals 'U' (unscreened), producing a temporary sorted dataset for downstream screening.",
+        "programs": "SORT*",
+        "inputs": "MMPRV.PROVIDER.MASTER.KSDS (provider master file); SYSIN (SORT control statements: SORT FIELDS=(1,10,CH,A), INCLUDE COND=(23,1,CH,EQ,C'U'))",
+        "outputs": "&&PRVSORT (temporary sorted provider dataset, passed to next step, SYSDA, 20 CYL primary/5 CYL secondary); SYSOUT, SYSPRINT (job log output)"
+      },
+      {
+        "step": "STEP030",
+        "purpose": "Executes the provider screening and verification engine against the provider master file, producing a screening results dataset for the current processing date.",
+        "programs": "PRVSCR01",
+        "inputs": "MMPRV.PROVIDER.MASTER.KSDS (provider master KSDS file)",
+        "outputs": "MMPRV.SCREEN.RESULTS.D&DATE (screening results file, FB/67/6700, new cataloged, 10 CYL primary/5 CYL secondary); SYSOUT (job log output)"
+      },
+      {
+        "step": "STEP040",
+        "purpose": "Performs risk-tier classification and revalidation due date assignment for providers by processing the provider master file, updating provider records with appropriate risk tier designations.",
+        "programs": "PRVRSK01",
+        "inputs": "MMPRV.PROVIDER.MASTER.KSDS (provider master KSDS file)",
+        "outputs": "SYSOUT (job log output)"
+      },
+      {
+        "step": "STEP099",
+        "purpose": "Serves as a no-operation cleanup step executed unconditionally at job end (COND=(0,LT) effectively never bypasses it), providing a standard job termination point.",
+        "programs": "IEFBR14*",
+        "inputs": "N/A",
+        "outputs": "SYSOUT (job log output)"
+      }
+    ],
+    "data_operations": [
+      {
+        "step": "STEP010",
+        "type": "Dataset",
+        "objects": "MMPRV.PROV.APPS.D&DATE",
+        "operations": "READ",
+        "description": "PRVENR01 reads daily provider application input records from the date-stamped application input file"
+      },
+      {
+        "step": "STEP010",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.KSDS",
+        "operations": "READ, WRITE, UPDATE",
+        "description": "PRVENR01 reads and updates the provider master KSDS VSAM file with new enrollment application data"
+      },
+      {
+        "step": "STEP010",
+        "type": "Dataset",
+        "objects": "MMPRV.PROV.ERRORS.D&DATE",
+        "operations": "WRITE",
+        "description": "PRVENR01 writes application error records to a new date-stamped error output file (FB, LRECL=250)"
+      },
+      {
+        "step": "STEP020",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.KSDS",
+        "operations": "READ",
+        "description": "DFSORT reads the provider master KSDS as SORTIN, filtering records where PRV-SCREEN-FLAG (col 23) equals 'U' (unscreened)"
+      },
+      {
+        "step": "STEP020",
+        "type": "Dataset",
+        "objects": "&&PRVSORT",
+        "operations": "WRITE",
+        "description": "DFSORT writes sorted and filtered unscreened provider records to temporary dataset &&PRVSORT, sorted ascending by NPI (columns 1-10), passed to subsequent steps"
+      },
+      {
+        "step": "STEP030",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.KSDS",
+        "operations": "READ, UPDATE",
+        "description": "PRVSCR01 reads provider records from the master KSDS and updates screening status as part of the screening and verification process"
+      },
+      {
+        "step": "STEP030",
+        "type": "Dataset",
+        "objects": "MMPRV.SCREEN.RESULTS.D&DATE",
+        "operations": "WRITE",
+        "description": "PRVSCR01 writes screening result records to a new date-stamped output file (FB, LRECL=67, BLKSIZE=6700)"
+      },
+      {
+        "step": "STEP040",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.KSDS",
+        "operations": "READ, UPDATE",
+        "description": "PRVRSK01 reads provider records from the master KSDS and updates risk-tier classification and revalidation due date fields"
+      }
+    ]
+  }
+}

@@ -1,0 +1,128 @@
+{
+    "created_on": "2026-11-17",
+    "document_title": "PRVMTH01.jcl Batch Documentation",
+    "type": "entry_point",
+    "document_name": "PRVMTH01.jcl",
+    "summary": {
+        "overview": "PRVMTH01 is a month-end batch job that identifies Medicaid providers overdue for revalidation per federal 42 CFR 455.414 requirements, extracts active provider data for monthly CMS T-MSIS federal reporting, and archives the T-MSIS submission file to tape for long-term compliance retention.",
+        "business_functions": [
+            "STEP010 - Scan the Provider Master File to identify all active providers whose revalidation due date has passed, queue them for re-screening with action 'RESCREEN-REQUIRED', and report the total count of providers flagged for revalidation in compliance with the 5-year federal revalidation cycle (42 CFR 455.414)",
+            "STEP010 - Write each overdue active provider's NPI and revalidation due date to a date-stamped Revalidation Queue file for downstream revalidation processing",
+            "STEP020 - Read the Provider Master File and extract all active Medicaid providers, validating enrollment dates to detect potential future-dated data quality issues",
+            "STEP020 - Format each active provider's Medicaid ID, NPI, active status, and current reporting period into the CMS T-MSIS compliant layout and write records to a date-stamped T-MSIS Provider Submission file for federal Medicaid reporting",
+            "STEP020 - Report the total number of provider records written to the T-MSIS submission file upon completion of the monthly extract",
+            "STEP030 - Archive the T-MSIS Provider Submission file produced in STEP020 to a tape-based Generation Data Group (GDG), creating a new versioned generation to ensure permanent retention of every monthly T-MSIS extract for audit and compliance purposes"
+        ],
+        "environment_summary": {
+            "workload_type": "Batch",
+            "database_types": [
+                "VSAM"
+            ],
+            "integration_components": [
+                "N/A"
+            ],
+            "dataset_types": [
+                "VSAM KSDS",
+                "PS",
+                "GDG"
+            ]
+        }
+    },
+    "functionality_flow": {
+        "PRVMTH01.jcl": [
+            {
+                "program_name": "PRVREV01",
+                "program_overview": "Scans the Provider Master File to identify active providers overdue for revalidation and writes them to the Revalidation Queue file",
+                "called_programs": []
+            },
+            {
+                "program_name": "PRVTMS01",
+                "program_overview": "Extracts active Medicaid providers from the Provider Master File and formats them into the monthly CMS T-MSIS Provider Submission file",
+                "called_programs": []
+            },
+            {
+                "program_name": "IEBGENER",
+                "program_overview": "Archives the T-MSIS Provider Submission file to a tape-based GDG for long-term compliance retention",
+                "called_programs": []
+            }
+        ]
+    },
+    "datasource_summary": [
+        {
+            "name": "Provider Master File (MMPRV.PROVIDER.MASTER.KSDS)",
+            "original_name": "MMPRV.PROVIDER.MASTER.KSDS",
+            "business_name": "Provider Master File",
+            "type": "VSAM KSDS",
+            "function": "The central provider master reference file containing all provider records. It is read sequentially to identify active providers for revalidation screening and to extract active provider data for T-MSIS submission to CMS.",
+            "used_by_programs": [
+                "PRVREV01.cbl",
+                "PRVTMS01.cbl",
+                "PRVMTH01.jcl"
+            ],
+            "accessType": [
+                "READ"
+            ]
+        },
+        {
+            "name": "Revalidation Queue File (MMPRV.REVAL.QUEUE.D&DATE)",
+            "original_name": "MMPRV.REVAL.QUEUE.D&DATE",
+            "business_name": "Revalidation Queue File",
+            "type": "SEQUENTIAL",
+            "function": "A date-stamped output file that captures all provider records identified as requiring revalidation rescreening. Each record includes the provider NPI, revalidation due date, and an action code of 'RESCREEN-REQUIRED', serving as the queue for downstream revalidation processing.",
+            "used_by_programs": [
+                "PRVREV01.cbl",
+                "PRVMTH01.jcl"
+            ],
+            "accessType": [
+                "WRITE"
+            ]
+        },
+        {
+            "name": "T-MSIS Provider Extract File (MMPRV.TMSIS.PROVIDER.D&DATE)",
+            "original_name": "MMPRV.TMSIS.PROVIDER.D&DATE",
+            "business_name": "T-MSIS Provider Extract File",
+            "type": "SEQUENTIAL",
+            "function": "A date-stamped file that holds formatted T-MSIS provider detail records (PRV01) containing Medicaid ID, NPI, active status, and reporting period. It is produced by the T-MSIS extraction process and subsequently read for archiving to CMS.",
+            "used_by_programs": [
+                "PRVTMS01.cbl",
+                "PRVMTH01.jcl"
+            ],
+            "accessType": [
+                "READ",
+                "WRITE"
+            ]
+        },
+        {
+            "name": "T-MSIS Provider Archive (MMPRV.TMSIS.ARCHIVE(+1))",
+            "original_name": "MMPRV.TMSIS.ARCHIVE(+1)",
+            "business_name": "T-MSIS Provider Archive",
+            "type": "GDG",
+            "function": "A generational data group stored on tape that serves as the permanent archive copy of the T-MSIS provider extract. A new generation is created each time the monthly job runs, preserving a historical record of all T-MSIS provider submissions made to CMS.",
+            "used_by_programs": [
+                "PRVMTH01.jcl"
+            ],
+            "accessType": [
+                "WRITE"
+            ]
+        },
+        {
+            "name": "Production Load Library (MMPRV.PROD.LOADLIB)",
+            "original_name": "MMPRV.PROD.LOADLIB",
+            "business_name": "Production Load Library",
+            "type": "PDS",
+            "function": "The production library containing the executable program modules used by the monthly provider processing job. It provides the compiled programs required to run the revalidation screening and T-MSIS extraction processes.",
+            "used_by_programs": [
+                "PRVMTH01.jcl"
+            ],
+            "accessType": [
+                "READ"
+            ]
+        }
+    ],
+    "program_paths": {
+        "PRVMTH01.jcl": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVMTH01.jcl",
+        "PRVREV01": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVREV01.cbl",
+        "PRVTMS01": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVTMS01.cbl"
+    },
+    "flow_diagram_code": "flowchart TD\n    PRVREV01[\"Scans the Provider Master File to identify active providers overdue for revalidation and writes them to the Revalidation Queue file (PRVREV01) \"]\n    PRVTMS01[\"Extracts active Medicaid providers from the Provider Master File and formats them into the monthly CMS T-MSIS Provider Submission file (PRVTMS01) \"]\n    IEBGENER[\"Archives the T-MSIS Provider Submission file to a tape-based GDG for long-term compliance retention (IEBGENER) \"]\n"
+}

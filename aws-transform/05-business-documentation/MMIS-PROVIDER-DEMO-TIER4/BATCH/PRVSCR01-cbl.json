@@ -1,0 +1,1615 @@
+{
+    "name": "PRVSCR01.cbl",
+    "program_name": "PRVSCR01.cbl",
+    "generated_at": "2026-11-17T12:39:57Z",
+    "overview": {
+        "total_key_functionalities": 11,
+        "total_rules": 62,
+        "main_flow_diagram": "flowchart TD\n    A([Start: PRVSCR01 Provider Screening]):::start\n\n    B[1:Provider Screening Initiation\nOpen Provider Master File\nOpen Screening Output File]:::process\n    PRV1[(PRV-MASTER-FILE\nVSAM Indexed)]:::datasource\n    SCROUT1[(SCREEN-OUT-FILE\nSequential File)]:::datasource\n\n    C{More Unprocessed\nProvider Records?}:::decision\n\n    D[2:Pending Provider Selection\nRead Next Provider Record]:::process\n    PRV2[(PRV-MASTER-FILE\nVSAM Indexed)]:::datasource\n\n    E{Provider Status\n= Unscreened?}:::decision\n\n    F{Medicare Reciprocity\nFlag Active?}:::decision\n\n    G[3:Medicare Reciprocity Check\nDEAD CODE - Never Executed\nQuery PECOS - Accept Medicare\nPrior Screening Results\nAuto-Pass All 4 Checks]:::process\n\n    H[4:State License Verification\nQuery State Licensing Board\nVerify Valid Active License]:::process\n    SCROUT2[(SCREEN-OUT-FILE\nWrite License Check Result)]:::datasource\n\n    I[5:OIG LEIE Exclusion Check\nQuery OIG LEIE Database\nVerify Provider Not Excluded]:::process\n    SCROUT3[(SCREEN-OUT-FILE\nWrite LEIE Check Result)]:::datasource\n\n    J[6:SAM Debarment Check\nQuery System for Award Management\nVerify Provider Not Debarred]:::process\n    SCROUT4[(SCREEN-OUT-FILE\nWrite SAM Check Result)]:::datasource\n\n    K[7:SSA Death Master File Check\nQuery SSA Death Master File\nVerify Provider Not Deceased]:::process\n    SCROUT5[(SCREEN-OUT-FILE\nWrite DMF Check Result)]:::datasource\n\n    L{8:Screening Verdict Determination\nAll 4 Checks Passed?\nLicense + LEIE + SAM + DMF}:::decision\n\n    M[Screening Verdict: PASS\nMark Provider as\nScreening-Passed]:::success\n\n    N[Screening Verdict: FAIL\nMark Provider as\nScreening-Failed\nIncrement Failure Counter]:::error\n\n    O[9:Provider Record Update\nWrite Updated Screening Verdict\nBack to Provider Master File]:::process\n    PRV3[(PRV-MASTER-FILE\nVSAM Indexed - Rewrite Record)]:::datasource\n\n    P[11:Screening Summary Reporting\nDisplay Total Count of\nProviders Who Failed Screening]:::process\n\n    Z([End: Batch Screening Complete]):::final\n\n    A --> B\n    PRV1 -.->|Open File| B\n    SCROUT1 -.->|Open File| B\n    B --> C\n    C -->|Yes - Read Next Record| D\n    PRV2 -.->|Sequential Read| D\n    D --> E\n    E -->|No - Skip Record| C\n    E -->|Yes - Process Provider| F\n    F -->|Yes - Flag Active\nNever True Since 2014| G\n    F -->|No - Flag Inactive\nNormal Path| H\n    G -->|Auto-Pass All Checks| L\n    H --> SCROUT2\n    SCROUT2 -.->|Write Check Row| H\n    H --> I\n    I --> SCROUT3\n    SCROUT3 -.->|Write Check Row| I\n    I --> J\n    J --> SCROUT4\n    SCROUT4 -.->|Write Check Row| J\n    J --> K\n    K --> SCROUT5\n    SCROUT5 -.->|Write Check Row| K\n    K --> L\n    L -->|All 4 Results = Pass| M\n    L -->|Any Result = Fail| N\n    M --> O\n    N --> O\n    PRV3 -.->|Rewrite Record| O\n    O --> C\n    C -->|No More Records - EOF| P\n    P --> Z\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313",
+        "rules": [
+            {
+                "rule_id": "R-PRVSCR01-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Screening Batch Initiation",
+                "rule_description": "The provider screening batch process must initialize by gaining access to the Provider Master File and the Screening Output File before any provider records can be read or screening results written.",
+                "sub_graph_node_text": "1:Provider Screening Initiation\nOpen Provider Master File\nOpen Screening Output File",
+                "acceptance_criteria": {
+                    "Given": "The PRVSCR01 provider screening batch program is invoked",
+                    "When": "The program begins execution",
+                    "Then": "The Provider Master File must be opened for both reading and updating, and the Screening Output File must be opened for writing, so that provider records can be retrieved and screening results can be recorded"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00002",
+                "rule_type": "Process Rules",
+                "rule_name": "Sequential Provider Record Retrieval",
+                "rule_description": "The program must read provider records one at a time from the Provider Master File in sequential order to ensure every provider record is evaluated for screening eligibility.",
+                "sub_graph_node_text": "2:Pending Provider Selection\nRead Next Provider Record",
+                "acceptance_criteria": {
+                    "Given": "The Provider Master File has been successfully opened and the screening loop is active",
+                    "When": "The program advances to the next iteration of the screening loop",
+                    "Then": "The next sequential provider record is read from the Provider Master File; if no more records exist, the end-of-file condition is detected and the screening loop terminates"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00003",
+                "rule_type": "Decision Rules",
+                "rule_name": "Unscreened Provider Filter",
+                "rule_description": "Only providers whose screening status is marked as UNSCREENED are eligible for the screening process. Providers already marked as screened (pass or fail) must be skipped to avoid duplicate screening.",
+                "sub_graph_node_text": "Provider Status\n= Unscreened?",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been read from the Provider Master File",
+                    "When": "The program evaluates the provider's current screening status",
+                    "Then": "If the provider status is UNSCREENED, the provider is forwarded for screening checks; if the provider status is anything other than UNSCREENED (already screened), the record is skipped and the next provider record is read"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00004",
+                "rule_type": "Decision Rules",
+                "rule_name": "Medicare Reciprocity Flag Evaluation",
+                "rule_description": "Before performing individual screening checks, the program must evaluate whether the Medicare Reciprocity flag is active. If active, the program relies on prior Medicare/PECOS screening results instead of performing independent checks. This flag has not been active since 2014, making this path effectively dead code.",
+                "sub_graph_node_text": "Medicare Reciprocity\nFlag Active?",
+                "acceptance_criteria": {
+                    "Given": "An unscreened provider record has been selected for screening",
+                    "When": "The program evaluates the Medicare Reciprocity system flag",
+                    "Then": "If the Medicare Reciprocity flag is active, the program invokes the Medicare Reciprocity Check routine and auto-passes all four screening checks (License, LEIE, SAM, DMF); if the flag is inactive (the normal operational path), the program proceeds to perform each individual screening check independently"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00005",
+                "rule_type": "Policy Rules",
+                "rule_name": "Medicare/PECOS Reciprocity Auto-Pass Override",
+                "rule_description": "When the Medicare Reciprocity flag is active, the program accepts prior Medicare/PECOS screening results as sufficient, automatically passing all four individual screening checks (License, LEIE, SAM, DMF) without performing independent verification. The output record is tagged as a PECOS-sourced screening record.",
+                "sub_graph_node_text": "3:Medicare Reciprocity Check\nDEAD CODE - Never Executed\nQuery PECOS - Accept Medicare\nPrior Screening Results\nAuto-Pass All 4 Checks",
+                "acceptance_criteria": {
+                    "Given": "An unscreened provider has been selected and the Medicare Reciprocity flag is active",
+                    "When": "The Medicare Reciprocity Check routine is executed",
+                    "Then": "All four screening check results \u2014 License, LEIE Exclusion, SAM Debarment, and SSA Death Master File \u2014 are automatically set to PASS; the screening output record is tagged as a PECOS record; no independent verification queries are performed for this provider"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00006",
+                "rule_type": "Action Rules",
+                "rule_name": "State License Verification",
+                "rule_description": "Each unscreened provider must have their state license verified against the State Licensing Board to confirm they hold a valid and active license. The result of this check is recorded in the Screening Output File.",
+                "sub_graph_node_text": "4:State License Verification\nQuery State Licensing Board\nVerify Valid Active License",
+                "acceptance_criteria": {
+                    "Given": "An unscreened provider has been selected for screening and the Medicare Reciprocity flag is inactive",
+                    "When": "The License Check routine is performed",
+                    "Then": "The provider's license status is verified; the License check result is set to PASS; the provider's NPI and the License check result are written as a row to the Screening Output File"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00007",
+                "rule_type": "Action Rules",
+                "rule_name": "OIG LEIE Exclusion Verification",
+                "rule_description": "Each unscreened provider must be checked against the OIG List of Excluded Individuals and Entities (LEIE) database to confirm the provider has not been excluded from participation in federal healthcare programs. The result is recorded in the Screening Output File.",
+                "sub_graph_node_text": "5:OIG LEIE Exclusion Check\nQuery OIG LEIE Database\nVerify Provider Not Excluded",
+                "acceptance_criteria": {
+                    "Given": "An unscreened provider has passed the License check step and the Medicare Reciprocity flag is inactive",
+                    "When": "The LEIE Exclusion Check routine is performed",
+                    "Then": "The provider's exclusion status is verified against the OIG LEIE database; the LEIE check result is set to PASS; the provider's NPI and the LEIE check result are written as a row to the Screening Output File"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00008",
+                "rule_type": "Action Rules",
+                "rule_name": "SAM Debarment Verification",
+                "rule_description": "Each unscreened provider must be checked against the System for Award Management (SAM) debarment list to confirm the provider has not been debarred from receiving federal funds. The result is recorded in the Screening Output File.",
+                "sub_graph_node_text": "6:SAM Debarment Check\nQuery System for Award Management\nVerify Provider Not Debarred",
+                "acceptance_criteria": {
+                    "Given": "An unscreened provider has passed the LEIE check step and the Medicare Reciprocity flag is inactive",
+                    "When": "The SAM Debarment Check routine is performed",
+                    "Then": "The provider's debarment status is verified against the SAM database; the SAM check result is set to PASS; the provider's NPI and the SAM check result are written as a row to the Screening Output File"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00009",
+                "rule_type": "Action Rules",
+                "rule_name": "SSA Death Master File Verification",
+                "rule_description": "Each unscreened provider must be checked against the Social Security Administration Death Master File (DMF) to confirm the provider is not deceased. The result is recorded in the Screening Output File.",
+                "sub_graph_node_text": "7:SSA Death Master File Check\nQuery SSA Death Master File\nVerify Provider Not Deceased",
+                "acceptance_criteria": {
+                    "Given": "An unscreened provider has passed the SAM check step and the Medicare Reciprocity flag is inactive",
+                    "When": "The SSA Death Master File Check routine is performed",
+                    "Then": "The provider's vital status is verified against the SSA Death Master File; the DMF check result is set to PASS; the provider's NPI and the DMF check result are written as a row to the Screening Output File"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00010",
+                "rule_type": "Decision Rules",
+                "rule_name": "Overall Screening Verdict Determination",
+                "rule_description": "After all four individual screening checks are completed, the program determines the overall screening verdict for the provider. A provider passes only if all four checks \u2014 License, LEIE Exclusion, SAM Debarment, and SSA Death Master File \u2014 return a passing result. Failure of any single check results in an overall screening failure.",
+                "sub_graph_node_text": "8:Screening Verdict Determination\nAll 4 Checks Passed?\nLicense + LEIE + SAM + DMF",
+                "acceptance_criteria": {
+                    "Given": "All four screening checks (License, LEIE, SAM, DMF) have been completed for an unscreened provider",
+                    "When": "The program evaluates the combined results of all four checks",
+                    "Then": "If the License check result AND the LEIE check result AND the SAM check result AND the DMF check result are all PASS, the provider is marked as SCREENING PASSED; if any one or more of the four check results is not PASS, the provider is marked as SCREENING FAILED and the screening failure counter is incremented by 1"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00011",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Master Record Screening Verdict Update",
+                "rule_description": "After the screening verdict (pass or fail) has been determined, the provider's record in the Provider Master File must be updated to reflect the new screening status, ensuring the provider is no longer treated as unscreened in future runs.",
+                "sub_graph_node_text": "9:Provider Record Update\nWrite Updated Screening Verdict\nBack to Provider Master File",
+                "acceptance_criteria": {
+                    "Given": "A screening verdict of either SCREENING PASSED or SCREENING FAILED has been determined for the provider",
+                    "When": "The program completes the verdict determination step",
+                    "Then": "The provider's record in the Provider Master File is updated (rewritten) with the new screening verdict status \u2014 either SCREEN PASS or SCREEN FAIL \u2014 so that the provider will not be reprocessed as unscreened in subsequent batch runs"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVSCR01-cbl-00012",
+                "rule_type": "Process Rules",
+                "rule_name": "Screening Failure Summary Reporting",
+                "rule_description": "At the conclusion of the batch screening run, the program must report the total number of providers who failed screening, providing an operational summary for business users to review screening outcomes.",
+                "sub_graph_node_text": "11:Screening Summary Reporting\nDisplay Total Count of\nProviders Who Failed Screening",
+                "acceptance_criteria": {
+                    "Given": "All provider records in the Provider Master File have been processed and the end-of-file condition has been reached",
+                    "When": "The screening batch loop terminates",
+                    "Then": "The program displays the total count of providers who received a SCREENING FAILED verdict during the current batch run, identified under the program name PRVSCR01, before the program terminates"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "provider-screening-initiation",
+            "title": "Provider Screening Initiation",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Screening Batch])\n    B[Identify Batch Program\\nPRVSCR01]\n    C[Open Provider Master File\\nfor Read and Update]\n    D[(PRV-MASTER-FILE\\nVSAM Indexed)]\n    E[Open Screening Output File\\nfor Writing Results]\n    F[(SCREEN-OUT-FILE\\nSequential File)]\n    G[Initialize Processing\\nSet End-of-File Flag to No]\n    H([Proceed to\\nPending Provider Selection])\n\n    A --> B\n    B --> C\n    C <-.->|Read & Update Access| D\n    C --> E\n    E <-.->|Write Access| F\n    E --> G\n    G --> H",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00013",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Identify Provider Screening Batch Program",
+                    "rule_description": "The provider screening batch process is identified and registered under the program name PRVSCR01, establishing the context for all subsequent screening activities performed during this batch run.",
+                    "sub_graph_node_text": "Identify Batch Program PRVSCR01",
+                    "acceptance_criteria": {
+                        "Given": "The provider screening batch process is initiated",
+                        "When": "The batch program begins execution",
+                        "Then": "The program is identified as PRVSCR01 and this identifier is recorded as the active batch program for the screening run"
+                    },
+                    "key_functionality_id": "provider-screening-initiation"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00014",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Open Provider Master File for Read and Update Access",
+                    "rule_description": "The Provider Master File must be opened with both read and update access at the start of the screening batch, so that provider records can be retrieved for screening and subsequently updated with screening outcomes.",
+                    "sub_graph_node_text": "Open Provider Master File for Read and Update",
+                    "acceptance_criteria": {
+                        "Given": "The provider screening batch program PRVSCR01 has been identified and is starting",
+                        "When": "The batch process initializes",
+                        "Then": "The Provider Master File is opened with simultaneous read and update access, enabling the program to both retrieve provider records for screening and write back the screening results (Pass or Fail) to the same file"
+                    },
+                    "key_functionality_id": "provider-screening-initiation"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00015",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Open Screening Output File for Writing Results",
+                    "rule_description": "A dedicated Screening Output File must be opened exclusively for writing at the start of the batch, so that individual screening check results for each provider can be recorded during the batch run.",
+                    "sub_graph_node_text": "Open Screening Output File for Writing Results",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File has been successfully opened for read and update access",
+                        "When": "The batch process continues its initialization",
+                        "Then": "The Screening Output File is opened in write-only mode, ready to receive individual screening check result rows (License, LEIE, SAM, DMF) for each provider processed during the batch"
+                    },
+                    "key_functionality_id": "provider-screening-initiation"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00016",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Initialize End-of-File Indicator Before Processing Begins",
+                    "rule_description": "Before any provider records are read or screened, the end-of-file indicator must be set to indicate that processing has not yet reached the end of the Provider Master File, ensuring the batch loop processes all pending providers.",
+                    "sub_graph_node_text": "Initialize Processing Set End-of-File Flag to No",
+                    "acceptance_criteria": {
+                        "Given": "Both the Provider Master File and the Screening Output File have been successfully opened",
+                        "When": "The batch process completes its initialization phase",
+                        "Then": "The end-of-file indicator is set to 'No' (not yet reached end of file), signaling that provider record retrieval and screening should begin and continue until all records have been evaluated"
+                    },
+                    "key_functionality_id": "provider-screening-initiation"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00017",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Continuously Process All Pending Providers Until File is Exhausted",
+                    "rule_description": "Once initialization is complete, the batch must repeatedly select and screen providers from the Provider Master File, continuing this cycle until every record in the file has been evaluated and the end of the file is reached.",
+                    "sub_graph_node_text": "Proceed to Pending Provider Selection",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File and Screening Output File are open, and the end-of-file indicator is set to 'No'",
+                        "When": "The batch process transitions from initialization to active processing",
+                        "Then": "The program enters a continuous loop that selects the next provider record and performs screening for each, repeating this cycle until the end-of-file indicator is set to 'Yes' (all records in the Provider Master File have been read and evaluated)"
+                    },
+                    "key_functionality_id": "provider-screening-initiation"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Screening Initiation"
+        },
+        {
+            "id": "pending-provider-selection",
+            "title": "Pending Provider Selection",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Pending Provider Selection])\n    B[Read Next Provider Record\\nfrom Provider Master File]\n    PRV[(PRV-MASTER-FILE\\nVSAM Indexed)]\n    C{End of File\\nReached?}\n    D([End: All Providers Processed])\n    E{Provider Status\\n= Unscreened?}\n    F([Forward to Screening\\nProcess])\n    G[Skip Provider Record\\nNo Action Required]\n\n    A --> B\n    PRV -.->|Sequential Read| B\n    B --> C\n    C -->|Yes - No More Records| D\n    C -->|No - Record Available| E\n    E -->|Yes - Unscreened Status| F\n    E -->|No - Already Screened\\nor Other Status| G\n    G --> B",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00018",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Sequential Read of Provider Records from Provider Master File",
+                    "rule_description": "The system reads provider records one at a time in sequential order from the Provider Master File to evaluate each provider for screening eligibility.",
+                    "sub_graph_node_text": "Read Next Provider Record\nfrom Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "The Provider Master File is open and available for sequential reading, and the end-of-file condition has not yet been reached",
+                        "When": "The system requests the next provider record from the Provider Master File in sequential order",
+                        "Then": "The next available provider record is retrieved from the Provider Master File and made available for status evaluation, and the file read status is captured for end-of-file detection"
+                    },
+                    "key_functionality_id": "pending-provider-selection"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00019",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "End of File Detection to Terminate Provider Processing Loop",
+                    "rule_description": "After each sequential read of the Provider Master File, the system checks whether all provider records have been processed. If the end of file is reached, the screening loop is terminated and no further providers are processed.",
+                    "sub_graph_node_text": "End of File\nReached?",
+                    "acceptance_criteria": {
+                        "Given": "A read operation has been performed on the Provider Master File and the file read status has been captured",
+                        "When": "The file read status indicates that the end of the Provider Master File has been reached (no more records available)",
+                        "Then": "The end-of-file flag is set to TRUE, the provider processing loop is terminated, and the program proceeds to close files and report final results"
+                    },
+                    "key_functionality_id": "pending-provider-selection"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00020",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Providers with Unscreened Status for Processing",
+                    "rule_description": "Each provider record retrieved from the Provider Master File is evaluated to determine whether the provider has an 'Unscreened' status. Only providers with this specific status are eligible to proceed through the screening workflow.",
+                    "sub_graph_node_text": "Provider Status\n= Unscreened?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully read from the Provider Master File and the end-of-file condition has not been reached",
+                        "When": "The system evaluates the provider's current screening status field in the provider master record",
+                        "Then": "If the provider's status is 'Unscreened', the provider is forwarded to the screening process; if the provider's status is anything other than 'Unscreened' (e.g., already screened as pass or fail), the provider record is skipped with no action taken"
+                    },
+                    "key_functionality_id": "pending-provider-selection"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00021",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Forward Unscreened Provider to Screening Process",
+                    "rule_description": "A provider record identified as having an 'Unscreened' status is forwarded to the full screening process, which includes Medicare reciprocity check (if applicable), license verification, LEIE exclusion check, SAM debarment check, and SSA Death Master File check.",
+                    "sub_graph_node_text": "Forward to Screening\nProcess",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and the provider's screening status is confirmed as 'Unscreened'",
+                        "When": "The system determines the provider requires screening",
+                        "Then": "The provider record is passed to the screening process (SCREEN-ONE-PROVIDER) where all applicable screening checks will be performed and the provider's master record will be updated with the screening outcome"
+                    },
+                    "key_functionality_id": "pending-provider-selection"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00022",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Skip Provider Records That Are Already Screened",
+                    "rule_description": "Provider records that do not carry an 'Unscreened' status are bypassed entirely. No screening checks are performed, no output records are written, and the provider's master record is not updated. The system moves on to read the next provider record.",
+                    "sub_graph_node_text": "Skip Provider Record\nNo Action Required",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been read from the Provider Master File and the end-of-file condition has not been reached",
+                        "When": "The provider's screening status is NOT 'Unscreened' (i.e., the provider has already been screened as pass or fail, or holds any other non-unscreened status)",
+                        "Then": "No screening action is taken for that provider record, no output is written for that provider, the provider's master record remains unchanged, and the system immediately proceeds to read the next provider record from the Provider Master File"
+                    },
+                    "key_functionality_id": "pending-provider-selection"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00023",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Continue Processing Until All Provider Records Are Exhausted",
+                    "rule_description": "The provider screening loop continues to read and evaluate provider records sequentially until every record in the Provider Master File has been read. Once the end of file is reached, the process is considered complete and the total count of screening failures is reported.",
+                    "sub_graph_node_text": "End: All Providers Processed",
+                    "acceptance_criteria": {
+                        "Given": "The provider screening loop is actively reading provider records from the Provider Master File",
+                        "When": "The end-of-file condition is detected on the Provider Master File, indicating no more provider records remain to be processed",
+                        "Then": "The screening loop terminates, the Provider Master File and Screen Output File are closed, and the total number of providers that failed screening is displayed as the final program output"
+                    },
+                    "key_functionality_id": "pending-provider-selection"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Pending Provider Selection"
+        },
+        {
+            "id": "medicare-reciprocity-check-(dead-code",
+            "title": "Medicare Reciprocity Check (Dead Code",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter Medicare Reciprocity Check])\n    B{Is Medicare\\nReciprocity Flag\\nEnabled?}\n    C[/_\u26a0\ufe0f DEAD CODE - Never Executed Since 2014\\nFlag Has Never Been Set to Active_/]\n    D[Log: Relying on\\nMedicare PECOS\\nPrior Screening Results]\n    E[Mark Record as\\nPECOS-Sourced Screening]\n    F[Auto-Pass All 4 Checks\\nLicense = PASS\\nOIG LEIE = PASS\\nSAM = PASS\\nSSA DMF = PASS]\n    G[/Avoids Duplicate Screening Work\\nPer 42 CFR 455.410/]\n    H([Return to Provider Screening])\n\n    A --> B\n    B -->|_No \u2717\\n-Always - Flag Inactive-_| H\n    B -->|_Yes \u2713\\n-Never Reached-_| C\n    C --> D\n    D --> E\n    E --> F\n    F --> G\n    G --> H",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00024",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Medicare Reciprocity Flag Evaluation",
+                    "rule_description": "Determines whether the Medicare Reciprocity feature is active before invoking the PECOS-based auto-pass logic. This flag has never been set to active since 2014, making the entire reciprocity branch permanently unreachable dead code.",
+                    "sub_graph_node_text": "Is Medicare Reciprocity Flag Enabled?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been identified as UNSCREENED and is being processed for screening",
+                        "When": "The system evaluates the Medicare Reciprocity Flag (WS-RECIPROCITY-ON) to determine if PECOS-based screening should be applied",
+                        "Then": "If the Medicare Reciprocity Flag is ENABLED, the system proceeds to apply PECOS-based auto-pass screening for all four checks; If the Medicare Reciprocity Flag is DISABLED (which is always the case as the flag has never been activated since 2014), the system bypasses the entire Medicare Reciprocity Check and returns directly to the standard individual provider screening flow"
+                    },
+                    "key_functionality_id": "medicare-reciprocity-check-(dead-code"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00025",
+                    "rule_type": "Process Rules",
+                    "rule_name": "PECOS Prior Screening Acknowledgement Log",
+                    "rule_description": "When Medicare Reciprocity is enabled, the system logs a notification indicating that it is relying on Medicare/PECOS prior screening results rather than performing independent verification. This is dead code that has never executed since 2014.",
+                    "sub_graph_node_text": "Log: Relying on Medicare PECOS Prior Screening Results",
+                    "acceptance_criteria": {
+                        "Given": "The Medicare Reciprocity Flag has been evaluated and found to be ENABLED (a condition that has never occurred since 2014)",
+                        "When": "The system enters the Medicare Reciprocity Check processing branch",
+                        "Then": "The system logs and displays the message 'PRVSCR01: RELYING ON MEDICARE/PECOS SCREENING' to indicate that Medicare's prior screening results are being accepted in lieu of independent checks"
+                    },
+                    "key_functionality_id": "medicare-reciprocity-check-(dead-code"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00026",
+                    "rule_type": "Action Rules",
+                    "rule_name": "PECOS-Sourced Screening Record Tagging",
+                    "rule_description": "When Medicare Reciprocity is active, the screening output record for the provider is tagged as PECOS-sourced, identifying that the screening result originates from Medicare's enrollment system rather than independent verification. This is dead code that has never executed since 2014.",
+                    "sub_graph_node_text": "Mark Record as PECOS-Sourced Screening",
+                    "acceptance_criteria": {
+                        "Given": "The Medicare Reciprocity Flag is ENABLED and the system has logged reliance on PECOS screening results",
+                        "When": "The system prepares the screening output record for the provider",
+                        "Then": "The screening output record is marked with the PECOS source indicator (SCR-PECOS flag set to TRUE), identifying that this provider's screening result is derived from Medicare/PECOS enrollment data rather than independent checks"
+                    },
+                    "key_functionality_id": "medicare-reciprocity-check-(dead-code"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00027",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Medicare Reciprocity Auto-Pass All Four Screening Checks",
+                    "rule_description": "When Medicare Reciprocity is enabled, all four mandatory screening checks \u2014 License verification, OIG LEIE exclusion, SAM debarment, and SSA Death Master File \u2014 are automatically set to PASS without performing independent verification, on the basis that Medicare/PECOS has already completed equivalent screening. This is dead code that has never executed since 2014.",
+                    "sub_graph_node_text": "Auto-Pass All 4 Checks: License = PASS, OIG LEIE = PASS, SAM = PASS, SSA DMF = PASS",
+                    "acceptance_criteria": {
+                        "Given": "The Medicare Reciprocity Flag is ENABLED and the provider's screening output record has been tagged as PECOS-sourced",
+                        "When": "The system applies the Medicare reciprocity auto-pass rule to the provider",
+                        "Then": "All four screening check results are automatically set to PASS: License Check Result = PASS, OIG LEIE Exclusion Check Result = PASS, SAM Debarment Check Result = PASS, SSA Death Master File Check Result = PASS \u2014 without executing any independent verification against those four data sources"
+                    },
+                    "key_functionality_id": "medicare-reciprocity-check-(dead-code"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00028",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Avoidance of Duplicate Screening Under 42 CFR 455.410",
+                    "rule_description": "The Medicare Reciprocity feature is designed to comply with 42 CFR 455.410, which permits Medicaid agencies to rely on Medicare's provider screening results to avoid duplicating screening work already performed by Medicare/PECOS. This policy-based bypass has been inactive since 2014 as the enabling flag was never activated.",
+                    "sub_graph_node_text": "Avoids Duplicate Screening Work Per 42 CFR 455.410",
+                    "acceptance_criteria": {
+                        "Given": "A provider is enrolled in Medicare and has already been screened through the Medicare/PECOS enrollment system",
+                        "When": "The Medicare Reciprocity Flag is ENABLED and all four screening checks have been auto-set to PASS based on PECOS results",
+                        "Then": "The system accepts Medicare's prior screening as sufficient under 42 CFR 455.410, bypasses independent re-verification of License, OIG LEIE, SAM, and SSA DMF, and proceeds to the overall pass/fail determination using the four auto-passed results \u2014 thereby avoiding duplicate screening effort"
+                    },
+                    "key_functionality_id": "medicare-reciprocity-check-(dead-code"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Medicare Reciprocity Check (Dead Code"
+        },
+        {
+            "id": "state-license-verification",
+            "title": "State License Verification",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: State License Verification])\n    B[Query State Licensing Board\\nVerify Provider Holds\\nValid and Active Professional License]\n    C[Record License Verification Result\\nCapture Provider NPI\\nSet Check Outcome to Pass]\n    D[(SCREEN-OUT-FILE\\nWrite License Verification Row)]\n    E([End: Return to Provider Screening])\n\n    A --> B\n    B --> C\n    C --> D\n    D -.->|Write Record| C\n    C --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00029",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "State License Verification Check Outcome Recording",
+                    "rule_description": "When a provider undergoes state license verification, the system queries the state licensing board to confirm the provider holds a valid and active professional license, and records the outcome of that verification as a Pass result.",
+                    "sub_graph_node_text": "Query State Licensing Board\nVerify Provider Holds\nValid and Active Professional License",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been identified as UNSCREENED and is undergoing the screening process",
+                        "When": "The State License Verification check is performed against the state licensing board for the provider",
+                        "Then": "The license verification result must be recorded as PASS ('P') in the screening result indicator, confirming the provider holds a valid and active professional license"
+                    },
+                    "key_functionality_id": "state-license-verification"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00030",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Provider NPI Captured for License Verification Output Record",
+                    "rule_description": "When recording the license verification result to the screening output, the provider's National Provider Identifier (NPI) must be captured from the Provider Master record and included in the screening output record to uniquely identify the provider associated with the verification result.",
+                    "sub_graph_node_text": "Record License Verification Result\nCapture Provider NPI\nSet Check Outcome to Pass",
+                    "acceptance_criteria": {
+                        "Given": "The state license verification check has been completed for a provider and the result is ready to be written to the screening output file",
+                        "When": "The system prepares the license verification output record",
+                        "Then": "The provider's NPI from the Provider Master Record must be copied into the screening output record's NPI field (SCR-NPI) to ensure the verification result is correctly attributed to the specific provider"
+                    },
+                    "key_functionality_id": "state-license-verification"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00031",
+                    "rule_type": "Process Rules",
+                    "rule_name": "License Verification Row Written with Pass Status to Screen Output File",
+                    "rule_description": "After the license verification result and provider NPI are captured, the screening output record must be flagged with a PASS status and written to the Screen Output File, creating a permanent audit record of the license verification outcome for the provider.",
+                    "sub_graph_node_text": "SCREEN-OUT-FILE\nWrite License Verification Row",
+                    "acceptance_criteria": {
+                        "Given": "The license verification output record has been prepared with the provider's NPI and the verification result has been determined",
+                        "When": "The system writes the license verification row to the Screen Output File",
+                        "Then": "The screening output record must have its check outcome status set to PASS (SCR-PASS = TRUE) and the complete record must be written to the Screen Output File (SCREEN-OUT-FILE), creating a traceable record of the license verification for the provider"
+                    },
+                    "key_functionality_id": "state-license-verification"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00032",
+                    "rule_type": "Action Rules",
+                    "rule_name": "License Verification Invoked as Part of Provider Screening Workflow",
+                    "rule_description": "State License Verification is a mandatory step that must be invoked for every unscreened provider during the provider screening process, unless Medicare/PECOS reciprocity is overriding the individual checks. The verification is triggered as a discrete sub-process within the overall provider screening workflow.",
+                    "sub_graph_node_text": "Start: State License Verification",
+                    "acceptance_criteria": {
+                        "Given": "A provider has been identified as UNSCREENED and the overall provider screening process (SCREEN-ONE-PROVIDER) has been initiated",
+                        "When": "The screening workflow reaches the license verification step",
+                        "Then": "The State License Verification sub-process (CHECK-LICENSE) must be invoked to perform the license check, and upon completion must return control back to the main provider screening workflow to continue with the remaining checks (LEIE, SAM, DMF)"
+                    },
+                    "key_functionality_id": "state-license-verification"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "State License Verification"
+        },
+        {
+            "id": "oig-leie-exclusion-check",
+            "title": "OIG LEIE Exclusion Check",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: OIG LEIE Exclusion Check])\n    B[Query OIG List of Excluded\\nIndividuals and Entities\\nfor Provider and Owners\\nwith 5% or Greater Ownership]\n    C[Record LEIE Verification\\nResult for Provider]\n    D[Capture Provider NPI\\nand Set Check Outcome]\n    E[(SCREEN-OUT-FILE\\nWrite LEIE Check Result Row\\nwith Provider NPI and Outcome)]\n    F([Return to Provider\\nScreening Workflow])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00033",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Invoke OIG LEIE Exclusion Check as Part of Provider Screening",
+                    "rule_description": "When a provider is identified as unscreened, the OIG LEIE Exclusion Check must be invoked as a mandatory step in the provider screening workflow to verify the provider and their qualifying owners are not federally excluded.",
+                    "sub_graph_node_text": "Query OIG List of Excluded Individuals and Entities for Provider and Owners with 5% or Greater Ownership",
+                    "acceptance_criteria": {
+                        "Given": "A provider record exists in the Provider Master File and is flagged as UNSCREENED",
+                        "When": "The provider screening workflow is executed for that provider",
+                        "Then": "The OIG LEIE Exclusion Check must be invoked to query the Office of Inspector General's List of Excluded Individuals and Entities for the provider and all owners holding 5% or greater ownership interest"
+                    },
+                    "key_functionality_id": "oig-leie-exclusion-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00034",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Record OIG LEIE Verification Result for Provider",
+                    "rule_description": "After the OIG LEIE Exclusion Check is performed, the verification outcome must be recorded against the provider so it can be used in the overall screening pass/fail determination.",
+                    "sub_graph_node_text": "Record LEIE Verification Result for Provider",
+                    "acceptance_criteria": {
+                        "Given": "The OIG LEIE Exclusion Check has been executed for a provider",
+                        "When": "The LEIE query completes and returns a result",
+                        "Then": "The LEIE verification result must be recorded as PASS ('P') for the provider, indicating the provider and their qualifying owners are not found on the OIG exclusion list"
+                    },
+                    "key_functionality_id": "oig-leie-exclusion-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00035",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Capture Provider NPI and Set LEIE Check Outcome for Output",
+                    "rule_description": "Following the LEIE verification, the provider's National Provider Identifier (NPI) must be captured and the check outcome must be set to PASS so that a complete and identifiable screening result record can be prepared for output.",
+                    "sub_graph_node_text": "Capture Provider NPI and Set Check Outcome",
+                    "acceptance_criteria": {
+                        "Given": "The LEIE verification result has been recorded for a provider",
+                        "When": "The system prepares the LEIE check result for writing to the screening output",
+                        "Then": "The provider's NPI must be captured from the Provider Master Record and the LEIE check outcome must be set to PASS"
+                    },
+                    "key_functionality_id": "oig-leie-exclusion-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00036",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Write LEIE Check Result Row to Screening Output File",
+                    "rule_description": "The LEIE check result, including the provider's NPI and the check outcome, must be written as a row to the Screening Output File to maintain a complete audit trail of all screening verifications performed.",
+                    "sub_graph_node_text": "SCREEN-OUT-FILE Write LEIE Check Result Row with Provider NPI and Outcome",
+                    "acceptance_criteria": {
+                        "Given": "The provider's NPI has been captured and the LEIE check outcome has been set to PASS",
+                        "When": "The system writes the LEIE verification result to the output",
+                        "Then": "A row containing the provider's NPI and the LEIE check outcome of PASS must be written to the Screening Output File"
+                    },
+                    "key_functionality_id": "oig-leie-exclusion-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00037",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "LEIE Result Must Pass for Provider to Achieve Overall Screening Pass",
+                    "rule_description": "The LEIE exclusion check result is one of four mandatory checks that must all pass for a provider to be marked as an overall screening pass. A failing LEIE result alone is sufficient to mark the provider as a screening failure.",
+                    "sub_graph_node_text": "Record LEIE Verification Result for Provider",
+                    "acceptance_criteria": {
+                        "Given": "The LEIE exclusion check result has been recorded for a provider along with the results of the License, SAM Debarment, and SSA Death Master File checks",
+                        "When": "The overall screening outcome is determined for the provider",
+                        "Then": "If the LEIE result is PASS along with all other three check results (License, SAM, DMF) also being PASS, the provider must be marked as SCREEN PASS; if the LEIE result is not PASS or any other check result is not PASS, the provider must be marked as SCREEN FAIL and the screening failure count must be incremented by 1"
+                    },
+                    "key_functionality_id": "oig-leie-exclusion-check"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "OIG LEIE Exclusion Check"
+        },
+        {
+            "id": "sam-debarment-check",
+            "title": "SAM Debarment Check",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: SAM Debarment Check]) \n    B[Query System for Award Management\\nSAM Database\\nVerify Provider is Not Debarred\\nor Suspended from Federal Programs]\n    C[Record SAM Verification Result\\nResult = Pass]\n    D[Capture Provider NPI\\nfor Output Record]\n    E[Mark Output Record\\nas Pass]\n    F[(SCREEN-OUT-FILE\\nWrite SAM Debarment\\nVerification Result Row)]\n    G([End: Return to\\nScreening Process])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n    F --> G",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00038",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Query SAM Database to Verify Provider Debarment Status",
+                    "rule_description": "When screening an unscreened provider, the system must query the System for Award Management (SAM) database to verify that the provider is not debarred or suspended from participating in federal programs.",
+                    "sub_graph_node_text": "Query System for Award Management\nSAM Database\nVerify Provider is Not Debarred\nor Suspended from Federal Programs",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been identified as UNSCREENED in the Provider Master File and the SAM Debarment Check has been invoked as part of the screening process",
+                        "When": "The SAM Debarment Check routine is executed for the provider",
+                        "Then": "The system queries the System for Award Management (SAM) database to verify that the provider is not debarred or suspended from participating in federal programs"
+                    },
+                    "key_functionality_id": "sam-debarment-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00039",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Record SAM Debarment Verification Result as Pass",
+                    "rule_description": "Upon completion of the SAM debarment query, the system records the SAM verification result. In the current implementation, the SAM check result is recorded as Pass (P) for the provider being screened.",
+                    "sub_graph_node_text": "Record SAM Verification Result\nResult = Pass",
+                    "acceptance_criteria": {
+                        "Given": "The SAM Debarment Check routine has been invoked for an unscreened provider",
+                        "When": "The SAM database verification is completed",
+                        "Then": "The SAM verification result (WS-SAM-RESULT) is set to 'P' (Pass), indicating the provider is not debarred or suspended from federal programs"
+                    },
+                    "key_functionality_id": "sam-debarment-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00040",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Capture Provider NPI for SAM Debarment Output Record",
+                    "rule_description": "Before writing the SAM debarment verification result to the screening output file, the system must capture the provider's National Provider Identifier (NPI) from the Provider Master Record and place it on the output record to ensure traceability of the screening result to the correct provider.",
+                    "sub_graph_node_text": "Capture Provider NPI\nfor Output Record",
+                    "acceptance_criteria": {
+                        "Given": "The SAM debarment verification result has been determined for a provider",
+                        "When": "The system prepares the screening output record for the SAM check",
+                        "Then": "The provider's NPI (National Provider Identifier) is copied from the Provider Master Record into the Screen Output Record (SCR-NPI) to identify which provider the SAM verification result belongs to"
+                    },
+                    "key_functionality_id": "sam-debarment-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00041",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Mark SAM Debarment Output Record as Pass",
+                    "rule_description": "The screening output record for the SAM debarment check must be explicitly marked with a Pass status before being written to the Screen Output File, ensuring the output record accurately reflects the SAM verification outcome.",
+                    "sub_graph_node_text": "Mark Output Record\nas Pass",
+                    "acceptance_criteria": {
+                        "Given": "The provider's NPI has been captured on the Screen Output Record for the SAM debarment check",
+                        "When": "The system finalizes the SAM debarment output record",
+                        "Then": "The Screen Output Record status indicator (SCR-PASS) is set to TRUE (Pass), reflecting that the provider has passed the SAM debarment verification"
+                    },
+                    "key_functionality_id": "sam-debarment-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00042",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Write SAM Debarment Verification Result to Screen Output File",
+                    "rule_description": "After the SAM debarment verification result has been determined and the output record prepared with the provider's NPI and Pass status, the system must write a SAM debarment verification result row to the Screen Output File to maintain a complete audit trail of all screening checks performed.",
+                    "sub_graph_node_text": "SCREEN-OUT-FILE\nWrite SAM Debarment\nVerification Result Row",
+                    "acceptance_criteria": {
+                        "Given": "The Screen Output Record has been populated with the provider's NPI and the SAM debarment verification result status (Pass)",
+                        "When": "The system completes preparation of the SAM debarment output record",
+                        "Then": "A SAM debarment verification result row containing the provider's NPI and the Pass status is written to the Screen Output File (SCREEN-OUT-FILE), creating a permanent record of the SAM debarment check outcome for the provider"
+                    },
+                    "key_functionality_id": "sam-debarment-check"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "SAM Debarment Check"
+        },
+        {
+            "id": "ssa-death-master-file-check",
+            "title": "SSA Death Master File Check",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: SSA Death Master File Check])\n    B[Query Social Security Administration\\nDeath Master File\\nVerify Provider is Not Deceased]\n    C[Record DMF Verification Result\\nResult = Pass]\n    D[Capture Provider NPI\\nfor Output Record]\n    E[10: Screening Output Record Writing\\nWrite DMF Check Result Row\\nto Screening Output File]\n    SCROUT[(SCREEN-OUT-FILE\\nSequential File)]\n    F([End: Return to Screening Verdict])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E -.->|Write DMF Result Row| SCROUT\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00043",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "SSA Death Master File Verification Result Recording",
+                    "rule_description": "When the SSA Death Master File check is performed for an unscreened provider, the system queries the Social Security Administration Death Master File to verify the provider is not deceased and records the verification result as Pass.",
+                    "sub_graph_node_text": "Query Social Security Administration Death Master File\nVerify Provider is Not Deceased\nRecord DMF Verification Result\nResult = Pass",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been identified as UNSCREENED and has been selected for screening, and the SSA Death Master File check step has been reached in the screening sequence",
+                        "When": "The system performs the SSA Death Master File check by querying the Social Security Administration Death Master File to verify that the provider is not deceased",
+                        "Then": "The DMF verification result is recorded as PASS (value 'P') in the DMF result field, indicating the provider is verified as not deceased in the SSA Death Master File"
+                    },
+                    "key_functionality_id": "ssa-death-master-file-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00044",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Provider NPI Capture for DMF Output Record",
+                    "rule_description": "Before writing the DMF check result to the screening output file, the provider's National Provider Identifier (NPI) must be captured from the Provider Master Record and placed into the screening output record to identify which provider the DMF result belongs to.",
+                    "sub_graph_node_text": "Capture Provider NPI\nfor Output Record",
+                    "acceptance_criteria": {
+                        "Given": "The SSA Death Master File check has been completed and a DMF verification result has been recorded for the provider",
+                        "When": "The system prepares the screening output record for the DMF check result",
+                        "Then": "The provider's NPI is copied from the Provider Master Record into the NPI field of the screening output record, ensuring the DMF result row is correctly associated with the provider"
+                    },
+                    "key_functionality_id": "ssa-death-master-file-check"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00045",
+                    "rule_type": "Process Rules",
+                    "rule_name": "DMF Check Result Row Written to Screening Output File",
+                    "rule_description": "After the SSA Death Master File check is completed and the provider NPI is captured, a result row must be written to the Screening Output File recording the provider's NPI and the DMF check outcome as PASS.",
+                    "sub_graph_node_text": "10: Screening Output Record Writing\nWrite DMF Check Result Row\nto Screening Output File",
+                    "acceptance_criteria": {
+                        "Given": "The SSA Death Master File check result has been recorded as PASS and the provider's NPI has been captured into the screening output record",
+                        "When": "The system writes the DMF check result row to the Screening Output File",
+                        "Then": "A new record is written to the Screening Output File containing the provider's NPI and the DMF check result status set to PASS, creating a permanent audit trail of the SSA Death Master File verification for that provider"
+                    },
+                    "key_functionality_id": "ssa-death-master-file-check"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "SSA Death Master File Check"
+        },
+        {
+            "id": "screening-verdict-determination",
+            "title": "Screening Verdict Determination",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Screening Verdict Determination])\n    B[Collect All Four\\nScreening Check Results:\\nState License Verification\\nOIG LEIE Exclusion Check\\nSAM Debarment Check\\nSSA Death Master File Check]\n    C{Did ALL Four\\nChecks Pass?\\nLicense = Pass\\nAND LEIE = Pass\\nAND SAM = Pass\\nAND DMF = Pass}\n    D[Mark Provider as\\nSCREENING PASSED\\nAll Compliance Checks\\nSuccessfully Cleared]\n    E[Mark Provider as\\nSCREENING FAILED\\nOne or More Compliance\\nChecks Not Cleared]\n    F[Increment\\nScreening Failure Counter\\nby 1]\n    Z([End: Verdict Recorded\\nProceed to Provider\\nRecord Update])\n\n    A --> B\n    B --> C\n    C -->|Yes - All Four Results = Pass| D\n    C -->|No - One or More Results = Fail| E\n    E --> F\n    D --> Z\n    F --> Z",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00046",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "All Four Compliance Checks Must Pass for Provider Screening Approval",
+                    "rule_description": "A provider's overall screening verdict is determined by evaluating all four compliance check results together. Only when every single check \u2014 State License Verification, OIG LEIE Exclusion, SAM Debarment, and SSA Death Master File \u2014 returns a passing result is the provider granted a screening-passed status.",
+                    "sub_graph_node_text": "Did ALL Four Checks Pass?\nLicense = Pass\nAND LEIE = Pass\nAND SAM = Pass\nAND DMF = Pass",
+                    "acceptance_criteria": {
+                        "Given": "An unscreened provider has completed all four compliance checks: State License Verification, OIG LEIE Exclusion Check, SAM Debarment Check, and SSA Death Master File Check, and all four results are recorded",
+                        "When": "The screening verdict is being determined and the License result equals Pass AND the LEIE result equals Pass AND the SAM result equals Pass AND the DMF result equals Pass",
+                        "Then": "The provider's record in the Provider Master File is updated with a status of SCREENING PASSED, indicating all compliance checks have been successfully cleared"
+                    },
+                    "key_functionality_id": "screening-verdict-determination"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00047",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Any Single Compliance Check Failure Results in Provider Screening Rejection",
+                    "rule_description": "If any one or more of the four mandatory compliance checks \u2014 State License Verification, OIG LEIE Exclusion, SAM Debarment, or SSA Death Master File \u2014 does not return a passing result, the provider is immediately marked as screening-failed, regardless of how many other checks passed.",
+                    "sub_graph_node_text": "Mark Provider as\nSCREENING FAILED\nOne or More Compliance\nChecks Not Cleared",
+                    "acceptance_criteria": {
+                        "Given": "An unscreened provider has completed all four compliance checks: State License Verification, OIG LEIE Exclusion Check, SAM Debarment Check, and SSA Death Master File Check, and all four results are recorded",
+                        "When": "The screening verdict is being determined and at least one of the following is not a passing result: License Check result, LEIE Exclusion Check result, SAM Debarment Check result, or SSA Death Master File Check result",
+                        "Then": "The provider's record in the Provider Master File is updated with a status of SCREENING FAILED, indicating one or more compliance checks were not cleared"
+                    },
+                    "key_functionality_id": "screening-verdict-determination"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00048",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Screening Failure Counter Incremented for Each Failed Provider",
+                    "rule_description": "Each time a provider fails the overall screening verdict \u2014 meaning one or more of the four compliance checks did not pass \u2014 the program's running total of screening failures is increased by exactly one, enabling an accurate count of all failed providers to be reported at the end of the screening run.",
+                    "sub_graph_node_text": "Increment\nScreening Failure Counter\nby 1",
+                    "acceptance_criteria": {
+                        "Given": "A provider has been evaluated for overall screening verdict and has been marked as SCREENING FAILED due to one or more compliance checks not returning a passing result",
+                        "When": "The screening failure status is recorded for that provider",
+                        "Then": "The screening failure counter is incremented by exactly 1, accumulating the total number of providers who did not clear all compliance checks during this screening run"
+                    },
+                    "key_functionality_id": "screening-verdict-determination"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00049",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Provider Master Record Must Be Updated After Every Screening Verdict",
+                    "rule_description": "Regardless of whether a provider passes or fails the overall screening verdict, the provider's record in the Provider Master File must always be updated to persist the final screening outcome \u2014 either SCREENING PASSED or SCREENING FAILED \u2014 before processing the next provider.",
+                    "sub_graph_node_text": "End: Verdict Recorded\nProceed to Provider\nRecord Update",
+                    "acceptance_criteria": {
+                        "Given": "A provider's overall screening verdict has been determined as either SCREENING PASSED or SCREENING FAILED based on the four compliance check results",
+                        "When": "The screening verdict has been recorded on the provider's record",
+                        "Then": "The provider's updated record \u2014 containing the new screening status of either SCREENING PASSED or SCREENING FAILED \u2014 is written back and saved to the Provider Master File to permanently reflect the screening outcome"
+                    },
+                    "key_functionality_id": "screening-verdict-determination"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Screening Verdict Determination"
+        },
+        {
+            "id": "provider-record-update",
+            "title": "Provider Record Update",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Provider Record Update])\n    B{What is the\\nScreening Verdict?}\n    C[Provider Marked as\\nScreening-PASSED]\n    D[Provider Marked as\\nScreening-FAILED]\n    E[Write Updated Provider Record\\nBack to Provider Master File]\n    PRV[(PRV-MASTER-FILE\\nVSAM Indexed)]\n    F([End: Provider Record Updated])\n\n    A --> B\n    B -->|All 4 Checks Passed| C\n    B -->|One or More Checks Failed| D\n    C --> E\n    D --> E\n    E -.->|Rewrite Record| PRV\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00050",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Mark Provider as Screening Passed",
+                    "rule_description": "When all four mandatory screening checks (License, LEIE Exclusion, SAM Debarment, and SSA Death Master File) return a passing result, the provider's screening verdict in the master record is updated to SCREEN PASS.",
+                    "sub_graph_node_text": "Provider Marked as Screening-PASSED",
+                    "acceptance_criteria": {
+                        "Given": "An unscreened provider record has been evaluated through all four screening checks: License Check, LEIE Exclusion Check, SAM Debarment Check, and SSA Death Master File Check",
+                        "When": "All four screening check results \u2014 License Result, LEIE Result, SAM Result, and DMF Result \u2014 are each equal to 'Pass'",
+                        "Then": "The provider's screening verdict field in the Provider Master Record is set to SCREEN PASS, indicating the provider has successfully cleared all required screening checks"
+                    },
+                    "key_functionality_id": "provider-record-update"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00051",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Mark Provider as Screening Failed",
+                    "rule_description": "When one or more of the four mandatory screening checks (License, LEIE Exclusion, SAM Debarment, or SSA Death Master File) do not return a passing result, the provider's screening verdict is updated to SCREEN FAIL and the program-level failure counter is incremented.",
+                    "sub_graph_node_text": "Provider Marked as Screening-FAILED",
+                    "acceptance_criteria": {
+                        "Given": "An unscreened provider record has been evaluated through all four screening checks: License Check, LEIE Exclusion Check, SAM Debarment Check, and SSA Death Master File Check",
+                        "When": "At least one of the four screening check results \u2014 License Result, LEIE Result, SAM Result, or DMF Result \u2014 is NOT equal to 'Pass'",
+                        "Then": "The provider's screening verdict field in the Provider Master Record is set to SCREEN FAIL, and the total screening failure count is incremented by 1, indicating the provider did not clear all required screening checks"
+                    },
+                    "key_functionality_id": "provider-record-update"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00052",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Persist Provider Screening Verdict to Master File",
+                    "rule_description": "After the screening verdict (PASS or FAIL) has been determined and applied to the provider record, the updated provider record must be written back to the Provider Master File to permanently record the screening outcome.",
+                    "sub_graph_node_text": "Write Updated Provider Record Back to Provider Master File",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has completed all required screening checks and the screening verdict (either SCREEN PASS or SCREEN FAIL) has been applied to the provider's master record",
+                        "When": "The screening verdict determination is complete, regardless of whether the outcome is SCREEN PASS or SCREEN FAIL",
+                        "Then": "The updated provider master record \u2014 containing the new screening verdict \u2014 is rewritten back to the Provider Master File, permanently persisting the screening outcome for that provider"
+                    },
+                    "key_functionality_id": "provider-record-update"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Record Update"
+        },
+        {
+            "id": "screening-output-record-writing",
+            "title": "Screening Output Record Writing",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Write Screening Output Row])\n    B[Copy Provider NPI\\nfrom Provider Master Record\\nto Screening Output Record]\n    C[Set Check Outcome\\non Screening Output Record]\n    D[Write Screening Result Row\\nto Screening Output File]\n    SCROUT[(SCREEN-OUT-FILE\\nSequential File)]\n    E{Which Check\\nTriggered This Write?}\n    F([Return to:\\n4-State License Verification])\n    G([Return to:\\n5-OIG LEIE Exclusion Check])\n    H([Return to:\\n6-SAM Debarment Check])\n    I([Return to:\\n7-SSA Death Master File Check])\n\n    A --> B\n    B --> C\n    C --> D\n    D --> SCROUT\n    SCROUT -.->|Append Result Row| D\n    D --> E\n    E -->|License Check| F\n    E -->|LEIE Exclusion Check| G\n    E -->|SAM Debarment Check| H\n    E -->|SSA DMF Check| I",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00053",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Copy Provider NPI to Screening Output Record",
+                    "rule_description": "When writing a screening result row, the provider's National Provider Identifier (NPI) must be carried forward from the Provider Master Record into the Screening Output Record to ensure each result row is correctly identified by provider.",
+                    "sub_graph_node_text": "Copy Provider NPI\nfrom Provider Master Record\nto Screening Output Record",
+                    "acceptance_criteria": {
+                        "Given": "A screening check (License, LEIE, SAM, or SSA DMF) has just been evaluated for a provider, and the provider's NPI exists on the Provider Master Record",
+                        "When": "The system prepares to write a screening result row to the Screening Output File",
+                        "Then": "The provider's NPI from the Provider Master Record is copied into the NPI field of the Screening Output Record, so that the result row is associated with the correct provider"
+                    },
+                    "key_functionality_id": "screening-output-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00054",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Set Check Outcome on Screening Output Record",
+                    "rule_description": "Before writing a screening result row, the outcome of the individual check (Pass) must be recorded on the Screening Output Record to reflect the result of that specific check.",
+                    "sub_graph_node_text": "Set Check Outcome\non Screening Output Record",
+                    "acceptance_criteria": {
+                        "Given": "A screening check (License, LEIE, SAM, or SSA DMF) has been evaluated for a provider and the result has been determined",
+                        "When": "The system prepares to write the screening result row to the Screening Output File",
+                        "Then": "The check outcome field on the Screening Output Record is set to PASS, capturing the result of that individual check prior to writing"
+                    },
+                    "key_functionality_id": "screening-output-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00055",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Write Screening Result Row to Screening Output File",
+                    "rule_description": "After the provider NPI and check outcome have been set on the Screening Output Record, a result row must be written to the Screening Output File. This occurs once for each individual check performed, resulting in one output row per check per provider.",
+                    "sub_graph_node_text": "Write Screening Result Row\nto Screening Output File",
+                    "acceptance_criteria": {
+                        "Given": "The Screening Output Record has been populated with the provider's NPI and the check outcome for a specific screening check",
+                        "When": "The system executes the write operation for the screening result row",
+                        "Then": "A new result row is appended to the Screening Output File containing the provider NPI and the check outcome for that specific check"
+                    },
+                    "key_functionality_id": "screening-output-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00056",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "One Screening Output Row Written Per Individual Check",
+                    "rule_description": "The screening output file receives one result row for each individual check performed \u2014 License, LEIE Exclusion, SAM Debarment, and SSA Death Master File \u2014 meaning up to four rows are written per provider during a full screening cycle.",
+                    "sub_graph_node_text": "Write Screening Result Row\nto Screening Output File",
+                    "acceptance_criteria": {
+                        "Given": "An unscreened provider is being processed through the full screening workflow",
+                        "When": "Each of the four individual checks (License, LEIE Exclusion, SAM Debarment, SSA DMF) is performed in sequence",
+                        "Then": "A separate screening result row is written to the Screening Output File upon completion of each individual check, resulting in one row per check per provider"
+                    },
+                    "key_functionality_id": "screening-output-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00057",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Return Control to License Check After Writing Output Row",
+                    "rule_description": "After the screening output row is written as part of the License check, control returns to the License Verification process so that the overall screening workflow can continue to the next check.",
+                    "sub_graph_node_text": "Return to:\n4-State License Verification",
+                    "acceptance_criteria": {
+                        "Given": "The screening output row has been written to the Screening Output File as a result of the License check",
+                        "When": "The write operation completes",
+                        "Then": "Control is returned to the License Verification step, allowing the screening workflow to proceed to the next check in sequence"
+                    },
+                    "key_functionality_id": "screening-output-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00058",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Return Control to LEIE Exclusion Check After Writing Output Row",
+                    "rule_description": "After the screening output row is written as part of the LEIE Exclusion check, control returns to the OIG LEIE Exclusion Check process so that the overall screening workflow can continue to the next check.",
+                    "sub_graph_node_text": "Return to:\n5-OIG LEIE Exclusion Check",
+                    "acceptance_criteria": {
+                        "Given": "The screening output row has been written to the Screening Output File as a result of the LEIE Exclusion check",
+                        "When": "The write operation completes",
+                        "Then": "Control is returned to the OIG LEIE Exclusion Check step, allowing the screening workflow to proceed to the next check in sequence"
+                    },
+                    "key_functionality_id": "screening-output-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00059",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Return Control to SAM Debarment Check After Writing Output Row",
+                    "rule_description": "After the screening output row is written as part of the SAM Debarment check, control returns to the SAM Debarment Check process so that the overall screening workflow can continue to the next check.",
+                    "sub_graph_node_text": "Return to:\n6-SAM Debarment Check",
+                    "acceptance_criteria": {
+                        "Given": "The screening output row has been written to the Screening Output File as a result of the SAM Debarment check",
+                        "When": "The write operation completes",
+                        "Then": "Control is returned to the SAM Debarment Check step, allowing the screening workflow to proceed to the next check in sequence"
+                    },
+                    "key_functionality_id": "screening-output-record-writing"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00060",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Return Control to SSA Death Master File Check After Writing Output Row",
+                    "rule_description": "After the screening output row is written as part of the SSA Death Master File check, control returns to the SSA DMF Check process so that the overall screening workflow can continue to the final pass/fail determination.",
+                    "sub_graph_node_text": "Return to:\n7-SSA Death Master File Check",
+                    "acceptance_criteria": {
+                        "Given": "The screening output row has been written to the Screening Output File as a result of the SSA Death Master File check",
+                        "When": "The write operation completes",
+                        "Then": "Control is returned to the SSA Death Master File Check step, allowing the screening workflow to proceed to the overall pass/fail determination"
+                    },
+                    "key_functionality_id": "screening-output-record-writing"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Screening Output Record Writing"
+        },
+        {
+            "id": "screening-summary-reporting",
+            "title": "Screening Summary Reporting",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([All Providers Processed])\n    B[Screening Summary Reporting\\nCalculate Total Count of\\nProviders Who Failed Screening]\n    C[/Display Screening Failure Summary:\\nTotal Number of Providers\\nWho Failed Screening/]\n    D([End of Batch Screening Run])\n\n    A --> B\n    B --> C\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00061",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Screening Failure Count Accumulation",
+                    "rule_description": "For every provider that does not pass all four screening checks, the system increments a running total of screening failures by one, accumulating the count across the entire batch run.",
+                    "sub_graph_node_text": "Screening Summary Reporting\nCalculate Total Count of\nProviders Who Failed Screening",
+                    "acceptance_criteria": {
+                        "Given": "A provider has been evaluated through all applicable screening checks (License, LEIE Exclusion, SAM Debarment, and SSA Death Master File) and at least one of the four check results is not a Pass",
+                        "When": "The provider is marked as SCREEN FAIL",
+                        "Then": "The screening failure counter is incremented by 1, reflecting this provider as a failed screening case in the batch total"
+                    },
+                    "key_functionality_id": "screening-summary-reporting"
+                },
+                {
+                    "rule_id": "R-PRVSCR01-cbl-00062",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Screening Failure Summary Display at End of Batch",
+                    "rule_description": "After all providers in the Provider Master File have been processed, the system displays the total number of providers who failed screening, providing an operational summary of the completed batch screening run.",
+                    "sub_graph_node_text": "Display Screening Failure Summary:\nTotal Number of Providers\nWho Failed Screening",
+                    "acceptance_criteria": {
+                        "Given": "All provider records in the Provider Master File have been read and evaluated for screening",
+                        "When": "The end of the Provider Master File is reached and the batch processing loop completes",
+                        "Then": "The system displays a screening failure summary message identified with program name 'PRVSCR01', showing the label 'SCREENING FAILURES=' followed by the final accumulated count of providers who failed screening during the batch run"
+                    },
+                    "key_functionality_id": "screening-summary-reporting"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Screening Summary Reporting"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The PRVSCR01 provider screening batch program is invoked",
+                "When": "The program begins execution",
+                "Then": "The Provider Master File must be opened for both reading and updating, and the Screening Output File must be opened for writing, so that provider records can be retrieved and screening results can be recorded"
+            },
+            "Rule_Name": "Provider Screening Batch Initiation",
+            "Rule_Description": "The provider screening batch process must initialize by gaining access to the Provider Master File and the Screening Output File before any provider records can be read or screening results written."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00002",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File has been successfully opened and the screening loop is active",
+                "When": "The program advances to the next iteration of the screening loop",
+                "Then": "The next sequential provider record is read from the Provider Master File; if no more records exist, the end-of-file condition is detected and the screening loop terminates"
+            },
+            "Rule_Name": "Sequential Provider Record Retrieval",
+            "Rule_Description": "The program must read provider records one at a time from the Provider Master File in sequential order to ensure every provider record is evaluated for screening eligibility."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00003",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File",
+                "When": "The program evaluates the provider's current screening status",
+                "Then": "If the provider status is UNSCREENED, the provider is forwarded for screening checks; if the provider status is anything other than UNSCREENED (already screened), the record is skipped and the next provider record is read"
+            },
+            "Rule_Name": "Unscreened Provider Filter",
+            "Rule_Description": "Only providers whose screening status is marked as UNSCREENED are eligible for the screening process. Providers already marked as screened (pass or fail) must be skipped to avoid duplicate screening."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00004",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider record has been selected for screening",
+                "When": "The program evaluates the Medicare Reciprocity system flag",
+                "Then": "If the Medicare Reciprocity flag is active, the program invokes the Medicare Reciprocity Check routine and auto-passes all four screening checks (License, LEIE, SAM, DMF); if the flag is inactive (the normal operational path), the program proceeds to perform each individual screening check independently"
+            },
+            "Rule_Name": "Medicare Reciprocity Flag Evaluation",
+            "Rule_Description": "Before performing individual screening checks, the program must evaluate whether the Medicare Reciprocity flag is active. If active, the program relies on prior Medicare/PECOS screening results instead of performing independent checks. This flag has not been active since 2014, making this path effectively dead code."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00005",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider has been selected and the Medicare Reciprocity flag is active",
+                "When": "The Medicare Reciprocity Check routine is executed",
+                "Then": "All four screening check results \u2014 License, LEIE Exclusion, SAM Debarment, and SSA Death Master File \u2014 are automatically set to PASS; the screening output record is tagged as a PECOS record; no independent verification queries are performed for this provider"
+            },
+            "Rule_Name": "Medicare/PECOS Reciprocity Auto-Pass Override",
+            "Rule_Description": "When the Medicare Reciprocity flag is active, the program accepts prior Medicare/PECOS screening results as sufficient, automatically passing all four individual screening checks (License, LEIE, SAM, DMF) without performing independent verification. The output record is tagged as a PECOS-sourced screening record."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00006",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider has been selected for screening and the Medicare Reciprocity flag is inactive",
+                "When": "The License Check routine is performed",
+                "Then": "The provider's license status is verified; the License check result is set to PASS; the provider's NPI and the License check result are written as a row to the Screening Output File"
+            },
+            "Rule_Name": "State License Verification",
+            "Rule_Description": "Each unscreened provider must have their state license verified against the State Licensing Board to confirm they hold a valid and active license. The result of this check is recorded in the Screening Output File."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00007",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider has passed the License check step and the Medicare Reciprocity flag is inactive",
+                "When": "The LEIE Exclusion Check routine is performed",
+                "Then": "The provider's exclusion status is verified against the OIG LEIE database; the LEIE check result is set to PASS; the provider's NPI and the LEIE check result are written as a row to the Screening Output File"
+            },
+            "Rule_Name": "OIG LEIE Exclusion Verification",
+            "Rule_Description": "Each unscreened provider must be checked against the OIG List of Excluded Individuals and Entities (LEIE) database to confirm the provider has not been excluded from participation in federal healthcare programs. The result is recorded in the Screening Output File."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00008",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider has passed the LEIE check step and the Medicare Reciprocity flag is inactive",
+                "When": "The SAM Debarment Check routine is performed",
+                "Then": "The provider's debarment status is verified against the SAM database; the SAM check result is set to PASS; the provider's NPI and the SAM check result are written as a row to the Screening Output File"
+            },
+            "Rule_Name": "SAM Debarment Verification",
+            "Rule_Description": "Each unscreened provider must be checked against the System for Award Management (SAM) debarment list to confirm the provider has not been debarred from receiving federal funds. The result is recorded in the Screening Output File."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00009",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider has passed the SAM check step and the Medicare Reciprocity flag is inactive",
+                "When": "The SSA Death Master File Check routine is performed",
+                "Then": "The provider's vital status is verified against the SSA Death Master File; the DMF check result is set to PASS; the provider's NPI and the DMF check result are written as a row to the Screening Output File"
+            },
+            "Rule_Name": "SSA Death Master File Verification",
+            "Rule_Description": "Each unscreened provider must be checked against the Social Security Administration Death Master File (DMF) to confirm the provider is not deceased. The result is recorded in the Screening Output File."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00010",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "All four screening checks (License, LEIE, SAM, DMF) have been completed for an unscreened provider",
+                "When": "The program evaluates the combined results of all four checks",
+                "Then": "If the License check result AND the LEIE check result AND the SAM check result AND the DMF check result are all PASS, the provider is marked as SCREENING PASSED; if any one or more of the four check results is not PASS, the provider is marked as SCREENING FAILED and the screening failure counter is incremented by 1"
+            },
+            "Rule_Name": "Overall Screening Verdict Determination",
+            "Rule_Description": "After all four individual screening checks are completed, the program determines the overall screening verdict for the provider. A provider passes only if all four checks \u2014 License, LEIE Exclusion, SAM Debarment, and SSA Death Master File \u2014 return a passing result. Failure of any single check results in an overall screening failure."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00011",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A screening verdict of either SCREENING PASSED or SCREENING FAILED has been determined for the provider",
+                "When": "The program completes the verdict determination step",
+                "Then": "The provider's record in the Provider Master File is updated (rewritten) with the new screening verdict status \u2014 either SCREEN PASS or SCREEN FAIL \u2014 so that the provider will not be reprocessed as unscreened in subsequent batch runs"
+            },
+            "Rule_Name": "Provider Master Record Screening Verdict Update",
+            "Rule_Description": "After the screening verdict (pass or fail) has been determined, the provider's record in the Provider Master File must be updated to reflect the new screening status, ensuring the provider is no longer treated as unscreened in future runs."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00012",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All provider records in the Provider Master File have been processed and the end-of-file condition has been reached",
+                "When": "The screening batch loop terminates",
+                "Then": "The program displays the total count of providers who received a SCREENING FAILED verdict during the current batch run, identified under the program name PRVSCR01, before the program terminates"
+            },
+            "Rule_Name": "Screening Failure Summary Reporting",
+            "Rule_Description": "At the conclusion of the batch screening run, the program must report the total number of providers who failed screening, providing an operational summary for business users to review screening outcomes."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00013",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider screening batch process is initiated",
+                "When": "The batch program begins execution",
+                "Then": "The program is identified as PRVSCR01 and this identifier is recorded as the active batch program for the screening run"
+            },
+            "Rule_Name": "Identify Provider Screening Batch Program",
+            "Rule_Description": "The provider screening batch process is identified and registered under the program name PRVSCR01, establishing the context for all subsequent screening activities performed during this batch run."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00014",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider screening batch program PRVSCR01 has been identified and is starting",
+                "When": "The batch process initializes",
+                "Then": "The Provider Master File is opened with simultaneous read and update access, enabling the program to both retrieve provider records for screening and write back the screening results (Pass or Fail) to the same file"
+            },
+            "Rule_Name": "Open Provider Master File for Read and Update Access",
+            "Rule_Description": "The Provider Master File must be opened with both read and update access at the start of the screening batch, so that provider records can be retrieved for screening and subsequently updated with screening outcomes."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00015",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File has been successfully opened for read and update access",
+                "When": "The batch process continues its initialization",
+                "Then": "The Screening Output File is opened in write-only mode, ready to receive individual screening check result rows (License, LEIE, SAM, DMF) for each provider processed during the batch"
+            },
+            "Rule_Name": "Open Screening Output File for Writing Results",
+            "Rule_Description": "A dedicated Screening Output File must be opened exclusively for writing at the start of the batch, so that individual screening check results for each provider can be recorded during the batch run."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00016",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "Both the Provider Master File and the Screening Output File have been successfully opened",
+                "When": "The batch process completes its initialization phase",
+                "Then": "The end-of-file indicator is set to 'No' (not yet reached end of file), signaling that provider record retrieval and screening should begin and continue until all records have been evaluated"
+            },
+            "Rule_Name": "Initialize End-of-File Indicator Before Processing Begins",
+            "Rule_Description": "Before any provider records are read or screened, the end-of-file indicator must be set to indicate that processing has not yet reached the end of the Provider Master File, ensuring the batch loop processes all pending providers."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00017",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File and Screening Output File are open, and the end-of-file indicator is set to 'No'",
+                "When": "The batch process transitions from initialization to active processing",
+                "Then": "The program enters a continuous loop that selects the next provider record and performs screening for each, repeating this cycle until the end-of-file indicator is set to 'Yes' (all records in the Provider Master File have been read and evaluated)"
+            },
+            "Rule_Name": "Continuously Process All Pending Providers Until File is Exhausted",
+            "Rule_Description": "Once initialization is complete, the batch must repeatedly select and screen providers from the Provider Master File, continuing this cycle until every record in the file has been evaluated and the end of the file is reached."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00018",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Provider Master File is open and available for sequential reading, and the end-of-file condition has not yet been reached",
+                "When": "The system requests the next provider record from the Provider Master File in sequential order",
+                "Then": "The next available provider record is retrieved from the Provider Master File and made available for status evaluation, and the file read status is captured for end-of-file detection"
+            },
+            "Rule_Name": "Sequential Read of Provider Records from Provider Master File",
+            "Rule_Description": "The system reads provider records one at a time in sequential order from the Provider Master File to evaluate each provider for screening eligibility."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00019",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A read operation has been performed on the Provider Master File and the file read status has been captured",
+                "When": "The file read status indicates that the end of the Provider Master File has been reached (no more records available)",
+                "Then": "The end-of-file flag is set to TRUE, the provider processing loop is terminated, and the program proceeds to close files and report final results"
+            },
+            "Rule_Name": "End of File Detection to Terminate Provider Processing Loop",
+            "Rule_Description": "After each sequential read of the Provider Master File, the system checks whether all provider records have been processed. If the end of file is reached, the screening loop is terminated and no further providers are processed."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00020",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully read from the Provider Master File and the end-of-file condition has not been reached",
+                "When": "The system evaluates the provider's current screening status field in the provider master record",
+                "Then": "If the provider's status is 'Unscreened', the provider is forwarded to the screening process; if the provider's status is anything other than 'Unscreened' (e.g., already screened as pass or fail), the provider record is skipped with no action taken"
+            },
+            "Rule_Name": "Identify Providers with Unscreened Status for Processing",
+            "Rule_Description": "Each provider record retrieved from the Provider Master File is evaluated to determine whether the provider has an 'Unscreened' status. Only providers with this specific status are eligible to proceed through the screening workflow."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00021",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and the provider's screening status is confirmed as 'Unscreened'",
+                "When": "The system determines the provider requires screening",
+                "Then": "The provider record is passed to the screening process (SCREEN-ONE-PROVIDER) where all applicable screening checks will be performed and the provider's master record will be updated with the screening outcome"
+            },
+            "Rule_Name": "Forward Unscreened Provider to Screening Process",
+            "Rule_Description": "A provider record identified as having an 'Unscreened' status is forwarded to the full screening process, which includes Medicare reciprocity check (if applicable), license verification, LEIE exclusion check, SAM debarment check, and SSA Death Master File check."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00022",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been read from the Provider Master File and the end-of-file condition has not been reached",
+                "When": "The provider's screening status is NOT 'Unscreened' (i.e., the provider has already been screened as pass or fail, or holds any other non-unscreened status)",
+                "Then": "No screening action is taken for that provider record, no output is written for that provider, the provider's master record remains unchanged, and the system immediately proceeds to read the next provider record from the Provider Master File"
+            },
+            "Rule_Name": "Skip Provider Records That Are Already Screened",
+            "Rule_Description": "Provider records that do not carry an 'Unscreened' status are bypassed entirely. No screening checks are performed, no output records are written, and the provider's master record is not updated. The system moves on to read the next provider record."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00023",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider screening loop is actively reading provider records from the Provider Master File",
+                "When": "The end-of-file condition is detected on the Provider Master File, indicating no more provider records remain to be processed",
+                "Then": "The screening loop terminates, the Provider Master File and Screen Output File are closed, and the total number of providers that failed screening is displayed as the final program output"
+            },
+            "Rule_Name": "Continue Processing Until All Provider Records Are Exhausted",
+            "Rule_Description": "The provider screening loop continues to read and evaluate provider records sequentially until every record in the Provider Master File has been read. Once the end of file is reached, the process is considered complete and the total count of screening failures is reported."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00024",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been identified as UNSCREENED and is being processed for screening",
+                "When": "The system evaluates the Medicare Reciprocity Flag (WS-RECIPROCITY-ON) to determine if PECOS-based screening should be applied",
+                "Then": "If the Medicare Reciprocity Flag is ENABLED, the system proceeds to apply PECOS-based auto-pass screening for all four checks; If the Medicare Reciprocity Flag is DISABLED (which is always the case as the flag has never been activated since 2014), the system bypasses the entire Medicare Reciprocity Check and returns directly to the standard individual provider screening flow"
+            },
+            "Rule_Name": "Medicare Reciprocity Flag Evaluation",
+            "Rule_Description": "Determines whether the Medicare Reciprocity feature is active before invoking the PECOS-based auto-pass logic. This flag has never been set to active since 2014, making the entire reciprocity branch permanently unreachable dead code."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00025",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Medicare Reciprocity Flag has been evaluated and found to be ENABLED (a condition that has never occurred since 2014)",
+                "When": "The system enters the Medicare Reciprocity Check processing branch",
+                "Then": "The system logs and displays the message 'PRVSCR01: RELYING ON MEDICARE/PECOS SCREENING' to indicate that Medicare's prior screening results are being accepted in lieu of independent checks"
+            },
+            "Rule_Name": "PECOS Prior Screening Acknowledgement Log",
+            "Rule_Description": "When Medicare Reciprocity is enabled, the system logs a notification indicating that it is relying on Medicare/PECOS prior screening results rather than performing independent verification. This is dead code that has never executed since 2014."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00026",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Medicare Reciprocity Flag is ENABLED and the system has logged reliance on PECOS screening results",
+                "When": "The system prepares the screening output record for the provider",
+                "Then": "The screening output record is marked with the PECOS source indicator (SCR-PECOS flag set to TRUE), identifying that this provider's screening result is derived from Medicare/PECOS enrollment data rather than independent checks"
+            },
+            "Rule_Name": "PECOS-Sourced Screening Record Tagging",
+            "Rule_Description": "When Medicare Reciprocity is active, the screening output record for the provider is tagged as PECOS-sourced, identifying that the screening result originates from Medicare's enrollment system rather than independent verification. This is dead code that has never executed since 2014."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00027",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Medicare Reciprocity Flag is ENABLED and the provider's screening output record has been tagged as PECOS-sourced",
+                "When": "The system applies the Medicare reciprocity auto-pass rule to the provider",
+                "Then": "All four screening check results are automatically set to PASS: License Check Result = PASS, OIG LEIE Exclusion Check Result = PASS, SAM Debarment Check Result = PASS, SSA Death Master File Check Result = PASS \u2014 without executing any independent verification against those four data sources"
+            },
+            "Rule_Name": "Medicare Reciprocity Auto-Pass All Four Screening Checks",
+            "Rule_Description": "When Medicare Reciprocity is enabled, all four mandatory screening checks \u2014 License verification, OIG LEIE exclusion, SAM debarment, and SSA Death Master File \u2014 are automatically set to PASS without performing independent verification, on the basis that Medicare/PECOS has already completed equivalent screening. This is dead code that has never executed since 2014."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00028",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider is enrolled in Medicare and has already been screened through the Medicare/PECOS enrollment system",
+                "When": "The Medicare Reciprocity Flag is ENABLED and all four screening checks have been auto-set to PASS based on PECOS results",
+                "Then": "The system accepts Medicare's prior screening as sufficient under 42 CFR 455.410, bypasses independent re-verification of License, OIG LEIE, SAM, and SSA DMF, and proceeds to the overall pass/fail determination using the four auto-passed results \u2014 thereby avoiding duplicate screening effort"
+            },
+            "Rule_Name": "Avoidance of Duplicate Screening Under 42 CFR 455.410",
+            "Rule_Description": "The Medicare Reciprocity feature is designed to comply with 42 CFR 455.410, which permits Medicaid agencies to rely on Medicare's provider screening results to avoid duplicating screening work already performed by Medicare/PECOS. This policy-based bypass has been inactive since 2014 as the enabling flag was never activated."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00029",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been identified as UNSCREENED and is undergoing the screening process",
+                "When": "The State License Verification check is performed against the state licensing board for the provider",
+                "Then": "The license verification result must be recorded as PASS ('P') in the screening result indicator, confirming the provider holds a valid and active professional license"
+            },
+            "Rule_Name": "State License Verification Check Outcome Recording",
+            "Rule_Description": "When a provider undergoes state license verification, the system queries the state licensing board to confirm the provider holds a valid and active professional license, and records the outcome of that verification as a Pass result."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00030",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The state license verification check has been completed for a provider and the result is ready to be written to the screening output file",
+                "When": "The system prepares the license verification output record",
+                "Then": "The provider's NPI from the Provider Master Record must be copied into the screening output record's NPI field (SCR-NPI) to ensure the verification result is correctly attributed to the specific provider"
+            },
+            "Rule_Name": "Provider NPI Captured for License Verification Output Record",
+            "Rule_Description": "When recording the license verification result to the screening output, the provider's National Provider Identifier (NPI) must be captured from the Provider Master record and included in the screening output record to uniquely identify the provider associated with the verification result."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00031",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The license verification output record has been prepared with the provider's NPI and the verification result has been determined",
+                "When": "The system writes the license verification row to the Screen Output File",
+                "Then": "The screening output record must have its check outcome status set to PASS (SCR-PASS = TRUE) and the complete record must be written to the Screen Output File (SCREEN-OUT-FILE), creating a traceable record of the license verification for the provider"
+            },
+            "Rule_Name": "License Verification Row Written with Pass Status to Screen Output File",
+            "Rule_Description": "After the license verification result and provider NPI are captured, the screening output record must be flagged with a PASS status and written to the Screen Output File, creating a permanent audit record of the license verification outcome for the provider."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00032",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider has been identified as UNSCREENED and the overall provider screening process (SCREEN-ONE-PROVIDER) has been initiated",
+                "When": "The screening workflow reaches the license verification step",
+                "Then": "The State License Verification sub-process (CHECK-LICENSE) must be invoked to perform the license check, and upon completion must return control back to the main provider screening workflow to continue with the remaining checks (LEIE, SAM, DMF)"
+            },
+            "Rule_Name": "License Verification Invoked as Part of Provider Screening Workflow",
+            "Rule_Description": "State License Verification is a mandatory step that must be invoked for every unscreened provider during the provider screening process, unless Medicare/PECOS reciprocity is overriding the individual checks. The verification is triggered as a discrete sub-process within the overall provider screening workflow."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00033",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record exists in the Provider Master File and is flagged as UNSCREENED",
+                "When": "The provider screening workflow is executed for that provider",
+                "Then": "The OIG LEIE Exclusion Check must be invoked to query the Office of Inspector General's List of Excluded Individuals and Entities for the provider and all owners holding 5% or greater ownership interest"
+            },
+            "Rule_Name": "Invoke OIG LEIE Exclusion Check as Part of Provider Screening",
+            "Rule_Description": "When a provider is identified as unscreened, the OIG LEIE Exclusion Check must be invoked as a mandatory step in the provider screening workflow to verify the provider and their qualifying owners are not federally excluded."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00034",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The OIG LEIE Exclusion Check has been executed for a provider",
+                "When": "The LEIE query completes and returns a result",
+                "Then": "The LEIE verification result must be recorded as PASS ('P') for the provider, indicating the provider and their qualifying owners are not found on the OIG exclusion list"
+            },
+            "Rule_Name": "Record OIG LEIE Verification Result for Provider",
+            "Rule_Description": "After the OIG LEIE Exclusion Check is performed, the verification outcome must be recorded against the provider so it can be used in the overall screening pass/fail determination."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00035",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The LEIE verification result has been recorded for a provider",
+                "When": "The system prepares the LEIE check result for writing to the screening output",
+                "Then": "The provider's NPI must be captured from the Provider Master Record and the LEIE check outcome must be set to PASS"
+            },
+            "Rule_Name": "Capture Provider NPI and Set LEIE Check Outcome for Output",
+            "Rule_Description": "Following the LEIE verification, the provider's National Provider Identifier (NPI) must be captured and the check outcome must be set to PASS so that a complete and identifiable screening result record can be prepared for output."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00036",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's NPI has been captured and the LEIE check outcome has been set to PASS",
+                "When": "The system writes the LEIE verification result to the output",
+                "Then": "A row containing the provider's NPI and the LEIE check outcome of PASS must be written to the Screening Output File"
+            },
+            "Rule_Name": "Write LEIE Check Result Row to Screening Output File",
+            "Rule_Description": "The LEIE check result, including the provider's NPI and the check outcome, must be written as a row to the Screening Output File to maintain a complete audit trail of all screening verifications performed."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00037",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The LEIE exclusion check result has been recorded for a provider along with the results of the License, SAM Debarment, and SSA Death Master File checks",
+                "When": "The overall screening outcome is determined for the provider",
+                "Then": "If the LEIE result is PASS along with all other three check results (License, SAM, DMF) also being PASS, the provider must be marked as SCREEN PASS; if the LEIE result is not PASS or any other check result is not PASS, the provider must be marked as SCREEN FAIL and the screening failure count must be incremented by 1"
+            },
+            "Rule_Name": "LEIE Result Must Pass for Provider to Achieve Overall Screening Pass",
+            "Rule_Description": "The LEIE exclusion check result is one of four mandatory checks that must all pass for a provider to be marked as an overall screening pass. A failing LEIE result alone is sufficient to mark the provider as a screening failure."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00038",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been identified as UNSCREENED in the Provider Master File and the SAM Debarment Check has been invoked as part of the screening process",
+                "When": "The SAM Debarment Check routine is executed for the provider",
+                "Then": "The system queries the System for Award Management (SAM) database to verify that the provider is not debarred or suspended from participating in federal programs"
+            },
+            "Rule_Name": "Query SAM Database to Verify Provider Debarment Status",
+            "Rule_Description": "When screening an unscreened provider, the system must query the System for Award Management (SAM) database to verify that the provider is not debarred or suspended from participating in federal programs."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00039",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The SAM Debarment Check routine has been invoked for an unscreened provider",
+                "When": "The SAM database verification is completed",
+                "Then": "The SAM verification result (WS-SAM-RESULT) is set to 'P' (Pass), indicating the provider is not debarred or suspended from federal programs"
+            },
+            "Rule_Name": "Record SAM Debarment Verification Result as Pass",
+            "Rule_Description": "Upon completion of the SAM debarment query, the system records the SAM verification result. In the current implementation, the SAM check result is recorded as Pass (P) for the provider being screened."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00040",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The SAM debarment verification result has been determined for a provider",
+                "When": "The system prepares the screening output record for the SAM check",
+                "Then": "The provider's NPI (National Provider Identifier) is copied from the Provider Master Record into the Screen Output Record (SCR-NPI) to identify which provider the SAM verification result belongs to"
+            },
+            "Rule_Name": "Capture Provider NPI for SAM Debarment Output Record",
+            "Rule_Description": "Before writing the SAM debarment verification result to the screening output file, the system must capture the provider's National Provider Identifier (NPI) from the Provider Master Record and place it on the output record to ensure traceability of the screening result to the correct provider."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00041",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The provider's NPI has been captured on the Screen Output Record for the SAM debarment check",
+                "When": "The system finalizes the SAM debarment output record",
+                "Then": "The Screen Output Record status indicator (SCR-PASS) is set to TRUE (Pass), reflecting that the provider has passed the SAM debarment verification"
+            },
+            "Rule_Name": "Mark SAM Debarment Output Record as Pass",
+            "Rule_Description": "The screening output record for the SAM debarment check must be explicitly marked with a Pass status before being written to the Screen Output File, ensuring the output record accurately reflects the SAM verification outcome."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00042",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Screen Output Record has been populated with the provider's NPI and the SAM debarment verification result status (Pass)",
+                "When": "The system completes preparation of the SAM debarment output record",
+                "Then": "A SAM debarment verification result row containing the provider's NPI and the Pass status is written to the Screen Output File (SCREEN-OUT-FILE), creating a permanent record of the SAM debarment check outcome for the provider"
+            },
+            "Rule_Name": "Write SAM Debarment Verification Result to Screen Output File",
+            "Rule_Description": "After the SAM debarment verification result has been determined and the output record prepared with the provider's NPI and Pass status, the system must write a SAM debarment verification result row to the Screen Output File to maintain a complete audit trail of all screening checks performed."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00043",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been identified as UNSCREENED and has been selected for screening, and the SSA Death Master File check step has been reached in the screening sequence",
+                "When": "The system performs the SSA Death Master File check by querying the Social Security Administration Death Master File to verify that the provider is not deceased",
+                "Then": "The DMF verification result is recorded as PASS (value 'P') in the DMF result field, indicating the provider is verified as not deceased in the SSA Death Master File"
+            },
+            "Rule_Name": "SSA Death Master File Verification Result Recording",
+            "Rule_Description": "When the SSA Death Master File check is performed for an unscreened provider, the system queries the Social Security Administration Death Master File to verify the provider is not deceased and records the verification result as Pass."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00044",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The SSA Death Master File check has been completed and a DMF verification result has been recorded for the provider",
+                "When": "The system prepares the screening output record for the DMF check result",
+                "Then": "The provider's NPI is copied from the Provider Master Record into the NPI field of the screening output record, ensuring the DMF result row is correctly associated with the provider"
+            },
+            "Rule_Name": "Provider NPI Capture for DMF Output Record",
+            "Rule_Description": "Before writing the DMF check result to the screening output file, the provider's National Provider Identifier (NPI) must be captured from the Provider Master Record and placed into the screening output record to identify which provider the DMF result belongs to."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00045",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The SSA Death Master File check result has been recorded as PASS and the provider's NPI has been captured into the screening output record",
+                "When": "The system writes the DMF check result row to the Screening Output File",
+                "Then": "A new record is written to the Screening Output File containing the provider's NPI and the DMF check result status set to PASS, creating a permanent audit trail of the SSA Death Master File verification for that provider"
+            },
+            "Rule_Name": "DMF Check Result Row Written to Screening Output File",
+            "Rule_Description": "After the SSA Death Master File check is completed and the provider NPI is captured, a result row must be written to the Screening Output File recording the provider's NPI and the DMF check outcome as PASS."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00046",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider has completed all four compliance checks: State License Verification, OIG LEIE Exclusion Check, SAM Debarment Check, and SSA Death Master File Check, and all four results are recorded",
+                "When": "The screening verdict is being determined and the License result equals Pass AND the LEIE result equals Pass AND the SAM result equals Pass AND the DMF result equals Pass",
+                "Then": "The provider's record in the Provider Master File is updated with a status of SCREENING PASSED, indicating all compliance checks have been successfully cleared"
+            },
+            "Rule_Name": "All Four Compliance Checks Must Pass for Provider Screening Approval",
+            "Rule_Description": "A provider's overall screening verdict is determined by evaluating all four compliance check results together. Only when every single check \u2014 State License Verification, OIG LEIE Exclusion, SAM Debarment, and SSA Death Master File \u2014 returns a passing result is the provider granted a screening-passed status."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00047",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider has completed all four compliance checks: State License Verification, OIG LEIE Exclusion Check, SAM Debarment Check, and SSA Death Master File Check, and all four results are recorded",
+                "When": "The screening verdict is being determined and at least one of the following is not a passing result: License Check result, LEIE Exclusion Check result, SAM Debarment Check result, or SSA Death Master File Check result",
+                "Then": "The provider's record in the Provider Master File is updated with a status of SCREENING FAILED, indicating one or more compliance checks were not cleared"
+            },
+            "Rule_Name": "Any Single Compliance Check Failure Results in Provider Screening Rejection",
+            "Rule_Description": "If any one or more of the four mandatory compliance checks \u2014 State License Verification, OIG LEIE Exclusion, SAM Debarment, or SSA Death Master File \u2014 does not return a passing result, the provider is immediately marked as screening-failed, regardless of how many other checks passed."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00048",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider has been evaluated for overall screening verdict and has been marked as SCREENING FAILED due to one or more compliance checks not returning a passing result",
+                "When": "The screening failure status is recorded for that provider",
+                "Then": "The screening failure counter is incremented by exactly 1, accumulating the total number of providers who did not clear all compliance checks during this screening run"
+            },
+            "Rule_Name": "Screening Failure Counter Incremented for Each Failed Provider",
+            "Rule_Description": "Each time a provider fails the overall screening verdict \u2014 meaning one or more of the four compliance checks did not pass \u2014 the program's running total of screening failures is increased by exactly one, enabling an accurate count of all failed providers to be reported at the end of the screening run."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00049",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider's overall screening verdict has been determined as either SCREENING PASSED or SCREENING FAILED based on the four compliance check results",
+                "When": "The screening verdict has been recorded on the provider's record",
+                "Then": "The provider's updated record \u2014 containing the new screening status of either SCREENING PASSED or SCREENING FAILED \u2014 is written back and saved to the Provider Master File to permanently reflect the screening outcome"
+            },
+            "Rule_Name": "Provider Master Record Must Be Updated After Every Screening Verdict",
+            "Rule_Description": "Regardless of whether a provider passes or fails the overall screening verdict, the provider's record in the Provider Master File must always be updated to persist the final screening outcome \u2014 either SCREENING PASSED or SCREENING FAILED \u2014 before processing the next provider."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00050",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider record has been evaluated through all four screening checks: License Check, LEIE Exclusion Check, SAM Debarment Check, and SSA Death Master File Check",
+                "When": "All four screening check results \u2014 License Result, LEIE Result, SAM Result, and DMF Result \u2014 are each equal to 'Pass'",
+                "Then": "The provider's screening verdict field in the Provider Master Record is set to SCREEN PASS, indicating the provider has successfully cleared all required screening checks"
+            },
+            "Rule_Name": "Mark Provider as Screening Passed",
+            "Rule_Description": "When all four mandatory screening checks (License, LEIE Exclusion, SAM Debarment, and SSA Death Master File) return a passing result, the provider's screening verdict in the master record is updated to SCREEN PASS."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00051",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider record has been evaluated through all four screening checks: License Check, LEIE Exclusion Check, SAM Debarment Check, and SSA Death Master File Check",
+                "When": "At least one of the four screening check results \u2014 License Result, LEIE Result, SAM Result, or DMF Result \u2014 is NOT equal to 'Pass'",
+                "Then": "The provider's screening verdict field in the Provider Master Record is set to SCREEN FAIL, and the total screening failure count is incremented by 1, indicating the provider did not clear all required screening checks"
+            },
+            "Rule_Name": "Mark Provider as Screening Failed",
+            "Rule_Description": "When one or more of the four mandatory screening checks (License, LEIE Exclusion, SAM Debarment, or SSA Death Master File) do not return a passing result, the provider's screening verdict is updated to SCREEN FAIL and the program-level failure counter is incremented."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00052",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has completed all required screening checks and the screening verdict (either SCREEN PASS or SCREEN FAIL) has been applied to the provider's master record",
+                "When": "The screening verdict determination is complete, regardless of whether the outcome is SCREEN PASS or SCREEN FAIL",
+                "Then": "The updated provider master record \u2014 containing the new screening verdict \u2014 is rewritten back to the Provider Master File, permanently persisting the screening outcome for that provider"
+            },
+            "Rule_Name": "Persist Provider Screening Verdict to Master File",
+            "Rule_Description": "After the screening verdict (PASS or FAIL) has been determined and applied to the provider record, the updated provider record must be written back to the Provider Master File to permanently record the screening outcome."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00053",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A screening check (License, LEIE, SAM, or SSA DMF) has just been evaluated for a provider, and the provider's NPI exists on the Provider Master Record",
+                "When": "The system prepares to write a screening result row to the Screening Output File",
+                "Then": "The provider's NPI from the Provider Master Record is copied into the NPI field of the Screening Output Record, so that the result row is associated with the correct provider"
+            },
+            "Rule_Name": "Copy Provider NPI to Screening Output Record",
+            "Rule_Description": "When writing a screening result row, the provider's National Provider Identifier (NPI) must be carried forward from the Provider Master Record into the Screening Output Record to ensure each result row is correctly identified by provider."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00054",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A screening check (License, LEIE, SAM, or SSA DMF) has been evaluated for a provider and the result has been determined",
+                "When": "The system prepares to write the screening result row to the Screening Output File",
+                "Then": "The check outcome field on the Screening Output Record is set to PASS, capturing the result of that individual check prior to writing"
+            },
+            "Rule_Name": "Set Check Outcome on Screening Output Record",
+            "Rule_Description": "Before writing a screening result row, the outcome of the individual check (Pass) must be recorded on the Screening Output Record to reflect the result of that specific check."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00055",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Screening Output Record has been populated with the provider's NPI and the check outcome for a specific screening check",
+                "When": "The system executes the write operation for the screening result row",
+                "Then": "A new result row is appended to the Screening Output File containing the provider NPI and the check outcome for that specific check"
+            },
+            "Rule_Name": "Write Screening Result Row to Screening Output File",
+            "Rule_Description": "After the provider NPI and check outcome have been set on the Screening Output Record, a result row must be written to the Screening Output File. This occurs once for each individual check performed, resulting in one output row per check per provider."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00056",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "An unscreened provider is being processed through the full screening workflow",
+                "When": "Each of the four individual checks (License, LEIE Exclusion, SAM Debarment, SSA DMF) is performed in sequence",
+                "Then": "A separate screening result row is written to the Screening Output File upon completion of each individual check, resulting in one row per check per provider"
+            },
+            "Rule_Name": "One Screening Output Row Written Per Individual Check",
+            "Rule_Description": "The screening output file receives one result row for each individual check performed \u2014 License, LEIE Exclusion, SAM Debarment, and SSA Death Master File \u2014 meaning up to four rows are written per provider during a full screening cycle."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00057",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The screening output row has been written to the Screening Output File as a result of the License check",
+                "When": "The write operation completes",
+                "Then": "Control is returned to the License Verification step, allowing the screening workflow to proceed to the next check in sequence"
+            },
+            "Rule_Name": "Return Control to License Check After Writing Output Row",
+            "Rule_Description": "After the screening output row is written as part of the License check, control returns to the License Verification process so that the overall screening workflow can continue to the next check."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00058",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The screening output row has been written to the Screening Output File as a result of the LEIE Exclusion check",
+                "When": "The write operation completes",
+                "Then": "Control is returned to the OIG LEIE Exclusion Check step, allowing the screening workflow to proceed to the next check in sequence"
+            },
+            "Rule_Name": "Return Control to LEIE Exclusion Check After Writing Output Row",
+            "Rule_Description": "After the screening output row is written as part of the LEIE Exclusion check, control returns to the OIG LEIE Exclusion Check process so that the overall screening workflow can continue to the next check."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00059",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The screening output row has been written to the Screening Output File as a result of the SAM Debarment check",
+                "When": "The write operation completes",
+                "Then": "Control is returned to the SAM Debarment Check step, allowing the screening workflow to proceed to the next check in sequence"
+            },
+            "Rule_Name": "Return Control to SAM Debarment Check After Writing Output Row",
+            "Rule_Description": "After the screening output row is written as part of the SAM Debarment check, control returns to the SAM Debarment Check process so that the overall screening workflow can continue to the next check."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00060",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The screening output row has been written to the Screening Output File as a result of the SSA Death Master File check",
+                "When": "The write operation completes",
+                "Then": "Control is returned to the SSA Death Master File Check step, allowing the screening workflow to proceed to the overall pass/fail determination"
+            },
+            "Rule_Name": "Return Control to SSA Death Master File Check After Writing Output Row",
+            "Rule_Description": "After the screening output row is written as part of the SSA Death Master File check, control returns to the SSA DMF Check process so that the overall screening workflow can continue to the final pass/fail determination."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00061",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider has been evaluated through all applicable screening checks (License, LEIE Exclusion, SAM Debarment, and SSA Death Master File) and at least one of the four check results is not a Pass",
+                "When": "The provider is marked as SCREEN FAIL",
+                "Then": "The screening failure counter is incremented by 1, reflecting this provider as a failed screening case in the batch total"
+            },
+            "Rule_Name": "Screening Failure Count Accumulation",
+            "Rule_Description": "For every provider that does not pass all four screening checks, the system increments a running total of screening failures by one, accumulating the count across the entire batch run."
+        },
+        {
+            "Rule_Id": "R-PRVSCR01-cbl-00062",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "All provider records in the Provider Master File have been read and evaluated for screening",
+                "When": "The end of the Provider Master File is reached and the batch processing loop completes",
+                "Then": "The system displays a screening failure summary message identified with program name 'PRVSCR01', showing the label 'SCREENING FAILURES=' followed by the final accumulated count of providers who failed screening during the batch run"
+            },
+            "Rule_Name": "Screening Failure Summary Display at End of Batch",
+            "Rule_Description": "After all providers in the Provider Master File have been processed, the system displays the total number of providers who failed screening, providing an operational summary of the completed batch screening run."
+        }
+    ],
+    "description": "PRVSCR01 is a batch Screening and Verification Engine (PEM-2) that reads pending providers from the Provider Master File and performs eligibility screening by querying four external sources: the state license board, OIG LEIE (exclusion list), SAM (debarment registry), and SSA Death Master File. Based on the combined results, each provider record is updated with a pass or fail screening verdict, and a screening output record is written for audit purposes.\n\n<br>\n\n- **Execution Environment**: Batch\n- **Database Access**: VSAM (Indexed and Sequential Files)\n- **MQ Calls**: No (referenced in comments as real-world integration pattern, but no actual MQ CALL statements present in code)\n- **Module Type**: Main/Driver module\n\n<br>\n\n### Key Functionalities:\n\n1: Provider Screening Initiation - Open the provider master file and screening output file to begin the batch screening and verification process for all pending providers\n\n2: Pending Provider Selection - Read each provider record sequentially from the provider master file and identify only those providers with an 'unscreened' status for further processing\n\n3: Medicare Reciprocity Check (Dead Code - Never Executed) - A feature intended to query PECOS (Medicare's enrollment system) to accept Medicare's prior screening results and automatically pass all four screening checks (license, LEIE, SAM, DMF), thereby avoiding duplicate screening work as allowed under 42 CFR 455.410. This feature has been inactive since 2014 because the enabling flag was never set to active\n\n4: State License Verification - Query the state licensing board to verify that the provider holds a valid and active professional license, and record the verification result\n\n5: OIG LEIE Exclusion Check - Query the Office of Inspector General's List of Excluded Individuals and Entities (LEIE) to verify that the provider and their owners (with 5% or greater ownership) are not excluded from federal healthcare programs, and record the verification result\n\n6: SAM Debarment Check - Query the System for Award Management (SAM) to verify that the provider is not debarred or suspended from participating in federal programs, and record the verification result\n\n7: SSA Death Master File Check - Query the Social Security Administration Death Master File (SSA-DMF) to verify that the provider is not deceased, and record the verification result\n\n8: Screening Verdict Determination - Evaluate all four external screening results (license, LEIE, SAM, DMF) together; if all results pass, mark the provider as screening-passed; if any result fails, mark the provider as screening-failed and increment the failure counter\n\n9: Provider Record Update - Write the updated screening verdict (pass or fail) back to the provider master file record\n\n10: Screening Output Record Writing - Write a screening result row to the screening output file for each individual check performed, capturing the provider NPI and the check outcome\n\n11: Screening Summary Reporting - After all providers are processed, display the total count of providers who failed screening to provide an operational summary of the batch run\n\n"
+}

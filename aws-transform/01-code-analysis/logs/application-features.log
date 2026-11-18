@@ -1,0 +1,22 @@
+2026-11-17 11:23:37,293 [main] INFO : Starting application features
+2026-11-17 11:23:37,336 [main] INFO : Features restricted to codebase files (--codebase-files-only)
+2026-11-17 11:23:37,375 [main] INFO : PathIndexer built: 22 unique identifiers indexed (codebase files only), BitSet size = 0 KB
+2026-11-17 11:23:37,377 [main] INFO : Graph loaded: 42 nodes, 102 dependencies, 8 entrypoints in 21 ms
+2026-11-17 11:23:37,379 [main] INFO : Application Features analysis started at: 11:23:37 (version 20261110101650)
+2026-11-17 11:23:37,380 [main] INFO : Pre-compute: identified 0 conditional boundary nodes in 0 ms
+2026-11-17 11:23:37,383 [main] INFO : Reachability: 47 vertices in 47 SCCs (largest: 1 vertices, 0 SCCs of more than one vertex), 40 summaries kept (0 MB, peak 0 MB during the pass), computed in 2 ms
+2026-11-17 11:23:37,386 [main] INFO : Processing 8 entrypoints with 15 threads (pre-compute enabled)
+2026-11-17 11:23:37,396 [pool-2-thread-1] INFO : Progress: 8/8 entrypoints processed in 0 s
+2026-11-17 11:23:37,397 [main] INFO : Phases: conditional boundaries 0 ms, reachability 4 ms, naming 1 ms, entrypoints 9 ms
+2026-11-17 11:23:37,397 [main] INFO : Slowest entrypoints: MMIS-PROVIDER-DEMO-TIER4/JCL/PRVDAY01.jcl in 1 ms (14 direct dependencies, 8 paths, 0 conditional boundaries included)
+2026-11-17 11:23:37,398 [main] INFO : Slowest entrypoints: MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDIR01.cbl in 1 ms (6 direct dependencies, 5 paths, 0 conditional boundaries included)
+2026-11-17 11:23:37,398 [main] INFO : Slowest entrypoints: MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM01.jcl in 1 ms (3 direct dependencies, 1 paths, 0 conditional boundaries included)
+2026-11-17 11:23:37,398 [main] INFO : Slowest entrypoints: MMIS-PROVIDER-DEMO-TIER4/ONLINE/PRVCICS1.cbl in 1 ms (4 direct dependencies, 2 paths, 0 conditional boundaries included)
+2026-11-17 11:23:37,398 [main] INFO : Slowest entrypoints: MMIS-PROVIDER-DEMO-TIER4/JCL/PRVMTH01.jcl in 1 ms (11 direct dependencies, 7 paths, 0 conditional boundaries included)
+2026-11-17 11:23:37,398 [main] INFO : Slowest entrypoints: MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSAN01.cbl in 1 ms (10 direct dependencies, 5 paths, 0 conditional boundaries included)
+2026-11-17 11:23:37,398 [main] INFO : Slowest entrypoints: MMIS-PROVIDER-DEMO-TIER4/VSAM/PRVVSM02.jcl in 1 ms (3 direct dependencies, 1 paths, 0 conditional boundaries included)
+2026-11-17 11:23:37,398 [main] INFO : Slowest entrypoints: MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVDEAD1.cbl in 1 ms (0 direct dependencies, 1 paths, 0 conditional boundaries included)
+2026-11-17 11:23:37,398 [main] INFO : Application Features analysis ended successfully at: 11:23:37
+2026-11-17 11:23:37,398 [main] INFO : Global duration: 0 sec
+2026-11-17 11:23:37,399 [main] INFO : Outcome: Identified 8 Application Features
+2026-11-17 11:23:37,419 [json-writer] INFO : JSON serialization complete: 8 results in 40 ms

@@ -1,0 +1,403 @@
+{
+    "name": "PRVDEAD1.cbl",
+    "program_name": "PRVDEAD1.cbl",
+    "generated_at": "2026-11-17T12:37:05Z",
+    "overview": {
+        "total_key_functionalities": 5,
+        "total_rules": 14,
+        "main_flow_diagram": "flowchart TD\n    A([Program Start]):::start\n    B[1:Paper Fingerprint Intake Initiation\nDisplay program identification banner\nfor legacy paper fingerprint intake process]:::process\n    C{2:Paper Fingerprint Processing\nEligibility Check\nIs paper fingerprint card\nprocessing enabled?}:::decision\n    D[3:LiveScan Redirection Notification\nNotify users that paper-based process\nis no longer active and direct them\nto use LiveScan electronic system]:::process\n    E[4:Paper Fingerprint Card Mailroom\nQueue Logging\nLog and register paper fingerprint card\nsubmission into mailroom queue]:::process\n    F[5:Paper Fingerprint Card Count Tracking\nMaintain and display running count\nof paper fingerprint cards queued\nto mailroom this session]:::process\n    G([Program End]):::final\n\n    A --> B\n    B --> C\n    C -->|Yes - Paper Processing Enabled| E\n    C -->|No - Paper Processing Disabled| D\n    E --> F\n    F --> G\n    D --> G\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313",
+        "rules": [
+            {
+                "rule_id": "R-PRVDEAD1-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "Paper Fingerprint Intake Process Identification",
+                "rule_description": "When the paper fingerprint intake process starts, the system identifies itself as the legacy paper fingerprint intake program to inform users of the process context.",
+                "sub_graph_node_text": "1:Paper Fingerprint Intake Initiation\nDisplay program identification banner\nfor legacy paper fingerprint intake process",
+                "acceptance_criteria": {
+                    "Given": "The paper fingerprint intake program (PRVDEAD1) is initiated",
+                    "When": "The program begins execution",
+                    "Then": "The system displays the program identification banner 'PRVDEAD1: PAPER FINGERPRINT INTAKE (LEGACY)' to notify users that this is the legacy paper fingerprint intake process"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDEAD1-cbl-00002",
+                "rule_type": "Decision Rules",
+                "rule_name": "Paper Fingerprint Processing Eligibility Check",
+                "rule_description": "The system evaluates whether paper fingerprint card processing is currently enabled before allowing any paper fingerprint card to be accepted and queued.",
+                "sub_graph_node_text": "2:Paper Fingerprint Processing\nEligibility Check\nIs paper fingerprint card\nprocessing enabled?",
+                "acceptance_criteria": {
+                    "Given": "The paper fingerprint intake program (PRVDEAD1) has been initiated and the program identification banner has been displayed",
+                    "When": "The system checks the paper fingerprint processing enabled flag (WS-PAPER-FP-ON)",
+                    "Then": "If the flag is set to TRUE (enabled), the system proceeds to log and queue the paper fingerprint card to the mailroom queue; if the flag is set to FALSE (disabled), the system redirects users to use the LiveScan electronic system instead"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDEAD1-cbl-00003",
+                "rule_type": "Policy Rules",
+                "rule_name": "LiveScan Redirection When Paper Processing Is Disabled",
+                "rule_description": "When paper fingerprint card processing is disabled, the system must notify users that the paper-based process is no longer active and direct them to use the LiveScan electronic fingerprint submission system.",
+                "sub_graph_node_text": "3:LiveScan Redirection Notification\nNotify users that paper-based process\nis no longer active and direct them\nto use LiveScan electronic system",
+                "acceptance_criteria": {
+                    "Given": "The paper fingerprint intake program (PRVDEAD1) has been initiated and the paper fingerprint processing enabled flag (WS-PAPER-FP-ON) is set to FALSE (disabled)",
+                    "When": "The system evaluates the paper fingerprint processing eligibility check and determines that paper processing is not enabled",
+                    "Then": "The system displays the message 'PRVDEAD1: PAPER PROCESS DISABLED - USE LIVESCAN' to notify users that paper-based fingerprint submission is no longer active and that LiveScan must be used as the approved fingerprint submission method, and the program terminates without processing any paper fingerprint card"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDEAD1-cbl-00004",
+                "rule_type": "Action Rules",
+                "rule_name": "Paper Fingerprint Card Mailroom Queue Registration",
+                "rule_description": "When paper fingerprint processing is enabled, the system logs and registers the submitted paper fingerprint card into the mailroom queue for further physical handling.",
+                "sub_graph_node_text": "4:Paper Fingerprint Card Mailroom\nQueue Logging\nLog and register paper fingerprint card\nsubmission into mailroom queue",
+                "acceptance_criteria": {
+                    "Given": "The paper fingerprint intake program (PRVDEAD1) has been initiated and the paper fingerprint processing enabled flag (WS-PAPER-FP-ON) is set to TRUE (enabled)",
+                    "When": "The system processes the submitted paper fingerprint card",
+                    "Then": "The system displays the message 'PRVDEAD1: LOGGING PAPER FP CARD TO MAILROOM QUEUE' to confirm that the paper fingerprint card has been logged and registered into the mailroom queue for further handling"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVDEAD1-cbl-00005",
+                "rule_type": "Computation Rules",
+                "rule_name": "Paper Fingerprint Card Session Count Tracking",
+                "rule_description": "Each time a paper fingerprint card is successfully queued to the mailroom, the system increments and displays a running count of all paper fingerprint cards queued during the current session.",
+                "sub_graph_node_text": "5:Paper Fingerprint Card Count Tracking\nMaintain and display running count\nof paper fingerprint cards queued\nto mailroom this session",
+                "acceptance_criteria": {
+                    "Given": "A paper fingerprint card has been successfully logged and registered into the mailroom queue during the current session",
+                    "When": "The system completes the mailroom queue logging for the paper fingerprint card",
+                    "Then": "The system increments the paper fingerprint card queue count (WS-CARD-COUNT) by 1 and displays the updated running total in the format 'PRVDEAD1: CARDS QUEUED= [WS-CARD-COUNT]' to reflect the cumulative number of paper fingerprint cards queued to the mailroom in the current session"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "paper-fingerprint-intake-initiation",
+            "title": "Paper Fingerprint Intake Initiation",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Start: Paper Fingerprint Intake Initiation])\n    B[Display Program Identification Banner:\\nPRVDEAD1 - Paper Fingerprint Intake\\nLegacy Process for High-Risk Providers]\n    C([Proceed to Next Step])\n\n    A --> B\n    B --> C",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00006",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Legacy Paper Fingerprint Intake Program Banner",
+                    "rule_description": "When the Paper Fingerprint Intake process is initiated, the system must display a program identification banner to indicate that this is the legacy paper fingerprint intake process designated for high-risk providers.",
+                    "sub_graph_node_text": "Display Program Identification Banner:\nPRVDEAD1 - Paper Fingerprint Intake\nLegacy Process for High-Risk Providers",
+                    "acceptance_criteria": {
+                        "Given": "The Paper Fingerprint Intake process has been initiated",
+                        "When": "The program begins execution",
+                        "Then": "The system must display the program identification banner 'PRVDEAD1: PAPER FINGERPRINT INTAKE (LEGACY)' to indicate that this is the legacy paper-based fingerprint intake process for high-risk providers"
+                    },
+                    "key_functionality_id": "paper-fingerprint-intake-initiation"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Paper Fingerprint Intake Initiation"
+        },
+        {
+            "id": "paper-fingerprint-processing-eligibility-check",
+            "title": "Paper Fingerprint Processing Eligibility Check",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Fingerprint\\nEligibility Check])\n    B{Is Paper Fingerprint\\nCard Processing\\nFeature Enabled?}\n    C([Proceed to Paper\\nFingerprint Card\\nMailroom Queue Logging])\n    D([Redirect to LiveScan\\nNotification])\n\n    A --> B\n    B -->|Yes - Feature Enabled| C\n    B -->|No - Feature Disabled| D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00007",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Paper Fingerprint Card Processing Feature Eligibility Check",
+                    "rule_description": "Before any paper fingerprint card intake workflow begins, the system must evaluate whether the paper fingerprint card processing feature is currently active. Based on this evaluation, the system either proceeds with paper card intake or redirects to LiveScan notification.",
+                    "sub_graph_node_text": "Is Paper Fingerprint Card Processing Feature Enabled?",
+                    "acceptance_criteria": {
+                        "Given": "The Paper Fingerprint Intake (Legacy) process has been initiated",
+                        "When": "The system evaluates the Paper Fingerprint Card Processing feature flag (Paper FP On/Off switch)",
+                        "Then": "If the feature flag is enabled, the system proceeds to log the paper fingerprint card to the Mailroom Queue; If the feature flag is disabled, the system redirects and notifies that paper processing is unavailable and LiveScan must be used instead"
+                    },
+                    "key_functionality_id": "paper-fingerprint-processing-eligibility-check"
+                },
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00008",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "Paper Fingerprint Processing Disabled - LiveScan Redirection Policy",
+                    "rule_description": "When the paper fingerprint card processing feature is turned off, the system enforces the use of LiveScan as the only accepted fingerprint submission method by blocking paper intake and issuing a redirection notification.",
+                    "sub_graph_node_text": "Redirect to LiveScan Notification",
+                    "acceptance_criteria": {
+                        "Given": "The Paper Fingerprint Intake (Legacy) process has been initiated",
+                        "When": "The Paper Fingerprint Card Processing feature flag is found to be disabled",
+                        "Then": "The system must block paper fingerprint card processing and display a notification instructing that the paper process is disabled and LiveScan must be used as the fingerprint submission method"
+                    },
+                    "key_functionality_id": "paper-fingerprint-processing-eligibility-check"
+                },
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00009",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Paper Fingerprint Processing Enabled - Proceed to Mailroom Queue Logging",
+                    "rule_description": "When the paper fingerprint card processing feature is active, the system is authorized to accept the paper fingerprint card and route it to the Mailroom Queue logging workflow for further handling.",
+                    "sub_graph_node_text": "Proceed to Paper Fingerprint Card Mailroom Queue Logging",
+                    "acceptance_criteria": {
+                        "Given": "The Paper Fingerprint Intake (Legacy) process has been initiated",
+                        "When": "The Paper Fingerprint Card Processing feature flag is found to be enabled",
+                        "Then": "The system must proceed to the Paper Fingerprint Card Mailroom Queue Logging process to accept and queue the submitted paper fingerprint card"
+                    },
+                    "key_functionality_id": "paper-fingerprint-processing-eligibility-check"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Paper Fingerprint Processing Eligibility Check"
+        },
+        {
+            "id": "livescan-redirection-notification",
+            "title": "LiveScan Redirection Notification",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter LiveScan\\nRedirection Notification])\n    B[Notify User:\\nPaper Fingerprint Process\\nis No Longer Active]\n    C[Direct User to Use\\nLiveScan Electronic\\nFingerprinting System Instead]\n    D([Return to\\nMain Process])\n\n    A --> B\n    B --> C\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00010",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Paper Fingerprint Process Disabled - LiveScan Redirection Notification",
+                    "rule_description": "When the paper fingerprint processing switch is turned off, the system must notify the user that the paper-based fingerprint card intake process is no longer active.",
+                    "sub_graph_node_text": "Notify User: Paper Fingerprint Process is No Longer Active",
+                    "acceptance_criteria": {
+                        "Given": "The paper fingerprint processing flag (WS-PAPER-FP-ON) is set to OFF/disabled",
+                        "When": "The system evaluates whether paper fingerprint card processing is permitted",
+                        "Then": "The system notifies the user that the paper fingerprint process is disabled and no paper fingerprint cards will be accepted or queued"
+                    },
+                    "key_functionality_id": "livescan-redirection-notification"
+                },
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00011",
+                    "rule_type": "Policy Rules",
+                    "rule_name": "LiveScan Electronic Fingerprinting System Redirection",
+                    "rule_description": "When paper fingerprint processing is disabled, the system must actively direct users to submit fingerprints through the LiveScan electronic fingerprinting system as the approved alternative method.",
+                    "sub_graph_node_text": "Direct User to Use LiveScan Electronic Fingerprinting System Instead",
+                    "acceptance_criteria": {
+                        "Given": "The paper fingerprint processing flag (WS-PAPER-FP-ON) is set to OFF/disabled and the user has been notified that the paper process is inactive",
+                        "When": "The system completes the paper process disabled notification",
+                        "Then": "The system instructs the user to use the LiveScan electronic fingerprinting system instead of the paper-based fingerprint card submission method"
+                    },
+                    "key_functionality_id": "livescan-redirection-notification"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "LiveScan Redirection Notification"
+        },
+        {
+            "id": "paper-fingerprint-card-mailroom-queue-logging",
+            "title": "Paper Fingerprint Card Mailroom Queue Logging",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter Paper Fingerprint\\nCard Mailroom Queue Logging])\n    B[Log and Register Paper Fingerprint\\nCard Submission into\\nMailroom Queue\\n\u26a0\ufe0f Legacy Workflow - Discontinued 2019]\n    C([Proceed to Card\\nCount Tracking])\n\n    A --> B\n    B --> C",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00012",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Paper Fingerprint Card Mailroom Queue Registration",
+                    "rule_description": "When a paper fingerprint card is submitted and paper processing is enabled, the system logs and registers the card submission into the mailroom queue. This is a legacy workflow that was discontinued in 2019 and should no longer be actively used.",
+                    "sub_graph_node_text": "Log and Register Paper Fingerprint Card Submission into Mailroom Queue \u26a0\ufe0f Legacy Workflow - Discontinued 2019",
+                    "acceptance_criteria": {
+                        "Given": "The paper fingerprint card processing feature is enabled (WS-PAPER-FP-ON is true) and a paper fingerprint card submission has been received for a high-risk provider",
+                        "When": "The paper fingerprint card mailroom queue logging process is initiated",
+                        "Then": "The system logs and registers the paper fingerprint card submission into the mailroom queue, recording the event with the identifier 'PRVDEAD1: LOGGING PAPER FP CARD TO MAILROOM QUEUE' to confirm the card has been queued for processing"
+                    },
+                    "key_functionality_id": "paper-fingerprint-card-mailroom-queue-logging"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Paper Fingerprint Card Mailroom Queue Logging"
+        },
+        {
+            "id": "paper-fingerprint-card-count-tracking",
+            "title": "Paper Fingerprint Card Count Tracking",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter Card Count Tracking])\n    B[Increment Running Total\\nAdd 1 to current session\\npaper fingerprint card count]\n    C[Display Updated Card Count\\nShow total number of paper\\nfingerprint cards queued to\\nmailroom in current session]\n    D([Return to Main Process])\n\n    A --> B\n    B --> C\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00013",
+                    "rule_type": "Computation Rules",
+                    "rule_name": "Increment Paper Fingerprint Card Queue Count",
+                    "rule_description": "Each time a paper fingerprint card is successfully routed to the mailroom queue, the system increments the running total count of paper fingerprint cards processed in the current session by exactly one unit.",
+                    "sub_graph_node_text": "Increment Running Total\nAdd 1 to current session\npaper fingerprint card count",
+                    "acceptance_criteria": {
+                        "Given": "The paper fingerprint processing system is active and a paper fingerprint card has been accepted for mailroom queue routing during the current processing session",
+                        "When": "A paper fingerprint card is logged to the mailroom queue",
+                        "Then": "The current session paper fingerprint card count is increased by 1, reflecting the newly queued card in the running total"
+                    },
+                    "key_functionality_id": "paper-fingerprint-card-count-tracking"
+                },
+                {
+                    "rule_id": "R-PRVDEAD1-cbl-00014",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Display Current Session Paper Fingerprint Card Queue Total",
+                    "rule_description": "After each paper fingerprint card is added to the mailroom queue and the running count is updated, the system immediately displays the updated total number of paper fingerprint cards that have been queued to the mailroom during the current processing session.",
+                    "sub_graph_node_text": "Display Updated Card Count\nShow total number of paper\nfingerprint cards queued to\nmailroom in current session",
+                    "acceptance_criteria": {
+                        "Given": "The running total of paper fingerprint cards queued to the mailroom has just been incremented for the current processing session",
+                        "When": "The card count update is complete",
+                        "Then": "The system displays the updated cumulative count of paper fingerprint cards queued to the mailroom in the current session, providing a real-time tally of legacy paper fingerprint cards processed"
+                    },
+                    "key_functionality_id": "paper-fingerprint-card-count-tracking"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Paper Fingerprint Card Count Tracking"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The paper fingerprint intake program (PRVDEAD1) is initiated",
+                "When": "The program begins execution",
+                "Then": "The system displays the program identification banner 'PRVDEAD1: PAPER FINGERPRINT INTAKE (LEGACY)' to notify users that this is the legacy paper fingerprint intake process"
+            },
+            "Rule_Name": "Paper Fingerprint Intake Process Identification",
+            "Rule_Description": "When the paper fingerprint intake process starts, the system identifies itself as the legacy paper fingerprint intake program to inform users of the process context."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00002",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The paper fingerprint intake program (PRVDEAD1) has been initiated and the program identification banner has been displayed",
+                "When": "The system checks the paper fingerprint processing enabled flag (WS-PAPER-FP-ON)",
+                "Then": "If the flag is set to TRUE (enabled), the system proceeds to log and queue the paper fingerprint card to the mailroom queue; if the flag is set to FALSE (disabled), the system redirects users to use the LiveScan electronic system instead"
+            },
+            "Rule_Name": "Paper Fingerprint Processing Eligibility Check",
+            "Rule_Description": "The system evaluates whether paper fingerprint card processing is currently enabled before allowing any paper fingerprint card to be accepted and queued."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00003",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "The paper fingerprint intake program (PRVDEAD1) has been initiated and the paper fingerprint processing enabled flag (WS-PAPER-FP-ON) is set to FALSE (disabled)",
+                "When": "The system evaluates the paper fingerprint processing eligibility check and determines that paper processing is not enabled",
+                "Then": "The system displays the message 'PRVDEAD1: PAPER PROCESS DISABLED - USE LIVESCAN' to notify users that paper-based fingerprint submission is no longer active and that LiveScan must be used as the approved fingerprint submission method, and the program terminates without processing any paper fingerprint card"
+            },
+            "Rule_Name": "LiveScan Redirection When Paper Processing Is Disabled",
+            "Rule_Description": "When paper fingerprint card processing is disabled, the system must notify users that the paper-based process is no longer active and direct them to use the LiveScan electronic fingerprint submission system."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00004",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The paper fingerprint intake program (PRVDEAD1) has been initiated and the paper fingerprint processing enabled flag (WS-PAPER-FP-ON) is set to TRUE (enabled)",
+                "When": "The system processes the submitted paper fingerprint card",
+                "Then": "The system displays the message 'PRVDEAD1: LOGGING PAPER FP CARD TO MAILROOM QUEUE' to confirm that the paper fingerprint card has been logged and registered into the mailroom queue for further handling"
+            },
+            "Rule_Name": "Paper Fingerprint Card Mailroom Queue Registration",
+            "Rule_Description": "When paper fingerprint processing is enabled, the system logs and registers the submitted paper fingerprint card into the mailroom queue for further physical handling."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00005",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A paper fingerprint card has been successfully logged and registered into the mailroom queue during the current session",
+                "When": "The system completes the mailroom queue logging for the paper fingerprint card",
+                "Then": "The system increments the paper fingerprint card queue count (WS-CARD-COUNT) by 1 and displays the updated running total in the format 'PRVDEAD1: CARDS QUEUED= [WS-CARD-COUNT]' to reflect the cumulative number of paper fingerprint cards queued to the mailroom in the current session"
+            },
+            "Rule_Name": "Paper Fingerprint Card Session Count Tracking",
+            "Rule_Description": "Each time a paper fingerprint card is successfully queued to the mailroom, the system increments and displays a running count of all paper fingerprint cards queued during the current session."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00006",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Paper Fingerprint Intake process has been initiated",
+                "When": "The program begins execution",
+                "Then": "The system must display the program identification banner 'PRVDEAD1: PAPER FINGERPRINT INTAKE (LEGACY)' to indicate that this is the legacy paper-based fingerprint intake process for high-risk providers"
+            },
+            "Rule_Name": "Display Legacy Paper Fingerprint Intake Program Banner",
+            "Rule_Description": "When the Paper Fingerprint Intake process is initiated, the system must display a program identification banner to indicate that this is the legacy paper fingerprint intake process designated for high-risk providers."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00007",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Paper Fingerprint Intake (Legacy) process has been initiated",
+                "When": "The system evaluates the Paper Fingerprint Card Processing feature flag (Paper FP On/Off switch)",
+                "Then": "If the feature flag is enabled, the system proceeds to log the paper fingerprint card to the Mailroom Queue; If the feature flag is disabled, the system redirects and notifies that paper processing is unavailable and LiveScan must be used instead"
+            },
+            "Rule_Name": "Paper Fingerprint Card Processing Feature Eligibility Check",
+            "Rule_Description": "Before any paper fingerprint card intake workflow begins, the system must evaluate whether the paper fingerprint card processing feature is currently active. Based on this evaluation, the system either proceeds with paper card intake or redirects to LiveScan notification."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00008",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Paper Fingerprint Intake (Legacy) process has been initiated",
+                "When": "The Paper Fingerprint Card Processing feature flag is found to be disabled",
+                "Then": "The system must block paper fingerprint card processing and display a notification instructing that the paper process is disabled and LiveScan must be used as the fingerprint submission method"
+            },
+            "Rule_Name": "Paper Fingerprint Processing Disabled - LiveScan Redirection Policy",
+            "Rule_Description": "When the paper fingerprint card processing feature is turned off, the system enforces the use of LiveScan as the only accepted fingerprint submission method by blocking paper intake and issuing a redirection notification."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00009",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The Paper Fingerprint Intake (Legacy) process has been initiated",
+                "When": "The Paper Fingerprint Card Processing feature flag is found to be enabled",
+                "Then": "The system must proceed to the Paper Fingerprint Card Mailroom Queue Logging process to accept and queue the submitted paper fingerprint card"
+            },
+            "Rule_Name": "Paper Fingerprint Processing Enabled - Proceed to Mailroom Queue Logging",
+            "Rule_Description": "When the paper fingerprint card processing feature is active, the system is authorized to accept the paper fingerprint card and route it to the Mailroom Queue logging workflow for further handling."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00010",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The paper fingerprint processing flag (WS-PAPER-FP-ON) is set to OFF/disabled",
+                "When": "The system evaluates whether paper fingerprint card processing is permitted",
+                "Then": "The system notifies the user that the paper fingerprint process is disabled and no paper fingerprint cards will be accepted or queued"
+            },
+            "Rule_Name": "Paper Fingerprint Process Disabled - LiveScan Redirection Notification",
+            "Rule_Description": "When the paper fingerprint processing switch is turned off, the system must notify the user that the paper-based fingerprint card intake process is no longer active."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00011",
+            "Rule_Type": "Policy Rules",
+            "Acceptance_Criteria": {
+                "Given": "The paper fingerprint processing flag (WS-PAPER-FP-ON) is set to OFF/disabled and the user has been notified that the paper process is inactive",
+                "When": "The system completes the paper process disabled notification",
+                "Then": "The system instructs the user to use the LiveScan electronic fingerprinting system instead of the paper-based fingerprint card submission method"
+            },
+            "Rule_Name": "LiveScan Electronic Fingerprinting System Redirection",
+            "Rule_Description": "When paper fingerprint processing is disabled, the system must actively direct users to submit fingerprints through the LiveScan electronic fingerprinting system as the approved alternative method."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00012",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The paper fingerprint card processing feature is enabled (WS-PAPER-FP-ON is true) and a paper fingerprint card submission has been received for a high-risk provider",
+                "When": "The paper fingerprint card mailroom queue logging process is initiated",
+                "Then": "The system logs and registers the paper fingerprint card submission into the mailroom queue, recording the event with the identifier 'PRVDEAD1: LOGGING PAPER FP CARD TO MAILROOM QUEUE' to confirm the card has been queued for processing"
+            },
+            "Rule_Name": "Paper Fingerprint Card Mailroom Queue Registration",
+            "Rule_Description": "When a paper fingerprint card is submitted and paper processing is enabled, the system logs and registers the card submission into the mailroom queue. This is a legacy workflow that was discontinued in 2019 and should no longer be actively used."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00013",
+            "Rule_Type": "Computation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The paper fingerprint processing system is active and a paper fingerprint card has been accepted for mailroom queue routing during the current processing session",
+                "When": "A paper fingerprint card is logged to the mailroom queue",
+                "Then": "The current session paper fingerprint card count is increased by 1, reflecting the newly queued card in the running total"
+            },
+            "Rule_Name": "Increment Paper Fingerprint Card Queue Count",
+            "Rule_Description": "Each time a paper fingerprint card is successfully routed to the mailroom queue, the system increments the running total count of paper fingerprint cards processed in the current session by exactly one unit."
+        },
+        {
+            "Rule_Id": "R-PRVDEAD1-cbl-00014",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The running total of paper fingerprint cards queued to the mailroom has just been incremented for the current processing session",
+                "When": "The card count update is complete",
+                "Then": "The system displays the updated cumulative count of paper fingerprint cards queued to the mailroom in the current session, providing a real-time tally of legacy paper fingerprint cards processed"
+            },
+            "Rule_Name": "Display Current Session Paper Fingerprint Card Queue Total",
+            "Rule_Description": "After each paper fingerprint card is added to the mailroom queue and the running count is updated, the system immediately displays the updated total number of paper fingerprint cards that have been queued to the mailroom during the current processing session."
+        }
+    ],
+    "description": "PRVDEAD1 is a legacy batch program originally designed to handle paper fingerprint card intake for high-risk providers. The program checks a hardcoded flag (permanently set to 'N') to determine whether to process paper fingerprint cards; since the flag is never enabled, the paper card processing logic is effectively unreachable and the program only displays a message directing users to use the LiveScan electronic fingerprinting system. This program has been functionally obsolete since the state transitioned to electronic LiveScan fingerprinting in 2019 and is no longer referenced or scheduled by any job.\n\n<br>\n\n- **Execution Environment**: Batch\n- **Database Access**: None\n- **MQ Calls**: No\n- **Module Type**: Main module\n\n<br>\n\n### Key Functionalities:\n\n1: Paper Fingerprint Intake Initiation - Display program identification banner indicating this is the legacy paper fingerprint intake process for high-risk providers\n\n2: Paper Fingerprint Processing Eligibility Check - Evaluate whether the paper fingerprint card processing feature is enabled or disabled before proceeding with any fingerprint intake workflow\n\n3: LiveScan Redirection Notification - When paper fingerprint processing is disabled, notify users that the paper-based process is no longer active and direct them to use the LiveScan electronic fingerprinting system instead\n\n4: Paper Fingerprint Card Mailroom Queue Logging - Log and register a paper fingerprint card submission into the mailroom queue for processing (legacy workflow, discontinued in 2019)\n\n5: Paper Fingerprint Card Count Tracking - Maintain and display a running count of paper fingerprint cards that have been queued to the mailroom during the current processing session (legacy workflow, discontinued in 2019)\n\n"
+}

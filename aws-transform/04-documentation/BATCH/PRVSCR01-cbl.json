@@ -1,0 +1,286 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVSCR01.cbl",
+        "type": "cobol"
+      },
+      "overview": "PRVSCR01 operates within a Medicaid Management Information System (MMIS) as part of the Provider Enrollment Module (PEM-2), serving the state agency's obligation to screen healthcare providers before enrollment or re-enrollment. It is invoked as a batch step (STEP030) within the daily provider processing job (PRVDAY01), running against all providers in a pending/unscreened status. The program automates the federally mandated provider screening workflow by querying four external compliance sources — state licensure boards, the OIG List of Excluded Individuals/Entities (LEIE), the SAM debarment registry, and the SSA Death Master File (DMF) — and records a pass/fail verdict back to the provider master record. It solves the problem of systematically ensuring no excluded, deceased, unlicensed, or debarred provider is enrolled in the Medicaid program, supporting compliance with 42 CFR 455 requirements.",
+      "key_features": [
+        {
+          "feature": "Pending Provider Selection",
+          "description": "Reads the indexed provider master file sequentially and processes only records flagged as unscreened, avoiding redundant re-screening of already-processed providers."
+        },
+        {
+          "feature": "State Licensure Verification",
+          "description": "Checks each pending provider against the state licensing board to confirm the provider holds a valid, active license."
+        },
+        {
+          "feature": "OIG LEIE Exclusion Check",
+          "description": "Matches the provider (and applicable owners) against the federal OIG List of Excluded Individuals/Entities to detect any Medicaid/Medicare exclusions."
+        },
+        {
+          "feature": "SAM Debarment Check",
+          "description": "Queries the System for Award Management (SAM) registry to identify providers debarred from receiving federal funds."
+        },
+        {
+          "feature": "SSA Death Master File Check",
+          "description": "Validates the provider against the Social Security Administration Death Master File to prevent enrollment of deceased individuals."
+        },
+        {
+          "feature": "Screening Verdict Posting",
+          "description": "Aggregates results from all four external sources and writes a pass or fail status directly back to the provider master record, with failed providers counted and reported at job end."
+        },
+        {
+          "feature": "Screening Output File",
+          "description": "Writes a sequential audit/output record for each screening check performed, providing a downstream-consumable log of screening activity per provider NPI."
+        },
+        {
+          "feature": "Medicare Reciprocity (Dead Code)",
+          "description": "Contains an unfinished feature intended to accept Medicare PECOS screening results in lieu of duplicate state checks (per 42 CFR 455.410), but the enabling flag was never activated, leaving this code path permanently unreachable for over 10 years."
+        }
+      ]
+    },
+    "input_output": [
+      {
+        "name": "PRV-MASTER-FILE",
+        "type": "Read/Write",
+        "description": "Indexed provider master file keyed by PRV-NPI. Read sequentially to find unscreened providers (PRV-SCREEN-FLAG = 'U'). After external source checks, the PRV-SCREEN-FLAG is updated to Pass ('P') or Fail ('F') and the record is rewritten back to the file."
+      },
+      {
+        "name": "SCREEN-OUT-FILE",
+        "type": "Write",
+        "description": "Sequential output file that receives one screening result row per external source queried (License Board, OIG LEIE, SAM.gov, SSA-DMF, or PECOS). Each row contains the provider NPI, source identifier, pass/fail verdict, verdict date, and detail text, forming the 42 CFR 455 Subpart E audit trail."
+      }
+    ],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "Program Initialization",
+          "description": "Sets program ID, opens PRV-MASTER-FILE in I-O mode and SCREEN-OUT-FILE in OUTPUT mode, initializes end-of-file flag to 'N'. WS-RECIPROCITY-ENABLED is hardcoded to 'N' and never changed.",
+          "records": [
+            "WS-PROGRAM-ID",
+            "WS-PRV-STATUS",
+            "WS-SCR-STATUS",
+            "WS-END-OF-FILE-FLAG",
+            "WS-RECIPROCITY-ENABLED"
+          ]
+        },
+        {
+          "step": 2,
+          "process": "Sequential Provider Read Loop",
+          "description": "Reads PRV-MASTER-FILE sequentially record by record using NEXT RECORD. Checks file status for EOF condition. If EOF is detected, sets WS-END-OF-FILE flag to terminate the loop.",
+          "records": [
+            "PRV-NPI",
+            "WS-PRV-STATUS",
+            "WS-FS-EOF",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "Unscreened Provider Filter",
+          "description": "Evaluates the PRV-UNSCREENED condition flag on each provider record. Only providers in an unscreened state are forwarded to the screening pipeline; already-screened providers are skipped silently.",
+          "records": [
+            "PRV-UNSCREENED",
+            "PRV-MASTER-RECORD"
+          ]
+        },
+        {
+          "step": 4,
+          "process": "Dead Code Reciprocity Guard",
+          "description": "Evaluates WS-RECIPROCITY-ON (88-level condition on WS-RECIPROCITY-ENABLED). Because WS-RECIPROCITY-ENABLED is permanently 'N', the CHECK-MEDICARE-RECIPROCITY paragraph is NEVER executed. The PECOS-based shortcut path (42 CFR 455.410) is permanently bypassed.",
+          "records": [
+            "WS-RECIPROCITY-ENABLED",
+            "WS-RECIPROCITY-ON"
+          ]
+        },
+        {
+          "step": 5,
+          "process": "State License Board Check",
+          "description": "Invokes CHECK-LICENSE paragraph, which in the production estate issues a CALL or MQ message to the state licensure board to verify the provider's active license. Simulated here by setting WS-LICENSE-RESULT to 'P'. Writes a screening row to SCREEN-OUT-FILE.",
+          "records": [
+            "WS-LICENSE-RESULT",
+            "PRV-NPI",
+            "SCR-NPI",
+            "SCR-PASS",
+            "SCREEN-OUT-RECORD"
+          ]
+        },
+        {
+          "step": 6,
+          "process": "OIG LEIE Exclusion Check",
+          "description": "Invokes CHECK-LEIE-EXCLUSION paragraph to match the provider NPI and 5%-or-greater owners against the OIG List of Excluded Individuals/Entities. Simulated by setting WS-LEIE-RESULT to 'P'. Writes a screening row to SCREEN-OUT-FILE.",
+          "records": [
+            "WS-LEIE-RESULT",
+            "PRV-NPI",
+            "SCR-NPI",
+            "SCR-PASS",
+            "SCREEN-OUT-RECORD"
+          ]
+        },
+        {
+          "step": 7,
+          "process": "SAM Debarment Check",
+          "description": "Invokes CHECK-SAM-DEBARMENT paragraph to verify the provider is not listed in the System for Award Management (SAM.gov) debarment database. Simulated by setting WS-SAM-RESULT to 'P'. Writes a screening row to SCREEN-OUT-FILE.",
+          "records": [
+            "WS-SAM-RESULT",
+            "PRV-NPI",
+            "SCR-NPI",
+            "SCR-PASS",
+            "SCREEN-OUT-RECORD"
+          ]
+        },
+        {
+          "step": 8,
+          "process": "SSA Death Master File Check",
+          "description": "Invokes CHECK-SSA-DMF paragraph to verify the provider (individual) is not listed on the Social Security Administration Death Master File. Simulated by setting WS-DMF-RESULT to 'P'. Writes a screening row to SCREEN-OUT-FILE.",
+          "records": [
+            "WS-DMF-RESULT",
+            "PRV-NPI",
+            "SCR-NPI",
+            "SCR-PASS",
+            "SCREEN-OUT-RECORD"
+          ]
+        },
+        {
+          "step": 9,
+          "process": "Screening Verdict Evaluation",
+          "description": "Evaluates all four external check results (WS-LICENSE-RESULT, WS-LEIE-RESULT, WS-SAM-RESULT, WS-DMF-RESULT). If all equal 'P', sets PRV-SCREEN-PASS on the master record. If any result is not 'P', sets PRV-SCREEN-FAIL and increments WS-FAIL-COUNT.",
+          "records": [
+            "WS-LICENSE-RESULT",
+            "WS-LEIE-RESULT",
+            "WS-SAM-RESULT",
+            "WS-DMF-RESULT",
+            "PRV-SCREEN-PASS",
+            "PRV-SCREEN-FAIL",
+            "WS-FAIL-COUNT"
+          ]
+        },
+        {
+          "step": 10,
+          "process": "Provider Master Record Update",
+          "description": "REWRITEs the updated PRV-MASTER-RECORD back to the indexed PRV-MASTER-FILE, persisting the new screening verdict (pass or fail) against the provider's NPI key.",
+          "records": [
+            "PRV-MASTER-RECORD",
+            "PRV-NPI",
+            "PRV-SCREEN-PASS",
+            "PRV-SCREEN-FAIL",
+            "WS-PRV-STATUS"
+          ]
+        },
+        {
+          "step": 11,
+          "process": "Program Termination and Reporting",
+          "description": "Closes both files after all providers are processed. Displays a summary count of screening failures (WS-FAIL-COUNT) to SYSOUT for operator visibility and job log auditing. Issues STOP RUN.",
+          "records": [
+            "WS-FAIL-COUNT",
+            "WS-PRV-STATUS",
+            "WS-SCR-STATUS"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "PRV-MASTER-FILE I-O Open Mode Requirement",
+          "description": "PRV-MASTER-FILE must be opened in I-O mode before any READ NEXT or REWRITE operations. The REWRITE at step 10 depends on the file being open in I-O mode; if opened as INPUT only, the verdict update would fail with a file status error."
+        },
+        {
+          "dependency": "Sequential Read Before REWRITE",
+          "description": "COBOL indexed file rules require that a REWRITE must immediately follow a successful READ of the same record. The SCREEN-ONE-PROVIDER paragraph depends on the record having been successfully read in SCREEN-NEXT-PROVIDER before any REWRITE is attempted."
+        },
+        {
+          "dependency": "PRV-UNSCREENED State Prerequisite",
+          "description": "The screening pipeline is only entered when PRV-UNSCREENED is TRUE on the provider record. This flag must be correctly set by upstream processes (e.g., PRVDAY01 STEP020 or provider enrollment intake) before PRVSCR01 runs, or providers will be silently skipped."
+        },
+        {
+          "dependency": "All Four External Check Results Must Be Set Before Verdict",
+          "description": "The verdict evaluation at step 9 requires all four working-storage result fields (WS-LICENSE-RESULT, WS-LEIE-RESULT, WS-SAM-RESULT, WS-DMF-RESULT) to be populated. Each check paragraph must complete successfully before the IF condition is evaluated. A failure or abend in any check paragraph would leave a result field unpopulated, producing an incorrect verdict."
+        },
+        {
+          "dependency": "WS-RECIPROCITY-ENABLED Hardcoded Dead Flag",
+          "description": "WS-RECIPROCITY-ENABLED is initialized to 'N' and never modified anywhere in the program or (per comments) the broader estate. This creates a permanent dead code dependency: CHECK-MEDICARE-RECIPROCITY is unreachable, meaning the program always performs all four external checks regardless of whether PECOS screening has already been completed, duplicating regulatory effort and incurring unnecessary external system calls."
+        },
+        {
+          "dependency": "SCREEN-OUT-FILE Sequential Write Order",
+          "description": "SCREEN-OUT-FILE is opened OUTPUT sequential. WRITE-SCREEN-ROW is called once per external check per provider, meaning up to four rows are written per provider in a fixed order (license, LEIE, SAM, DMF). Downstream consumers of SCRNOUT must expect this multi-row-per-provider structure and cannot rely on a single verdict row per NPI."
+        },
+        {
+          "dependency": "WS-FAIL-COUNT Overflow Risk",
+          "description": "WS-FAIL-COUNT is defined as PIC 9(03), allowing a maximum value of 999. If more than 999 providers fail screening in a single run, the counter will overflow silently, producing an incorrect summary count on SYSOUT and potentially corrupting the display output."
+        },
+        {
+          "dependency": "Copybook Field Availability",
+          "description": "The program depends on PRVRECRD.cpy exposing PRV-NPI as the RECORD KEY, PRV-UNSCREENED, PRV-SCREEN-PASS, and PRV-SCREEN-FAIL condition names. SCRNREC.cpy must expose SCR-NPI, SCR-PASS, and SCR-PECOS. WRKSTORE.cpy must expose WS-PROGRAM-ID, WS-END-OF-FILE-FLAG, WS-END-OF-FILE, WS-FS-EOF, and WS-FILE-STATUS. Any structural change to these copybooks without corresponding program changes will cause compilation or runtime failures."
+        },
+        {
+          "dependency": "Job Step Sequencing Dependency on PRVDAY01",
+          "description": "PRVSCR01 is called as STEP030 within the PRVDAY01 job. It depends on prior steps having populated PRV-MASTER-FILE with pending providers in PRV-UNSCREENED status. Running PRVSCR01 out of sequence or in isolation without prior steps completing successfully would result in no records being processed."
+        }
+      ],
+      "external_system_integrations": [
+        {
+          "system": "State Licensure Board",
+          "type": "MQ or remote CALL (production)",
+          "purpose": "Verifies that the provider holds a current, active professional license issued by the state licensing authority. Result drives WS-LICENSE-RESULT. Invoked via CHECK-LICENSE paragraph."
+        },
+        {
+          "system": "OIG LEIE (List of Excluded Individuals/Entities)",
+          "type": "MQ or FTP batch match (production)",
+          "purpose": "Matches provider NPI and 5%-or-greater ownership entities against the Office of Inspector General exclusion list to detect federally excluded parties. Result drives WS-LEIE-RESULT. Invoked via CHECK-LEIE-EXCLUSION paragraph."
+        },
+        {
+          "system": "SAM.gov (System for Award Management)",
+          "type": "MQ or FTP batch match (production)",
+          "purpose": "Checks whether the provider or associated entities appear on the federal debarment and suspension list maintained by the General Services Administration. Result drives WS-SAM-RESULT. Invoked via CHECK-SAM-DEBARMENT paragraph."
+        },
+        {
+          "system": "SSA Death Master File (DMF)",
+          "type": "MQ or FTP batch match (production)",
+          "purpose": "Verifies that the individual provider is not recorded as deceased in the Social Security Administration Death Master File, preventing enrollment of deceased individuals. Result drives WS-DMF-RESULT. Invoked via CHECK-SSA-DMF paragraph."
+        },
+        {
+          "system": "CMS PECOS (Provider Enrollment, Chain and Ownership System)",
+          "type": "Remote query (dead code path, never invoked)",
+          "purpose": "Would allow the state to rely on Medicare's existing PECOS screening results under 42 CFR 455.410 reciprocity provisions, bypassing duplicate state-level checks. Permanently unreachable because WS-RECIPROCITY-ENABLED is hardcoded to 'N'. Intended integration was specified in 2014 but never activated."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "File Operation Errors - EOF Detection",
+        "description": "After each READ of PRV-MASTER-FILE, WS-PRV-STATUS is moved to WS-FILE-STATUS and checked via the WS-FS-EOF condition-name. On EOF, WS-END-OF-FILE flag is set to TRUE to terminate the PERFORM UNTIL loop. No explicit handling for other non-zero file status codes (e.g., 22-duplicate, 30-permanent error); non-EOF statuses fall through silently without abend or message."
+      },
+      {
+        "category": "File Operation Errors - REWRITE Failures",
+        "description": "After updating the provider screening verdict, REWRITE PRV-MASTER-RECORD is issued with no subsequent check of WS-PRV-STATUS. A failed rewrite (e.g., record locked, I/O error) would go undetected, silently losing the screening verdict update with no error message, abend, or retry logic."
+      },
+      {
+        "category": "File Operation Errors - WRITE to Sequential Output",
+        "description": "WRITE SCREEN-OUT-RECORD in WRITE-SCREEN-ROW does not check WS-SCR-STATUS after the write. Output file errors are completely unhandled; records may be lost without any notification or program termination."
+      },
+      {
+        "category": "File Operation Errors - OPEN Failures",
+        "description": "OPEN I-O PRV-MASTER-FILE and OPEN OUTPUT SCREEN-OUT-FILE in MAIN-CONTROL have no file status checks following the OPEN statements. A failed open would cause subsequent READ or WRITE operations to fail with no controlled error path, likely resulting in an uncontrolled abend."
+      },
+      {
+        "category": "External Source / Transaction Processing Errors",
+        "description": "The CHECK-LICENSE, CHECK-LEIE-EXCLUSION, CHECK-SAM-DEBARMENT, and CHECK-SSA-DMF paragraphs unconditionally set their respective result fields to 'P' (pass). There is no error handling for external call failures, timeouts, or non-pass verdicts from licensure board, OIG LEIE, SAM, or SSA-DMF sources. A real integration failure would be indistinguishable from a clean pass."
+      },
+      {
+        "category": "Screening Verdict / Business Rule Errors",
+        "description": "When any external result is not 'P', PRV-SCREEN-FAIL is set and WS-FAIL-COUNT is incremented. At program end, the total failure count is reported via DISPLAY. This is the only active business-level error reporting mechanism; there is no per-provider error detail written to a reject file or error log."
+      },
+      {
+        "category": "Dead Code - Reciprocity Path Never Executed",
+        "description": "WS-RECIPROCITY-ENABLED is hardcoded to 'N' and never modified, making the WS-RECIPROCITY-ON condition permanently false. The CHECK-MEDICARE-RECIPROCITY paragraph is unreachable dead code. No error or warning is raised about this misconfiguration; the program silently bypasses the PECOS reciprocity shortcut on every execution."
+      },
+      {
+        "category": "Program Termination / Abend Handling",
+        "description": "There is no global error routine, DECLARATIVES section, or ON EXCEPTION clause anywhere in the program. Unrecoverable errors (e.g., open failure, I/O error) would result in an uncontrolled OS-level abend rather than a graceful shutdown with diagnostic information. STOP RUN is only reached on normal EOF completion."
+      }
+    ]
+  }
+}

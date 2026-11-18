@@ -1,0 +1,151 @@
+[
+  {
+    "item": {
+      "type": "Issue",
+      "severity": "ERROR",
+      "name": "Missing LISTCAT file",
+      "description": "Required LISTCAT file was not provided.",
+      "impact": "May have impact on Transform step.",
+      "details": "The LISTCAT file is required as it contains essential metadata about cataloged data sets including NONVSAM files, VSAM clusters (DATA and INDEX components), Alternate Index (AIX) entries, Generation Data Groups (GDGs).",
+      "action": "Provide at least one LISTCAT file with the required definitions."
+    },
+    "files": [
+      {
+        "file": "PROJECT"
+      }
+    ]
+  },
+  {
+    "item": {
+      "type": "Issue",
+      "severity": "ERROR",
+      "name": "Missing CSD file",
+      "description": "No CSD (CICS System Definition) file was provided.",
+      "impact": "May have impact during the execution.",
+      "details": "The CSD (CICS System Definition) file is mandatory as it defines and manages CICS resources.",
+      "action": "Provide at least one CSD file with the required definitions."
+    },
+    "files": [
+      {
+        "file": "PROJECT"
+      }
+    ]
+  },
+  {
+    "item": {
+      "type": "Issue",
+      "severity": "ERROR",
+      "name": "Missing dependency detected",
+      "description": "One or more missing dependencies were detected in the dependencies graph.",
+      "impact": "May have impact on Transform step.",
+      "details": "A referenced component could not be found in the analyzed codebase.",
+      "action": "Verify the missing component exists in your source code and and include it in the analysis scope."
+    },
+    "files": [
+      {
+        "file": "PROJECT",
+        "details": [
+          "Found 3 missing name(s), referenced 3 time(s) by 1 file(s).",
+          "Missing BMS (1):",
+          "  - PRVSET1",
+          "Missing CICS Dataset Definition (1):",
+          "  - PRVPROVN",
+          "Missing CICS Transaction Definition (1):",
+          "  - PINQ"
+        ]
+      },
+      {
+        "file": "PRVCICS1.cbl",
+        "filePath": "MMIS-PROVIDER-DEMO-TIER4/ONLINE/PRVCICS1.cbl",
+        "lineNumber": 33,
+        "details": [
+          "Missing BMS: PRVSET1 (Exec CICS map)",
+          "Line(s): 33"
+        ]
+      },
+      {
+        "file": "PRVCICS1.cbl",
+        "filePath": "MMIS-PROVIDER-DEMO-TIER4/ONLINE/PRVCICS1.cbl",
+        "lineNumber": 37,
+        "details": [
+          "Missing CICS Dataset Definition: PRVPROVN (Exec CICS Read file)",
+          "Line(s): 37"
+        ]
+      },
+      {
+        "file": "PRVCICS1.cbl",
+        "filePath": "MMIS-PROVIDER-DEMO-TIER4/ONLINE/PRVCICS1.cbl",
+        "lineNumber": 58,
+        "details": [
+          "Missing CICS Transaction Definition: PINQ (Exec CICS Return transaction)",
+          "Line(s): 58"
+        ]
+      }
+    ]
+  },
+  {
+    "item": {
+      "type": "Issue",
+      "severity": "ERROR",
+      "name": "Missing program detected",
+      "description": "One or more missing programs were detected in the dependencies graph.",
+      "impact": "May have impact during the execution.",
+      "details": "A called program is not present in the analyzed codebase.",
+      "action": "Add the missing program to your source code or verify it's a system utility that will be available at runtime."
+    },
+    "files": [
+      {
+        "file": "PROJECT",
+        "details": [
+          "Found 4 missing name(s), referenced 4 time(s) by 1 file(s).",
+          "Missing Program (4):",
+          "  - PRVNTGEN",
+          "  - PRVNTRST",
+          "  - PRVNTSUS",
+          "  - PRVNTTRM"
+        ]
+      },
+      {
+        "file": "PRVSAN01.cbl",
+        "filePath": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSAN01.cbl",
+        "lineNumber": 134,
+        "details": [
+          "Missing Program: PRVNTGEN (Call; [Dynamic] Call)",
+          "Line(s): 134",
+          "Missing Program: PRVNTRST (Call; [Dynamic] Call)",
+          "Line(s): 134",
+          "Missing Program: PRVNTSUS (Call; [Dynamic] Call)",
+          "Line(s): 134",
+          "Missing Program: PRVNTTRM (Call; [Dynamic] Call)",
+          "Line(s): 134"
+        ]
+      }
+    ]
+  },
+  {
+    "item": {
+      "type": "Issue",
+      "severity": "ERROR",
+      "name": "Unknown file type detected",
+      "description": "One or more files are classified as UNKNOWN.",
+      "impact": "May have impact on Transform step.",
+      "details": "The classification process was unable to determine the type of one or more files in the codebase. These files may be data files, configuration files, or artifacts in an unrecognized format.",
+      "action": "Review the detected unknown files and determine if they are required for the application. If needed, manually classify them or use the correct file extensions."
+    },
+    "files": [
+      {
+        "file": "PROJECT",
+        "details": [
+          "Found 1 file(s) classified as UNKNOWN."
+        ]
+      },
+      {
+        "file": "README.md",
+        "filePath": "MMIS-PROVIDER-DEMO-TIER4/README.md",
+        "details": [
+          "File classified as UNKNOWN."
+        ]
+      }
+    ]
+  }
+]

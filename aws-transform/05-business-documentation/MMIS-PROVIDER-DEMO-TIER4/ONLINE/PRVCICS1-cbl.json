@@ -1,0 +1,1207 @@
+{
+    "name": "PRVCICS1.cbl",
+    "program_name": "PRVCICS1.cbl",
+    "generated_at": "2026-11-17T12:38:59Z",
+    "overview": {
+        "total_key_functionalities": 11,
+        "total_rules": 45,
+        "main_flow_diagram": "flowchart TD\n    A([Start PINQ Provider Inquiry]):::start\n\n    B{Previous Session\nExists?}:::decision\n\n    C[1:NPI Session Continuity\nRetrieve NPI from\nCommunication Area]:::process\n\n    D[2:Analyst NPI Input Capture\nAccept NPI from Analyst\non PINQ Screen PRVMAP1]:::process\n\n    E[3:Provider Master Record Lookup\nSearch Provider Master File\nusing entered NPI]:::process\n\n    DS1[(PRVPROVN\nProvider Master File\nVSAM)]:::datasource\n\n    F{Provider\nRecord Found?}:::decision\n\n    G[4:Provider Not Found Handling\nGenerate Provider Not Found\nMessage for Analyst]:::error\n\n    H[5:Provider Enrollment Status Determination\nEvaluate Provider Status Flags\nto Classify Enrollment Status]:::process\n\n    I{Which Status\nFlag is Set?}:::decision\n\n    J[6:Active Provider Identification\nLabel Provider as ACTIVE\nCurrently Enrolled and Eligible]:::process\n\n    K[7:Terminated Provider Identification\nLabel Provider as TERMINATED\nEnrollment Has Been Ended]:::process\n\n    L[8:Pending Provider Identification\nLabel Provider as PENDING\nApplication Under Review]:::process\n\n    M[9:Denied Provider Identification\nLabel Provider as DENIED\nEnrollment Was Denied]:::process\n\n    N[10:Provider Inquiry Results Display\nSend Enrollment Status and\nRecord Details to PINQ Screen]:::process\n\n    O[11:Transaction Session Persistence\nReturn Control to PINQ Transaction\nRetain NPI in Communication Area]:::process\n\n    Z([End - Session Active\nAwaiting Next Lookup]):::final\n\n    A --> B\n    B -->|Yes - Returning Analyst| C\n    B -->|No - New Session| D\n    C --> D\n    D --> E\n    DS1 -.->|Read Provider Record by NPI| E\n    E --> F\n    F -->|Not Found| G\n    F -->|Found| H\n    G --> N\n    H --> I\n    I -->|Active Flag Set| J\n    I -->|Terminated Flag Set| K\n    I -->|Pending Flag Set| L\n    I -->|No Flags Set| M\n    J --> N\n    K --> N\n    L --> N\n    M --> N\n    N --> O\n    O --> Z\n\n    classDef start fill:#67A353,color:#fff,stroke:#67A353\n    classDef process fill:#08AAD2,color:#fff,stroke:#08AAD2\n    classDef decision fill:#FFE347,color:#000,stroke:#FFE347\n    classDef datasource fill:#2EA597,color:#fff,stroke:#2EA597\n    classDef final fill:#D13313,color:#fff,stroke:#D13313\n    classDef success fill:#2BB534,color:#fff,stroke:#2BB534\n    classDef error fill:#D13313,color:#fff,stroke:#D13313",
+        "rules": [
+            {
+                "rule_id": "R-PRVCICS1-cbl-00001",
+                "rule_type": "Process Rules",
+                "rule_name": "NPI Session Continuity - Retrieve NPI from Previous Session",
+                "rule_description": "When an analyst returns to the Provider Inquiry screen from a previous session, the NPI used in the prior session is automatically retrieved and pre-loaded to avoid re-entry.",
+                "sub_graph_node_text": "1:NPI Session Continuity\nRetrieve NPI from\nCommunication Area",
+                "acceptance_criteria": {
+                    "Given": "An analyst is returning to the Provider Inquiry transaction (PINQ) and a previous session exists with a stored NPI in the communication area",
+                    "When": "The system detects that a prior session communication area is available (session length is greater than zero)",
+                    "Then": "The system automatically retrieves and pre-loads the NPI from the previous session into the current inquiry input field, so the analyst does not need to re-enter it"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00002",
+                "rule_type": "Process Rules",
+                "rule_name": "Analyst NPI Input Capture on Provider Inquiry Screen",
+                "rule_description": "The system accepts the National Provider Identifier (NPI) entered by the analyst on the Provider Inquiry screen (PRVMAP1) as the key input for the provider lookup.",
+                "sub_graph_node_text": "2:Analyst NPI Input Capture\nAccept NPI from Analyst\non PINQ Screen PRVMAP1",
+                "acceptance_criteria": {
+                    "Given": "An analyst is on the Provider Inquiry screen (PRVMAP1) within the PINQ transaction",
+                    "When": "The analyst submits the screen with an NPI value entered",
+                    "Then": "The system captures the NPI input from the screen and uses it as the search key for the provider master record lookup"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00003",
+                "rule_type": "Action Rules",
+                "rule_name": "Provider Master Record Lookup by NPI",
+                "rule_description": "The system searches the Provider Master File (PRVPROVN) using the NPI submitted by the analyst to retrieve the corresponding provider enrollment record.",
+                "sub_graph_node_text": "3:Provider Master Record Lookup\nSearch Provider Master File\nusing entered NPI",
+                "acceptance_criteria": {
+                    "Given": "An analyst has submitted an NPI on the Provider Inquiry screen",
+                    "When": "The system performs a lookup against the Provider Master File (PRVPROVN) using the submitted NPI as the unique record identifier",
+                    "Then": "The system retrieves the full provider record associated with that NPI, or determines that no matching record exists"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00004",
+                "rule_type": "Decision Rules",
+                "rule_name": "Provider Not Found Handling",
+                "rule_description": "When the submitted NPI does not match any record in the Provider Master File, the system generates a 'Provider Not Found' message to inform the analyst.",
+                "sub_graph_node_text": "4:Provider Not Found Handling\nGenerate Provider Not Found\nMessage for Analyst",
+                "acceptance_criteria": {
+                    "Given": "An analyst has submitted an NPI on the Provider Inquiry screen and the system has searched the Provider Master File (PRVPROVN)",
+                    "When": "No provider record is found in the Provider Master File matching the submitted NPI",
+                    "Then": "The system sets the display message to 'PROVIDER NOT FOUND' and sends it back to the Provider Inquiry screen to inform the analyst that the NPI does not correspond to any known provider"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00005",
+                "rule_type": "Decision Rules",
+                "rule_name": "Provider Enrollment Status Determination",
+                "rule_description": "When a provider record is successfully retrieved, the system evaluates the provider's status flags to classify and determine the current enrollment status of the provider.",
+                "sub_graph_node_text": "5:Provider Enrollment Status Determination\nEvaluate Provider Status Flags\nto Classify Enrollment Status",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been successfully retrieved from the Provider Master File using the submitted NPI",
+                    "When": "The system evaluates the provider status flags present on the retrieved provider record",
+                    "Then": "The system classifies the provider's enrollment status as one of: ACTIVE, TERMINATED, PENDING, or DENIED, based on which status flag is set on the record"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00006",
+                "rule_type": "Decision Rules",
+                "rule_name": "Active Provider Identification",
+                "rule_description": "When the provider record has the Active status flag set, the system identifies and labels the provider as currently enrolled and eligible.",
+                "sub_graph_node_text": "6:Active Provider Identification\nLabel Provider as ACTIVE\nCurrently Enrolled and Eligible",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been successfully retrieved from the Provider Master File and the system is evaluating the provider's enrollment status flags",
+                    "When": "The Active status flag (PRV-ACTIVE) is set on the provider record",
+                    "Then": "The system sets the enrollment status display message to 'ACTIVE', indicating the provider is currently enrolled and eligible"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00007",
+                "rule_type": "Decision Rules",
+                "rule_name": "Terminated Provider Identification",
+                "rule_description": "When the provider record has the Terminated status flag set, the system identifies and labels the provider as having their enrollment ended.",
+                "sub_graph_node_text": "7:Terminated Provider Identification\nLabel Provider as TERMINATED\nEnrollment Has Been Ended",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been successfully retrieved from the Provider Master File and the system is evaluating the provider's enrollment status flags",
+                    "When": "The Terminated status flag (PRV-TERMINATED) is set on the provider record",
+                    "Then": "The system sets the enrollment status display message to 'TERMINATED', indicating the provider's enrollment has been ended"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00008",
+                "rule_type": "Decision Rules",
+                "rule_name": "Pending Provider Identification",
+                "rule_description": "When the provider record has the Pending status flag set, the system identifies and labels the provider as having an enrollment application currently under review.",
+                "sub_graph_node_text": "8:Pending Provider Identification\nLabel Provider as PENDING\nApplication Under Review",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been successfully retrieved from the Provider Master File and the system is evaluating the provider's enrollment status flags",
+                    "When": "The Pending status flag (PRV-PENDING) is set on the provider record",
+                    "Then": "The system sets the enrollment status display message to 'PENDING', indicating the provider's enrollment application is currently under review"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00009",
+                "rule_type": "Decision Rules",
+                "rule_name": "Denied Provider Identification",
+                "rule_description": "When the provider record does not have any recognized enrollment status flag set (Active, Terminated, or Pending), the system classifies the provider's enrollment status as Denied.",
+                "sub_graph_node_text": "9:Denied Provider Identification\nLabel Provider as DENIED\nEnrollment Was Denied",
+                "acceptance_criteria": {
+                    "Given": "A provider record has been successfully retrieved from the Provider Master File and the system is evaluating the provider's enrollment status flags",
+                    "When": "None of the recognized status flags (PRV-ACTIVE, PRV-TERMINATED, PRV-PENDING) are set on the provider record",
+                    "Then": "The system sets the enrollment status display message to 'DENIED', indicating the provider's enrollment was denied or the status is unrecognized"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00010",
+                "rule_type": "Process Rules",
+                "rule_name": "Provider Inquiry Results Display to Analyst",
+                "rule_description": "After determining the provider's enrollment status or generating a not-found message, the system sends the provider record details and the status message back to the Provider Inquiry screen for the analyst to view.",
+                "sub_graph_node_text": "10:Provider Inquiry Results Display\nSend Enrollment Status and\nRecord Details to PINQ Screen",
+                "acceptance_criteria": {
+                    "Given": "The system has completed the provider lookup and determined either the enrollment status (ACTIVE, TERMINATED, PENDING, or DENIED) or generated a 'PROVIDER NOT FOUND' message",
+                    "When": "The system is ready to present the results to the analyst",
+                    "Then": "The system sends the provider record details along with the corresponding enrollment status message back to the Provider Inquiry screen (PRVMAP1), making the results visible to the analyst"
+                },
+                "key_functionality_id": "overview"
+            },
+            {
+                "rule_id": "R-PRVCICS1-cbl-00011",
+                "rule_type": "Process Rules",
+                "rule_name": "Transaction Session Persistence and NPI Retention",
+                "rule_description": "After displaying the inquiry results, the system retains the NPI in the session communication area and keeps the PINQ transaction active, enabling the analyst to perform subsequent provider lookups without restarting the transaction.",
+                "sub_graph_node_text": "11:Transaction Session Persistence\nReturn Control to PINQ Transaction\nRetain NPI in Communication Area",
+                "acceptance_criteria": {
+                    "Given": "The system has sent the provider inquiry results back to the analyst on the Provider Inquiry screen",
+                    "When": "The system completes the current inquiry cycle",
+                    "Then": "The system returns control to the PINQ transaction, retains the current NPI in the communication area for the next session, and keeps the transaction active and ready to accept the next provider inquiry from the analyst"
+                },
+                "key_functionality_id": "overview"
+            }
+        ]
+    },
+    "key_functionalities": [
+        {
+            "id": "npi-session-continuity",
+            "title": "NPI Session Continuity",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Analyst Returns to\\nPINQ Inquiry Screen])\n    B{Is This a\\nReturn Visit to\\nthe Inquiry Screen?}\n    C[Retrieve Previously Entered NPI\\nfrom Session Memory]\n    D[NPI is Now Available\\nfor Provider Lookup]\n    E[No Previous NPI\\nAvailable]\n\n    A --> B\n    B -->|Yes - Analyst Previously\\nUsed This Screen| C\n    B -->|No - First Time\\non This Screen| E\n    C --> D\n    D --> F([Proceed with\\nProvider Lookup])\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00012",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Detect Analyst Return Visit to Provider Inquiry Screen",
+                    "rule_description": "Determines whether the analyst is returning to the PINQ Provider Inquiry Screen from a previous session or accessing it for the first time, by checking whether a prior session context exists.",
+                    "sub_graph_node_text": "Is This a Return Visit to the Inquiry Screen?",
+                    "acceptance_criteria": {
+                        "Given": "An analyst navigates to the PINQ Provider Inquiry Screen",
+                        "When": "The system checks whether a prior session context with a previously entered NPI exists from an earlier visit to this screen",
+                        "Then": "If a prior session context exists, the system identifies this as a return visit and proceeds to retrieve the previously entered NPI; if no prior session context exists, the system identifies this as a first-time visit and no NPI is pre-loaded, requiring the analyst to enter an NPI manually"
+                    },
+                    "key_functionality_id": "npi-session-continuity"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00013",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Retrieve Previously Entered NPI from Session Memory on Return Visit",
+                    "rule_description": "When an analyst returns to the PINQ Provider Inquiry Screen, the system automatically retrieves the NPI that was entered during the previous session and makes it available for the current provider lookup, eliminating the need for the analyst to re-enter the NPI.",
+                    "sub_graph_node_text": "Retrieve Previously Entered NPI from Session Memory",
+                    "acceptance_criteria": {
+                        "Given": "An analyst returns to the PINQ Provider Inquiry Screen and a prior session context containing a previously entered NPI exists",
+                        "When": "The system detects that a prior session context is present (session memory is not empty)",
+                        "Then": "The system retrieves the NPI stored in the session memory from the previous visit and loads it into the active NPI input field, making it immediately available for the provider lookup without requiring manual re-entry by the analyst"
+                    },
+                    "key_functionality_id": "npi-session-continuity"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00014",
+                    "rule_type": "Process Rules",
+                    "rule_name": "No NPI Pre-Loaded on First Visit to Provider Inquiry Screen",
+                    "rule_description": "When an analyst accesses the PINQ Provider Inquiry Screen for the first time within a session, no prior NPI exists in session memory, so the NPI input field remains empty and the analyst must manually enter the NPI to perform a provider lookup.",
+                    "sub_graph_node_text": "No Previous NPI Available",
+                    "acceptance_criteria": {
+                        "Given": "An analyst accesses the PINQ Provider Inquiry Screen for the first time in a session",
+                        "When": "The system checks for a prior session context and determines that no previous session context or NPI exists",
+                        "Then": "The system does not pre-populate the NPI input field, leaving it empty, and the analyst is required to manually enter the NPI to proceed with the provider lookup"
+                    },
+                    "key_functionality_id": "npi-session-continuity"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00015",
+                    "rule_type": "Process Rules",
+                    "rule_name": "NPI Available for Provider Lookup After Session Retrieval",
+                    "rule_description": "Once the previously entered NPI has been successfully retrieved from session memory on a return visit, the NPI is confirmed as available and ready to be used for the provider lookup process without any further input from the analyst.",
+                    "sub_graph_node_text": "NPI is Now Available for Provider Lookup",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has returned to the PINQ Provider Inquiry Screen and the system has detected a prior session context containing a previously entered NPI",
+                        "When": "The system successfully retrieves and loads the NPI from the prior session memory into the active NPI input field",
+                        "Then": "The NPI is confirmed as available and ready for use in the provider lookup, and the system proceeds directly to the provider lookup step using the retrieved NPI value without requiring any additional input from the analyst"
+                    },
+                    "key_functionality_id": "npi-session-continuity"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "NPI Session Continuity"
+        },
+        {
+            "id": "analyst-npi-input-capture",
+            "title": "Analyst NPI Input Capture",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Analyst Opens PINQ\\nProvider Inquiry Screen])\n    B[Analyst Types National Provider\\nIdentifier NPI into\\nPRVMAP1 Inquiry Screen]\n    C[System Accepts NPI Input\\nfrom PRVMAP1 Screen]\n    D{NPI\\nCaptured\\nSuccessfully?}\n    E[NPI Ready for\\nProvider Master\\nRecord Lookup]\n    F([Proceed to\\nProvider Lookup])\n\n    A --> B\n    B --> C\n    C --> D\n    D -->|Yes - NPI Received| E\n    D -->|No - Input Not Received| B\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00016",
+                    "rule_type": "Process Rules",
+                    "rule_name": "State Analyst Initiates Provider Inquiry via PINQ Screen",
+                    "rule_description": "A state analyst opens the PINQ transaction to access the Provider Inquiry screen (PRVMAP1) in order to begin a provider lookup using a National Provider Identifier (NPI).",
+                    "sub_graph_node_text": "Analyst Opens PINQ Provider Inquiry Screen",
+                    "acceptance_criteria": {
+                        "Given": "A state analyst needs to look up a provider's enrollment information and initiates the PINQ provider inquiry transaction",
+                        "When": "The analyst opens the PINQ transaction which presents the PRVMAP1 Provider Inquiry screen",
+                        "Then": "The PRVMAP1 Provider Inquiry screen is displayed and ready to accept a National Provider Identifier (NPI) input from the analyst"
+                    },
+                    "key_functionality_id": "analyst-npi-input-capture"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00017",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Pre-Population of NPI from Previous Inquiry Session",
+                    "rule_description": "When a state analyst returns to the PINQ Provider Inquiry screen from a previous session, the NPI used in the prior inquiry is automatically pre-loaded into the input field, eliminating the need to re-enter the same NPI.",
+                    "sub_graph_node_text": "Analyst Types National Provider Identifier NPI into PRVMAP1 Inquiry Screen",
+                    "acceptance_criteria": {
+                        "Given": "A state analyst is returning to the PRVMAP1 Provider Inquiry screen and a prior NPI value was passed forward from the previous inquiry session",
+                        "When": "The system detects that a communication area containing a prior NPI exists from the previous session",
+                        "Then": "The system automatically pre-populates the NPI input field on the PRVMAP1 screen with the NPI value carried forward from the previous session, so the analyst does not need to re-enter it"
+                    },
+                    "key_functionality_id": "analyst-npi-input-capture"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00018",
+                    "rule_type": "Action Rules",
+                    "rule_name": "System Captures NPI Input Entered by Analyst on PRVMAP1 Screen",
+                    "rule_description": "The system captures the National Provider Identifier (NPI) entered by the state analyst on the PRVMAP1 Provider Inquiry screen to use as the search key for the provider master record lookup.",
+                    "sub_graph_node_text": "System Accepts NPI Input from PRVMAP1 Screen",
+                    "acceptance_criteria": {
+                        "Given": "The PRVMAP1 Provider Inquiry screen is displayed and the state analyst has typed a National Provider Identifier (NPI) into the NPI input field",
+                        "When": "The analyst submits the PRVMAP1 screen with the entered NPI",
+                        "Then": "The system successfully captures the NPI value entered by the analyst from the PRVMAP1 screen and stores it as the provider lookup key to be used in the provider master record search"
+                    },
+                    "key_functionality_id": "analyst-npi-input-capture"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00019",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "NPI Successfully Captured and Ready for Provider Master Record Lookup",
+                    "rule_description": "Once the NPI is successfully received from the PRVMAP1 screen, the system confirms the NPI is available and ready to be used as the search key to retrieve the provider's master record from the provider database.",
+                    "sub_graph_node_text": "NPI Ready for Provider Master Record Lookup",
+                    "acceptance_criteria": {
+                        "Given": "The state analyst has submitted the PRVMAP1 Provider Inquiry screen with a National Provider Identifier (NPI) entered in the input field",
+                        "When": "The system successfully receives and captures the NPI from the PRVMAP1 screen without any input failure",
+                        "Then": "The captured NPI is confirmed as the provider lookup key and the system proceeds to search the Provider Master database (PRVPROVN) using that NPI to retrieve the matching provider record"
+                    },
+                    "key_functionality_id": "analyst-npi-input-capture"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00020",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "NPI Input Not Received \u2014 Analyst Must Re-Enter NPI",
+                    "rule_description": "If the system does not successfully receive the NPI input from the PRVMAP1 screen, the analyst is required to re-enter the NPI before the provider lookup can proceed.",
+                    "sub_graph_node_text": "NPI Captured Successfully?",
+                    "acceptance_criteria": {
+                        "Given": "The state analyst is on the PRVMAP1 Provider Inquiry screen and has attempted to submit an NPI for provider lookup",
+                        "When": "The system fails to capture a valid NPI input from the PRVMAP1 screen",
+                        "Then": "The system does not proceed to the provider master record lookup and instead returns the analyst to the PRVMAP1 screen to re-enter the National Provider Identifier (NPI)"
+                    },
+                    "key_functionality_id": "analyst-npi-input-capture"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Analyst NPI Input Capture"
+        },
+        {
+            "id": "provider-master-record-lookup",
+            "title": "Provider Master Record Lookup",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Provider Master\\nRecord Lookup])\n    B[Use Entered NPI as\\nUnique Search Key]\n    C[(PRVPROVN\\nProvider Master File)]\n    D[Search Provider Master File\\nfor Matching NPI Record]\n    E{Matching Provider\\nRecord Found?}\n    F[Retrieve Provider Enrollment\\nRecord and Associated Details]\n    G[Provider Record Available\\nfor Status Evaluation]\n    H[No Matching Record\\nfor Entered NPI]\n    I([End Provider\\nMaster Record Lookup])\n\n    A --> B\n    B --> D\n    D <-->|Query by NPI Key| C\n    D --> E\n    E -->|Yes - Record Exists| F\n    F --> G\n    G --> I\n    E -->|No - NPI Not Found| H\n    H --> I",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00021",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "NPI Used as Unique Provider Lookup Key",
+                    "rule_description": "The National Provider Identifier (NPI) entered by the user serves as the sole unique key to identify and retrieve a specific provider's enrollment record from the Provider Master file.",
+                    "sub_graph_node_text": "Use Entered NPI as Unique Search Key",
+                    "acceptance_criteria": {
+                        "Given": "A user has entered an NPI on the Provider Inquiry screen",
+                        "When": "The system initiates a search against the Provider Master file (PRVPROVN)",
+                        "Then": "The entered NPI value (WS-NPI-IN) must be used as the unique record identifier key to locate the provider's enrollment record, ensuring only the exact matching provider record is targeted"
+                    },
+                    "key_functionality_id": "provider-master-record-lookup"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00022",
+                    "rule_type": "Action Rules",
+                    "rule_name": "Provider Master File Search by NPI",
+                    "rule_description": "The system performs a direct lookup against the Provider Master file (PRVPROVN) using the entered NPI as the search key to retrieve the provider's full enrollment record and associated details into the provider working area.",
+                    "sub_graph_node_text": "Search Provider Master File for Matching NPI Record",
+                    "acceptance_criteria": {
+                        "Given": "A valid NPI has been entered on the Provider Inquiry screen and is available as the search key",
+                        "When": "The system executes a read operation against the Provider Master file (PRVPROVN) using the NPI as the unique record identifier",
+                        "Then": "The system retrieves the complete provider enrollment record and all associated details into the provider working storage area (WS-PROVIDER-AREA) for further processing and status evaluation"
+                    },
+                    "key_functionality_id": "provider-master-record-lookup"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00023",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Provider Record Successfully Retrieved for Status Evaluation",
+                    "rule_description": "When the Provider Master file lookup returns a successful match for the entered NPI, the system proceeds to evaluate the provider's enrollment status and associated details.",
+                    "sub_graph_node_text": "Retrieve Provider Enrollment Record and Associated Details",
+                    "acceptance_criteria": {
+                        "Given": "A search of the Provider Master file (PRVPROVN) has been performed using the entered NPI",
+                        "When": "The Provider Master file confirms a matching provider record exists and the read operation completes successfully (Normal response)",
+                        "Then": "The system makes the retrieved provider enrollment record and associated details available and invokes the provider status evaluation process (FORMAT-PROVIDER) to determine and display the provider's current enrollment status"
+                    },
+                    "key_functionality_id": "provider-master-record-lookup"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00024",
+                    "rule_type": "Validation Rules",
+                    "rule_name": "No Matching Provider Record Found for Entered NPI",
+                    "rule_description": "When the Provider Master file lookup finds no record matching the entered NPI, the system must inform the user that the provider does not exist in the system.",
+                    "sub_graph_node_text": "No Matching Record for Entered NPI",
+                    "acceptance_criteria": {
+                        "Given": "A search of the Provider Master file (PRVPROVN) has been performed using the entered NPI",
+                        "When": "The Provider Master file confirms no matching provider record exists for the entered NPI (Not Found response)",
+                        "Then": "The system sets the display message to 'PROVIDER NOT FOUND' to inform the user that no provider enrollment record exists for the entered NPI, and no provider details or status information are displayed"
+                    },
+                    "key_functionality_id": "provider-master-record-lookup"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Master Record Lookup"
+        },
+        {
+            "id": "provider-not-found-handling",
+            "title": "Provider Not Found Handling",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Provider Master File\\nLookup Completed])\n    B{Did NPI Match\\na Provider Record?}\n    C[Generate Provider Not Found\\nMessage for Analyst]\n    D([Display Message\\non PINQ Screen])\n\n    A --> B\n    B -->|No Match Found\\nfor Entered NPI| C\n    B -->|Record Found| D\n    C --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00025",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Provider NPI Lookup - No Match Found",
+                    "rule_description": "When a user submits an NPI on the Provider Inquiry Screen (PINQ), the system searches the Provider Master File. If no provider record matches the entered NPI, the system must generate a 'Provider Not Found' message to inform the analyst that the NPI does not exist in the system.",
+                    "sub_graph_node_text": "Did NPI Match a Provider Record?",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has entered an NPI on the Provider Inquiry Screen (PINQ) and the system has completed a lookup against the Provider Master File",
+                        "When": "No provider record exists in the Provider Master File that matches the entered NPI",
+                        "Then": "The system generates and displays the message 'PROVIDER NOT FOUND' on the Provider Inquiry Screen (PINQ) to inform the analyst that the entered NPI does not exist in the system"
+                    },
+                    "key_functionality_id": "provider-not-found-handling"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Not Found Handling"
+        },
+        {
+            "id": "provider-enrollment-status-determination",
+            "title": "Provider Enrollment Status Determination",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Enrollment\\nStatus Determination])\n    B{Is Provider\\nActive Flag Set?}\n    C[Classify Provider\\nas ACTIVE\\nCurrently Enrolled & Eligible]\n    D{Is Provider\\nTerminated Flag Set?}\n    E[Classify Provider\\nas TERMINATED\\nEnrollment Has Been Ended]\n    F{Is Provider\\nPending Flag Set?}\n    G[Classify Provider\\nas PENDING\\nApplication Under Review]\n    H[Classify Provider\\nas DENIED\\nEnrollment Was Denied]\n    Z([End - Status\\nClassification Complete])\n\n    A --> B\n    B -->|Yes| C\n    B -->|No| D\n    D -->|Yes| E\n    D -->|No| F\n    F -->|Yes| G\n    F -->|No - No Flags Set| H\n    C --> Z\n    E --> Z\n    G --> Z\n    H --> Z",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00026",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Classify Provider as ACTIVE When Active Flag Is Set",
+                    "rule_description": "When a provider record is retrieved and the Active status flag is set, the provider's enrollment status must be classified as ACTIVE, indicating the provider is currently enrolled and eligible.",
+                    "sub_graph_node_text": "Is Provider Active Flag Set? \u2192 Classify Provider as ACTIVE Currently Enrolled & Eligible",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number",
+                        "When": "The provider's Active flag is set to TRUE in the retrieved provider record",
+                        "Then": "The provider's enrollment status is classified as 'ACTIVE', indicating the provider is currently enrolled and eligible for participation"
+                    },
+                    "key_functionality_id": "provider-enrollment-status-determination"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00027",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Classify Provider as TERMINATED When Terminated Flag Is Set",
+                    "rule_description": "When a provider record is retrieved and the Active flag is not set but the Terminated status flag is set, the provider's enrollment status must be classified as TERMINATED, indicating the provider's enrollment has been ended.",
+                    "sub_graph_node_text": "Is Provider Terminated Flag Set? \u2192 Classify Provider as TERMINATED Enrollment Has Been Ended",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number, and the provider's Active flag is NOT set",
+                        "When": "The provider's Terminated flag is set to TRUE in the retrieved provider record",
+                        "Then": "The provider's enrollment status is classified as 'TERMINATED', indicating the provider's enrollment has been ended"
+                    },
+                    "key_functionality_id": "provider-enrollment-status-determination"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00028",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Classify Provider as PENDING When Pending Flag Is Set",
+                    "rule_description": "When a provider record is retrieved and neither the Active nor the Terminated flag is set, but the Pending status flag is set, the provider's enrollment status must be classified as PENDING, indicating the provider's application is currently under review.",
+                    "sub_graph_node_text": "Is Provider Pending Flag Set? \u2192 Classify Provider as PENDING Application Under Review",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number, and neither the Active flag nor the Terminated flag is set",
+                        "When": "The provider's Pending flag is set to TRUE in the retrieved provider record",
+                        "Then": "The provider's enrollment status is classified as 'PENDING', indicating the provider's enrollment application is currently under review"
+                    },
+                    "key_functionality_id": "provider-enrollment-status-determination"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00029",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Classify Provider as DENIED When No Status Flag Is Set",
+                    "rule_description": "When a provider record is retrieved and none of the recognized status flags (Active, Terminated, or Pending) are set, the provider's enrollment status must be classified as DENIED, indicating the provider's enrollment was denied or the status is unrecognized.",
+                    "sub_graph_node_text": "No Flags Set \u2192 Classify Provider as DENIED Enrollment Was Denied",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number",
+                        "When": "None of the provider's status flags \u2014 Active, Terminated, or Pending \u2014 are set in the retrieved provider record",
+                        "Then": "The provider's enrollment status is classified as 'DENIED', indicating the provider's enrollment was denied or the status does not match any recognized enrollment state"
+                    },
+                    "key_functionality_id": "provider-enrollment-status-determination"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Enrollment Status Determination"
+        },
+        {
+            "id": "active-provider-identification",
+            "title": "Active Provider Identification",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Provider Status Identification])\n    B{Is Provider\\nActive Flag Set?}\n    C[Label Provider Enrollment\\nStatus as ACTIVE\\nProvider is Currently Enrolled\\nand Eligible]\n    D([Pass ACTIVE Status\\nfor Display to Analyst])\n    E([Check Next\\nStatus Flag])\n\n    A --> B\n    B -->|Yes - Active Flag is Set| C\n    C --> D\n    B -->|No - Active Flag Not Set| E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00030",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Active Provider Status Identification",
+                    "rule_description": "When evaluating a retrieved provider record from the Provider Master file, the system checks the provider's active status flag. If the active flag is set, the provider's enrollment status is classified and labeled as ACTIVE, indicating the provider is currently enrolled and eligible. This is the first status check evaluated in the provider enrollment status determination sequence.",
+                    "sub_graph_node_text": "Label Provider Enrollment Status as ACTIVE - Provider is Currently Enrolled and Eligible",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the Provider Master file (PRVPROVN) using the entered NPI, and the provider enrollment status determination process has begun",
+                        "When": "The provider's Active Status Flag (PRV-ACTIVE) within the retrieved provider record is set to true",
+                        "Then": "The provider's enrollment status is labeled as 'ACTIVE', indicating the provider is currently enrolled and eligible, and this ACTIVE status is passed forward for display to the analyst on the PINQ inquiry screen (PRVMAP1); no further status flags are evaluated for this provider record"
+                    },
+                    "key_functionality_id": "active-provider-identification"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Active Provider Identification"
+        },
+        {
+            "id": "terminated-provider-identification",
+            "title": "Terminated Provider Identification",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter Status Evaluation\\nProvider Record Retrieved])\n    B{Is Provider\\nActive Flag Set?}\n    C{Is Provider\\nTerminated Flag Set?}\n    D[Label Provider Status\\nas TERMINATED\\nEnrollment Has Been Ended]\n    E([Exit to\\nResults Display])\n\n    A --> B\n    B -->|No - Active Flag Not Set| C\n    B -->|Yes - Active Flag Set| E\n    C -->|Yes - Terminated Flag Set| D\n    C -->|No - Terminated Flag Not Set| E\n    D --> E",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00031",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Skip Terminated Status Check When Provider Is Active",
+                    "rule_description": "When evaluating a retrieved provider record, if the provider's Active flag is already set, the system bypasses the Terminated status check entirely and proceeds directly to display results.",
+                    "sub_graph_node_text": "Is Provider Active Flag Set?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the provider database using the entered NPI number",
+                        "When": "The provider's Active status flag is set to true",
+                        "Then": "The system skips the Terminated flag evaluation and proceeds directly to the results display step without assigning a Terminated label"
+                    },
+                    "key_functionality_id": "terminated-provider-identification"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00032",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Terminated Provider Status Identification",
+                    "rule_description": "When a retrieved provider record is not active, the system checks whether the provider's Terminated flag is set to determine if the provider's enrollment has been ended.",
+                    "sub_graph_node_text": "Is Provider Terminated Flag Set?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the provider database using the entered NPI number, and the provider's Active status flag is NOT set",
+                        "When": "The provider's Terminated status flag is set to true",
+                        "Then": "The system identifies the provider as Terminated and proceeds to label the provider's enrollment status accordingly"
+                    },
+                    "key_functionality_id": "terminated-provider-identification"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00033",
+                    "rule_type": "Definitional Rules",
+                    "rule_name": "Label Provider Enrollment Status as TERMINATED",
+                    "rule_description": "When a provider's Terminated flag is confirmed as set, the system assigns the status label 'TERMINATED' to indicate that the provider's enrollment has been formally ended.",
+                    "sub_graph_node_text": "Label Provider Status as TERMINATED\nEnrollment Has Been Ended",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the provider database using the entered NPI number, the provider's Active status flag is NOT set, and the provider's Terminated status flag IS set",
+                        "When": "The system evaluates the provider's enrollment status flags",
+                        "Then": "The system sets the provider status message to 'TERMINATED', indicating that the provider's enrollment has been ended, and this message is prepared for display on the Provider Inquiry Screen"
+                    },
+                    "key_functionality_id": "terminated-provider-identification"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Terminated Provider Identification"
+        },
+        {
+            "id": "pending-provider-identification",
+            "title": "Pending Provider Identification",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Enter Provider Status Evaluation])\n    B{Is Provider\\nActive Flag Set?}\n    C{Is Provider\\nTerminated Flag Set?}\n    D{Is Provider\\nPending Flag Set?}\n    E[Label Provider as PENDING\\nEnrollment Application\\nIs Under Review]\n    F([Return Provider\\nStatus as PENDING])\n\n    A --> B\n    B -->|Yes - Active| Z([Other Status Handling])\n    B -->|No| C\n    C -->|Yes - Terminated| Z\n    C -->|No| D\n    D -->|Yes - Pending Flag is Set| E\n    D -->|No| Z\n    E --> F",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00034",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Identify Provider with Pending Enrollment Status",
+                    "rule_description": "When evaluating a provider's enrollment status, the system must check whether the provider's pending status flag is set only after confirming the provider is neither Active nor Terminated. If the pending flag is set, the provider is labeled as PENDING, indicating their enrollment application is currently under review.",
+                    "sub_graph_node_text": "Is Provider Pending Flag Set?",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number, AND the provider's Active status flag is NOT set, AND the provider's Terminated status flag is NOT set",
+                        "When": "The system evaluates the provider's enrollment status flags and finds that the provider's Pending status flag IS set",
+                        "Then": "The system labels the provider's enrollment status as 'PENDING' and returns the status message 'PENDING' to the Provider Inquiry Screen, indicating that the provider's enrollment application is currently under review"
+                    },
+                    "key_functionality_id": "pending-provider-identification"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Pending Provider Identification"
+        },
+        {
+            "id": "denied-provider-identification",
+            "title": "Denied Provider Identification",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Provider Status Evaluation])\n    B{Is Provider\\nActive Flag Set?}\n    C[Provider Labeled\\nas ACTIVE]\n    D{Is Provider\\nTerminated Flag Set?}\n    E[Provider Labeled\\nas TERMINATED]\n    F{Is Provider\\nPending Flag Set?}\n    G[Provider Labeled\\nas PENDING]\n    H{No Status Flags\\nAre Set?}\n    I[9: Denied Provider Identification\\nProvider Labeled as DENIED\\nEnrollment Application Was Denied]\n    J([Return Enrollment Status\\nfor Display])\n\n    A --> B\n    B -->|Yes| C\n    B -->|No| D\n    D -->|Yes| E\n    D -->|No| F\n    F -->|Yes| G\n    F -->|No| H\n    H -->|Confirmed - No Flags Set| I\n    C --> J\n    E --> J\n    G --> J\n    I --> J",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00035",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Denied Provider Identification Based on Absence of All Enrollment Status Flags",
+                    "rule_description": "When a provider record is retrieved and none of the recognized enrollment status flags (Active, Terminated, or Pending) are set, the provider's enrollment status must be identified and labeled as DENIED, indicating that the provider's enrollment application was denied.",
+                    "sub_graph_node_text": "9: Denied Provider Identification\nProvider Labeled as DENIED\nEnrollment Application Was Denied",
+                    "acceptance_criteria": {
+                        "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number entered on the Provider Inquiry Screen, AND the provider record does not have the Active enrollment flag set, AND the provider record does not have the Terminated enrollment flag set, AND the provider record does not have the Pending enrollment flag set",
+                        "When": "The system evaluates the provider's enrollment status flags and confirms that none of the known enrollment status flags (Active, Terminated, Pending) are set on the provider record",
+                        "Then": "The system must label the provider's enrollment status as 'DENIED', indicating that the provider's enrollment application was denied, and this 'DENIED' status message must be returned and displayed on the Provider Inquiry Screen to the user"
+                    },
+                    "key_functionality_id": "denied-provider-identification"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Denied Provider Identification"
+        },
+        {
+            "id": "provider-inquiry-results-display",
+            "title": "Provider Inquiry Results Display",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Begin Provider Inquiry Results Display])\n    B{What Result\\nWas Determined?}\n    C[Prepare Provider Not Found\\nMessage for Display]\n    D[Prepare Provider Record Details\\nwith ACTIVE Status for Display]\n    E[Prepare Provider Record Details\\nwith TERMINATED Status for Display]\n    F[Prepare Provider Record Details\\nwith PENDING Status for Display]\n    G[Prepare Provider Record Details\\nwith DENIED Status for Display]\n    H[Send Provider Enrollment Status\\nand Record Details to\\nAnalyst PINQ Screen PRVMAP1]\n    Z([End - Results Presented\\nto Analyst for Review])\n\n    A --> B\n    B -->|Provider Not Found| C\n    B -->|Active| D\n    B -->|Terminated| E\n    B -->|Pending| F\n    B -->|Denied| G\n    C --> H\n    D --> H\n    E --> H\n    F --> H\n    G --> H\n    H --> Z",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00036",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Display Provider Not Found Status on Inquiry Screen",
+                    "rule_description": "When a provider lookup by NPI yields no matching record, a 'Provider Not Found' message is prepared and sent to the analyst's PINQ screen (PRVMAP1) to inform the analyst that no provider exists for the given NPI.",
+                    "sub_graph_node_text": "Prepare Provider Not Found Message for Display",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1)",
+                        "When": "The provider record lookup returns no matching provider for the submitted NPI",
+                        "Then": "The message 'PROVIDER NOT FOUND' is prepared and sent back to the analyst's PINQ screen (PRVMAP1) indicating that no provider record exists for the given NPI"
+                    },
+                    "key_functionality_id": "provider-inquiry-results-display"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00037",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Display Active Provider Enrollment Status on Inquiry Screen",
+                    "rule_description": "When a provider record is found and the provider's enrollment status is Active, the provider record details along with the 'ACTIVE' status message are prepared and sent to the analyst's PINQ screen (PRVMAP1) for review.",
+                    "sub_graph_node_text": "Prepare Provider Record Details with ACTIVE Status for Display",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1) and the provider record exists in the provider database",
+                        "When": "The retrieved provider record indicates the provider's enrollment status is ACTIVE",
+                        "Then": "The message 'ACTIVE' is prepared along with the provider record details and sent back to the analyst's PINQ screen (PRVMAP1) confirming the provider is currently active and enrolled"
+                    },
+                    "key_functionality_id": "provider-inquiry-results-display"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00038",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Display Terminated Provider Enrollment Status on Inquiry Screen",
+                    "rule_description": "When a provider record is found and the provider's enrollment status is Terminated, the provider record details along with the 'TERMINATED' status message are prepared and sent to the analyst's PINQ screen (PRVMAP1) for review.",
+                    "sub_graph_node_text": "Prepare Provider Record Details with TERMINATED Status for Display",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1) and the provider record exists in the provider database",
+                        "When": "The retrieved provider record indicates the provider's enrollment status is TERMINATED",
+                        "Then": "The message 'TERMINATED' is prepared along with the provider record details and sent back to the analyst's PINQ screen (PRVMAP1) indicating the provider's enrollment has been terminated"
+                    },
+                    "key_functionality_id": "provider-inquiry-results-display"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00039",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Display Pending Provider Enrollment Status on Inquiry Screen",
+                    "rule_description": "When a provider record is found and the provider's enrollment status is Pending, the provider record details along with the 'PENDING' status message are prepared and sent to the analyst's PINQ screen (PRVMAP1) for review.",
+                    "sub_graph_node_text": "Prepare Provider Record Details with PENDING Status for Display",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1) and the provider record exists in the provider database",
+                        "When": "The retrieved provider record indicates the provider's enrollment status is PENDING",
+                        "Then": "The message 'PENDING' is prepared along with the provider record details and sent back to the analyst's PINQ screen (PRVMAP1) indicating the provider's enrollment is awaiting approval"
+                    },
+                    "key_functionality_id": "provider-inquiry-results-display"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00040",
+                    "rule_type": "Decision Rules",
+                    "rule_name": "Display Denied Provider Enrollment Status on Inquiry Screen",
+                    "rule_description": "When a provider record is found but the provider's enrollment status does not match any recognized status (Active, Terminated, or Pending), the provider record details along with the 'DENIED' status message are prepared and sent to the analyst's PINQ screen (PRVMAP1) for review.",
+                    "sub_graph_node_text": "Prepare Provider Record Details with DENIED Status for Display",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1) and the provider record exists in the provider database",
+                        "When": "The retrieved provider record's enrollment status does not match Active, Terminated, or Pending",
+                        "Then": "The message 'DENIED' is prepared along with the provider record details and sent back to the analyst's PINQ screen (PRVMAP1) indicating the provider's enrollment status is unrecognized or denied"
+                    },
+                    "key_functionality_id": "provider-inquiry-results-display"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00041",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Send Provider Enrollment Status and Record Details to Analyst PINQ Screen",
+                    "rule_description": "Regardless of the determined provider enrollment status outcome (Not Found, Active, Terminated, Pending, or Denied), the prepared provider record details and corresponding status message are always sent back to the analyst's PINQ screen (PRVMAP1) to present the inquiry results for review.",
+                    "sub_graph_node_text": "Send Provider Enrollment Status and Record Details to Analyst PINQ Screen PRVMAP1",
+                    "acceptance_criteria": {
+                        "Given": "A provider enrollment status and corresponding message have been determined based on the NPI lookup result (Provider Not Found, Active, Terminated, Pending, or Denied)",
+                        "When": "The provider inquiry results are ready to be presented to the analyst",
+                        "Then": "The provider record details and the determined status message are sent to the analyst's PINQ screen (PRVMAP1), presenting all retrieved provider information for the analyst's review"
+                    },
+                    "key_functionality_id": "provider-inquiry-results-display"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Provider Inquiry Results Display"
+        },
+        {
+            "id": "transaction-session-persistence",
+            "title": "Transaction Session Persistence",
+            "level": 1,
+            "mermaid_diagram": "flowchart TD\n    A([Results Displayed\\nto Analyst])\n    B[Preserve Current NPI\\nin Session Memory\\nfor Next Lookup]\n    C[Keep Inquiry Session\\nActive and Ready]\n    D{Analyst Initiates\\nNext Provider Lookup?}\n    E[Session Remains\\nOpen on PINQ Screen]\n    F([NPI Available\\nfor Next Search\\nWithout Re-entry])\n\n    A --> B\n    B --> C\n    C --> D\n    D -->|Yes - New NPI Entered| F\n    D -->|Waiting - No Action Yet| E\n    E --> D",
+            "rules": [
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00042",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Preserve Current NPI in Session Memory for Next Lookup",
+                    "rule_description": "After displaying provider inquiry results, the system retains the current NPI value in the session communication area so it is automatically available for the next provider lookup without requiring the analyst to re-enter it.",
+                    "sub_graph_node_text": "Preserve Current NPI\nin Session Memory\nfor Next Lookup",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has completed a provider inquiry and results have been displayed on the PINQ inquiry screen",
+                        "When": "The system prepares to return control for the next interaction",
+                        "Then": "The current NPI value (WS-NPI-IN) is preserved in the session communication area (COMMAREA) so it remains available for the next provider lookup without re-entry"
+                    },
+                    "key_functionality_id": "transaction-session-persistence"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00043",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Keep Inquiry Session Active and Ready on PINQ Screen",
+                    "rule_description": "After each provider inquiry interaction, the system keeps the PINQ transaction session alive and ready, ensuring the analyst remains on the provider inquiry screen without being logged out or redirected.",
+                    "sub_graph_node_text": "Keep Inquiry Session\nActive and Ready",
+                    "acceptance_criteria": {
+                        "Given": "An analyst has received provider inquiry results on the PINQ screen",
+                        "When": "The system completes sending the results back to the screen",
+                        "Then": "The system returns control to the PINQ transaction (Transaction ID: PINQ), keeping the inquiry session active and the screen open so the analyst can immediately initiate another provider lookup"
+                    },
+                    "key_functionality_id": "transaction-session-persistence"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00044",
+                    "rule_type": "Process Rules",
+                    "rule_name": "NPI Available for Next Search Without Re-entry",
+                    "rule_description": "When the analyst initiates a new provider lookup, the previously used NPI is automatically pre-loaded from the session memory into the inquiry input field, eliminating the need to re-enter the NPI manually.",
+                    "sub_graph_node_text": "NPI Available\nfor Next Search\nWithout Re-entry",
+                    "acceptance_criteria": {
+                        "Given": "The PINQ inquiry session is active and a prior NPI has been preserved in the session communication area",
+                        "When": "The analyst returns to the provider inquiry screen for a new lookup",
+                        "Then": "The system detects that a communication area exists (session length greater than zero) and automatically loads the previously used NPI into the inquiry input field, making it immediately available for the next search without manual re-entry"
+                    },
+                    "key_functionality_id": "transaction-session-persistence"
+                },
+                {
+                    "rule_id": "R-PRVCICS1-cbl-00045",
+                    "rule_type": "Process Rules",
+                    "rule_name": "Session Remains Open on PINQ Screen While Awaiting Analyst Action",
+                    "rule_description": "When the analyst has not yet initiated a new provider lookup after viewing results, the PINQ inquiry session remains open and idle on the screen, waiting for the next action without timing out or closing.",
+                    "sub_graph_node_text": "Session Remains\nOpen on PINQ Screen",
+                    "acceptance_criteria": {
+                        "Given": "Provider inquiry results have been displayed to the analyst and no new NPI has been entered yet",
+                        "When": "The analyst has not yet initiated a new provider lookup",
+                        "Then": "The PINQ transaction session remains open and active on the inquiry screen, retaining the last used NPI in session memory, and continues to wait until the analyst either enters a new NPI or takes further action"
+                    },
+                    "key_functionality_id": "transaction-session-persistence"
+                }
+            ],
+            "sub_functionalities": [],
+            "description": "Transaction Session Persistence"
+        }
+    ],
+    "all_rules": [
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00001",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst is returning to the Provider Inquiry transaction (PINQ) and a previous session exists with a stored NPI in the communication area",
+                "When": "The system detects that a prior session communication area is available (session length is greater than zero)",
+                "Then": "The system automatically retrieves and pre-loads the NPI from the previous session into the current inquiry input field, so the analyst does not need to re-enter it"
+            },
+            "Rule_Name": "NPI Session Continuity - Retrieve NPI from Previous Session",
+            "Rule_Description": "When an analyst returns to the Provider Inquiry screen from a previous session, the NPI used in the prior session is automatically retrieved and pre-loaded to avoid re-entry."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00002",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst is on the Provider Inquiry screen (PRVMAP1) within the PINQ transaction",
+                "When": "The analyst submits the screen with an NPI value entered",
+                "Then": "The system captures the NPI input from the screen and uses it as the search key for the provider master record lookup"
+            },
+            "Rule_Name": "Analyst NPI Input Capture on Provider Inquiry Screen",
+            "Rule_Description": "The system accepts the National Provider Identifier (NPI) entered by the analyst on the Provider Inquiry screen (PRVMAP1) as the key input for the provider lookup."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00003",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has submitted an NPI on the Provider Inquiry screen",
+                "When": "The system performs a lookup against the Provider Master File (PRVPROVN) using the submitted NPI as the unique record identifier",
+                "Then": "The system retrieves the full provider record associated with that NPI, or determines that no matching record exists"
+            },
+            "Rule_Name": "Provider Master Record Lookup by NPI",
+            "Rule_Description": "The system searches the Provider Master File (PRVPROVN) using the NPI submitted by the analyst to retrieve the corresponding provider enrollment record."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00004",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has submitted an NPI on the Provider Inquiry screen and the system has searched the Provider Master File (PRVPROVN)",
+                "When": "No provider record is found in the Provider Master File matching the submitted NPI",
+                "Then": "The system sets the display message to 'PROVIDER NOT FOUND' and sends it back to the Provider Inquiry screen to inform the analyst that the NPI does not correspond to any known provider"
+            },
+            "Rule_Name": "Provider Not Found Handling",
+            "Rule_Description": "When the submitted NPI does not match any record in the Provider Master File, the system generates a 'Provider Not Found' message to inform the analyst."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00005",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider Master File using the submitted NPI",
+                "When": "The system evaluates the provider status flags present on the retrieved provider record",
+                "Then": "The system classifies the provider's enrollment status as one of: ACTIVE, TERMINATED, PENDING, or DENIED, based on which status flag is set on the record"
+            },
+            "Rule_Name": "Provider Enrollment Status Determination",
+            "Rule_Description": "When a provider record is successfully retrieved, the system evaluates the provider's status flags to classify and determine the current enrollment status of the provider."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00006",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider Master File and the system is evaluating the provider's enrollment status flags",
+                "When": "The Active status flag (PRV-ACTIVE) is set on the provider record",
+                "Then": "The system sets the enrollment status display message to 'ACTIVE', indicating the provider is currently enrolled and eligible"
+            },
+            "Rule_Name": "Active Provider Identification",
+            "Rule_Description": "When the provider record has the Active status flag set, the system identifies and labels the provider as currently enrolled and eligible."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00007",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider Master File and the system is evaluating the provider's enrollment status flags",
+                "When": "The Terminated status flag (PRV-TERMINATED) is set on the provider record",
+                "Then": "The system sets the enrollment status display message to 'TERMINATED', indicating the provider's enrollment has been ended"
+            },
+            "Rule_Name": "Terminated Provider Identification",
+            "Rule_Description": "When the provider record has the Terminated status flag set, the system identifies and labels the provider as having their enrollment ended."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00008",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider Master File and the system is evaluating the provider's enrollment status flags",
+                "When": "The Pending status flag (PRV-PENDING) is set on the provider record",
+                "Then": "The system sets the enrollment status display message to 'PENDING', indicating the provider's enrollment application is currently under review"
+            },
+            "Rule_Name": "Pending Provider Identification",
+            "Rule_Description": "When the provider record has the Pending status flag set, the system identifies and labels the provider as having an enrollment application currently under review."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00009",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider Master File and the system is evaluating the provider's enrollment status flags",
+                "When": "None of the recognized status flags (PRV-ACTIVE, PRV-TERMINATED, PRV-PENDING) are set on the provider record",
+                "Then": "The system sets the enrollment status display message to 'DENIED', indicating the provider's enrollment was denied or the status is unrecognized"
+            },
+            "Rule_Name": "Denied Provider Identification",
+            "Rule_Description": "When the provider record does not have any recognized enrollment status flag set (Active, Terminated, or Pending), the system classifies the provider's enrollment status as Denied."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00010",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system has completed the provider lookup and determined either the enrollment status (ACTIVE, TERMINATED, PENDING, or DENIED) or generated a 'PROVIDER NOT FOUND' message",
+                "When": "The system is ready to present the results to the analyst",
+                "Then": "The system sends the provider record details along with the corresponding enrollment status message back to the Provider Inquiry screen (PRVMAP1), making the results visible to the analyst"
+            },
+            "Rule_Name": "Provider Inquiry Results Display to Analyst",
+            "Rule_Description": "After determining the provider's enrollment status or generating a not-found message, the system sends the provider record details and the status message back to the Provider Inquiry screen for the analyst to view."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00011",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The system has sent the provider inquiry results back to the analyst on the Provider Inquiry screen",
+                "When": "The system completes the current inquiry cycle",
+                "Then": "The system returns control to the PINQ transaction, retains the current NPI in the communication area for the next session, and keeps the transaction active and ready to accept the next provider inquiry from the analyst"
+            },
+            "Rule_Name": "Transaction Session Persistence and NPI Retention",
+            "Rule_Description": "After displaying the inquiry results, the system retains the NPI in the session communication area and keeps the PINQ transaction active, enabling the analyst to perform subsequent provider lookups without restarting the transaction."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00012",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst navigates to the PINQ Provider Inquiry Screen",
+                "When": "The system checks whether a prior session context with a previously entered NPI exists from an earlier visit to this screen",
+                "Then": "If a prior session context exists, the system identifies this as a return visit and proceeds to retrieve the previously entered NPI; if no prior session context exists, the system identifies this as a first-time visit and no NPI is pre-loaded, requiring the analyst to enter an NPI manually"
+            },
+            "Rule_Name": "Detect Analyst Return Visit to Provider Inquiry Screen",
+            "Rule_Description": "Determines whether the analyst is returning to the PINQ Provider Inquiry Screen from a previous session or accessing it for the first time, by checking whether a prior session context exists."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00013",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst returns to the PINQ Provider Inquiry Screen and a prior session context containing a previously entered NPI exists",
+                "When": "The system detects that a prior session context is present (session memory is not empty)",
+                "Then": "The system retrieves the NPI stored in the session memory from the previous visit and loads it into the active NPI input field, making it immediately available for the provider lookup without requiring manual re-entry by the analyst"
+            },
+            "Rule_Name": "Retrieve Previously Entered NPI from Session Memory on Return Visit",
+            "Rule_Description": "When an analyst returns to the PINQ Provider Inquiry Screen, the system automatically retrieves the NPI that was entered during the previous session and makes it available for the current provider lookup, eliminating the need for the analyst to re-enter the NPI."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00014",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst accesses the PINQ Provider Inquiry Screen for the first time in a session",
+                "When": "The system checks for a prior session context and determines that no previous session context or NPI exists",
+                "Then": "The system does not pre-populate the NPI input field, leaving it empty, and the analyst is required to manually enter the NPI to proceed with the provider lookup"
+            },
+            "Rule_Name": "No NPI Pre-Loaded on First Visit to Provider Inquiry Screen",
+            "Rule_Description": "When an analyst accesses the PINQ Provider Inquiry Screen for the first time within a session, no prior NPI exists in session memory, so the NPI input field remains empty and the analyst must manually enter the NPI to perform a provider lookup."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00015",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has returned to the PINQ Provider Inquiry Screen and the system has detected a prior session context containing a previously entered NPI",
+                "When": "The system successfully retrieves and loads the NPI from the prior session memory into the active NPI input field",
+                "Then": "The NPI is confirmed as available and ready for use in the provider lookup, and the system proceeds directly to the provider lookup step using the retrieved NPI value without requiring any additional input from the analyst"
+            },
+            "Rule_Name": "NPI Available for Provider Lookup After Session Retrieval",
+            "Rule_Description": "Once the previously entered NPI has been successfully retrieved from session memory on a return visit, the NPI is confirmed as available and ready to be used for the provider lookup process without any further input from the analyst."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00016",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A state analyst needs to look up a provider's enrollment information and initiates the PINQ provider inquiry transaction",
+                "When": "The analyst opens the PINQ transaction which presents the PRVMAP1 Provider Inquiry screen",
+                "Then": "The PRVMAP1 Provider Inquiry screen is displayed and ready to accept a National Provider Identifier (NPI) input from the analyst"
+            },
+            "Rule_Name": "State Analyst Initiates Provider Inquiry via PINQ Screen",
+            "Rule_Description": "A state analyst opens the PINQ transaction to access the Provider Inquiry screen (PRVMAP1) in order to begin a provider lookup using a National Provider Identifier (NPI)."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00017",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A state analyst is returning to the PRVMAP1 Provider Inquiry screen and a prior NPI value was passed forward from the previous inquiry session",
+                "When": "The system detects that a communication area containing a prior NPI exists from the previous session",
+                "Then": "The system automatically pre-populates the NPI input field on the PRVMAP1 screen with the NPI value carried forward from the previous session, so the analyst does not need to re-enter it"
+            },
+            "Rule_Name": "Pre-Population of NPI from Previous Inquiry Session",
+            "Rule_Description": "When a state analyst returns to the PINQ Provider Inquiry screen from a previous session, the NPI used in the prior inquiry is automatically pre-loaded into the input field, eliminating the need to re-enter the same NPI."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00018",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "The PRVMAP1 Provider Inquiry screen is displayed and the state analyst has typed a National Provider Identifier (NPI) into the NPI input field",
+                "When": "The analyst submits the PRVMAP1 screen with the entered NPI",
+                "Then": "The system successfully captures the NPI value entered by the analyst from the PRVMAP1 screen and stores it as the provider lookup key to be used in the provider master record search"
+            },
+            "Rule_Name": "System Captures NPI Input Entered by Analyst on PRVMAP1 Screen",
+            "Rule_Description": "The system captures the National Provider Identifier (NPI) entered by the state analyst on the PRVMAP1 Provider Inquiry screen to use as the search key for the provider master record lookup."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00019",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "The state analyst has submitted the PRVMAP1 Provider Inquiry screen with a National Provider Identifier (NPI) entered in the input field",
+                "When": "The system successfully receives and captures the NPI from the PRVMAP1 screen without any input failure",
+                "Then": "The captured NPI is confirmed as the provider lookup key and the system proceeds to search the Provider Master database (PRVPROVN) using that NPI to retrieve the matching provider record"
+            },
+            "Rule_Name": "NPI Successfully Captured and Ready for Provider Master Record Lookup",
+            "Rule_Description": "Once the NPI is successfully received from the PRVMAP1 screen, the system confirms the NPI is available and ready to be used as the search key to retrieve the provider's master record from the provider database."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00020",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "The state analyst is on the PRVMAP1 Provider Inquiry screen and has attempted to submit an NPI for provider lookup",
+                "When": "The system fails to capture a valid NPI input from the PRVMAP1 screen",
+                "Then": "The system does not proceed to the provider master record lookup and instead returns the analyst to the PRVMAP1 screen to re-enter the National Provider Identifier (NPI)"
+            },
+            "Rule_Name": "NPI Input Not Received \u2014 Analyst Must Re-Enter NPI",
+            "Rule_Description": "If the system does not successfully receive the NPI input from the PRVMAP1 screen, the analyst is required to re-enter the NPI before the provider lookup can proceed."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00021",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "A user has entered an NPI on the Provider Inquiry screen",
+                "When": "The system initiates a search against the Provider Master file (PRVPROVN)",
+                "Then": "The entered NPI value (WS-NPI-IN) must be used as the unique record identifier key to locate the provider's enrollment record, ensuring only the exact matching provider record is targeted"
+            },
+            "Rule_Name": "NPI Used as Unique Provider Lookup Key",
+            "Rule_Description": "The National Provider Identifier (NPI) entered by the user serves as the sole unique key to identify and retrieve a specific provider's enrollment record from the Provider Master file."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00022",
+            "Rule_Type": "Action Rules",
+            "Acceptance_Criteria": {
+                "Given": "A valid NPI has been entered on the Provider Inquiry screen and is available as the search key",
+                "When": "The system executes a read operation against the Provider Master file (PRVPROVN) using the NPI as the unique record identifier",
+                "Then": "The system retrieves the complete provider enrollment record and all associated details into the provider working storage area (WS-PROVIDER-AREA) for further processing and status evaluation"
+            },
+            "Rule_Name": "Provider Master File Search by NPI",
+            "Rule_Description": "The system performs a direct lookup against the Provider Master file (PRVPROVN) using the entered NPI as the search key to retrieve the provider's full enrollment record and associated details into the provider working area."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00023",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A search of the Provider Master file (PRVPROVN) has been performed using the entered NPI",
+                "When": "The Provider Master file confirms a matching provider record exists and the read operation completes successfully (Normal response)",
+                "Then": "The system makes the retrieved provider enrollment record and associated details available and invokes the provider status evaluation process (FORMAT-PROVIDER) to determine and display the provider's current enrollment status"
+            },
+            "Rule_Name": "Provider Record Successfully Retrieved for Status Evaluation",
+            "Rule_Description": "When the Provider Master file lookup returns a successful match for the entered NPI, the system proceeds to evaluate the provider's enrollment status and associated details."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00024",
+            "Rule_Type": "Validation Rules",
+            "Acceptance_Criteria": {
+                "Given": "A search of the Provider Master file (PRVPROVN) has been performed using the entered NPI",
+                "When": "The Provider Master file confirms no matching provider record exists for the entered NPI (Not Found response)",
+                "Then": "The system sets the display message to 'PROVIDER NOT FOUND' to inform the user that no provider enrollment record exists for the entered NPI, and no provider details or status information are displayed"
+            },
+            "Rule_Name": "No Matching Provider Record Found for Entered NPI",
+            "Rule_Description": "When the Provider Master file lookup finds no record matching the entered NPI, the system must inform the user that the provider does not exist in the system."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00025",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has entered an NPI on the Provider Inquiry Screen (PINQ) and the system has completed a lookup against the Provider Master File",
+                "When": "No provider record exists in the Provider Master File that matches the entered NPI",
+                "Then": "The system generates and displays the message 'PROVIDER NOT FOUND' on the Provider Inquiry Screen (PINQ) to inform the analyst that the entered NPI does not exist in the system"
+            },
+            "Rule_Name": "Provider NPI Lookup - No Match Found",
+            "Rule_Description": "When a user submits an NPI on the Provider Inquiry Screen (PINQ), the system searches the Provider Master File. If no provider record matches the entered NPI, the system must generate a 'Provider Not Found' message to inform the analyst that the NPI does not exist in the system."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00026",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number",
+                "When": "The provider's Active flag is set to TRUE in the retrieved provider record",
+                "Then": "The provider's enrollment status is classified as 'ACTIVE', indicating the provider is currently enrolled and eligible for participation"
+            },
+            "Rule_Name": "Classify Provider as ACTIVE When Active Flag Is Set",
+            "Rule_Description": "When a provider record is retrieved and the Active status flag is set, the provider's enrollment status must be classified as ACTIVE, indicating the provider is currently enrolled and eligible."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00027",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number, and the provider's Active flag is NOT set",
+                "When": "The provider's Terminated flag is set to TRUE in the retrieved provider record",
+                "Then": "The provider's enrollment status is classified as 'TERMINATED', indicating the provider's enrollment has been ended"
+            },
+            "Rule_Name": "Classify Provider as TERMINATED When Terminated Flag Is Set",
+            "Rule_Description": "When a provider record is retrieved and the Active flag is not set but the Terminated status flag is set, the provider's enrollment status must be classified as TERMINATED, indicating the provider's enrollment has been ended."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00028",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number, and neither the Active flag nor the Terminated flag is set",
+                "When": "The provider's Pending flag is set to TRUE in the retrieved provider record",
+                "Then": "The provider's enrollment status is classified as 'PENDING', indicating the provider's enrollment application is currently under review"
+            },
+            "Rule_Name": "Classify Provider as PENDING When Pending Flag Is Set",
+            "Rule_Description": "When a provider record is retrieved and neither the Active nor the Terminated flag is set, but the Pending status flag is set, the provider's enrollment status must be classified as PENDING, indicating the provider's application is currently under review."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00029",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number",
+                "When": "None of the provider's status flags \u2014 Active, Terminated, or Pending \u2014 are set in the retrieved provider record",
+                "Then": "The provider's enrollment status is classified as 'DENIED', indicating the provider's enrollment was denied or the status does not match any recognized enrollment state"
+            },
+            "Rule_Name": "Classify Provider as DENIED When No Status Flag Is Set",
+            "Rule_Description": "When a provider record is retrieved and none of the recognized status flags (Active, Terminated, or Pending) are set, the provider's enrollment status must be classified as DENIED, indicating the provider's enrollment was denied or the status is unrecognized."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00030",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider Master file (PRVPROVN) using the entered NPI, and the provider enrollment status determination process has begun",
+                "When": "The provider's Active Status Flag (PRV-ACTIVE) within the retrieved provider record is set to true",
+                "Then": "The provider's enrollment status is labeled as 'ACTIVE', indicating the provider is currently enrolled and eligible, and this ACTIVE status is passed forward for display to the analyst on the PINQ inquiry screen (PRVMAP1); no further status flags are evaluated for this provider record"
+            },
+            "Rule_Name": "Active Provider Status Identification",
+            "Rule_Description": "When evaluating a retrieved provider record from the Provider Master file, the system checks the provider's active status flag. If the active flag is set, the provider's enrollment status is classified and labeled as ACTIVE, indicating the provider is currently enrolled and eligible. This is the first status check evaluated in the provider enrollment status determination sequence."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00031",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the provider database using the entered NPI number",
+                "When": "The provider's Active status flag is set to true",
+                "Then": "The system skips the Terminated flag evaluation and proceeds directly to the results display step without assigning a Terminated label"
+            },
+            "Rule_Name": "Skip Terminated Status Check When Provider Is Active",
+            "Rule_Description": "When evaluating a retrieved provider record, if the provider's Active flag is already set, the system bypasses the Terminated status check entirely and proceeds directly to display results."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00032",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the provider database using the entered NPI number, and the provider's Active status flag is NOT set",
+                "When": "The provider's Terminated status flag is set to true",
+                "Then": "The system identifies the provider as Terminated and proceeds to label the provider's enrollment status accordingly"
+            },
+            "Rule_Name": "Terminated Provider Status Identification",
+            "Rule_Description": "When a retrieved provider record is not active, the system checks whether the provider's Terminated flag is set to determine if the provider's enrollment has been ended."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00033",
+            "Rule_Type": "Definitional Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the provider database using the entered NPI number, the provider's Active status flag is NOT set, and the provider's Terminated status flag IS set",
+                "When": "The system evaluates the provider's enrollment status flags",
+                "Then": "The system sets the provider status message to 'TERMINATED', indicating that the provider's enrollment has been ended, and this message is prepared for display on the Provider Inquiry Screen"
+            },
+            "Rule_Name": "Label Provider Enrollment Status as TERMINATED",
+            "Rule_Description": "When a provider's Terminated flag is confirmed as set, the system assigns the status label 'TERMINATED' to indicate that the provider's enrollment has been formally ended."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00034",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number, AND the provider's Active status flag is NOT set, AND the provider's Terminated status flag is NOT set",
+                "When": "The system evaluates the provider's enrollment status flags and finds that the provider's Pending status flag IS set",
+                "Then": "The system labels the provider's enrollment status as 'PENDING' and returns the status message 'PENDING' to the Provider Inquiry Screen, indicating that the provider's enrollment application is currently under review"
+            },
+            "Rule_Name": "Identify Provider with Pending Enrollment Status",
+            "Rule_Description": "When evaluating a provider's enrollment status, the system must check whether the provider's pending status flag is set only after confirming the provider is neither Active nor Terminated. If the pending flag is set, the provider is labeled as PENDING, indicating their enrollment application is currently under review."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00035",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider record has been successfully retrieved from the Provider database using the NPI number entered on the Provider Inquiry Screen, AND the provider record does not have the Active enrollment flag set, AND the provider record does not have the Terminated enrollment flag set, AND the provider record does not have the Pending enrollment flag set",
+                "When": "The system evaluates the provider's enrollment status flags and confirms that none of the known enrollment status flags (Active, Terminated, Pending) are set on the provider record",
+                "Then": "The system must label the provider's enrollment status as 'DENIED', indicating that the provider's enrollment application was denied, and this 'DENIED' status message must be returned and displayed on the Provider Inquiry Screen to the user"
+            },
+            "Rule_Name": "Denied Provider Identification Based on Absence of All Enrollment Status Flags",
+            "Rule_Description": "When a provider record is retrieved and none of the recognized enrollment status flags (Active, Terminated, or Pending) are set, the provider's enrollment status must be identified and labeled as DENIED, indicating that the provider's enrollment application was denied."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00036",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1)",
+                "When": "The provider record lookup returns no matching provider for the submitted NPI",
+                "Then": "The message 'PROVIDER NOT FOUND' is prepared and sent back to the analyst's PINQ screen (PRVMAP1) indicating that no provider record exists for the given NPI"
+            },
+            "Rule_Name": "Display Provider Not Found Status on Inquiry Screen",
+            "Rule_Description": "When a provider lookup by NPI yields no matching record, a 'Provider Not Found' message is prepared and sent to the analyst's PINQ screen (PRVMAP1) to inform the analyst that no provider exists for the given NPI."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00037",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1) and the provider record exists in the provider database",
+                "When": "The retrieved provider record indicates the provider's enrollment status is ACTIVE",
+                "Then": "The message 'ACTIVE' is prepared along with the provider record details and sent back to the analyst's PINQ screen (PRVMAP1) confirming the provider is currently active and enrolled"
+            },
+            "Rule_Name": "Display Active Provider Enrollment Status on Inquiry Screen",
+            "Rule_Description": "When a provider record is found and the provider's enrollment status is Active, the provider record details along with the 'ACTIVE' status message are prepared and sent to the analyst's PINQ screen (PRVMAP1) for review."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00038",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1) and the provider record exists in the provider database",
+                "When": "The retrieved provider record indicates the provider's enrollment status is TERMINATED",
+                "Then": "The message 'TERMINATED' is prepared along with the provider record details and sent back to the analyst's PINQ screen (PRVMAP1) indicating the provider's enrollment has been terminated"
+            },
+            "Rule_Name": "Display Terminated Provider Enrollment Status on Inquiry Screen",
+            "Rule_Description": "When a provider record is found and the provider's enrollment status is Terminated, the provider record details along with the 'TERMINATED' status message are prepared and sent to the analyst's PINQ screen (PRVMAP1) for review."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00039",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1) and the provider record exists in the provider database",
+                "When": "The retrieved provider record indicates the provider's enrollment status is PENDING",
+                "Then": "The message 'PENDING' is prepared along with the provider record details and sent back to the analyst's PINQ screen (PRVMAP1) indicating the provider's enrollment is awaiting approval"
+            },
+            "Rule_Name": "Display Pending Provider Enrollment Status on Inquiry Screen",
+            "Rule_Description": "When a provider record is found and the provider's enrollment status is Pending, the provider record details along with the 'PENDING' status message are prepared and sent to the analyst's PINQ screen (PRVMAP1) for review."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00040",
+            "Rule_Type": "Decision Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has submitted a provider inquiry using an NPI number on the PINQ screen (PRVMAP1) and the provider record exists in the provider database",
+                "When": "The retrieved provider record's enrollment status does not match Active, Terminated, or Pending",
+                "Then": "The message 'DENIED' is prepared along with the provider record details and sent back to the analyst's PINQ screen (PRVMAP1) indicating the provider's enrollment status is unrecognized or denied"
+            },
+            "Rule_Name": "Display Denied Provider Enrollment Status on Inquiry Screen",
+            "Rule_Description": "When a provider record is found but the provider's enrollment status does not match any recognized status (Active, Terminated, or Pending), the provider record details along with the 'DENIED' status message are prepared and sent to the analyst's PINQ screen (PRVMAP1) for review."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00041",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "A provider enrollment status and corresponding message have been determined based on the NPI lookup result (Provider Not Found, Active, Terminated, Pending, or Denied)",
+                "When": "The provider inquiry results are ready to be presented to the analyst",
+                "Then": "The provider record details and the determined status message are sent to the analyst's PINQ screen (PRVMAP1), presenting all retrieved provider information for the analyst's review"
+            },
+            "Rule_Name": "Send Provider Enrollment Status and Record Details to Analyst PINQ Screen",
+            "Rule_Description": "Regardless of the determined provider enrollment status outcome (Not Found, Active, Terminated, Pending, or Denied), the prepared provider record details and corresponding status message are always sent back to the analyst's PINQ screen (PRVMAP1) to present the inquiry results for review."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00042",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has completed a provider inquiry and results have been displayed on the PINQ inquiry screen",
+                "When": "The system prepares to return control for the next interaction",
+                "Then": "The current NPI value (WS-NPI-IN) is preserved in the session communication area (COMMAREA) so it remains available for the next provider lookup without re-entry"
+            },
+            "Rule_Name": "Preserve Current NPI in Session Memory for Next Lookup",
+            "Rule_Description": "After displaying provider inquiry results, the system retains the current NPI value in the session communication area so it is automatically available for the next provider lookup without requiring the analyst to re-enter it."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00043",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "An analyst has received provider inquiry results on the PINQ screen",
+                "When": "The system completes sending the results back to the screen",
+                "Then": "The system returns control to the PINQ transaction (Transaction ID: PINQ), keeping the inquiry session active and the screen open so the analyst can immediately initiate another provider lookup"
+            },
+            "Rule_Name": "Keep Inquiry Session Active and Ready on PINQ Screen",
+            "Rule_Description": "After each provider inquiry interaction, the system keeps the PINQ transaction session alive and ready, ensuring the analyst remains on the provider inquiry screen without being logged out or redirected."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00044",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "The PINQ inquiry session is active and a prior NPI has been preserved in the session communication area",
+                "When": "The analyst returns to the provider inquiry screen for a new lookup",
+                "Then": "The system detects that a communication area exists (session length greater than zero) and automatically loads the previously used NPI into the inquiry input field, making it immediately available for the next search without manual re-entry"
+            },
+            "Rule_Name": "NPI Available for Next Search Without Re-entry",
+            "Rule_Description": "When the analyst initiates a new provider lookup, the previously used NPI is automatically pre-loaded from the session memory into the inquiry input field, eliminating the need to re-enter the NPI manually."
+        },
+        {
+            "Rule_Id": "R-PRVCICS1-cbl-00045",
+            "Rule_Type": "Process Rules",
+            "Acceptance_Criteria": {
+                "Given": "Provider inquiry results have been displayed to the analyst and no new NPI has been entered yet",
+                "When": "The analyst has not yet initiated a new provider lookup",
+                "Then": "The PINQ transaction session remains open and active on the inquiry screen, retaining the last used NPI in session memory, and continues to wait until the analyst either enters a new NPI or takes further action"
+            },
+            "Rule_Name": "Session Remains Open on PINQ Screen While Awaiting Analyst Action",
+            "Rule_Description": "When the analyst has not yet initiated a new provider lookup after viewing results, the PINQ inquiry session remains open and idle on the screen, waiting for the next action without timing out or closing."
+        }
+    ],
+    "description": "PRVCICS1 is an online CICS transaction program (transaction ID: PINQ) that supports a Provider Inquiry function for state analysts. It accepts a National Provider Identifier (NPI) entered on a green-screen BMS map, reads the Provider Master VSAM file to retrieve the provider's record, and returns the provider's enrollment status (Active, Terminated, Pending, or Denied) along with their risk tier information to the analyst's screen.\n\n<br>\n\n- **Execution Environment**: Online (CICS)\n- **Database Access**: VSAM (CICS FILE: PRVPROVN)\n- **MQ Calls**: No\n- **Module Type**: Main module\n\n<br>\n\n### Key Functionalities:\n\n1: NPI Session Continuity - Retrieve the previously entered NPI from the communication area when the analyst returns to the inquiry screen, enabling seamless continuation of the provider lookup session without re-entering the NPI\n\n2: Analyst NPI Input Capture - Accept the National Provider Identifier (NPI) entered by the state analyst on the PINQ provider inquiry screen (PRVMAP1) to initiate a provider lookup\n\n3: Provider Master Record Lookup - Search the Provider Master file using the entered NPI as the unique key to retrieve the provider's enrollment record and associated details\n\n4: Provider Not Found Handling - When no provider record matches the entered NPI, generate a 'Provider Not Found' message to inform the analyst that the NPI does not exist in the system\n\n5: Provider Enrollment Status Determination - Evaluate the provider's status flags from the retrieved record and classify the provider's enrollment status as one of four states: ACTIVE, TERMINATED, PENDING, or DENIED\n\n6: Active Provider Identification - Identify and label a provider as 'ACTIVE' when the provider's active status flag is set, indicating the provider is currently enrolled and eligible\n\n7: Terminated Provider Identification - Identify and label a provider as 'TERMINATED' when the provider's terminated status flag is set, indicating the provider's enrollment has been ended\n\n8: Pending Provider Identification - Identify and label a provider as 'PENDING' when the provider's pending status flag is set, indicating the provider's enrollment application is under review\n\n9: Denied Provider Identification - Identify and label a provider as 'DENIED' when none of the active, terminated, or pending flags are set, indicating the provider's enrollment was denied\n\n10: Provider Inquiry Results Display - Send the provider's enrollment status and record details back to the analyst's PINQ screen (PRVMAP1), presenting the retrieved provider information for review\n\n11: Transaction Session Persistence - Return control to the PINQ transaction while retaining the NPI in the communication area, keeping the inquiry session active and ready for the next provider lookup\n\n"
+}

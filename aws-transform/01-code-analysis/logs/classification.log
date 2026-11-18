@@ -1,0 +1,20 @@
+2026-11-17 11:23:05,931 [main] INFO : Starting classification
+2026-11-17 11:23:06,056 [main] INFO : Classification started at : 11:23:06 (version 20261112102756)
+2026-11-17 11:23:06,281 [pool-2-thread-13] INFO : File /ramdisk/1/generic_and_classification/classification/files-to-classify/MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/DCLPROV.cpy was classified through a second check
+2026-11-17 11:23:06,285 [pool-2-thread-1] INFO : File /ramdisk/1/generic_and_classification/classification/files-to-classify/MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/ERRCODES.cpy was classified through a second check
+2026-11-17 11:23:06,285 [pool-2-thread-11] INFO : File /ramdisk/1/generic_and_classification/classification/files-to-classify/MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/SCRNREC.cpy was classified through a second check
+2026-11-17 11:23:06,285 [pool-2-thread-12] INFO : File /ramdisk/1/generic_and_classification/classification/files-to-classify/MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/WRKSTORE.cpy was classified through a second check
+2026-11-17 11:23:06,286 [pool-2-thread-14] INFO : File /ramdisk/1/generic_and_classification/classification/files-to-classify/MMIS-PROVIDER-DEMO-TIER4/COPYBOOKS/PRVRECRD.cpy was classified through a second check
+2026-11-17 11:23:06,296 [main] INFO : File /ramdisk/1/generic_and_classification/classification/files-to-classify/MMIS-PROVIDER-DEMO-TIER4/README.md has no content type (Unknown): DETECTOR_UNKNOWN (a detector assigned the Unknown type)
+2026-11-17 11:23:06,297 [main] INFO : Classification successful, finished at : 11:23:06
+2026-11-17 11:23:06,297 [main] INFO : 22 files processed
+2026-11-17 11:23:06,297 [main] INFO : 0 files need no processing (with extension)
+2026-11-17 11:23:06,298 [main] INFO : Global duration : 0 sec
+2026-11-17 11:23:06,298 [main] INFO : Outcome:
+2026-11-17 11:23:06,299 [main] INFO : - proc: 1
+2026-11-17 11:23:06,299 [main] INFO : - jcl: 4
+2026-11-17 11:23:06,299 [main] INFO : - Unknown: 1
+2026-11-17 11:23:06,299 [main] INFO : - REXX: 1
+2026-11-17 11:23:06,299 [main] INFO : - cob: 9
+2026-11-17 11:23:06,299 [main] INFO : - cpy: 5
+2026-11-17 11:23:06,299 [main] INFO : - sql: 1

@@ -1,0 +1,72 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVVSM01.jcl",
+        "type": "jcl"
+      },
+      "overview": "This JCL job defines the VSAM infrastructure for a Provider Master file used in a Medicaid Management Information System (MMIS). It creates a Key-Sequenced Data Set (KSDS) using the National Provider Identifier (NPI) as the primary key, along with an Alternate Index on the Medicaid Provider ID to support lookups by either identifier. The job also establishes an access Path over the Alternate Index, enabling applications to retrieve provider records through either the enterprise NPI key or the Medicaid-specific provider ID.",
+      "parameters": [
+        {
+          "name": "JOB",
+          "value": "(MMIS,VSAM),'DEFINE PROV KSDS'",
+          "description": "The JOB statement marks the beginning of a job and provides accounting information (MMIS,VSAM) and a job description/programmer name ('DEFINE PROV KSDS'). The accounting information is used for billing and resource tracking purposes."
+        },
+        {
+          "name": "CLASS",
+          "value": "A",
+          "description": "Assigns the job to input job class A, which determines the job's scheduling priority and the initiator that will process it. Different classes may have different resource allocations and scheduling priorities defined by the installation."
+        },
+        {
+          "name": "MSGCLASS",
+          "value": "X",
+          "description": "Specifies the output class X for the job's system messages and job log. This determines where the JES job log, allocation/termination messages, and other system output are routed, typically to a held output queue for review before printing or deletion."
+        },
+        {
+          "name": "NOTIFY",
+          "value": "&SYSUID",
+          "description": "Specifies that a notification message should be sent to the submitting user's TSO userid (resolved from the symbolic &SYSUID) upon job completion. This alerts the user when the job has finished, along with its completion status."
+        }
+      ]
+    },
+    "job_details": [
+      {
+        "step": "DEFKSDS",
+        "purpose": "Deletes any existing Provider Master VSAM KSDS cluster and redefines it along with an Alternate Index on Medicaid Provider ID and a PATH to support alternate key access. The base cluster uses the NPI (National Provider Identifier) as the primary enterprise provider key.",
+        "programs": "IDCAMS*",
+        "inputs": "SYSIN (inline commands: DELETE MMPRV.PROVIDER.MASTER.KSDS CLUSTER PURGE; DEFINE CLUSTER MMPRV.PROVIDER.MASTER.KSDS with DATA MMPRV.PROVIDER.MASTER.DATA and INDEX MMPRV.PROVIDER.MASTER.INDEX; DEFINE ALTERNATEINDEX MMPRV.PROVIDER.MASTER.AIX with DATA MMPRV.PROVIDER.MASTER.AIX.DATA and INDEX MMPRV.PROVIDER.MASTER.AIX.INDEX; DEFINE PATH MMPRV.PROVIDER.MASTER.PATH)",
+        "outputs": "VSAM KSDS cluster MMPRV.PROVIDER.MASTER.KSDS (INDEXED, KEYS(10 0), RECORDSIZE(121 121), SHAREOPTIONS(2 3), CYLINDERS(10 5)); Alternate Index MMPRV.PROVIDER.MASTER.AIX (RELATE to base cluster, KEYS(9 10), NONUNIQUEKEY, RECORDSIZE(30 60), CYLINDERS(2 1)); PATH MMPRV.PROVIDER.MASTER.PATH (PATHENTRY MMPRV.PROVIDER.MASTER.AIX); SYSPRINT (execution log)"
+      }
+    ],
+    "data_operations": [
+      {
+        "step": "DEFKSDS",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.KSDS",
+        "operations": "DELETE",
+        "description": "Deletes the existing PROVIDER MASTER KSDS cluster with PURGE option, then resets MAXCC to 0 to suppress errors if the dataset does not exist"
+      },
+      {
+        "step": "DEFKSDS",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.KSDS, MMPRV.PROVIDER.MASTER.DATA, MMPRV.PROVIDER.MASTER.INDEX",
+        "operations": "DEFINE",
+        "description": "Defines a new VSAM KSDS base cluster named MMPRV.PROVIDER.MASTER.KSDS with a 10-byte primary key at offset 0, fixed-length records of 121 bytes, SHAREOPTIONS(2 3), allocated at 10 cylinders primary and 5 secondary, with separate DATA and INDEX components"
+      },
+      {
+        "step": "DEFKSDS",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.AIX, MMPRV.PROVIDER.MASTER.AIX.DATA, MMPRV.PROVIDER.MASTER.AIX.INDEX",
+        "operations": "DEFINE",
+        "description": "Defines an Alternate Index on MMPRV.PROVIDER.MASTER.KSDS with a 9-byte alternate key at offset 10 (Medicaid Provider ID), NONUNIQUEKEY allowed, variable-length records (30 minimum, 60 maximum), allocated at 2 cylinders primary and 1 secondary, with separate DATA and INDEX components"
+      },
+      {
+        "step": "DEFKSDS",
+        "type": "Dataset",
+        "objects": "MMPRV.PROVIDER.MASTER.PATH",
+        "operations": "DEFINE",
+        "description": "Defines a PATH named MMPRV.PROVIDER.MASTER.PATH that points to the Alternate Index MMPRV.PROVIDER.MASTER.AIX, enabling access to the base cluster MMPRV.PROVIDER.MASTER.KSDS via the alternate key"
+      }
+    ]
+  }
+}

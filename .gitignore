@@ -1,0 +1,7 @@
+.env
+.work/
+modern/kag/.venv/
+**/build/
+**/.gradle/
+**/node_modules/
+modern/web-ui/dist/

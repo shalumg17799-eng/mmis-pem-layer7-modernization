@@ -1,0 +1,192 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVRSK01.cbl",
+        "type": "cobol"
+      },
+      "overview": "PRVRSK01 operates within a Medicaid Management Information System (MMIS) as part of the provider enrollment and compliance workflow, executing as a batch step (STEP040) within the PRVDAY01 job. It implements federal Medicaid provider screening requirements under 42 CFR 455.450 and 455.414, which mandate that all enrolled providers be assigned a risk-based screening tier and periodically revalidated. The program reads each provider record from the indexed provider master file, classifies the provider into a risk screening tier (Limited, Moderate, or High) based on their taxonomy code, and calculates the next revalidation due date five years out, writing the results back to the master record. This automates CMS compliance obligations that determine the intensity of background checks and site visits a state Medicaid agency must perform for each provider type.",
+      "key_features": [
+        {
+          "feature": "Risk Tier Classification",
+          "description": "Assigns each provider a CMS-mandated screening risk tier (Limited, Moderate, or High) based on the first three characters of their taxonomy code, per 42 CFR 455.450."
+        },
+        {
+          "feature": "Taxonomy-Driven Routing",
+          "description": "Uses provider taxonomy group codes to determine risk level; specific codes (e.g., 332, 251) map to High risk, others to Moderate or Limited tiers."
+        },
+        {
+          "feature": "Revalidation Due Date Calculation",
+          "description": "Computes the next required revalidation date by adding five years to the current date per 42 CFR 455.414, storing the result in the provider master record."
+        },
+        {
+          "feature": "Provider Master File Update",
+          "description": "Performs sequential read and in-place rewrite of the indexed provider master file, updating risk tier and revalidation date fields for every provider record."
+        },
+        {
+          "feature": "Sequential Batch Processing",
+          "description": "Iterates through all provider records in the master file in a single batch pass, processing each record until end-of-file is reached."
+        },
+        {
+          "feature": "Known Y2K-Style Date Defect",
+          "description": "The revalidation date calculation uses 2-digit year arithmetic with a year-70 century pivot, which will produce incorrect (historically past) due dates for providers enrolled in 2065 or later."
+        },
+        {
+          "feature": "Runtime Branch Alteration (ALTER)",
+          "description": "Uses the deprecated COBOL ALTER statement to dynamically redirect tier-routing logic at runtime, making the actual execution path invisible to static code analysis tools."
+        }
+      ]
+    },
+    "input_output": [
+      {
+        "name": "PRV-MASTER-FILE",
+        "type": "Read/Write",
+        "description": "Indexed provider master file (DDNAME: PRVMSTR) - sequentially reads all provider records to classify risk tier (Limited/Moderate/High) based on taxonomy code, computes and sets the next revalidation due date, then rewrites each updated record back to the file"
+      }
+    ],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "Program Initialization",
+          "description": "Sets the program identifier in working storage and opens the provider master indexed file in I-O mode to allow both reading and rewriting of records.",
+          "records": [
+            "WS-PROGRAM-ID",
+            "WS-PRV-STATUS",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 2,
+          "process": "Sequential Record Read",
+          "description": "Reads the next record sequentially from the indexed PRV-MASTER-FILE. Checks the file status code; if end-of-file is detected, sets the termination flag. Otherwise, routes to classification processing.",
+          "records": [
+            "PRV-NPI",
+            "WS-PRV-STATUS",
+            "WS-FS-EOF",
+            "WS-END-OF-FILE-FLAG"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "Taxonomy Group Extraction",
+          "description": "Extracts the first 3 characters of the provider taxonomy code from the master record into a working storage field used to drive the risk tier classification decision.",
+          "records": [
+            "PRV-TAXONOMY",
+            "WS-TAXONOMY-GROUP"
+          ]
+        },
+        {
+          "step": 4,
+          "process": "Risk Tier Routing via ALTER",
+          "description": "Evaluates the 3-character taxonomy group against known high-risk codes (332, 251), moderate-risk codes (341, 291, 225), and all others (limited). Uses the COBOL ALTER statement to dynamically rewrite the GO TO target inside APPLY-TIER-PARA at runtime, making the branch destination invisible to static analysis tools.",
+          "records": [
+            "WS-TAXONOMY-GROUP"
+          ]
+        },
+        {
+          "step": 5,
+          "process": "Risk Tier Assignment",
+          "description": "Executes APPLY-TIER-PARA whose GO TO destination has been altered at runtime. Branches to LIMITED-TIER, MODERATE-TIER, or HIGH-TIER paragraph and sets the corresponding risk level indicator (PRV-RISK-LIMITED, PRV-RISK-MODERATE, or PRV-RISK-HIGH) on the provider master record per 42 CFR 455.450.",
+          "records": [
+            "PRV-RISK-LIMITED",
+            "PRV-RISK-MODERATE",
+            "PRV-RISK-HIGH"
+          ]
+        },
+        {
+          "step": 6,
+          "process": "Revalidation Due Date Calculation",
+          "description": "Accepts the current date using YYYYMMDD format, extracts the 2-digit year (positions 3-4) and MMDD (positions 5-8). Adds 5 years to the 2-digit year using modulo 100 arithmetic. Applies a century pivot: if the resulting 2-digit year is less than 70, assigns century 2000; otherwise assigns century 1900. Constructs the 8-digit due date as CCYYMMDD. This logic is defective for any 5-year window crossing year 2070, producing incorrect century assignments (e.g., a 2068 enrollment yields a due year of 73, pivoted to 1973).",
+          "records": [
+            "WS-CURR-DATE",
+            "WS-CURR-YY",
+            "WS-CURR-MMDD",
+            "WS-DUE-YY",
+            "WS-DUE-CCYY",
+            "WS-DUE-DATE",
+            "PRV-REVAL-DUE-DATE"
+          ]
+        },
+        {
+          "step": 7,
+          "process": "Provider Master Record Rewrite",
+          "description": "Rewrites the updated provider master record back to the indexed file, persisting the newly assigned risk tier indicator and the computed revalidation due date per 42 CFR 455.414.",
+          "records": [
+            "PRV-NPI",
+            "PRV-RISK-LIMITED",
+            "PRV-RISK-MODERATE",
+            "PRV-RISK-HIGH",
+            "PRV-REVAL-DUE-DATE"
+          ]
+        },
+        {
+          "step": 8,
+          "process": "Loop and Termination",
+          "description": "Returns to CLASSIFY-NEXT to read the next record. When end-of-file is reached, closes the PRV-MASTER-FILE and terminates the program with STOP RUN.",
+          "records": [
+            "WS-END-OF-FILE-FLAG",
+            "WS-PRV-STATUS"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "ALTER Statement Runtime State",
+          "description": "The GO TO target within APPLY-TIER-PARA is modified at runtime by the ALTER statement in CLASSIFY-ONE. The correct tier paragraph (LIMITED-TIER, MODERATE-TIER, or HIGH-TIER) is only reachable if the EVALUATE block in CLASSIFY-ONE has executed for the current record before APPLY-TIER-PARA is performed. If APPLY-TIER-PARA were ever called without a preceding ALTER execution (e.g., on first invocation before any EVALUATE), the default GO TO LIMITED-TIER would fire regardless of taxonomy. This creates an implicit sequencing dependency between the EVALUATE block and the PERFORM of APPLY-TIER-PARA."
+        },
+        {
+          "dependency": "Taxonomy Code Completeness",
+          "description": "The risk tier classification depends entirely on WS-TAXONOMY-GROUP, which is derived from the first 3 characters of PRV-TAXONOMY in the master record. If PRV-TAXONOMY is blank, low-value, or shorter than 3 characters, WS-TAXONOMY-GROUP will not match any explicit WHEN clause and the provider will default to LIMITED-TIER, potentially misclassifying high-risk providers."
+        },
+        {
+          "dependency": "2-Digit Year Century Pivot Validity",
+          "description": "The revalidation due date calculation in SET-REVALIDATION-DATE is valid only while the computed 2-digit due year remains below 70. For any enrollment year from 2065 onward, adding 5 years produces a due year of 70 or above, which the pivot incorrectly maps to the 1900s. This creates a hard temporal dependency: the program produces correct output only when run before 2065, and produces systematically incorrect (past-century) revalidation dates thereafter, causing downstream revalidation sweep jobs to treat affected providers as decades overdue."
+        },
+        {
+          "dependency": "File Status Field Shared State",
+          "description": "WS-PRV-STATUS is populated by the file system after each READ and is then moved to WS-FILE-STATUS (from WRKSTORE copybook). The EOF condition check WS-FS-EOF depends on this move having occurred correctly. Any intervening logic that modifies WS-FILE-STATUS before the IF check would break EOF detection and potentially cause an infinite loop or premature termination."
+        },
+        {
+          "dependency": "I-O Open Mode Requirement for REWRITE",
+          "description": "The REWRITE of PRV-MASTER-RECORD at the end of CLASSIFY-ONE requires that PRV-MASTER-FILE was opened in I-O mode. This is satisfied in MAIN-CONTROL. However, if the OPEN fails (non-zero WS-PRV-STATUS) and the program does not check the open status before proceeding, all subsequent READ and REWRITE operations will fail silently or abend, corrupting the processing loop."
+        },
+        {
+          "dependency": "REWRITE Requires Prior Successful READ",
+          "description": "The COBOL REWRITE verb for an indexed file in dynamic access mode requires that the record to be rewritten was the last record successfully read. The program correctly reads then rewrites within CLASSIFY-ONE, maintaining this dependency. Any future refactoring that separates the READ and REWRITE across different paragraphs or introduces conditional skipping of REWRITE must preserve this sequencing."
+        },
+        {
+          "dependency": "WRKSTORE Copybook Field Alignment",
+          "description": "The program relies on fields defined in WRKSTORE.cpy (WS-END-OF-FILE-FLAG, WS-FILE-STATUS, WS-FS-EOF condition, WS-PROGRAM-ID) and PRVRECRD.cpy (PRV-NPI, PRV-TAXONOMY, PRV-RISK-LIMITED, PRV-RISK-MODERATE, PRV-RISK-HIGH, PRV-REVAL-DUE-DATE). Any structural change to either copybook that alters field lengths, offsets, or condition-name values will silently corrupt data or alter control flow without compile-time errors if the copybook version is not synchronized."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "File Operation Errors",
+        "description": "File status is captured in WS-PRV-STATUS after OPEN and READ operations and moved to WS-FILE-STATUS. Only EOF (WS-FS-EOF) is explicitly checked to terminate the read loop. Non-EOF error codes (e.g., status '23' record not found, '30' permanent error, '92' logic error) are not tested, logged, or handled — the program silently continues or abends without any diagnostic message or graceful recovery path."
+      },
+      {
+        "category": "REWRITE Operation Errors",
+        "description": "After updating the risk tier and revalidation date, PRV-MASTER-RECORD is rewritten with no subsequent check of WS-PRV-STATUS. A failed REWRITE (e.g., duplicate key, locked record, I/O error) goes undetected, meaning corrupted or missing updates are invisible to the calling job PRVDAY01 STEP040."
+      },
+      {
+        "category": "Date Computation Errors (Y2K-style Century Pivot)",
+        "description": "SET-REVALIDATION-DATE uses 2-digit year arithmetic with a hard-coded pivot of 70 to assign century (>=70 maps to 1900s, <70 maps to 2000s). For any provider processed in 2065 or later, adding 5 years produces a due-year that crosses the 2070 boundary, causing MOD arithmetic to yield a value >=70, which is incorrectly assigned to the 1900s century. No error is raised, no bounds check is performed, and the resulting date (e.g., 19730101) is silently written to PRV-REVAL-DUE-DATE, making the provider appear decades overdue."
+      },
+      {
+        "category": "Control Flow Errors (ALTER Anti-Pattern)",
+        "description": "The ALTER statement dynamically rewrites the GO TO target of APPLY-TIER-PARA at runtime. If the EVALUATE block fails to execute (e.g., due to an unexpected code path or copybook field truncation in WS-TAXONOMY-GROUP), the ALTER may not fire, leaving the GO TO pointing to LIMITED-TIER by default regardless of the provider's actual taxonomy. There is no validation, fallback check, or audit log to detect incorrect tier assignments caused by stale or unset ALTER targets."
+      },
+      {
+        "category": "Input Validation Errors",
+        "description": "No validation is performed on PRV-TAXONOMY before extracting the 3-character WS-TAXONOMY-GROUP substring. Spaces, low-values, or non-numeric/non-alpha content in the taxonomy field are silently routed to the WHEN OTHER branch and assigned LIMITED-TIER without any warning, rejection, or audit trail."
+      },
+      {
+        "category": "Program Initialization and Termination Errors",
+        "description": "The OPEN of PRV-MASTER-FILE has no status check following the statement. A failed open (e.g., file not catalogued, allocation error) would cause the subsequent READ to fail with an unhandled status, likely resulting in an uncontrolled abend rather than a clean diagnostic termination. No ABEND code, return code, or error message is issued to the calling job step."
+      }
+    ]
+  }
+}

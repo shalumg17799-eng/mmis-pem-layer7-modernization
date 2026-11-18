@@ -1,0 +1,152 @@
+{
+    "created_on": "2026-11-17",
+    "document_title": "PRVDAY01.jcl Batch Documentation",
+    "type": "entry_point",
+    "document_name": "PRVDAY01.jcl",
+    "summary": {
+        "overview": "PRVDAY01 is the daily Medicaid provider enrollment and compliance batch job that ingests new provider applications, validates and loads them into the Provider Master File, screens each unscreened provider against federal exclusion and debarment registries, and assigns a risk-based screening tier and revalidation due date to every provider in compliance with federal Medicaid regulations (42 CFR 455.410, 455.414, 455.450).",
+        "business_functions": [
+            "STEP010 \u2013 Provider Enrollment Processing: Reads daily provider applications, validates each application for required fields (NPI, provider type, taxonomy code), enrolls approved providers into the Provider Master File as PENDING/UNSCREENED records, and writes rejected applications to a date-stamped error file for follow-up correction",
+            "STEP010 \u2013 Enrollment Validation: Verifies that each application contains a valid National Provider Identifier (NPI), a recognized provider type (Individual, Group, or Facility), and a populated taxonomy code before allowing enrollment",
+            "STEP010 \u2013 Enrollment Status Assignment: Sets approved providers to PENDING enrollment status and UNSCREENED screening status, marking them as awaiting background screening before full enrollment is granted",
+            "STEP010 \u2013 Enrollment Error Reporting: Captures all applications failing validation into a date-stamped error file, enabling downstream review and resubmission workflows",
+            "STEP020 \u2013 Unscreened Provider Extraction and Sorting: Filters the Provider Master File to extract only providers with an UNSCREENED status and sorts them in ascending NPI order, preparing a targeted work file for the screening step",
+            "STEP030 \u2013 State License Verification: Queries the state licensing board to confirm each unscreened provider holds a valid and active professional license",
+            "STEP030 \u2013 OIG LEIE Exclusion Check: Queries the Office of Inspector General's List of Excluded Individuals and Entities (LEIE) to verify that the provider and owners with 5% or greater ownership are not excluded from federal healthcare programs",
+            "STEP030 \u2013 SAM Debarment Check: Queries the System for Award Management (SAM) to confirm the provider is not debarred or suspended from participating in federal programs",
+            "STEP030 \u2013 SSA Death Master File Check: Queries the Social Security Administration Death Master File to verify the provider is not deceased",
+            "STEP030 \u2013 Screening Verdict Determination and Recording: Evaluates all four external screening results together; marks the provider as screening-passed only if all checks pass, or screening-failed if any check fails, and writes a detailed screening result record to the date-stamped screening output file for audit purposes",
+            "STEP040 \u2013 Provider Risk Tier Classification: Reads each provider record and assigns a risk screening tier (Limited, Moderate, or High) based on the provider's taxonomy group code in compliance with 42 CFR 455.450",
+            "STEP040 \u2013 Revalidation Due Date Calculation: Calculates and sets the provider's next revalidation due date as 5 years from the current date per 42 CFR 455.414, and writes the updated risk tier and revalidation date back to the Provider Master File",
+            "STEP099 \u2013 End-of-Job Error Handling: Activates only when any preceding step encounters an error, providing a controlled and clean job termination to prevent incomplete or erroneous data from propagating to downstream processes"
+        ],
+        "environment_summary": {
+            "workload_type": "Batch",
+            "database_types": [
+                "VSAM"
+            ],
+            "integration_components": [
+                "N/A"
+            ],
+            "dataset_types": [
+                "VSAM KSDS",
+                "PS"
+            ]
+        }
+    },
+    "functionality_flow": {
+        "PRVDAY01.jcl": [
+            {
+                "program_name": "PRVENR01",
+                "program_overview": "Validates and loads daily provider enrollment applications into the Provider Master File, routing invalid applications to an error file",
+                "called_programs": []
+            },
+            {
+                "program_name": "PRVSCR01",
+                "program_overview": "Screens unscreened providers against state license board, OIG LEIE exclusion list, SAM debarment registry, and SSA Death Master File, recording pass/fail verdicts and audit output records",
+                "called_programs": []
+            },
+            {
+                "program_name": "PRVRSK01",
+                "program_overview": "Assigns a federal risk screening tier (Limited, Moderate, or High) and calculates a 5-year revalidation due date for each provider based on taxonomy group code",
+                "called_programs": []
+            }
+        ]
+    },
+    "datasource_summary": [
+        {
+            "name": "Provider Master File (MMPRV.PROVIDER.MASTER.KSDS)",
+            "original_name": "MMPRV.PROVIDER.MASTER.KSDS",
+            "business_name": "Provider Master File",
+            "type": "VSAM KSDS",
+            "function": "Central repository of all provider records. New provider enrollment applications are written here as pending entries, unscreened providers are read for screening and risk assessment, and records are updated with screening verdicts and risk tier classifications along with revalidation due dates.",
+            "used_by_programs": [
+                "PRVENR01.cbl",
+                "PRVSCR01.cbl",
+                "PRVRSK01.cbl",
+                "PRVDAY01.jcl"
+            ],
+            "accessType": [
+                "READ",
+                "WRITE",
+                "UPDATE"
+            ]
+        },
+        {
+            "name": "Daily Provider Applications File (MMPRV.PROV.APPS.D&DATE)",
+            "original_name": "MMPRV.PROV.APPS.D&DATE",
+            "business_name": "Daily Provider Applications File",
+            "type": "Sequential File",
+            "function": "Contains the daily batch of provider enrollment applications submitted for the current processing date. Each record represents a provider's application to be validated and enrolled into the Provider Master File.",
+            "used_by_programs": [
+                "PRVENR01.cbl",
+                "PRVDAY01.jcl"
+            ],
+            "accessType": [
+                "READ"
+            ]
+        },
+        {
+            "name": "Provider Enrollment Error File (MMPRV.PROV.ERRORS.D&DATE)",
+            "original_name": "MMPRV.PROV.ERRORS.D&DATE",
+            "business_name": "Provider Enrollment Error File",
+            "type": "Sequential File",
+            "function": "Captures error detail records for provider applications that fail enrollment validation, including issues such as missing NPI, invalid provider type, or missing taxonomy code. Used for audit, correction, and follow-up purposes.",
+            "used_by_programs": [
+                "PRVENR01.cbl",
+                "PRVDAY01.jcl"
+            ],
+            "accessType": [
+                "WRITE"
+            ]
+        },
+        {
+            "name": "Provider Screening Results File (MMPRV.SCREEN.RESULTS.D&DATE)",
+            "original_name": "MMPRV.SCREEN.RESULTS.D&DATE",
+            "business_name": "Provider Screening Results File",
+            "type": "Sequential File",
+            "function": "Records the outcome of external source screening checks for each provider, capturing the provider NPI and pass/fail screening verdict. Used for audit trail and compliance reporting purposes.",
+            "used_by_programs": [
+                "PRVSCR01.cbl",
+                "PRVDAY01.jcl"
+            ],
+            "accessType": [
+                "WRITE"
+            ]
+        },
+        {
+            "name": "Unscreened Providers Sort Work File (&&PRVSORT)",
+            "original_name": "&&PRVSORT",
+            "business_name": "Unscreened Providers Sort Work File",
+            "type": "Sequential File",
+            "function": "Temporary intermediate file created during daily batch processing that holds Provider Master records filtered to only those providers pending screening, sorted by NPI in ascending order. Used to feed the provider screening step in an organized sequence.",
+            "used_by_programs": [
+                "PRVDAY01.jcl"
+            ],
+            "accessType": [
+                "READ",
+                "WRITE"
+            ]
+        },
+        {
+            "name": "Production Program Load Library (MMPRV.PROD.LOADLIB)",
+            "original_name": "MMPRV.PROD.LOADLIB",
+            "business_name": "Production Program Load Library",
+            "type": "PDS",
+            "function": "Stores the compiled and executable program modules used throughout the daily provider batch job, including the enrollment, screening, and risk assessment programs. Referenced to locate and load the correct program versions during batch execution.",
+            "used_by_programs": [
+                "PRVDAY01.jcl"
+            ],
+            "accessType": [
+                "READ"
+            ]
+        }
+    ],
+    "program_paths": {
+        "PRVDAY01.jcl": "MMIS-PROVIDER-DEMO-TIER4/JCL/PRVDAY01.jcl",
+        "PRVENR01": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVENR01.cbl",
+        "PRVSCR01": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVSCR01.cbl",
+        "PRVRSK01": "MMIS-PROVIDER-DEMO-TIER4/BATCH/PRVRSK01.cbl"
+    },
+    "flow_diagram_code": "flowchart TD\n    PRVENR01[\"Validates and loads daily provider enrollment applications into the Provider Master File, routing invalid applications to an error file (PRVENR01) \"]\n    PRVSCR01[\"Screens unscreened providers against state license board, OIG LEIE exclusion list, SAM debarment registry, and SSA Death Master File, recording pass/fail verdicts and audit output records (PRVSCR01) \"]\n    PRVRSK01[\"Assigns a federal risk screening tier (Limited, Moderate, or High) and calculates a 5-year revalidation due date for each provider based on taxonomy group code (PRVRSK01) \"]\n"
+}

@@ -1,0 +1,3 @@
+app_config.parsed_args.output_dir =/ramdisk/1/test_data_collection/outputs
+Starting ATX Test Data Collection application...
+ATX Test Data Collection 1.0 completed in 0.07890489400051592 seconds

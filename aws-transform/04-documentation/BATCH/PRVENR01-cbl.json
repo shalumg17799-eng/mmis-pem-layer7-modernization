@@ -1,0 +1,229 @@
+{
+  "documentation": {
+    "high_level_overview": {
+      "program_information": {
+        "name": "PRVENR01.cbl",
+        "type": "cobol"
+      },
+      "overview": "PRVENR01 operates within a Medicaid Management Information System (MMIS) as part of the daily provider enrollment batch cycle (PRVDAY01), handling the intake of new provider applications submitted to the state Medicaid program. It serves as the entry point for onboarding healthcare providers — individuals, groups, and facilities — into the Provider Master file, which governs eligibility to receive Medicaid reimbursements. The program reads provider applications from a sequential intake file, performs prerequisite validation checks, and loads approved applicants as pending records into the Provider Master KSDS (PEM-1), where they become eligible for downstream auto-approval screening. A critical defect present since 1998 causes applications that fail validation to also be written to the master file as pending records, creating improper payment exposure by allowing unqualified providers to pass through the enrollment pipeline.",
+      "key_features": [
+        {
+          "feature": "Provider Application Intake",
+          "description": "Reads sequential batch file of provider enrollment applications submitted for Medicaid participation, supporting individual providers, group practices, and facilities."
+        },
+        {
+          "feature": "NPI Validation",
+          "description": "Verifies that each applicant record contains a National Provider Identifier (NPI), the federally required unique identifier for Medicaid billing eligibility."
+        },
+        {
+          "feature": "Provider Type Validation",
+          "description": "Confirms that each applicant is classified as a recognized provider type — individual, group, or facility — before allowing enrollment to proceed."
+        },
+        {
+          "feature": "Taxonomy Code Validation",
+          "description": "Checks that a provider taxonomy code is present, ensuring the applicant's specialty or service category is identified for claims processing and credentialing."
+        },
+        {
+          "feature": "Provider Master File Loading",
+          "description": "Writes validated provider records to the Provider Master KSDS (PEM-1) with a PENDING and UNSCREENED status, making them available for the auto-approval sweep process."
+        },
+        {
+          "feature": "Duplicate NPI Detection",
+          "description": "Detects and logs duplicate NPI submissions during the master file write, preventing overwrite of existing provider records while tracking skipped entries."
+        },
+        {
+          "feature": "Error Reporting",
+          "description": "Writes detailed error records to a sequential error file for each application that fails validation, capturing NPI and provider type for downstream review and remediation."
+        },
+        {
+          "feature": "Batch Tracking and Audit Logging",
+          "description": "Accepts a batch identifier from the job environment and produces summary counts of records read, written, errored, and skipped to support operational reconciliation and audit trails."
+        },
+        {
+          "feature": "Validation Fall-Through Defect",
+          "description": "A long-standing structural defect causes failed validation to fall through into the write routine, resulting in invalid provider applications being loaded to the master file as pending — a direct improper payment risk."
+        }
+      ]
+    },
+    "input_output": [
+      {
+        "name": "APP-INPUT-FILE",
+        "type": "Read",
+        "description": "Sequential intake file containing provider enrollment applications; read sequentially record by record and mapped into working storage for validation processing"
+      },
+      {
+        "name": "PRV-MASTER-FILE",
+        "type": "Read-Write",
+        "description": "Provider master KSDS (VSAM indexed file keyed on PRV-NPI); new provider records are written as PENDING/UNSCREENED after validation; opened in I-O mode to support both read and write operations"
+      },
+      {
+        "name": "APP-ERROR-FILE",
+        "type": "Write",
+        "description": "Sequential error output file; receives 250-character error detail records for provider applications that fail validation checks (missing NPI, invalid provider type, missing taxonomy)"
+      }
+    ],
+    "data_flow_and_dependencies": {
+      "data_flow": [
+        {
+          "step": 1,
+          "process": "Program Initialization",
+          "description": "Sets program ID, resets all counters to zero, opens APP-INPUT-FILE (input), PRV-MASTER-FILE (I-O), and APP-ERROR-FILE (output). Accepts BATCH_ID from the runtime environment variable; defaults to 'DEFBATCH' if not supplied.",
+          "records": [
+            "WS-PROGRAM-ID",
+            "WS-BATCH-ID",
+            "WS-END-OF-FILE-FLAG",
+            "WS-RECORDS-READ",
+            "WS-RECORDS-WRITTEN",
+            "WS-RECORDS-SKIPPED",
+            "WS-RECORDS-ERRORED"
+          ]
+        },
+        {
+          "step": 2,
+          "process": "Read Provider Application Record",
+          "description": "Reads the next 200-byte fixed-length record from the sequential intake file (APPINPUT DD) into the WS-PRV-WORK working-storage area. Sets end-of-file flag on status '10', increments error counter and sets RETURN-CODE 8 on any other non-zero status.",
+          "records": [
+            "APP-INPUT-RECORD",
+            "WS-PRV-WORK",
+            "WS-APP-IN-STATUS",
+            "WS-FILE-STATUS",
+            "WS-RECORDS-READ",
+            "WS-RECORDS-ERRORED"
+          ]
+        },
+        {
+          "step": 3,
+          "process": "Validate Provider Application",
+          "description": "Performs three sequential validation checks on the in-memory WS-PRV-WORK record: (1) NPI must not be spaces, (2) provider type must be INDIVIDUAL, GROUP, or FACILITY, (3) taxonomy code must not be spaces. Each failed check writes an error record to APP-ERROR-FILE, increments WS-RECORDS-ERRORED, and issues GO TO INVALID-APP. Due to the paragraph fall-through anti-pattern, INVALID-APP has no EXIT or branch, so control unconditionally continues into WRITE-PROVIDER-RECORD regardless of validation outcome.",
+          "records": [
+            "PRV-NPI",
+            "PRV-TYPE-CODE",
+            "PRV-INDIVIDUAL",
+            "PRV-GROUP",
+            "PRV-FACILITY",
+            "PRV-TAXONOMY",
+            "WS-RECORDS-ERRORED",
+            "EC-MISSING-NPI",
+            "WS-FILE-STATUS"
+          ]
+        },
+        {
+          "step": 4,
+          "process": "Set Enrollment Status Flags (Valid Path Only)",
+          "description": "For records that pass all three validations, sets PRV-PENDING and PRV-UNSCREENED flags to TRUE in WS-PRV-WORK before writing to the master file. Records that failed validation bypass this step via GO TO INVALID-APP but still reach WRITE-PROVIDER-RECORD due to fall-through, meaning they are written without these flags being set.",
+          "records": [
+            "PRV-PENDING",
+            "PRV-UNSCREENED",
+            "WS-PRV-WORK"
+          ]
+        },
+        {
+          "step": 5,
+          "process": "Write Provider Master Record",
+          "description": "Moves WS-PRV-WORK to PRV-MASTER-RECORD and writes it to the KSDS PRV-MASTER-FILE (PRVMSTR DD / PEM-1) keyed on PRV-NPI. Status '00' increments WS-RECORDS-WRITTEN; status '22' (duplicate key) logs the NPI and increments WS-RECORDS-SKIPPED; any other status logs an error, increments WS-RECORDS-ERRORED, and sets RETURN-CODE 8. Due to the fall-through bug, both valid and invalid applications reach this step.",
+          "records": [
+            "PRV-MASTER-RECORD",
+            "PRV-NPI",
+            "WS-PRV-OUT-STATUS",
+            "WS-RECORDS-WRITTEN",
+            "WS-RECORDS-SKIPPED",
+            "WS-RECORDS-ERRORED"
+          ]
+        },
+        {
+          "step": 6,
+          "process": "Write Error Record",
+          "description": "Constructs a 250-byte error detail string by concatenating PRV-NPI, PRV-TYPE-CODE, and a literal 'ERR:VALIDATION-FAILED' message into WS-ERR-DETAIL, then writes it to the sequential APP-ERROR-FILE (APPERROR DD). Called only from within VALIDATE-APPLICATION on each failed check.",
+          "records": [
+            "WS-ERR-DETAIL",
+            "APP-ERROR-RECORD",
+            "PRV-NPI",
+            "PRV-TYPE-CODE",
+            "WS-APP-ERR-STATUS"
+          ]
+        },
+        {
+          "step": 7,
+          "process": "Program Termination",
+          "description": "Closes all three files. Displays final counts for records read, written, errored, and skipped. If WS-RECORDS-ERRORED is greater than zero, sets RETURN-CODE to 4 (note: individual error events during processing may have already set RETURN-CODE to 8, which this step would downgrade to 4).",
+          "records": [
+            "WS-RECORDS-READ",
+            "WS-RECORDS-WRITTEN",
+            "WS-RECORDS-ERRORED",
+            "WS-RECORDS-SKIPPED",
+            "RETURN-CODE"
+          ]
+        }
+      ],
+      "data_dependencies": [
+        {
+          "dependency": "Paragraph Fall-Through: INVALID-APP to WRITE-PROVIDER-RECORD",
+          "description": "The INVALID-APP paragraph contains no EXIT, STOP RUN, or GO TO statement. Any record that fails NPI, provider-type, or taxonomy validation is directed here via GO TO INVALID-APP, but execution immediately falls through into WRITE-PROVIDER-RECORD. This means every failed application is written to the PEM-1 provider master as a PENDING record, creating an improper-payment exposure if the auto-approve sweep processes it. This bug has been present since the program was written in 1998."
+        },
+        {
+          "dependency": "RETURN-CODE Overwrite Risk",
+          "description": "RETURN-CODE is set to 8 during read errors and write errors within the processing loop. TERMINATE-PROGRAM unconditionally sets RETURN-CODE to 4 if WS-RECORDS-ERRORED > 0, potentially downgrading a severity-8 condition to severity-4 and misleading the calling job (PRVDAY01 STEP010) about the true error severity."
+        },
+        {
+          "dependency": "PRV-NPI KSDS Key Uniqueness",
+          "description": "PRV-NPI is the RECORD KEY for the indexed PRV-MASTER-FILE. Duplicate NPI submissions are silently skipped (status '22') with only a DISPLAY message and no error record written to APP-ERROR-FILE, meaning duplicate detection is not surfaced to downstream error reporting."
+        },
+        {
+          "dependency": "WS-PRV-WORK Shared Record Buffer",
+          "description": "A single WS-PRV-WORK area (copied from PRVRECRD) is reused for every record read from APP-INPUT-FILE. It is overwritten on each READ without explicit clearing, so residual field values from a prior record could persist if the input record is shorter or fields are not fully populated."
+        },
+        {
+          "dependency": "BATCH_ID Environment Variable",
+          "description": "The program accepts BATCH_ID from the runtime environment at initialization. If the variable is absent or blank, it defaults to 'DEFBATCH'. The BATCH_ID is only used in the startup DISPLAY message and is not written to any output record, so batch traceability in the master file is absent."
+        },
+        {
+          "dependency": "Validation State Not Persisted to Master Record",
+          "description": "Validation failure is recorded in WS-RECORDS-ERRORED and APP-ERROR-FILE, but no failure flag or error code is written into the PRV-MASTER-RECORD itself. Because the fall-through bug causes the record to be written anyway, there is no field in PEM-1 to distinguish a properly validated PENDING record from one that bypassed validation."
+        },
+        {
+          "dependency": "File Open Order and I-O Mode for PRV-MASTER-FILE",
+          "description": "PRV-MASTER-FILE is opened in I-O (read/write) mode with DYNAMIC access, allowing both sequential and keyed access. The program only performs WRITE operations, but the I-O open mode implies the file must already exist as a KSDS cluster before the job step runs. If the file is absent or empty, the OPEN will fail and no file-status check is performed after the OPEN statements."
+        },
+        {
+          "dependency": "Copybook PRVRECRD Dual Use",
+          "description": "PRVRECRD is copied into both the FD PRV-MASTER-RECORD (file buffer) and WS-PRV-WORK (working storage). The MOVE WS-PRV-WORK TO PRV-MASTER-RECORD in WRITE-PROVIDER-RECORD depends on both copies having identical layouts. Any future change to PRVRECRD automatically affects both, but any manual override of one without the other would cause silent data corruption."
+        },
+        {
+          "dependency": "Sequential Processing Order Dependency",
+          "description": "Records are processed strictly in the order they appear in the sequential APP-INPUT-FILE. There is no sorting or deduplication prior to writing. If the same NPI appears multiple times in the input file, the first occurrence is written and subsequent ones are skipped as duplicates, meaning the last-submitted application for a provider is not guaranteed to be the one enrolled."
+        }
+      ],
+      "called_programs": []
+    },
+    "error_handling": [
+      {
+        "category": "Input Validation Errors",
+        "description": "Three validation checks are performed in VALIDATE-APPLICATION: missing NPI, invalid provider type (not individual/group/facility), and missing taxonomy code. Each failed check increments WS-RECORDS-ERRORED, calls WRITE-ERROR-RECORD to log a structured error string (NPI + type code + 'VALIDATION-FAILED') to the sequential APP-ERROR-FILE, and issues a GO TO INVALID-APP. However, due to a paragraph fall-through anti-pattern, INVALID-APP contains no EXIT or branch, so control continues directly into WRITE-PROVIDER-RECORD, causing the failed record to also be written to the provider master as PENDING. This means validation errors are logged but do NOT prevent the invalid record from being enrolled."
+      },
+      {
+        "category": "Sequential File Read Errors",
+        "description": "After each READ of APP-INPUT-FILE, WS-APP-IN-STATUS is evaluated. An EOF condition (WS-FS-EOF) sets the end-of-file flag to terminate processing normally. A successful read (WS-FS-OK) proceeds to validation. Any other status code is treated as a hard read error: a DISPLAY message is emitted with the raw two-character file status, WS-RECORDS-ERRORED is incremented, and RETURN-CODE is set to 8 to signal job failure to the calling JCL step. No retry or record-skip logic is applied for read errors."
+      },
+      {
+        "category": "KSDS Write Errors (Provider Master)",
+        "description": "After each WRITE to PRV-MASTER-FILE, WS-PRV-OUT-STATUS is evaluated in an EVALUATE block. Status '00' (success) increments WS-RECORDS-WRITTEN. Status '22' (duplicate key) is treated as a non-fatal condition: a DISPLAY message identifies the duplicate NPI and WS-RECORDS-SKIPPED is incremented, with no record written. Any other status is treated as a hard write error: a DISPLAY message with the raw status is emitted, WS-RECORDS-ERRORED is incremented, and RETURN-CODE is set to 8."
+      },
+      {
+        "category": "Error File Write Errors",
+        "description": "Writes to APP-ERROR-FILE in WRITE-ERROR-RECORD are performed without any subsequent check of WS-APP-ERR-STATUS. There is no error handling for failures writing to the error log itself, meaning error records could be silently lost if the error file encounters an I/O problem."
+      },
+      {
+        "category": "File Open / Initialization Errors",
+        "description": "Files are opened in INITIALIZE-PROGRAM (APP-INPUT-FILE as INPUT, PRV-MASTER-FILE as I-O, APP-ERROR-FILE as OUTPUT) but no file status checks are performed after the OPEN statements. Failures to open any of the three files are not detected, logged, or handled, and processing would continue or abend without a controlled error response."
+      },
+      {
+        "category": "Batch Identification / Environment Errors",
+        "description": "The BATCH_ID environment variable is accepted via ACCEPT. If it is absent or blank, a default value of 'DEFBATCH' is substituted. This is a soft fallback with no error flag set and no non-zero RETURN-CODE issued, so missing batch context is silently tolerated."
+      },
+      {
+        "category": "End-of-Job Return Code Handling",
+        "description": "TERMINATE-PROGRAM sets RETURN-CODE to 4 if WS-RECORDS-ERRORED is greater than zero, signaling a warning condition to the JCL. Individual hard errors (read failures, write failures) set RETURN-CODE to 8 inline. There is no consolidation logic, so a prior inline setting of 8 could be overwritten to 4 at termination if the errored count is non-zero, potentially downgrading the severity signal to the job scheduler."
+      }
+    ]
+  }
+}
