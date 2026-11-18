@@ -3,6 +3,7 @@ from pathlib import Path
 
 KAG = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(KAG / "loaders"))
+sys.path.insert(0, str(KAG))
 
 REPO = KAG.parents[1]
 SRC = REPO / "source-code"

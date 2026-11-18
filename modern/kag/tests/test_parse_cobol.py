@@ -75,3 +75,12 @@ def test_total_lines_are_one_less_than_aws_asset_counts():
     for prog, n in aws.items():
         folder = PROGRAMS[prog]
         assert parse_cobol(read(f"{folder}/{prog}.cbl"))["total_lines"] == n - 1, prog
+
+
+def test_section_level_copy_is_not_attached_to_the_previous_record():
+    # Regression: COPY WRKSTORE sits right after WORKING-STORAGE SECTION and must not attach to the FD record before it.
+    p = parse_cobol(read("BATCH/PRVENR01.cbl"))
+    recs = {r.name: r for r in p["records"]}
+    assert recs["APP-ERROR-RECORD"].copies == []
+    assert recs["WS-PRV-WORK"].copies == ["PRVRECRD"] and recs["WS-PRV-WORK"].length == 0
+    assert any(c["name"] == "WRKSTORE" for c in p["copies"])  # still recorded as a program-level COPY

@@ -151,11 +151,13 @@ def parse_data_division(code):
     stack: list[DataItem] = []
     cur_fd, cur_declared, section = None, None, "WORKING-STORAGE"
     last: DataItem | None = None
+    in_record = False  # a COPY attaches to a record only while we are inside one (after an 01, before the next section/FD)
     for ln, stmt in split_statements(code):
         up = stmt.upper()
         m = re.match(r"(FILE|WORKING-STORAGE|LINKAGE|LOCAL-STORAGE) SECTION$", up)
         if m:
             section = m.group(1)
+            in_record, last = False, None
             if section != "FILE":
                 cur_fd = cur_declared = None
             continue
@@ -166,16 +168,15 @@ def parse_data_division(code):
             cur_fd = m.group(2)
             d = re.search(r"RECORD CONTAINS (\d+)", up)
             cur_declared = int(d.group(1)) if d else None
+            in_record, last = False, None
             continue
         if up.startswith("EXEC "):
             continue
         m = re.match(r"COPY\s+([A-Z0-9-]+)", up)
         if m:
-            target = last or (records[-1].root if records else None)
-            if target is not None:
-                target.copy = m.group(1)
-                if records:
-                    records[-1].copies.append(m.group(1))
+            if in_record and records:
+                (last or records[-1].root).copy = m.group(1)
+                records[-1].copies.append(m.group(1))
             continue
         m = re.match(r"(\d{1,2})(?:\s+(\S+))?(.*)$", stmt)
         if not m:
@@ -203,6 +204,7 @@ def parse_data_division(code):
                          declared_length=cur_declared if section == "FILE" else None, section=section)
             records.append(rec)
             stack = [item]
+            in_record = True
         elif stack:
             while len(stack) > 1 and stack[-1].level >= level:
                 stack.pop()
@@ -333,7 +335,9 @@ def parse_jcl(text: str) -> dict:
             steps.append(cur)
         elif op == "DD" and cur is not None:
             dsn = re.search(r"\bDSN=([^,\s]+)", s["operands"], re.I)
-            cur["dds"].append({"dd": nm or None, "dsn": dsn.group(1) if dsn else None, "line": s["line"]})
+            lr = re.search(r"\bLRECL=(\d+)", s["operands"], re.I)
+            cur["dds"].append({"dd": nm or None, "dsn": dsn.group(1) if dsn else None,
+                               "lrecl": int(lr.group(1)) if lr else None, "line": s["line"]})
     sysin = _instream(text)
     return {"kind": kind, "name": name, "steps": steps, "idcams": parse_idcams(sysin) if "IDCAMS" in text.upper() else []}
 
