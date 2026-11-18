@@ -7,7 +7,7 @@ AWAITING APPROVAL, APPROVED.
 
 | Phase | Status | Approved on | Notes |
 |---|---|---|---|
-| 0 Setup | AWAITING APPROVAL | | Not pushed to GitHub yet (awaiting user OK). `uv` not installed (needed in Phase 1). |
+| 0 Setup | AWAITING APPROVAL | | Git stays local; push only when the user asks. `uv` not installed (needed in Phase 1). |
 | 1 Knowledge graph | NOT STARTED | | |
 | 2 Legacy analysis | NOT STARTED | | |
 | 3 Architecture and UX | NOT STARTED | | |
@@ -34,6 +34,8 @@ AWAITING APPROVAL, APPROVED.
 
 | Date | Decision | Made by | Where recorded |
 |---|---|---|---|
+| 2026-11-18 | Git stays local. Nothing is pushed to GitHub until the user asks; then push as the user directs. | user | this file |
+| 2026-11-18 | Phase 1 uses the user's **local Neo4j Desktop** (Bolt `127.0.0.1:7687`), not a Docker Neo4j. Its discovery endpoint reports version `2026.03.1`, edition `enterprise` (the kit text assumes 5.x: driver/MCP compatibility is checked in Phase 1). Recommended in Phase 1: a dedicated database for PEM (Enterprise allows several) so constraints and nodes do not mix with the user's other graphs. | user (choice), Claude (version check) | this file |
 | 2026-11-18 | Phase 9 legacy outputs are produced by running the legacy jobs in the local Docker container `mmis-hercules` (MVS TK5 on Hercules). Container state and the `*-LAB.jcl` stubs are checked when Phase 9 starts. | user | this file |
 | 2026-11-18 | Git remote is `shalumg17799-eng/mmis-pem-layer7-modernization` (public, empty when checked). Baseline is on `main`, work on `modernization`. Repo-local `core.autocrlf=false` so legacy files keep their exact bytes. Nothing pushed until the user confirms. | user (remote), Claude (autocrlf) | this file |
 | 2026-11-18 | The duplicate extract of the kit under `_archive/` was removed by the user; `_archive/pem-agent-kit.zip` stays as the backup. | user | this file |
