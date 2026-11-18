@@ -1,0 +1,77 @@
+rule_id,program,paragraph,start_line,end_line,status,note
+R-PRVENR01-ADD-01,PRVENR01,"(data division),PROCESS-APPLICATIONS",55,103,VERIFIED,"The intake record is 200 bytes (APP-INPUT-RECORD X(200)) but is read INTO the 130-byte PRVRECRD work area, so bytes 131-200 of each intake record are ignored. The real intake layout is not defined anywhere in the estate."
+R-PRVENR01-ADD-02,PRVENR01,"(data division),WRITE-PROVIDER-RECORD",57,159,VERIFIED,"The master FD declares 121 bytes but PRVRECRD is 130, so PRV-OWNER-NPI (bytes 121-130) would be lost on a 121-byte file (INFERRED effect). D-007: 130 is correct."
+R-PRVENR01-ADD-03,PRVENR01,"MAIN-CONTROL,PROCESS-APPLICATIONS",81,116,VERIFIED,"A persistent read error (status other than 00 or 10) never sets the end-of-file flag, so the PERFORM UNTIL loop would repeat forever (INFERRED, not executed)."
+R-PRVENR01-ADD-04,PRVENR01,WRITE-PROVIDER-RECORD,160,166,VERIFIED,Duplicate detection happens only at WRITE (status 22). EC-DUP-NPI (E103) is never used (D-016).
+R-PRVENR01-ADD-05,PRVENR01,VALIDATE-APPLICATION,129,145,VERIFIED,Only the missing-NPI branch moves an error code (cut to 2 bytes); E102 and E104 are never assigned (D-016).
+R-PRVENR01-ADD-06,PRVENR01,"(data division),WRITE-ERROR-RECORD",75,179,VERIFIED,"WS-ERR-DETAIL (X(250)) has no VALUE and STRING does not clear it, so bytes 41-250 of every error row are undefined (INFERRED)."
+R-PRVENR01-ADD-07,PRVENR01,"PROCESS-APPLICATIONS,WRITE-PROVIDER-RECORD,TERMINATE-PROGRAM",114,189,VERIFIED,"RC 4 at termination overwrites an earlier RC 8, so a hard error is reported to the job as a warning (D-017 area)."
+R-PRVENR01-ADD-08,PRVENR01,"PROCESS-APPLICATIONS,VALIDATE-APPLICATION,WRITE-PROVIDER-RECORD",109,166,VERIFIED,"Counters are not exclusive: an invalid application is counted as read, as errored and then as written or skipped."
+R-PRVENR01-cbl-00001,PRVENR01,INITIALIZE-PROGRAM,85,100,VERIFIED,INITIALIZE-PROGRAM sets the batch id (default DEFBATCH) and displays the start message.
+R-PRVENR01-cbl-00002,PRVENR01,PROCESS-APPLICATIONS,102,116,VERIFIED,"READ, EOF test and read counter in PROCESS-APPLICATIONS."
+R-PRVENR01-cbl-00003,PRVENR01,VALIDATE-APPLICATION,128,133,MISMATCH,"Error counted and error row written (130-131), but GO TO INVALID-APP (132) falls through to WRITE-PROVIDER-RECORD (157-159): the application is NOT rejected from the master. AWS states the corrected behaviour. Decision D-001 FIX."
+R-PRVENR01-cbl-00004,PRVENR01,VALIDATE-APPLICATION,134,139,MISMATCH,Same defect: error row written (138) then GO TO INVALID-APP; the application is still written to the master. D-001.
+R-PRVENR01-cbl-00005,PRVENR01,VALIDATE-APPLICATION,141,144,MISMATCH,Same defect for a blank taxonomy. D-001.
+R-PRVENR01-cbl-00006,PRVENR01,WRITE-ERROR-RECORD,173,179,VERIFIED,"Error row = NPI + ' TYPE:' + type code + ' ERR:VALIDATION-FAILED' (STRING, 40 meaningful bytes)."
+R-PRVENR01-cbl-00007,PRVENR01,VALIDATE-APPLICATION,146,148,VERIFIED,On the VALID path PENDING and UNSCREENED are set before the write. On the invalid path these two statements are skipped (see 00034).
+R-PRVENR01-cbl-00008,PRVENR01,WRITE-PROVIDER-RECORD,160,171,VERIFIED,"EVALUATE on the write status: 00 counts written, 22 counts skipped with message, other is error with RC 8."
+R-PRVENR01-cbl-00009,PRVENR01,TERMINATE-PROGRAM,181,189,VERIFIED,Four counters displayed and RC 4 set when errors exist.
+R-PRVENR01-cbl-00010,PRVENR01,INITIALIZE-PROGRAM,86,86,VERIFIED,MOVE 'PRVENR01' TO WS-PROGRAM-ID.
+R-PRVENR01-cbl-00011,PRVENR01,INITIALIZE-PROGRAM,88,91,VERIFIED,Four counters zeroed.
+R-PRVENR01-cbl-00012,PRVENR01,INITIALIZE-PROGRAM,92,92,VERIFIED,OPEN INPUT APP-INPUT-FILE.
+R-PRVENR01-cbl-00013,PRVENR01,INITIALIZE-PROGRAM,93,93,VERIFIED,OPEN I-O PRV-MASTER-FILE.
+R-PRVENR01-cbl-00014,PRVENR01,INITIALIZE-PROGRAM,94,94,VERIFIED,OPEN OUTPUT APP-ERROR-FILE.
+R-PRVENR01-cbl-00015,PRVENR01,INITIALIZE-PROGRAM,95,95,VERIFIED,"ACCEPT FROM ENVIRONMENT 'BATCH_ID'. The JCL passes PARM='BATCH_ID=&BATCH_DATE' instead and the program has no LINKAGE, so the id is probably always blank (D-017)."
+R-PRVENR01-cbl-00016,PRVENR01,INITIALIZE-PROGRAM,96,98,VERIFIED,Blank id defaults to DEFBATCH.
+R-PRVENR01-cbl-00017,PRVENR01,INITIALIZE-PROGRAM,96,98,VERIFIED,A non-blank id is kept (the IF has no ELSE).
+R-PRVENR01-cbl-00018,PRVENR01,INITIALIZE-PROGRAM,99,100,VERIFIED,Start message with the batch id.
+R-PRVENR01-cbl-00019,PRVENR01,PROCESS-APPLICATIONS,103,104,VERIFIED,READ INTO WS-PRV-WORK and the file status copied to WS-FILE-STATUS. The 200-byte intake record is read INTO a 130-byte area (see ADD-01).
+R-PRVENR01-cbl-00020,PRVENR01,PROCESS-APPLICATIONS,105,106,VERIFIED,End-of-file sets the flag.
+R-PRVENR01-cbl-00021,PRVENR01,PROCESS-APPLICATIONS,108,109,VERIFIED,Successful read adds 1.
+R-PRVENR01-cbl-00022,PRVENR01,PROCESS-APPLICATIONS,110,110,VERIFIED,PERFORM VALIDATE-APPLICATION.
+R-PRVENR01-cbl-00023,PRVENR01,PROCESS-APPLICATIONS,111,114,VERIFIED,"Read error: message, error counter and RC 8. The loop then reads again (see ADD-03: possible endless loop, INFERRED)."
+R-PRVENR01-cbl-00024,PRVENR01,VALIDATE-APPLICATION,128,133,VERIFIED,Blank NPI is routed to error processing (what happens next is the defect in 00003).
+R-PRVENR01-cbl-00025,PRVENR01,VALIDATE-APPLICATION,129,129,VERIFIED,"EC-MISSING-NPI is moved to WS-FILE-STATUS (a 2-byte field, so it is cut to E1) and never read again (ADD-05, D-016)."
+R-PRVENR01-cbl-00026,PRVENR01,VALIDATE-APPLICATION,130,130,VERIFIED,ADD 1 TO WS-RECORDS-ERRORED.
+R-PRVENR01-cbl-00027,PRVENR01,VALIDATE-APPLICATION,131,131,VERIFIED,PERFORM WRITE-ERROR-RECORD.
+R-PRVENR01-cbl-00028,PRVENR01,VALIDATE-APPLICATION,132,133,VERIFIED,GO TO INVALID-APP; execution continues into WRITE-PROVIDER-RECORD (155-159). This rule describes the defect correctly (AP-01).
+R-PRVENR01-cbl-00029,PRVENR01,VALIDATE-APPLICATION,134,139,MISMATCH,Rule says the invalid type must not proceed to enrolment; the code proceeds (fall-through). D-001.
+R-PRVENR01-cbl-00030,PRVENR01,VALIDATE-APPLICATION,134,141,VERIFIED,"A valid type (IN, GR or FA) continues to the taxonomy check."
+R-PRVENR01-cbl-00031,PRVENR01,VALIDATE-APPLICATION,137,137,VERIFIED,ADD 1 TO WS-RECORDS-ERRORED.
+R-PRVENR01-cbl-00032,PRVENR01,VALIDATE-APPLICATION,138,139,VERIFIED,"Error row written, then GO TO INVALID-APP (which does not stop the flow)."
+R-PRVENR01-cbl-00033,PRVENR01,WRITE-ERROR-RECORD,173,179,VERIFIED,"Error row with NPI, 'TYPE:' and the type code."
+R-PRVENR01-cbl-00034,PRVENR01,"INVALID-APP,WRITE-PROVIDER-RECORD",155,159,MISMATCH,"Rule says the invalid record is written with status PENDING and UNSCREENED. The SET statements (146-147) are skipped by the GO TO, so it is written with whatever status bytes the input held. AP-01, D-001."
+R-PRVENR01-cbl-00035,PRVENR01,VALIDATE-APPLICATION,141,144,MISMATCH,Missing taxonomy is flagged and logged but the application is still written. D-001.
+R-PRVENR01-cbl-00036,PRVENR01,VALIDATE-APPLICATION,142,142,VERIFIED,ADD 1 TO WS-RECORDS-ERRORED.
+R-PRVENR01-cbl-00037,PRVENR01,VALIDATE-APPLICATION,143,143,VERIFIED,PERFORM WRITE-ERROR-RECORD.
+R-PRVENR01-cbl-00038,PRVENR01,"INVALID-APP,WRITE-PROVIDER-RECORD",155,159,MISMATCH,"Rule says the rest of the processing is skipped and the next record is read. WRITE-PROVIDER-RECORD is NOT skipped, and control then runs on through WRITE-ERROR-RECORD and TERMINATE-PROGRAM (INFERRED, not executed: the load likely stops at the first bad application). D-001."
+R-PRVENR01-cbl-00039,PRVENR01,VALIDATE-APPLICATION,141,146,VERIFIED,A taxonomy that is present reaches the status assignment.
+R-PRVENR01-cbl-00040,PRVENR01,VALIDATE-APPLICATION,146,146,VERIFIED,SET PRV-PENDING TO TRUE.
+R-PRVENR01-cbl-00041,PRVENR01,VALIDATE-APPLICATION,147,147,VERIFIED,SET PRV-UNSCREENED TO TRUE.
+R-PRVENR01-cbl-00042,PRVENR01,VALIDATE-APPLICATION,148,148,VERIFIED,PERFORM WRITE-PROVIDER-RECORD.
+R-PRVENR01-cbl-00043,PRVENR01,VALIDATE-APPLICATION,128,133,MISMATCH,Rule says the application is excluded from further enrolment; the code only adds the error row and then falls through to the write. D-001.
+R-PRVENR01-cbl-00044,PRVENR01,VALIDATE-APPLICATION,134,139,MISMATCH,Same as 00043 for an invalid type. D-001.
+R-PRVENR01-cbl-00045,PRVENR01,VALIDATE-APPLICATION,141,144,MISMATCH,Same as 00043 for a missing taxonomy. D-001.
+R-PRVENR01-cbl-00046,PRVENR01,WRITE-ERROR-RECORD,174,178,VERIFIED,"STRING of NPI, ' TYPE:', type code and ' ERR:VALIDATION-FAILED' into WS-ERR-DETAIL."
+R-PRVENR01-cbl-00047,PRVENR01,WRITE-ERROR-RECORD,179,179,VERIFIED,WRITE APP-ERROR-RECORD FROM WS-ERR-DETAIL (one row per call).
+R-PRVENR01-cbl-00048,PRVENR01,"INVALID-APP,WRITE-PROVIDER-RECORD",155,159,MISMATCH,Rule states the corrected behaviour ('must NOT fall through'); the code falls through (AP-01). D-001.
+R-PRVENR01-cbl-00049,PRVENR01,WRITE-PROVIDER-RECORD,157,159,MISMATCH,Rule says the invalid record must not be written; the code writes it (without PENDING/UNSCREENED). D-001.
+R-PRVENR01-cbl-00050,PRVENR01,WRITE-PROVIDER-RECORD,157,162,MISMATCH,Rule says the invalid record must not exist in the master; it is written and counted as written. D-001.
+R-PRVENR01-cbl-00051,PRVENR01,WRITE-PROVIDER-RECORD,163,166,VERIFIED,"A duplicate NPI gives status 22: message and skipped counter. The write itself fails, so the existing record is kept (INFERRED from WRITE semantics, not executed)."
+R-PRVENR01-cbl-00052,PRVENR01,WRITE-PROVIDER-RECORD,157,159,MISMATCH,Rule says an improperly written record must not be eligible downstream; the code does write it. No auto-approval sweep exists in this estate (nothing sets ACTIVE: see D-019). D-001.
+R-PRVENR01-cbl-00053,PRVENR01,VALIDATE-APPLICATION,134,139,MISMATCH,Rule says an invalid provider type is rejected; the code also writes it. D-001.
+R-PRVENR01-cbl-00054,PRVENR01,VALIDATE-APPLICATION,128,133,MISMATCH,Same for a missing NPI. D-001.
+R-PRVENR01-cbl-00055,PRVENR01,VALIDATE-APPLICATION,141,144,MISMATCH,Same for a missing taxonomy. D-001.
+R-PRVENR01-cbl-00056,PRVENR01,WRITE-PROVIDER-RECORD,157,159,VERIFIED,MOVE WS-PRV-WORK TO PRV-MASTER-RECORD then WRITE. The record carries whatever status the work area holds.
+R-PRVENR01-cbl-00057,PRVENR01,WRITE-PROVIDER-RECORD,161,162,VERIFIED,Status 00 adds 1 to written.
+R-PRVENR01-cbl-00058,PRVENR01,WRITE-PROVIDER-RECORD,163,166,VERIFIED,"Duplicate key: message 'DUPLICATE NPI', skipped counter."
+R-PRVENR01-cbl-00059,PRVENR01,WRITE-PROVIDER-RECORD,167,170,VERIFIED,"Other status: 'WRITE ERROR', error counter, RC 8."
+R-PRVENR01-cbl-00060,PRVENR01,TERMINATE-PROGRAM,182,182,VERIFIED,CLOSE of the three files.
+R-PRVENR01-cbl-00061,PRVENR01,TERMINATE-PROGRAM,183,183,VERIFIED,DISPLAY READ count.
+R-PRVENR01-cbl-00062,PRVENR01,TERMINATE-PROGRAM,184,184,VERIFIED,DISPLAY WRITTEN count.
+R-PRVENR01-cbl-00063,PRVENR01,TERMINATE-PROGRAM,185,185,VERIFIED,DISPLAY ERRORS count.
+R-PRVENR01-cbl-00064,PRVENR01,TERMINATE-PROGRAM,186,186,VERIFIED,DISPLAY SKIPPED count.
+R-PRVENR01-cbl-00065,PRVENR01,TERMINATE-PROGRAM,187,187,VERIFIED,IF errored > zero.
+R-PRVENR01-cbl-00066,PRVENR01,TERMINATE-PROGRAM,188,188,VERIFIED,"MOVE 4 TO RETURN-CODE (also overwrites an earlier RC 8, see ADD-07)."
+R-PRVENR01-cbl-00067,PRVENR01,TERMINATE-PROGRAM,187,189,VERIFIED,With no errors RETURN-CODE is left unset (default 0).
+R-PRVENR01-cbl-00068,PRVENR01,TERMINATE-PROGRAM,187,189,VERIFIED,RC 4 when any error was counted.

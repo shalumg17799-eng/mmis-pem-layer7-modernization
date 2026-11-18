@@ -1,0 +1,29 @@
+rule_id,program,paragraph,start_line,end_line,status,note
+R-PRVREV01-ADD-01,PRVREV01,CHECK-NEXT,81,84,VERIFIED,"The due date compared here is the one PRVRSK01 resets to today + 5 years on every daily run, so no provider processed by PRVRSK01 can ever be due: the queue stays (almost) empty. INFERRED combination (not executed). D-003 FIX."
+R-PRVREV01-ADD-02,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",81,94,VERIFIED,"No state is kept: a provider that stays overdue is queued again at every month end, and the queue row has no sweep date."
+R-PRVREV01-ADD-03,PRVREV01,CHECK-NEXT,81,84,VERIFIED,An active provider whose due date is zero (never classified by PRVRSK01) is <= today and is queued.
+R-PRVREV01-ADD-04,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",76,93,VERIFIED,"READ and WRITE statuses are not tested beyond end of file, and RETURN-CODE is never set."
+R-PRVREV01-cbl-00001,PRVREV01,MAIN-CONTROL,64,65,VERIFIED,ACCEPT WS-TODAY FROM DATE YYYYMMDD at start.
+R-PRVREV01-cbl-00002,PRVREV01,MAIN-CONTROL,66,67,VERIFIED,Master opened INPUT and the queue file OUTPUT.
+R-PRVREV01-cbl-00003,PRVREV01,CHECK-NEXT,81,81,VERIFIED,Only PRV-ACTIVE records are considered.
+R-PRVREV01-cbl-00004,PRVREV01,CHECK-NEXT,81,84,VERIFIED,"Due date <= today queues the provider. The due dates come from PRVRSK01, which resets them (ADD-01, D-003)."
+R-PRVREV01-cbl-00005,PRVREV01,QUEUE-FOR-REVAL,89,93,VERIFIED,"The queue row holds NPI, due date and 'RESCREEN-REQUIRED'."
+R-PRVREV01-cbl-00006,PRVREV01,QUEUE-FOR-REVAL,94,94,VERIFIED,ADD 1 TO WS-REVAL-COUNT.
+R-PRVREV01-cbl-00007,PRVREV01,MAIN-CONTROL,71,72,VERIFIED,DISPLAY with the final count.
+R-PRVREV01-cbl-00008,PRVREV01,MAIN-CONTROL,65,65,MISMATCH,"The date is held as YYYYMMDD (PIC 9(08)), not YYYY-MM-DD as the rule says. Format difference only."
+R-PRVREV01-cbl-00009,PRVREV01,MAIN-CONTROL,64,64,VERIFIED,MOVE 'PRVREV01' TO WS-PROGRAM-ID.
+R-PRVREV01-cbl-00010,PRVREV01,"(data division),MAIN-CONTROL",59,65,VERIFIED,WS-TODAY is set once and never changed.
+R-PRVREV01-cbl-00011,PRVREV01,CHECK-NEXT,76,76,VERIFIED,READ NEXT.
+R-PRVREV01-cbl-00012,PRVREV01,CHECK-NEXT,78,79,VERIFIED,EOF sets the flag.
+R-PRVREV01-cbl-00013,PRVREV01,CHECK-NEXT,80,85,VERIFIED,A record that is read goes to the eligibility test and the loop continues.
+R-PRVREV01-cbl-00014,PRVREV01,MAIN-CONTROL,69,70,VERIFIED,Loop ends and the files are closed.
+R-PRVREV01-cbl-00015,PRVREV01,CHECK-NEXT,81,81,VERIFIED,Active filter.
+R-PRVREV01-cbl-00016,PRVREV01,CHECK-NEXT,82,84,VERIFIED,Due date on or before today.
+R-PRVREV01-cbl-00017,PRVREV01,QUEUE-FOR-REVAL,89,89,VERIFIED,MOVE NPI TO REV-NPI.
+R-PRVREV01-cbl-00018,PRVREV01,QUEUE-FOR-REVAL,90,91,VERIFIED,MOVE due date TO REV-DUE-DATE.
+R-PRVREV01-cbl-00019,PRVREV01,QUEUE-FOR-REVAL,92,92,VERIFIED,MOVE 'RESCREEN-REQUIRED' TO REV-ACTION.
+R-PRVREV01-cbl-00020,PRVREV01,QUEUE-FOR-REVAL,93,93,VERIFIED,WRITE REVAL-OUT-RECORD.
+R-PRVREV01-cbl-00021,PRVREV01,QUEUE-FOR-REVAL,94,94,VERIFIED,Count incremented.
+R-PRVREV01-cbl-00022,PRVREV01,"MAIN-CONTROL,CHECK-NEXT",69,86,VERIFIED,Loop continues until EOF.
+R-PRVREV01-cbl-00023,PRVREV01,MAIN-CONTROL,70,72,VERIFIED,Files closed then the count is displayed.
+R-PRVREV01-cbl-00024,PRVREV01,MAIN-CONTROL,71,72,VERIFIED,Summary message with the count.

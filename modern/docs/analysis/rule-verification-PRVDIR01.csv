@@ -1,0 +1,35 @@
+rule_id,program,paragraph,start_line,end_line,status,note
+R-PRVDIR01-ADD-01,PRVDIR01,EXTRACT-NEXT,78,79,VERIFIED,"The filter is only the active status. Screening result and overdue revalidation are not considered, so an active provider that failed screening or is overdue still appears in the directory."
+R-PRVDIR01-ADD-02,PRVDIR01,WRITE-DIR-ROW,88,88,VERIFIED,"DIR-NAME is the first 60 bytes of PRV-VARIANT, which is not a display name: for an individual it is last name (30) + first name (20) + the first 10 characters of the licence number; for a group or facility it is the legal name (40) + the first 20 of the DBA name. No trimming or spacing."
+R-PRVDIR01-ADD-03,PRVDIR01,"MAIN-CONTROL,WRITE-DIR-ROW",64,89,VERIFIED,OPEN statuses and WRITE status are never tested and RETURN-CODE is never set.
+R-PRVDIR01-ADD-04,PRVDIR01,"(data division),WRITE-DIR-ROW",47,88,VERIFIED,"The directory row has no taxonomy or specialty, address, phone or network information, so it cannot feed a FHIR PractitionerRole (specialty = taxonomy) as it is (Q-008)."
+R-PRVDIR01-ADD-05,PRVDIR01,"MAIN-CONTROL,EXTRACT-NEXT",62,73,VERIFIED,AP-06: PEMAPP2 reads PEMAPP1's master directly with no API. D-013 FIX.
+R-PRVDIR01-cbl-00001,PRVDIR01,MAIN-CONTROL,63,67,VERIFIED,MAIN-CONTROL opens the master INPUT and the directory file OUTPUT and starts the loop.
+R-PRVDIR01-cbl-00002,PRVDIR01,EXTRACT-NEXT,73,73,VERIFIED,READ PRV-MASTER-FILE NEXT RECORD.
+R-PRVDIR01-cbl-00003,PRVDIR01,EXTRACT-NEXT,75,76,VERIFIED,EOF sets the flag.
+R-PRVDIR01-cbl-00004,PRVDIR01,EXTRACT-NEXT,78,79,VERIFIED,Only PRV-ACTIVE providers are written (ADD-01).
+R-PRVDIR01-cbl-00005,PRVDIR01,WRITE-DIR-ROW,84,88,VERIFIED,"Five fields are mapped: Medicaid ID, NPI, type, risk tier, name."
+R-PRVDIR01-cbl-00006,PRVDIR01,WRITE-DIR-ROW,88,88,VERIFIED,DIR-NAME takes the first 60 bytes of PRV-VARIANT (ADD-02).
+R-PRVDIR01-cbl-00007,PRVDIR01,WRITE-DIR-ROW,89,89,VERIFIED,WRITE DIR-OUT-RECORD.
+R-PRVDIR01-cbl-00008,PRVDIR01,WRITE-DIR-ROW,90,90,VERIFIED,ADD 1 TO WS-DIR-COUNT.
+R-PRVDIR01-cbl-00009,PRVDIR01,MAIN-CONTROL,68,69,VERIFIED,Both files closed and the count displayed.
+R-PRVDIR01-cbl-00010,PRVDIR01,MAIN-CONTROL,63,63,VERIFIED,MOVE 'PRVDIR01' TO WS-PROGRAM-ID.
+R-PRVDIR01-cbl-00011,PRVDIR01,MAIN-CONTROL,64,64,VERIFIED,OPEN INPUT of the master. No OPEN status is tested (ADD-03).
+R-PRVDIR01-cbl-00012,PRVDIR01,MAIN-CONTROL,65,65,VERIFIED,OPEN OUTPUT of the directory file (ADD-03).
+R-PRVDIR01-cbl-00013,PRVDIR01,MAIN-CONTROL,66,66,VERIFIED,End-of-file flag set to N.
+R-PRVDIR01-cbl-00014,PRVDIR01,MAIN-CONTROL,67,67,VERIFIED,The loop starts after the opens.
+R-PRVDIR01-cbl-00015,PRVDIR01,"MAIN-CONTROL,EXTRACT-NEXT",67,81,VERIFIED,"One record per read, in file order."
+R-PRVDIR01-cbl-00016,PRVDIR01,EXTRACT-NEXT,75,76,VERIFIED,EOF ends the loop.
+R-PRVDIR01-cbl-00017,PRVDIR01,EXTRACT-NEXT,77,80,VERIFIED,A record that is read goes to the active filter.
+R-PRVDIR01-cbl-00018,PRVDIR01,EXTRACT-NEXT,78,78,VERIFIED,Active filter.
+R-PRVDIR01-cbl-00019,PRVDIR01,WRITE-DIR-ROW,84,84,VERIFIED,MOVE Medicaid ID.
+R-PRVDIR01-cbl-00020,PRVDIR01,WRITE-DIR-ROW,85,85,VERIFIED,MOVE NPI.
+R-PRVDIR01-cbl-00021,PRVDIR01,WRITE-DIR-ROW,86,86,VERIFIED,MOVE type code.
+R-PRVDIR01-cbl-00022,PRVDIR01,WRITE-DIR-ROW,87,87,VERIFIED,MOVE risk tier.
+R-PRVDIR01-cbl-00023,PRVDIR01,WRITE-DIR-ROW,88,88,VERIFIED,MOVE first 60 bytes of PRV-VARIANT.
+R-PRVDIR01-cbl-00024,PRVDIR01,WRITE-DIR-ROW,84,88,VERIFIED,All five fields mapped.
+R-PRVDIR01-cbl-00025,PRVDIR01,WRITE-DIR-ROW,88,88,VERIFIED,60-byte name (ADD-02).
+R-PRVDIR01-cbl-00026,PRVDIR01,WRITE-DIR-ROW,89,89,VERIFIED,WRITE to the nightly flat file.
+R-PRVDIR01-cbl-00027,PRVDIR01,WRITE-DIR-ROW,90,90,VERIFIED,Count incremented per row written.
+R-PRVDIR01-cbl-00028,PRVDIR01,WRITE-DIR-ROW,90,90,VERIFIED,Same counter.
+R-PRVDIR01-cbl-00029,PRVDIR01,MAIN-CONTROL,69,69,VERIFIED,DISPLAY 'PRVDIR01: DIRECTORY ROWS=' count.

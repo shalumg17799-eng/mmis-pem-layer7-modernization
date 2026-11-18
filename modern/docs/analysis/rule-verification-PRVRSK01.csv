@@ -1,0 +1,56 @@
+rule_id,program,paragraph,start_line,end_line,status,note
+R-PRVRSK01-ADD-01,PRVRSK01,"CLASSIFY-NEXT,CLASSIFY-ONE",70,97,VERIFIED,"There is no status filter: every provider (active, terminated, denied) is re-tiered on every run, and the due date is reset to today + 5 years each time. D-003 FIX."
+R-PRVRSK01-ADD-02,PRVRSK01,SET-REVALIDATION-DATE,129,136,VERIFIED,"The month and day are copied unchanged, so a run on Feb 29 produces an impossible due date such as 20290229 (no leap-year handling). D-004 area."
+R-PRVRSK01-ADD-03,PRVRSK01,CLASSIFY-ONE,83,92,VERIFIED,There is no validation of the taxonomy: a blank or invalid value silently becomes LIMITED.
+R-PRVRSK01-ADD-04,PRVRSK01,"CLASSIFY-ONE,APPLY-TIER-PARA,TIER-DONE",95,116,VERIFIED,"AP-03. APPLY-TIER-PARA ends in an ALTERed GO TO; TIER-DONE EXIT (115-116) is outside the PERFORM range, so control INFERRED (not executed) continues into SET-REVALIDATION-DATE and off the end of the program: the REWRITE at 97 is likely never reached and only the first record is touched. D-002 FIX."
+R-PRVRSK01-ADD-05,PRVRSK01,CLASSIFY-NEXT,70,76,VERIFIED,READ NEXT tests only for end of file; any other status is not handled (INFERRED effect).
+R-PRVRSK01-ADD-06,PRVRSK01,CLASSIFY-ONE,97,97,VERIFIED,The REWRITE status is never tested.
+R-PRVRSK01-ADD-07,PRVRSK01,MAIN-CONTROL,61,67,VERIFIED,"No counters, no summary DISPLAY and no RETURN-CODE: the job cannot tell how many providers were classified."
+R-PRVRSK01-cbl-00001,PRVRSK01,MAIN-CONTROL,62,64,VERIFIED,Master opened I-O and the EOF flag set to N.
+R-PRVRSK01-cbl-00002,PRVRSK01,CLASSIFY-NEXT,70,76,VERIFIED,"READ NEXT; a record goes on to CLASSIFY-ONE, EOF ends the loop."
+R-PRVRSK01-cbl-00003,PRVRSK01,CLASSIFY-ONE,79,80,VERIFIED,First 3 characters of PRV-TAXONOMY go to WS-TAXONOMY-GROUP.
+R-PRVRSK01-cbl-00004,PRVRSK01,"CLASSIFY-ONE,HIGH-TIER",84,114,VERIFIED,"Prefix 332 or 251 sets PRV-RISK-HIGH via ALTER and HIGH-TIER. INFERRED (not executed): the ALTERed GO TO leaves the PERFORM range (AP-03, D-002)."
+R-PRVRSK01-cbl-00005,PRVRSK01,"CLASSIFY-ONE,MODERATE-TIER",87,111,VERIFIED,"Prefix 341, 291 or 225 sets PRV-RISK-MODERATE. Same ALTER note (D-002)."
+R-PRVRSK01-cbl-00006,PRVRSK01,"CLASSIFY-ONE,LIMITED-TIER",91,108,VERIFIED,"Any other prefix, including blank, sets PRV-RISK-LIMITED. Same ALTER note."
+R-PRVRSK01-cbl-00007,PRVRSK01,"LIMITED-TIER,MODERATE-TIER,HIGH-TIER",107,113,VERIFIED,"The tier is ONE field (PRV-RISK-TIER, PIC X) with three 88-levels, so exactly one value exists at a time."
+R-PRVRSK01-cbl-00008,PRVRSK01,SET-REVALIDATION-DATE,127,136,VERIFIED,"The 5-year due date is built with a 2-digit year (YY+5 modulo 100, pivot 70). D-004 FIX: 4-digit dates."
+R-PRVRSK01-cbl-00009,PRVRSK01,SET-REVALIDATION-DATE,137,137,VERIFIED,MOVE WS-DUE-DATE TO PRV-REVAL-DUE-DATE.
+R-PRVRSK01-cbl-00010,PRVRSK01,CLASSIFY-ONE,95,97,VERIFIED,"REWRITE of the master after the tier and the date are set. INFERRED (not executed): after the ALTERed GO TO the REWRITE may never be reached (ADD-04, D-002)."
+R-PRVRSK01-cbl-00011,PRVRSK01,MAIN-CONTROL,63,63,VERIFIED,OPEN I-O PRV-MASTER-FILE.
+R-PRVRSK01-cbl-00012,PRVRSK01,MAIN-CONTROL,64,64,VERIFIED,End-of-file flag set to N.
+R-PRVRSK01-cbl-00013,PRVRSK01,MAIN-CONTROL,65,65,VERIFIED,PERFORM CLASSIFY-NEXT UNTIL end of file.
+R-PRVRSK01-cbl-00014,PRVRSK01,CLASSIFY-NEXT,70,70,VERIFIED,READ PRV-MASTER-FILE NEXT RECORD.
+R-PRVRSK01-cbl-00015,PRVRSK01,CLASSIFY-NEXT,72,73,VERIFIED,End of file sets the flag and ends the loop.
+R-PRVRSK01-cbl-00016,PRVRSK01,CLASSIFY-NEXT,74,75,VERIFIED,A record is passed to CLASSIFY-ONE.
+R-PRVRSK01-cbl-00017,PRVRSK01,"MAIN-CONTROL,CLASSIFY-NEXT",65,76,VERIFIED,"Every record is read in sequence with no filter (ADD-01). INFERRED: if the ALTER path ends the program, only the first record is processed (D-002)."
+R-PRVRSK01-cbl-00018,PRVRSK01,CLASSIFY-ONE,79,79,VERIFIED,The taxonomy field of the master record is used.
+R-PRVRSK01-cbl-00019,PRVRSK01,CLASSIFY-ONE,79,79,VERIFIED,Reference modification (1:3) takes the first three characters.
+R-PRVRSK01-cbl-00020,PRVRSK01,CLASSIFY-ONE,80,80,VERIFIED,Stored in WS-TAXONOMY-GROUP.
+R-PRVRSK01-cbl-00021,PRVRSK01,CLASSIFY-ONE,79,80,VERIFIED,Same extraction (AWS repeats the rule).
+R-PRVRSK01-cbl-00022,PRVRSK01,CLASSIFY-ONE,84,86,VERIFIED,Prefix 332 or 251 is High risk. The meaning 'substance abuse facility' is AWS's reading: the source only has the numeric prefix (Q-005).
+R-PRVRSK01-cbl-00023,PRVRSK01,CLASSIFY-ONE,84,86,VERIFIED,"Prefix 332 or 251 is High risk. The meaning 'home health agency' is AWS's reading, not in the source (Q-005)."
+R-PRVRSK01-cbl-00024,PRVRSK01,HIGH-TIER,112,114,VERIFIED,"HIGH-TIER sets PRV-RISK-HIGH (the only flag, see 00007) and goes to TIER-DONE."
+R-PRVRSK01-cbl-00025,PRVRSK01,CLASSIFY-ONE,84,92,VERIFIED,Non-high prefixes go to the moderate or limited branch of the same EVALUATE.
+R-PRVRSK01-cbl-00026,PRVRSK01,CLASSIFY-ONE,87,90,VERIFIED,"Prefix 341, 291 or 225 is Moderate. The agency meaning is AWS's reading (Q-005)."
+R-PRVRSK01-cbl-00027,PRVRSK01,CLASSIFY-ONE,87,90,VERIFIED,Same prefixes. The 'laboratory' meaning is AWS's reading (Q-005).
+R-PRVRSK01-cbl-00028,PRVRSK01,CLASSIFY-ONE,87,90,VERIFIED,Same prefixes. The 'therapy' meaning is AWS's reading (Q-005).
+R-PRVRSK01-cbl-00029,PRVRSK01,MODERATE-TIER,109,111,VERIFIED,"MODERATE-TIER sets PRV-RISK-MODERATE, overwriting any earlier tier."
+R-PRVRSK01-cbl-00030,PRVRSK01,CLASSIFY-ONE,87,92,VERIFIED,A prefix that is not in the moderate list falls to WHEN OTHER (limited).
+R-PRVRSK01-cbl-00031,PRVRSK01,"CLASSIFY-ONE,APPLY-TIER-PARA",84,104,VERIFIED,With HIGH selected the limited paragraph is not run (the ALTER replaces the default GO TO). INFERRED for the runtime path.
+R-PRVRSK01-cbl-00032,PRVRSK01,"CLASSIFY-ONE,APPLY-TIER-PARA",87,104,VERIFIED,With MODERATE selected the limited paragraph is not run. INFERRED for the runtime path.
+R-PRVRSK01-cbl-00033,PRVRSK01,CLASSIFY-ONE,91,92,VERIFIED,"Everything else is WHEN OTHER, which selects the limited tier."
+R-PRVRSK01-cbl-00034,PRVRSK01,LIMITED-TIER,106,108,VERIFIED,"LIMITED-TIER sets PRV-RISK-LIMITED, overwriting any earlier tier."
+R-PRVRSK01-cbl-00035,PRVRSK01,"CLASSIFY-ONE,HIGH-TIER",84,114,VERIFIED,HIGH for 332 and 251.
+R-PRVRSK01-cbl-00036,PRVRSK01,"CLASSIFY-ONE,MODERATE-TIER",87,111,VERIFIED,"MODERATE for 341, 291 and 225."
+R-PRVRSK01-cbl-00037,PRVRSK01,"CLASSIFY-ONE,LIMITED-TIER",91,108,VERIFIED,LIMITED for all others.
+R-PRVRSK01-cbl-00038,PRVRSK01,"LIMITED-TIER,MODERATE-TIER,HIGH-TIER",107,113,VERIFIED,One field holds one tier (see 00007).
+R-PRVRSK01-cbl-00039,PRVRSK01,SET-REVALIDATION-DATE,127,127,VERIFIED,ACCEPT WS-CURR-DATE FROM DATE YYYYMMDD.
+R-PRVRSK01-cbl-00040,PRVRSK01,SET-REVALIDATION-DATE,128,128,VERIFIED,WS-CURR-YY from positions 3-4.
+R-PRVRSK01-cbl-00041,PRVRSK01,SET-REVALIDATION-DATE,129,129,VERIFIED,WS-CURR-MMDD from positions 5-8.
+R-PRVRSK01-cbl-00042,PRVRSK01,SET-REVALIDATION-DATE,130,130,VERIFIED,"WS-DUE-YY = MOD(YY + 5, 100). D-004."
+R-PRVRSK01-cbl-00043,PRVRSK01,SET-REVALIDATION-DATE,131,132,VERIFIED,Due year below 70 means 2000 + YY.
+R-PRVRSK01-cbl-00044,PRVRSK01,SET-REVALIDATION-DATE,133,134,VERIFIED,"Due year 70 or more means 1900 + YY: wrong from 2065 on (AP-04, D-004 FIX)."
+R-PRVRSK01-cbl-00045,PRVRSK01,SET-REVALIDATION-DATE,136,136,VERIFIED,Due date = CCYY * 10000 + MMDD.
+R-PRVRSK01-cbl-00046,PRVRSK01,SET-REVALIDATION-DATE,129,136,VERIFIED,"The month and day of today are kept, but a Feb 29 start date gives an invalid date in a non-leap year (ADD-02)."
+R-PRVRSK01-cbl-00047,PRVRSK01,SET-REVALIDATION-DATE,137,137,VERIFIED,Stored in PRV-REVAL-DUE-DATE.
+R-PRVRSK01-cbl-00048,PRVRSK01,CLASSIFY-ONE,97,97,VERIFIED,"REWRITE persists the tier and the date. INFERRED (not executed): may never be reached (ADD-04, D-002)."
