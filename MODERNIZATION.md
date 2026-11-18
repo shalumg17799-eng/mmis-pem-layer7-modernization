@@ -31,6 +31,11 @@ and conventions are in the skill `.claude/skills/java-microservices/SKILL.md`.
 
 ## 4. How we work: phases and gates
 
+> **Overridden by the user's standing working mode (2026-11-18), recorded in `modern/docs/PROGRESS.md` under
+> "Working mode".** Phases now run back to back; a phase whose exit checks all pass is approved in advance; stop only
+> for a missing credential or connection, a check that still fails after 2 attempts, a business question with no
+> recommended default, or before creating anything in Jira. The text below is the original rule, kept for reference.
+
 1. The user runs one phase command at a time: `/phase-0-setup` … `/phase-9-parity`.
 2. Each phase starts by reading `modern/docs/PROGRESS.md`. **If the previous phase is not
    `APPROVED`, stop** and say which phase must be approved first. (Phase 6 and 7 commands
