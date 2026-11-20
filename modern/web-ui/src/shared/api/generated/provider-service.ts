@@ -9,7 +9,7 @@ export interface paths {
         };
         /**
          * Search providers by NPI, Medicaid ID, name or status (replaces CICS PINQ)
-         * @description Roles: ANALYST, SUPERVISOR, ADMIN, SYSTEM. Legacy / decisions: PRVCICS1 inquiry; work-queue filters.
+         * @description Roles: ANALYST, SUPERVISOR, ADMIN, SYSTEM. Legacy / decisions: PRVCICS1 inquiry; work-queue filters; keyset paging Q-132 (1.2.0). Every given filter must match. The items are in ascending NPI order, with or without afterNpi (MAM-37 AC-6). Two ways to page, never mixed in one call. (1) Offset paging, unchanged: page and size; a call without afterNpi answers exactly as in 1.1.0 (same results, same order, same paging). (2) Keyset paging (1.2.0): afterNpi and size; the answer holds only the providers whose NPI is greater than afterNpi, in ascending NPI order, at most size of them; page must be absent or 0 (any other page is a 400 problem) and the answer then has page 0. To walk every match: the first call has no afterNpi (page absent or 0); each next call repeats the same filters and size and sets afterNpi to the npi of the last item of the previous answer; the walk ends at the first answer whose items list is empty (an answer with fewer items than size is the last one that holds providers, so a caller may also stop there). Because the key only moves forward, a provider that matches the filters for the whole walk is returned exactly once, whatever changes elsewhere in the data during the walk. total is always the number of ALL providers that match the filters (npi, medicaidId, name, status, screenFlag), never only those after the key: it is the same on every answer of a walk while the data does not change, and a caller compares it between answers to notice a change (the Q-132 safety net).
          */
         get: operations["searchProviders"];
         put?: never;
@@ -130,21 +130,54 @@ export interface components {
             decision: "APPROVE" | "DENY";
             reason?: string;
         };
+        /** @description Part of after in an APPROVED or DENIED entry (MAM-40, 1.1.0): the decision as sent to decideProvider. Both members are always written; reason is null when none was sent. */
+        AuditDecision: {
+            /** @enum {string} */
+            decision: "APPROVE" | "DENY";
+            reason: string | null;
+        };
+        /** @description One entry of the provider history (MAM-40, D-018). actor is the user, or the producing service for an event. action is one of REGISTERED, SCREENING_VERDICT, RISK_TIER_ASSIGNED, APPROVED, DENIED, TERMINATED, SUSPENDED, REINSTATED, REVALIDATION_PASSED, NOTICE_SENT. before and after are ProviderSnapshot (members declared in 1.1.0, Q-131 A). correlationId is absent when the request or event had none that is a uuid. */
         AuditEntry: {
             /** Format: date-time */
             at: string;
             actor: string;
             action: string;
-            before?: Record<string, never> | null;
-            after?: Record<string, never> | null;
+            before?: components["schemas"]["ProviderSnapshot"];
+            after?: components["schemas"]["ProviderSnapshot"];
             /** Format: uuid */
             correlationId?: string;
+        };
+        /** @description The only member of after in a NOTICE_SENT entry (MAM-40 AC-4, D-012, 1.1.0): the notice id and template of the NoticeSent event, as received. */
+        AuditNotice: {
+            /** Format: uuid */
+            noticeId: string;
+            template: string;
         };
         AuditPage: {
             items: components["schemas"]["AuditEntry"][];
             page: number;
             size: number;
             total: number;
+        };
+        /** @description Part of after in a RISK_TIER_ASSIGNED entry (MAM-40, 1.1.0): the tier of the RiskTierAssigned event, as received. */
+        AuditRisk: {
+            /** @enum {string} */
+            tier: "L" | "M" | "H";
+        };
+        /** @description Part of after in a SCREENING_VERDICT entry (MAM-40, 1.1.0): the result of the ScreeningCompleted event, as received. */
+        AuditScreening: {
+            /** @enum {string} */
+            result: "PASS" | "FAIL";
+        };
+        /** @description Part of after in a TERMINATED, SUSPENDED or REINSTATED entry (MAM-40 AC-5, 1.1.0): the StatusChangeRequest as applied. All four members are always written; reason and sanctionId are null when none was sent. */
+        AuditStatusChange: {
+            /** @enum {string} */
+            action: "TERMINATE" | "SUSPEND" | "REINSTATE";
+            reason: string | null;
+            /** Format: date */
+            effectiveDate: string;
+            /** Format: uuid */
+            sanctionId: string | null;
         };
         FieldError: {
             /** @enum {string} */
@@ -215,12 +248,42 @@ export interface components {
             organization?: components["schemas"]["Organization"];
             version?: number;
         };
+        /** @description One answer of searchProviders. The items are in ascending NPI order (MAM-37 AC-6). */
         ProviderPage: {
             items: components["schemas"]["Provider"][];
+            /** @description The page asked for; 0 with afterNpi (keyset paging, 1.2.0) */
             page: number;
             size: number;
+            /** @description The number of ALL providers that match the filters, with or without afterNpi (never only those after the key, Q-132) */
             total: number;
         };
+        /** @description The provider record as written to audit_log before or after one change (MAM-40; members declared in 1.1.0, Q-131 A). Null for before in REGISTERED and NOTICE_SENT entries. A snapshot of the record carries all eleven provider members, nulls included; after also carries the one part named for its action: screening (SCREENING_VERDICT), risk (RISK_TIER_ASSIGNED), decision (APPROVED, DENIED) or statusChange (TERMINATED, SUSPENDED, REINSTATED); REVALIDATION_PASSED has no part. The after of NOTICE_SENT carries only notice. No member is required because no member is in every entry. The schema itself admits null so that before and after can reference it directly. */
+        ProviderSnapshot: {
+            /** @description National Provider Identifier (10 digits), the provider key */
+            npi?: string;
+            medicaidId?: string;
+            /** @enum {string} */
+            providerType?: "IN" | "GR" | "FA";
+            taxonomy?: string;
+            /** @enum {string|null} */
+            riskTier?: "L" | "M" | "H" | null;
+            /** @enum {string} */
+            enrollStatus?: "P" | "A" | "T" | "D" | "S";
+            /** @enum {string} */
+            screenFlag?: "U" | "P" | "F";
+            /** Format: date */
+            effectiveDate?: string;
+            /** Format: date */
+            endDate?: string | null;
+            /** Format: date */
+            revalidationDueDate?: string | null;
+            version?: number;
+            screening?: components["schemas"]["AuditScreening"];
+            risk?: components["schemas"]["AuditRisk"];
+            decision?: components["schemas"]["AuditDecision"];
+            statusChange?: components["schemas"]["AuditStatusChange"];
+            notice?: components["schemas"]["AuditNotice"];
+        } | null;
         StatusChangeRequest: {
             /**
              * @description Legacy SANCIN T, S, R. Applied whatever the current status (D-027, Q-006).
@@ -255,10 +318,12 @@ export interface operations {
                 status?: "P" | "A" | "T" | "D" | "S";
                 /** @description Screen flag */
                 screenFlag?: "U" | "P" | "F";
-                /** @description Page number (0-based) */
+                /** @description Page number (0-based). With afterNpi it must be absent or 0; any other page is a 400 problem. */
                 page?: number;
-                /** @description Page size */
+                /** @description Page size (the same with or without afterNpi) */
                 size?: number;
+                /** @description Keyset paging (1.2.0, Q-132). Present: the answer holds only the providers whose NPI is greater than afterNpi, in ascending NPI order (10-digit NPIs compare the same as text and as numbers), at most size of them; every other filter combines with it; page must be absent or 0. The value need not be on file or match the filters: it is only a position (normally the npi of the last item of the previous answer). total still counts ALL providers that match the filters, not only those after the key. Absent: nothing changes, the answer is exactly as in 1.1.0. Strict input (lesson b of the code reviews): a value that is not exactly 10 digits (empty, shorter, longer, letters, a sign, spaces or other padding) or afterNpi given more than once is a 400 problem, never coerced and never ignored. */
+                afterNpi?: string;
             };
             header?: never;
             path?: never;
@@ -266,7 +331,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description OK. Without afterNpi: page page of the matches in ascending NPI order. With afterNpi: up to size matches whose NPI is greater than afterNpi, in ascending NPI order, and page 0; an empty items list means there is nothing after the key (the end of a walk). In both, total is the number of all matches of the filters. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -275,7 +340,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProviderPage"];
                 };
             };
-            /** @description Invalid request */
+            /** @description Invalid request: a malformed filter or paging value (npi, medicaidId, status, screenFlag, page, size, afterNpi; afterNpi not exactly 10 digits or given more than once), or afterNpi together with a page other than 0. */
             400: {
                 headers: {
                     [name: string]: unknown;

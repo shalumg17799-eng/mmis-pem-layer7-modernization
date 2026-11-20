@@ -86,7 +86,20 @@ Feature: Export the provider master in the legacy 130-byte PRVRECRD layout
     When an "ADMIN" caller exports the provider master
     Then the line of NPI "1003000222" has " " in bytes 32 to 32
     And the line of NPI "1003000222" has "U" in bytes 34 to 34
-    And the line of NPI "1003000222" has "00000000" in bytes 43 to 50
+    And the line of NPI "1003000222" has "99991231" in bytes 43 to 50
+
+  @AC-6
+  Scenario: A provider without a due date is exported with 99991231 and the codec reads the line back
+    Given only these providers are stored:
+      | npi        | medicaidId | providerType | enrollStatus | screenFlag | riskTier | effectiveDate | revalidationDueDate | lastName | firstName | licenseNo | licenseState |
+      | 1003000222 | MCD000222  | IN           | P            | U          |          | 2026-11-18    |                     | LINDQVIST | ASTRID   | MD22222   | TX           |
+      | 1003000111 | MCD000111  | IN           | A            | P          | L        | 2026-11-18    | 2031-11-18          | RIVERA   | MARIA     | MD12345   | TX           |
+    When an "ADMIN" caller exports the provider master
+    Then the line of NPI "1003000222" has "20261118" in bytes 35 to 42
+    And the line of NPI "1003000222" has "99991231" in bytes 43 to 50
+    And the line of NPI "1003000111" has "20311118" in bytes 43 to 50
+    And the line of NPI "1003000222" is read back by the PRVRECRD codec with the due date "9999-12-31"
+    And the line of NPI "1003000111" is read back by the PRVRECRD codec with the due date "2031-11-18"
 
   @AC-7
   Scenario: The export decodes to the same values as the API

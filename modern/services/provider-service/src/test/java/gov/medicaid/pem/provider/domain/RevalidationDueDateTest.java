@@ -36,7 +36,7 @@ class RevalidationDueDateTest {
         4);
   }
 
-  @ParameterizedTest(name = "approved on {0}: due {1}")
+  @ParameterizedTest(name = "[MAM-30 AC-1/AC-2/AC-3] approved on {0}: due {1}")
   @CsvSource({
     "2029-03-15,2034-03-15",
     "2065-06-30,2070-06-30",
@@ -63,7 +63,7 @@ class RevalidationDueDateTest {
     assertThat(after).usingRecursiveComparison().ignoringFields("revalidationDueDate").isEqualTo(p);
   }
 
-  @ParameterizedTest(name = "revalidated on {0}: due {1}")
+  @ParameterizedTest(name = "[MAM-30 AC-3/AC-4] revalidated on {0}: due {1}")
   @CsvSource({"2028-02-29,2033-02-28", "2066-01-15,2071-01-15", "2099-12-31,2104-12-31"})
   @DisplayName(
       "[MAM-30 AC-3/AC-4] a revalidation on 29 February or late in the century still gives a real 4-digit-year date")

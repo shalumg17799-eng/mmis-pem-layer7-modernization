@@ -1,8 +1,9 @@
 // MAM-92 AC-1..AC-6 (component level): the admin page /console/admin/risk-rules shows the data-driven taxonomy-prefix table of the
 // risk tier (legacy values at version 1), lets an administrator add, change and remove rows and the default tier, and saves the
 // result as a new version with PUT /api/v1/risk-rules (Q-005, pem-domain section 3). Invalid prefixes are refused at the cell.
-import { screen, waitFor, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { focusManager } from '@tanstack/react-query';
+import { act, screen, waitFor, within } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { problem, response } from '../support/fakeApi';
 import { api, installApi, renderApp, setupShellWorld, signedInAs, text } from '../support/world';
 import {
@@ -16,6 +17,7 @@ import {
   riskWorld,
   RULES_ROUTE,
   ruleSet,
+  type RiskRuleSet,
   SAVE_ROUTE,
   saveButton,
   savedBody,
@@ -288,6 +290,91 @@ describe('[MAM-92 AC-5] refusals from the service are shown and the table is rel
     expect(tableRows()).toEqual([['111', 'High (H)']]);
     expect(screen.queryByDisplayValue('207')).toBeNull();
     expect(defaultTierList()).toHaveValue('M');
+  });
+});
+
+describe('[MAM-92 AC-5] a table that another administrator saved meanwhile is never overwritten (lost update)', () => {
+  // Code review of the web UI, MUST-FIX 1 (2026-11-20). admin1 edits version 1 and switches to another browser tab; admin2 saves
+  // version 2; admin1 comes back (TanStack Query refetches a stale query when the window is focused again: its default, which
+  // main.tsx keeps) and chooses Save. The service refuses a PUT whose version is not the one it holds (contract replaceRiskRules,
+  // 422), so the page must send the version its rows are based on (1), not the version of the newest answer it happens to hold.
+  afterEach(() => focusManager.setFocused(undefined));
+
+  const admin2Table = (): RiskRuleSet => ruleSet({ version: 2, defaultTier: 'M', rules: [{ taxonomyPrefix: '111', tier: 'H' }] });
+
+  /** admin1 switches tab and comes back. The page may refetch (the default) or not (refetchOnWindowFocus off): both are fine, so the refetch is awaited for a bounded time only. */
+  async function comeBackToTheTab(): Promise<void> {
+    const gets = () => api.to('GET', '/api/v1/risk-rules').length;
+    const before = gets();
+    focusManager.setFocused(false);
+    focusManager.setFocused(true);
+    await waitFor(() => expect(gets()).toBeGreaterThan(before), { timeout: 1500 }).catch(() => undefined);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    });
+  }
+
+  /** The service as the contract describes it: it holds one table; a PUT is accepted only with the version it holds (then it stores version + 1), else 422. */
+  async function editThenAnotherAdministratorSaves() {
+    let held = ruleSet();
+    const world = riskWorld({
+      [RULES_ROUTE]: () => response(200, held),
+      [SAVE_ROUTE]: (call) => {
+        const body = JSON.parse(call.body ?? '{}') as RiskRuleSet;
+        if (body.version !== held.version) {
+          return response(422, { title: 'refused', status: 422, detail: `The table was changed by someone else: you edited version ${body.version}, the service holds version ${held.version}` });
+        }
+        held = { version: held.version + 1, defaultTier: body.defaultTier, rules: body.rules };
+        return response(200, held);
+      },
+    });
+    const { user } = await openRules(world.routes);
+    await findVersionHeading();
+    await user.click(addButton());
+    await setPrefix(user, 6, '207');
+
+    held = admin2Table(); // admin2 saves version 2 while admin1 edits version 1
+    await comeBackToTheTab();
+    return { user, held: () => held };
+  }
+
+  it('[MAM-92 AC-5] after admin1 comes back to the tab, Save sends the version the rows are based on (1), not the version of the newest answer (2)', async () => {
+    const { user } = await editThenAnotherAdministratorSaves();
+
+    await user.click(saveButton());
+
+    await waitFor(() => expect(saves()).toHaveLength(1));
+    expect(savedBody(saves()[0]).version).toBe(1);
+  });
+
+  it('[MAM-92 AC-5] the table admin2 saved (version 2, prefix 111) is still what the service holds after admin1 chose Save: nothing was overwritten', async () => {
+    const { user, held } = await editThenAnotherAdministratorSaves();
+
+    await user.click(saveButton());
+
+    await waitFor(() => expect(saves()).toHaveLength(1));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    });
+    expect(held()).toEqual(admin2Table());
+  });
+
+  it('[MAM-92 AC-5] the service answers 422, the page shows its detail, does not say "saved", and shows the table the service holds now (version 2) after reloading', async () => {
+    const { user } = await editThenAnotherAdministratorSaves();
+
+    await user.click(saveButton());
+
+    expect(await screen.findByText('The table was changed by someone else: you edited version 1, the service holds version 2')).toBeInTheDocument();
+    expect(screen.queryByText(/Risk rules saved/)).toBeNull();
+    await waitFor(async () => expect(text(await findVersionHeading())).toBe('Version 2 (default tier: Moderate (M))'));
+    expect(tableRows()).toEqual([['111', 'High (H)']]);
+  });
+
+  it('[MAM-92 AC-5] while the unsaved rows of admin1 (version 1 plus 207) are on screen, the page does not call them "Version 2"', async () => {
+    await editThenAnotherAdministratorSaves();
+
+    expect(prefixBox(6)).toHaveValue('207');
+    expect(screen.queryByRole('heading', { level: 2, name: /^Version 2 / })).toBeNull();
   });
 });
 

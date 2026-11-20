@@ -21,4 +21,12 @@ public interface ProviderSearch {
       String npi, String medicaidId, String name, EnrollStatus status, ScreenFlag screenFlag) {}
 
   Page find(Criteria criteria, int page, int size);
+
+  /**
+   * Keyset paging (MAM-37 AC-9, Q-132, contract 1.2.0): up to size providers that match the
+   * criteria and whose NPI is greater than afterNpi, in ascending NPI order. The key is only a
+   * position: it need not be on file or match the criteria. The answer is page 0, and its total
+   * counts every provider that matches the criteria, not only those after the key.
+   */
+  Page findAfter(Criteria criteria, String afterNpi, int size);
 }

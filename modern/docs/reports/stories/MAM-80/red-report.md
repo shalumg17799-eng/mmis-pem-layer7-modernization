@@ -173,3 +173,20 @@ Test titles that named the old format were corrected for honesty (AC tags kept);
 The full default Playwright suite (16 specs, journeys excluded, `--workers=1`, `NODE_OPTIONS=--dns-result-order=ipv4first`, one run): **152 of 152 pass** (8.4 min). The Playwright suite was not run before the correction (no time; the UI agent's static list was used), so there is no before count for it.
 
 **Hashes:** re-recorded with `test_protection.py record MAM-80` with exactly the files of the story's `.tests.sha256`; `check` and `sha256sum -c` are OK.
+
+## Additive tests after the code review of the web UI (2026-11-20, MUST-FIX 2: two labels for one provider)
+
+Cause: **the code-reviewer of the web UI returned a MUST-FIX on `ProviderTable.tsx:17`**: AC-3 says exactly one label is shown for a provider and AC-6 says the legacy catch-all label is kept. For a stored status X the banner and the "Provider record" list read "Denied (X)", but the short list "Provider" on the same page uses the plain code lookup and reads "Unknown (X)"; for a blank status it reads "Unknown ()" (not even the "(blank)" marker). The AC-6 tests above check only the banner and the Enrolment status row, so they passed. Under Q-097 C (standing rule): **additive only, no assertion weakened or removed, production code untouched**.
+
+New tests in `tests/console/provider-detail.test.tsx`, in the describe "[MAM-80 AC-6]" (title tags `[MAM-80 AC-3][MAM-80 AC-6]`):
+
+| Test | Result before the fix | Reason |
+|---|---|---|
+| status X: the list "Provider" reads "Denied (X)" in its Status row | FAIL | `expected [ [ 'NPI', '1003000111' ], ... ] to deep equally contain [ 'Status', 'Denied (X)' ]` (the row reads `Unknown (X)`) |
+| status blank: the list "Provider" reads "Denied (blank)" in its Status row | FAIL | the same assertion with `[ 'Status', 'Denied (blank)' ]` (the row reads `Unknown ()`) |
+| status X: the word "Unknown" appears nowhere in the main area | FAIL | `expected 'Provider detailOne provider at a glan...' not to contain 'Unknown'` (only hit: `Status Unknown (X)` in the list "Provider") |
+| status blank: the word "Unknown" appears nowhere in the main area | FAIL | the same (only hit: `Status Unknown ()`) |
+
+Control (scratch test, deleted): for the statuses A, T, P, D and S the main text of the page contains "Unknown" nowhere, and for X and blank its only occurrence is the Status row of the list "Provider", so the "no Unknown" assertion is not noisy once that row uses `statusWithCatchAll`. The other 21 tests of the file still pass (25 in the file now).
+
+Exact change (line endings LF, kept): previous blob `64d41bb815a666de2145f6073d0ba2a4a061284b`, new blob `9e63bd1c3d8d8b6b407775ef24dc4e0c35af5b9e`; 19 lines added, none changed or removed (`@@ -153,0 +154,19 @@`). `tests/support/detail.ts` and `e2e/console-detail.spec.ts` are unchanged. `tsc --noEmit -p tsconfig.json` and `eslint --max-warnings 0` on the file: no findings.

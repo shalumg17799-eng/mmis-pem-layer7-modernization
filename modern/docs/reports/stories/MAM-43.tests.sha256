@@ -1,0 +1,10 @@
+a575f994f3a953655ebb372239ceb94d81eb85a98e4ed5a8fe4a7389b136734d  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/LogCapture.java
+84697b951375d15992cfa4c23df7baddfffe2ef8d97428034be0c5d407e1ac9f  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java
+9936105f7fdcb455147e52982ac7188dde192c9e768d5d4d36b0680b305fb8c8  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/HttpAnswerSteps.java
+ac47cca01a1a988d6422aef61e6e891b882d621949fdeae3e735d5c941a8bce3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderFixtureSteps.java
+c1c239d87526cd79219aea8a98e7255e2ace1b5ebc08028f5445ebbd6a614a29  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderMasterExportSteps.java
+04a489c8ecf2413dd3a8fd18fb0b36a8291f87ea3c036140090defca7a6da4d5  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/adapter/legacy/PrvrecrdFileTest.java
+a1d2a4c3b0aea75fc0d29f6c6813fcb3a5ef11390305a87dd67769c92835552b  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/LegacyMasterExportApiTest.java
+3bb016a8f5251962f9a12cdbd1c342004ad18eeb736837bfb60211521ea6ab7c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderReadFailureTest.java
+d132e43473a572983d0ebf4b6d0b7295094a85ab1ed0e7e61e355eef688674e3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ExportProviderMasterTest.java
+3be760fdcdf05fc27715873759c36a0d4b34a0468a9122bb32362ab1fc99850f  modern/services/provider-service/src/test/resources/features/MAM-43.feature

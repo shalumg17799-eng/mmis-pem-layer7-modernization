@@ -20,3 +20,8 @@ Test hashes: `modern/docs/reports/stories/MAM-34.tests.sha256` (16 files), resto
 
 Platform checks in `PlatformChecksTest` belong to MAM-16 (ArchUnit), MAM-24 (Flyway schema) and MAM-36 (health,
 protected actuator, correlation id); they are recorded in those stories' hash files.
+
+## Lane 3 additions (2026-11-20)
+
+Names only (Q-097 C; the byte-level diff against the red blobs shows only the `name =` pattern of the parameterized tests): the invocation name of a parameterized test replaces its display name in the JUnit XML, so the traceability tool saw no story tag; the pattern now starts with the tag. No assertion changed.
+`ProviderCodesTest` (4 parameterized tests) and `ProviderLookupRolesTest` (1) now start with `[MAM-34 AC-1]`. `MAM-34.tests.sha256` re-recorded (18 files, the same files).

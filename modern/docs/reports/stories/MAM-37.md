@@ -29,3 +29,20 @@ Not verified:      automated tests (Part D); AC-8 live; AC-1/AC-6 with the journ
                    written (checked on the seeded providers instead)
 Questions for you: none
 ```
+
+## Lane 3 tests (2026-11-20)
+
+Outcome line unchanged. Tests for every AC of MAM-37 (AC-8 also with the real outage).
+
+- Test files (10, recorded in `MAM-37.tests.sha256`): `ProviderSearchApiTest`, `ProviderReadFailureTest`, `ProviderOutageTest`, `features/MAM-37.feature`, `ProviderSearchSteps`, `HttpAnswerSteps`, `ProviderFixtureSteps`, `LogCapture`, `ProviderRows`, `junit-platform.properties`.
+- Tests per AC (JUnit + Cucumber scenarios): AC-1 3+1, AC-2 1+1, AC-3 2+1, AC-4 6+1, AC-5 13+1, AC-6 15+2, AC-7 9+1, AC-8 6+1.
+- Written after the code. Found by the first run of the earlier lane: the exception was not attached to the log call (AC-8, D-024); fixed in `ProviderProblems` and verified. Lesson e (percent, underscore and backslash literal) holds.
+- No open defect of this story.
+Runs (all on 2026-11-20, from `modern/`, one Gradle build at a time through the shared lock, `--no-daemon`):
+- `./gradlew -I <init script: Spotless on src/test of provider-service only> :services:provider-service:spotlessApply` (formats the test sources only).
+- `./gradlew :services:provider-service:check --continue` (tests, Spotless on everything, ArchUnit, JaCoCo, PIT). Last run 21:00-21:09: **417 tests, 9 failures, 0 skipped**;
+  the 9 failures are the Q-124 tests (red by design until `PrvrecrdFile` is changed, see MAM-43); PIT **130 of 130 mutations killed (100 %)** on `domain` and `application`;
+  Spotless and ArchUnit passed.
+- `./gradlew :services:provider-service:jacocoTestReport -x test` (the report of the same run; with a failing test `check` does not reach `jacocoTestCoverageVerification`):
+  **line coverage 98.34 %** (768 of 781 lines; 98.84 % without `*Application`, as the gate counts), branch 88.31 %. Gate 85 %.
+- Not verified: the real outage against the running stack (the lead's journeys J1 and J2).

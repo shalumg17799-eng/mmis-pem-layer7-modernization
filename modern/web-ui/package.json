@@ -12,6 +12,7 @@
     "api:gen": "node scripts/gen-api.mjs",
     "api:check": "node scripts/gen-api.mjs --check",
     "test": "vitest run --reporter=default --reporter=json --outputFile=test-results/vitest.json && node scripts/no-skipped.mjs test-results/vitest.json",
+    "coverage": "vitest run --coverage",
     "e2e": "playwright test"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.3.0",
+    "@vitest/coverage-v8": "5.1.1",
     "eslint": "9.39.5",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "17.14.0",

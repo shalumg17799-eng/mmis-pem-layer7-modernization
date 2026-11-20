@@ -1110,3 +1110,123 @@ stories stay open.
 - Q-123 (MAM-16 AC-2): the default stands (A: the readers and writers of enrollment and sanctions stay where they are);
   the lead reads "MAM-16 AC-2 (Q-123 default)" as: accept the layout as it is and close MAM-16 once its build-change fix
   has been re-reviewed. To be corrected by the user if a move of the classes was meant.
+
+## Applied on 2026-11-20 after the user's answers (recorded by the lead, 19:55)
+
+- Q-124 A: MAM-43 AC-6 now says bytes 43-50 are '99991231' for a provider with no revalidation due date (Jira description
+  and modern/specs/MAM-43.md, spec version 2, backlog-planner 19:47). The recorded test and the code follow in the provider
+  lane (test first). No other spec states the old zero convention for a written file.
+- Q-131 A: modern/contracts/openapi/provider-service.yaml is 1.1.0 (architect 19:51): AuditEntry.before and .after refer to
+  the new schema ProviderSnapshot (nullable; npi, medicaidId, providerType, taxonomy, riskTier, enrollStatus, screenFlag,
+  effectiveDate, endDate, revalidationDueDate, version, and the parts screening, risk, decision, statusChange, notice with
+  their own schemas). Additive only. check_phase3.py passes (7 of 7). The generated web UI types were regenerated
+  (npm run api:gen; api:check: they match).
+
+## Q-132. (code review tmsis-service, MAM-71 AC-5, 2026-11-20 20:18) The T-MSIS extract pages through live provider data by offset (status: ANSWERED 2026-11-20 20:22 by the user: B, and A kept as a safety net)
+
+The extract reads the ACTIVE providers from provider-service page by page (page n, size 200). If a provider enters or leaves
+ACTIVE while a run is reading (an approval or a termination at month end), the later pages shift: one provider can be
+missed or written twice, and the run still ends COMPLETED (MAM-71 AC-5 "no provider is missed or repeated" is tested with
+static data only). The legacy read the KSDS in key order inside a batch window.
+Options: A) the reader notices the change (the total differs from the first page, or an NPI is not greater than the one
+before) and the run ends FAILED with the reason "provider data changed during the extract; run it again": no contract
+change, but it cannot notice an approval and a termination that cancel each other out; B) an additive keyset parameter on
+provider-service searchProviders (for example npiAfter, minor version bump) and the reader pages by key: complete, but it
+changes another service's contract. **Default applied: A** (tests first, in the tmsis MUST-FIX round); **B is recommended
+as the lasting answer and needs the user's approval** (contract change).
+
+**User, 2026-11-20 20:22 (Q-132):** the lasting fix is approved. provider-service gets keyset paging as an ADDITIVE, optional
+parameter (for example afterNpi, results in NPI order) with a minor contract version bump; existing callers keep working
+unchanged. tmsis-service then pages by key, so a concurrent approval or termination can no longer cause a missed or
+repeated provider. The check "detect a change and fail with a clear reason" stays as a safety net. Tests first for both;
+the concurrent-change case must be a test. Plan of the lead: contract 1.2.0 (architect) and the provider part (tests, code)
+right after the provider lane's gate and before the provider deploy; the tmsis part in step e with the two MUST-FIX items
+of its review.
+
+## Q-133. (backlog-planner, MAM-93, 2026-11-20 20:50) The "Out of scope" line of MAM-93 is stale for three more jobs (status: DEFAULT APPLIED - revisit)
+
+MAM-93 still lists "status polling for the screening run, revalidation sweep and directory extract beyond the 202 answer" as
+out of scope, although the contracts have had run-status calls for these three jobs since Q-105 (answered), the Batch jobs
+page follows them, and tests cover it. No acceptance criterion names it. (The T-MSIS part of that line was corrected today
+by the user's order of 19:32.)
+Options: A) drop the exclusion and name the three jobs in AC-4, with their status calls in the technical notes (text only:
+behaviour, contracts and tests already agree); B) leave the text. **Default applied: A**, to be written into Jira and the
+spec by the backlog-planner in the wrap-up of this run (no code or test change).
+
+## Q-134. (provider lane, MAM-36 AC-1, 2026-11-20 21:15) No JDBC socket timeout: health can block while the database is frozen (status: DEFAULT APPLIED - revisit)
+
+Found by the provider test-writer: a recorded test (ObservabilityTest, "while the database is stopped health answers 503
+DOWN") hung a build for 14 minutes and an earlier one for 31. Cause: the services set no JDBC socketTimeout
+(pem-common.yml, provider-service.yml), so a read from a database that is frozen (not stopped: a stopped one answers at
+once) blocks without limit, and /actuator/health with it. The test now has its own time limits (assertion unchanged, rule
+Q-097 C). The production setting is unchanged.
+Options: A) add a socket timeout to the shared datasource settings of all services (for example 10 s; it must be longer
+than the longest statement of any batch job, which has not been measured); B) leave it: the compose health check has its
+own timeout, and a frozen database is rare. **Default applied: B** (a shared run-time setting for all ten services should
+not change without measuring the batch statements and a full regression). **Recommended: A with a measured value.**
+
+## Q-135. (provider lane, MAM-43 AC-7, 2026-11-20 21:15) After Q-124 A a provider without a due date decodes to 9999-12-31 (status: DEFAULT APPLIED - revisit)
+
+With the user's decision Q-124 A the export writes 99991231 for a provider without a revalidation due date. The codec reads
+that line back as the date 9999-12-31, while the API leaves revalidationDueDate out for the same provider. MAM-43 AC-7
+("the decoded fields equal the API fields") covers providers that have a due date, so it is not broken, but the two views
+differ for this case. Options: A) accept 9999-12-31 as the file's "no due date" (readers map it to none, as
+testdata/README.md already says); B) show 9999-12-31 in the API too (contract change). **Default applied: A** (tests assert
+it; no contract change).
+
+## Q-136. (code review web UI, MAM-87 / MAM-80 AC-6, 2026-11-20 22:00) The approval page words an unknown stored status differently from the provider list (status: DEFAULT APPLIED - revisit)
+
+After the MAM-80 fix of today the shared Provider list shows the catch-all label for a stored status that is not P, A, T,
+D or S ("Denied (X)", "Denied (blank)", as MAM-80 AC-6 and D-006 say). The approval page still builds its own sentence and
+its brief with the plain code label (ApprovalPage.tsx:77 and :23, ApprovalBrief.tsx:39), so for a decided provider with an
+unknown stored status it would say "Unknown (X)" next to a list that says "Denied (X)". MAM-87 has no criterion for this
+case, and the modern system cannot store such a status itself (only an imported legacy record can carry one).
+Options: A) use the catch-all label everywhere in the console (an additive test under MAM-87 first, then the three calls);
+B) leave the approval page as it is. **Default applied: B for now** (the second review calls it SHOULD-FIX, and the user's
+rule for the review rounds is MUST-FIX only; it is listed in docs/reports/review-should-fix.md). **Recommended: A.**
+
+## Q-137. (MAM-86 AC-6, accessibility tests, 2026-11-20 23:34) The inputs of the risk rules table have no visible label element (status: DEFAULT APPLIED - revisit)
+
+MAM-86 AC-6 and the front-end standard say "every input has a visible label". On the admin page "Risk rules" the ten inputs
+of the table (taxonomy prefix and tier of each row) are named for assistive technology by an aria-label ("Taxonomy prefix,
+row 1"); what a sighted user sees is the column header. The automatic axe scan passes, but the new accessibility test
+reads the criterion strictly (a visible label element for every input) and fails for this page.
+Options: A) accept the column header as the visible label and loosen the test to accept it (a change of a recorded test);
+B) give every input of the table its own visible label element and leave the test as written.
+**Default applied: A** (changed by the lead at 23:56, 20 minutes after the first default B). Reason: B was tried first. The
+visible labels put the words "Taxonomy prefix, row 1" and "Tier, row 1" into every table row, and the recorded test of
+MAM-92 AC-1 ("no meaning, such as a specialty name, is shown next to a prefix") then fails, because it allows no other
+text in a rule row. So B cannot be done without changing a test of a closed story, while A changes no production code
+and no test of a closed story: the new accessibility test of MAM-86, written tonight and still in its own correction
+round, is brought in line with the wording of its criterion by its author. With A an input counts as labelled when it has
+a visible label element, or when it sits in a table cell under a visible column header and its accessible name contains
+that header's text (the header is the visible label; WCAG 2.1 "Label in Name" and "Labels or Instructions"). The page
+itself stays as it was (the axe scan passed before and after). **Recommended: A.**
+
+## Parity re-run of 2026-11-20 23:17: what it changes for Q-124 to Q-130 (recorded by the lead, 23:40)
+
+Source: `modern/docs/reports/parity-report.md` (re-run by the parity-checker, checked by two independent reviewers,
+corrected 23:38). Totals: MATCH 168 (was 128), EXPECTED 41, UNEXPECTED 27 (was 67).
+
+- **Q-124 A (answered by the user) is live** since deploy 4 (23:02): the export writes 99991231 for a provider with no
+  revalidation due date. All 46 rows of group U-1 now match, and the modern master before each run equals the legacy file
+  byte for byte. The text of Q-124 above ("nothing is changed") describes the state before the answer. Proposal of the
+  parity-checker: record the convention as decision D-030 in the defect register (bookkeeping of the user's answer).
+- **Q-130 (default A) is applied**: the licence stub knows SD20001 / TX (loaded 22:13). Group U-10 is gone: application
+  1006133288 passes the screening on both sides.
+- **Q-125** (effective date of a new provider): 9 rows remain (3 new providers in 3 files). Default: accept.
+- **Q-126** (the event chain replaces the JCL step sequence): 27 rows remain (U-3 12, U-5 12, U-6 2, U-7 1; the text of
+  Q-126 above still says 10 rows for U-3). Default: accept.
+- **Q-127** (a risk tier only after a PASS screening): 2 rows remain (providers 1005914035 and 1005960046, status D, flag
+  F; the text of Q-127 above still says 3 rows). Default: accept.
+- **Q-128** (an APPROVED notice after reinstating a pending provider): 1 row remains. Default: accept.
+- **Q-129** stays BLOCKED (GDG archive generation; lab account HERC01).
+- **New observation for Q-018 (Q-A4, default A applied):** the due date written at a completed revalidation is the
+  processing date of the service clock plus five years, not the business date of the sweep plus five years. D-003
+  explains that the date changes at a completed revalidation; the value itself is the default of Q-018 (the processing
+  date), and it equals "business date plus five years" in this run only because both dates are 2026-11-20. At another
+  business date the value would differ. Options for the user: confirm default A (the processing date), or let the business date drive the due date
+  (a change of code and contract). Nothing was changed.
+
+MAM-91 AC-7 asks for a human decision on every unexplained difference: Q-125 to Q-128 need the user's confirmation and
+Q-129 needs the lab account, so MAM-91 stays In Progress.

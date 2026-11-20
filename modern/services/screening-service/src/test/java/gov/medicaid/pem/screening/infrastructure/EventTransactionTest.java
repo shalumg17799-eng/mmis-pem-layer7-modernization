@@ -2,7 +2,9 @@ package gov.medicaid.pem.screening.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.qos.logback.classic.Level;
 import gov.medicaid.pem.screening.Lane3Test;
+import gov.medicaid.pem.screening.LogCapture;
 import gov.medicaid.pem.screening.ScreeningEvents;
 import gov.medicaid.pem.screening.ScreeningWorld;
 import java.util.UUID;
@@ -112,17 +114,23 @@ class EventTransactionTest extends Lane3Test {
 
   @Test
   @DisplayName(
-      "[MAM-32 AC-7] a requested screening whose ScreeningCompleted cannot be written is not kept: the screening and its event are one transaction (lesson c)")
+      "[MAM-28 AC-1] a requested screening whose ScreeningCompleted cannot be written is not kept: the screening and its event are one transaction (lesson c)")
   void requestedScreeningAndEventAreOneTransaction() throws Exception {
     world();
     reject("reject_outbox_manual", "INSERT", "outbox_event", "NEW.subject = '" + NPI + "'");
-    var r = post("/api/v1/screenings", token("ANALYST"), "{\"npi\":\"" + NPI + "\"}");
-    assertThat(r.getResponse().getStatus()).isEqualTo(202);
-    until(
-        "the background screening has ended (the sources were asked)",
-        () -> ScreeningWorld.lookups("SAMGOV", NPI) >= 1,
-        BOUND);
-    Thread.sleep(1500);
+    try (LogCapture log = LogCapture.open()) {
+      var r = post("/api/v1/screenings", token("ANALYST"), "{\"npi\":\"" + NPI + "\"}");
+      assertThat(r.getResponse().getStatus()).isEqualTo(202);
+      until(
+          "the background screening has ended: its failure is logged at ERROR",
+          () ->
+              log.lines().stream()
+                  .anyMatch(
+                      l ->
+                          l.level() == Level.ERROR
+                              && l.everything().contains("the test database rejected this write")),
+          BOUND);
+    }
     assertThat(screeningCount(NPI)).isZero();
     assertThat(completedEvents(NPI)).isZero();
   }

@@ -82,6 +82,21 @@ public class JpaProviderChanges
         result.getTotalElements());
   }
 
+  /**
+   * MAM-37 AC-9: the key goes into the item query only (npi &gt; key, ORDER BY npi, LIMIT size, on
+   * the unique index of npi); the count uses the filters alone, so total stays "all matches".
+   */
+  @Override
+  public Page findAfter(Criteria c, String afterNpi, int size) {
+    Specification<ProviderEntity> matches = matching(c);
+    List<ProviderEntity> items =
+        repo.findBy(
+            matches.and((root, query, cb) -> cb.greaterThan(root.<String>get("npi"), afterNpi)),
+            q -> q.sortBy(Sort.by("npi")).limit(size).all());
+    return new Page(
+        items.stream().map(JpaProviderStore::toDomain).toList(), 0, size, repo.count(matches));
+  }
+
   /** MAM-37: every given filter must match; the name filter is a case-blind "contains". */
   static Specification<ProviderEntity> matching(Criteria c) {
     return (root, query, cb) -> {

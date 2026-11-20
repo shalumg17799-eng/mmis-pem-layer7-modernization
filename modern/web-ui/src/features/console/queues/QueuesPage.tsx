@@ -1,4 +1,3 @@
-import { Table } from '@trussworks/react-uswds';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Provider, ScreeningPage } from '../../../shared/api/types';
@@ -12,6 +11,7 @@ import {
   withCode,
 } from '../../../shared/format/format';
 import { PageHeading } from '../../../shared/ui/PageHeading';
+import { ScrollableTable } from '../../../shared/ui/ScrollableTable';
 import { SortHeader, useSorting } from '../../../shared/ui/sorting';
 import { useFailedScreenings, usePendingProviders, useRejectedApplications, useRevalidationQueue } from './queries';
 import { QueueSection } from './QueueSection';
@@ -51,7 +51,7 @@ function PendingApproval() {
       onPage={setPage}
       onRetry={() => void query.refetch()}
     >
-      <Table bordered={false} fullWidth scrollable>
+      <ScrollableTable bordered={false} fullWidth label="Providers pending approval">
         <thead>
           <tr>
             <SortHeader column="npi" label="NPI" sorting={sorting} />
@@ -74,7 +74,7 @@ function PendingApproval() {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </ScrollableTable>
     </QueueSection>
   );
 }
@@ -109,7 +109,7 @@ function FailedScreening() {
       onPage={setPage}
       onRetry={() => void query.refetch()}
     >
-      <Table bordered={false} fullWidth scrollable>
+      <ScrollableTable bordered={false} fullWidth label="Providers with failed screening">
         <thead>
           <tr>
             <SortHeader column="npi" label="NPI" sorting={sorting} />
@@ -136,7 +136,7 @@ function FailedScreening() {
             );
           })}
         </tbody>
-      </Table>
+      </ScrollableTable>
     </QueueSection>
   );
 }
@@ -161,7 +161,7 @@ function RevalidationDue() {
       onPage={setPage}
       onRetry={queue.refetch}
     >
-      <Table bordered={false} fullWidth scrollable>
+      <ScrollableTable bordered={false} fullWidth label="Revalidations due">
         <thead>
           <tr>
             <SortHeader column="npi" label="NPI" sorting={sorting} />
@@ -178,7 +178,7 @@ function RevalidationDue() {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </ScrollableTable>
     </QueueSection>
   );
 }
@@ -198,7 +198,7 @@ function RejectedApplications() {
       onPage={setPage}
       onRetry={() => void query.refetch()}
     >
-      <Table bordered={false} fullWidth scrollable>
+      <ScrollableTable bordered={false} fullWidth label="Rejected applications">
         <thead>
           <tr>
             <SortHeader column="npi" label="NPI" sorting={sorting} />
@@ -217,7 +217,7 @@ function RejectedApplications() {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </ScrollableTable>
     </QueueSection>
   );
 }

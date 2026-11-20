@@ -1,0 +1,15 @@
+a575f994f3a953655ebb372239ceb94d81eb85a98e4ed5a8fe4a7389b136734d  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/LogCapture.java
+4ed55abec1d530f16d1bf603d00b6677ffa833ad468ab9aeea9a620f24d59d01  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutageTest.java
+84697b951375d15992cfa4c23df7baddfffe2ef8d97428034be0c5d407e1ac9f  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java
+9936105f7fdcb455147e52982ac7188dde192c9e768d5d4d36b0680b305fb8c8  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/HttpAnswerSteps.java
+ac47cca01a1a988d6422aef61e6e891b882d621949fdeae3e735d5c941a8bce3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderFixtureSteps.java
+c5578f4f61a79f399e7a5e46e2bba45684458672c49fa62454758f344810c5f9  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderKeysetWalkSteps.java
+a8f576e360c4ac63044ba44aac0d5ef5d7d1bea40dd4fb2cc711615e9c144bc0  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderSearchSteps.java
+e417910452cb6243d5284a4338c7eed4373c74496afcf90f002a9cfc7010636c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/KeysetFixtures.java
+2318fbf01f4ef609ebe186754c0ea704c97a86021fb124259d9e4d5ba8de52a2  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderKeysetContractTest.java
+cbf52817a3de2c3d79277bf61fdd733e22e1c2c517778273af1d4832440505e1  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderKeysetSearchApiTest.java
+1519d8852717a5bf9f379202a02b73d97a6dfdd90a454ad0adb20b9f9e0a20e5  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderKeysetWalkTest.java
+3bb016a8f5251962f9a12cdbd1c342004ad18eeb736837bfb60211521ea6ab7c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderReadFailureTest.java
+b8a63f97de5d27f50636c69a223aed6939229b78968ac889f057fe7a5ee9f414  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderSearchApiTest.java
+4d7f31cb90706e2608cd2adfd9ce4f47bba7382ea6f311817f7376ae8605ad93  modern/services/provider-service/src/test/resources/features/MAM-37.feature
+f7d2edbb030719ca2bf473d834e7825c35854163ee4dd00cfa65a416d8f58f70  modern/services/provider-service/src/test/resources/junit-platform.properties

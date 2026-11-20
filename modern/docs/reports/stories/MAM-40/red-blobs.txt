@@ -1,0 +1,14 @@
+59bb423f6e4ba8c10ea96584fe7d45e2f7700640  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/LogCapture.java
+667a9c1ba95ba3f69bbda0f96b9a980fdf0f6a70  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java
+33229c8cf04a97462f1cc3e3ae8f70ae5cbe702c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/TestEvents.java
+38fcb570a3260aa0a5d6bdfdfe91fb26142ae0c4  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/HttpAnswerSteps.java
+654ecffc2693859df5ea59d1fd54a69640843483  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderAuditSteps.java
+5d84f3e26010b903302854d8b5dd3117b4b61841  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderFixtureSteps.java
+54b394583f223cf71c274aacd5b1e44bcc64be3e  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderAuditApiTest.java
+832401e54f78bd1a34f749c554f2270f8d1d9fb3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderReadFailureTest.java
+b4f17d4e7dd6e4a319635dfa9483f5e63ce355ab  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/AuditHistoryUseCasesTest.java
+c2e9508cce3414e6faeab53284914be83454eaf0  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/AuditTrailTest.java
+05f29a02aef2ba04726f92e5ed579540791fb96f  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ReadProviderHistoryTest.java
+14e4f46d280a67a327db97c9c3ec7961b753c485  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/RecordNoticeSentTest.java
+d41daf3e8cd5c26379dc12874b2b51150893cf15  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/infrastructure/NoticeEventsListenerTest.java
+dccfac715674eb3c1afb241feeebd73d8879deb9  modern/services/provider-service/src/test/resources/features/MAM-40.feature

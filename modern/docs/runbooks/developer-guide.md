@@ -87,4 +87,5 @@ For the build agents (test-writer, java-developer, ui-developer, code-reviewer) 
 | Whole stack (local run mode, ADR-011) | `make up` (or `./pem.sh up`), then `make seed` |
 | One service's checks | `./gradlew --no-daemon :services:<svc>:check` |
 | Web UI | `cd web-ui && npm run lint && npm test && npm run e2e` (e2e needs the stack) |
+| Web UI coverage (figure only, no threshold) | `cd web-ui && npm run coverage` (report in `web-ui/coverage/`; last figures in `docs/reports/ui-coverage.md`) |
 | Traceability after a story | `python modern/tools/trace/build_rule_trace.py` (updates `modern/docs/traceability/rule-trace.csv`; Neo4j holds the legacy context only) |

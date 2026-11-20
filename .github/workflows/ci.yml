@@ -16,7 +16,10 @@ jobs:
   build-and-check:
     name: Gradle build and full check
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    # 150 minutes (was 90): the build is sequential and memory-bound on purpose (gradle.properties: no parallel build, two
+    # workers), and the module checks with PIT add up to more than an hour on the development machine (provider-service
+    # alone 9 minutes); a clean runner also downloads Gradle, the libraries and the Testcontainers images first.
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4.2.2
       - uses: actions/setup-java@v4.7.1
@@ -58,8 +61,10 @@ jobs:
       - uses: actions/checkout@v4.2.2
       - uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20.19.2"
+          node-version: "22.22.2"
       # AC-3: npm test fails on a failing test and, through scripts/no-skipped.mjs, on a skipped one
+      # Node 22.22.2 (2026-11-20, first CI run): vitest, jsdom and other test packages of the lock file need Node 22;
+      # on Node 20.19.2 the job failed in 18 seconds
       - name: Install and test
         working-directory: modern/web-ui
         run: |
@@ -80,7 +85,7 @@ jobs:
           java-version: "21.0.7"
       - uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20.19.2"
+          node-version: "22.22.2"
       # AC-4: make up (pem.sh up waits until every container is healthy), the gateway health, the walking-skeleton
       # provider lookup, then make down; the logs of any container that is not healthy are printed on failure
       - name: Start the stack

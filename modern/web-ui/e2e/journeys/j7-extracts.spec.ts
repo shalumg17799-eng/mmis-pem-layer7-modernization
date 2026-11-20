@@ -9,7 +9,7 @@
 // row count); its payload (businessDate, periodYyddd, rowCount) by the tmsis-service tests (MAM-75).
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test';
 import { signIn, type PemUser } from '../support/keycloak';
 import { expectNoAxeViolations } from '../support/page';
 
@@ -73,17 +73,19 @@ async function runJob(page: Page, option: string, startPath: string): Promise<{ 
   return run;
 }
 
-/** Clicks the Download button of the newest completed run of a job and returns the bytes the browser saved. */
-async function downloadFile(page: Page, label: string): Promise<Buffer> {
-  const runs = page.getByRole('table', { name: /Recent runs/ });
-  // Corrected 2026-11-20 (Q-097 C): the newest run of this job is the first row that names the job, and its Download
-  // button only appears once that row shows Completed. The old selector took the first Download button of the whole table,
-  // which belongs to an OLDER run while the new row still shows Running (seen in the final run of 2026-11-20).
-  const newest = runs.getByRole('row').filter({ hasText: label }).first();
-  await expect(newest, `the newest ${label} run shows Completed`).toContainText('Completed', { timeout: 120_000 });
-  const button = newest.getByRole('button', { name: new RegExp(`^Download ${label}`) });
-  await expect(button).toBeVisible({ timeout: 120_000 });
-  const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+/**
+ * Clicks the Download button in the row of ONE run and returns the bytes the browser saved. Corrected 2026-11-20 (Q-097 C, review of
+ * the 19:25 correction): the click is bound to the run, not to a position in the table. The row must show Completed, the button
+ * must belong to that row, the browser must request exactly the file path of that run, and the saved name is the legacy DD name.
+ */
+async function downloadFile(page: Page, row: Locator, filePath: string, savedName: string): Promise<Buffer> {
+  await expect(row.getByRole('cell').nth(2), 'the run shows Completed').toHaveText('Completed', { timeout: 120_000 });
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.waitForRequest((request) => new URL(request.url()).pathname === filePath && request.method() === 'GET'),
+    row.getByRole('button', { name: /^Download / }).click(),
+  ]);
+  expect(download.suggestedFilename()).toBe(savedName);
   return readFileSync(await download.path());
 }
 
@@ -116,18 +118,35 @@ test.describe('MAM-83 journey J7: month-end extracts and the public directory', 
     const admin = await (await browser.newContext()).newPage();
     await signIn(admin, 'admin1', '/console/admin/jobs');
     await expect(admin.getByRole('heading', { level: 1, name: 'Batch jobs' })).toBeVisible();
+    // The page must follow the run it started by itself: no reload and no new address from here on (counted below).
+    let navigations = 0;
+    admin.on('framenavigated', (frame) => {
+      if (frame === admin.mainFrame()) navigations += 1;
+    });
+    const runs = admin.getByRole('table', { name: /Recent runs/ });
     const tmsisRun = await runJob(admin, 'T-MSIS extract', '/api/v1/batch/tmsis-extracts');
     const listed = async () =>
       ((await getJson(request, '/api/v1/batch/tmsis-extracts?size=200', adminToken)).body.items as Json[]).find(
         (r) => r.runId === tmsisRun.runId,
       );
     await expect.poll(async () => (await listed())?.status, { message: 'T-MSIS run COMPLETED', ...POLL }).toBe('COMPLETED');
-    // Corrected 2026-11-20 (Q-097 C): the T-MSIS job has no run-status call, so the page keeps the row of the run it just
-    // started at "Running" until the list is read again. The admin reloads the page (what a user has to do today; listed
-    // as an open UI finding in docs/reports/final-report.md), then downloads the file of THIS run from the first row.
-    await admin.reload();
-    await expect(admin.getByRole('heading', { level: 1, name: 'Batch jobs' })).toBeVisible();
-    const tmsisOut = await downloadFile(admin, 'T-MSIS extract');
+    // Corrected 2026-11-20 (Q-097 C, review of the 19:25 correction; the user's order of 19:32): no reload. The T-MSIS job has no
+    // run-status call, so the page has to move its own row off "Running" from the run list. The row of THIS run is the T-MSIS
+    // row that shows its archive generation (unique per run); it must be the newest T-MSIS row, the only one for the run, and the
+    // page must not have been reloaded (a reload would also clear the business date typed in the form).
+    const entry = await listed();
+    expect(entry.counts?.archiveGeneration, 'the completed run lists its archive generation').toEqual(expect.any(Number));
+    const generation = new RegExp(`archiveGeneration ${entry.counts.archiveGeneration}(?!\\d)`);
+    const tmsisRows = runs.getByRole('row').filter({ hasText: 'T-MSIS extract' });
+    const tmsisRow = tmsisRows.filter({ hasText: generation });
+    await expect(tmsisRow, 'the page shows the run it started with its archive generation, without a reload').toHaveCount(1, { timeout: 120_000 });
+    await expect(tmsisRow.getByRole('cell').nth(2)).toHaveText('Completed');
+    await expect(tmsisRow.getByRole('cell').nth(3)).toContainText(`rows ${entry.counts.rows}`);
+    await expect(tmsisRows.first(), 'the new run is the newest T-MSIS row').toContainText(generation);
+    await expect(tmsisRows, 'no second row for the same run').toHaveCount(Math.min(listedBefore + 1, 20));
+    expect(navigations, 'the page was not reloaded').toBe(0);
+    await expect(admin.getByLabel(/^Business date/)).toHaveValue('03/31/2026');
+    const tmsisOut = await downloadFile(admin, tmsisRow, `/api/v1/batch/tmsis-extracts/${tmsisRun.runId}/file`, 'TMSISOUT.D20260331');
     const tmsisApi = await request.get(`${GATEWAY}/api/v1/batch/tmsis-extracts/${tmsisRun.runId}/file`, {
       headers: { Authorization: `Bearer ${adminToken}` },
     });
@@ -147,7 +166,6 @@ test.describe('MAM-83 journey J7: month-end extracts and the public directory', 
 
     // AC-2: the run is listed as a new entry (COMPLETED, 2026-03-31) next to the earlier runs, with its row count and an
     // archive generation.
-    const entry = await listed();
     expect(entry.businessDate).toBe(BUSINESS_DATE);
     expect(entry.counts?.rows).toBe(tmsisRecords.length);
     expect(typeof entry.counts?.archiveGeneration).toBe('number');
@@ -162,7 +180,9 @@ test.describe('MAM-83 journey J7: month-end extracts and the public directory', 
         ...POLL,
       })
       .toBe('COMPLETED');
-    const dirOut = await downloadFile(admin, 'Directory extract');
+    const dirRows = runs.getByRole('row').filter({ hasText: 'Directory extract' });
+    await expect(dirRows).toHaveCount(1);
+    const dirOut = await downloadFile(admin, dirRows, `/api/v1/batch/directory-extracts/${dirRun.runId}/file`, 'DIROUT.D20260331');
     const dirApi = await request.get(`${GATEWAY}/api/v1/batch/directory-extracts/${dirRun.runId}/file`, {
       headers: { Authorization: `Bearer ${adminToken}` },
     });

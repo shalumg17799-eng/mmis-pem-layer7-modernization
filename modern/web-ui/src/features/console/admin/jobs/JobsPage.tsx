@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Alert, AlertText, Button, Fieldset, Form, FormGroup, Label, Select, Table, Tag, TextInput } from '@trussworks/react-uswds';
+import { Alert, AlertText, Button, Fieldset, Form, FormGroup, Label, Select, Tag, TextInput } from '@trussworks/react-uswds';
 import { useEffect, useRef, useState, type FormEvent, type MouseEvent } from 'react';
 import { ApiError } from '../../../../shared/api/client';
 import { useApi } from '../../../../shared/api/useApi';
@@ -8,6 +8,7 @@ import { toIsoDate } from '../../../../shared/format/dates';
 import { formatDate } from '../../../../shared/format/format';
 import { ErrorSummary } from '../../../../shared/ui/ErrorSummary';
 import { PageHeading } from '../../../../shared/ui/PageHeading';
+import { ScrollableTable } from '../../../../shared/ui/ScrollableTable';
 import { SortHeader, useSorting } from '../../../../shared/ui/sorting';
 import {
   countsText,
@@ -29,7 +30,7 @@ import {
 /** Colour adds to the run badge; the word names the state. */
 const RUN_COLOUR: Record<BatchRun['status'], string> = { RUNNING: '', COMPLETED: 'bg-success-dark', FAILED: 'bg-secondary-dark' };
 
-/** How often a running job (intake, screening run, revalidation sweep, directory extract) is asked for its status. */
+/** How often a running job (intake, screening run, revalidation sweep, directory extract) is asked for its status, and the T-MSIS run list is read while a T-MSIS run started here is running. */
 export const POLL_INTERVAL_MS = 1000;
 
 interface Run {
@@ -38,6 +39,19 @@ interface Run {
   /** The last refresh of a running job failed: the row says so, the status is not guessed. */
   refreshFailed?: boolean;
 }
+
+/**
+ * The T-MSIS job has no run-status call (its contract has a list and a file only), so a T-MSIS run started here is followed in the list
+ * the service gives: the copy the service lists for the run replaces the local one (the answer to the start is always RUNNING).
+ * A run the list does not show yet keeps its local copy.
+ */
+function currentRun(entry: Run, listed: readonly BatchRun[] | undefined): BatchRun {
+  if (entry.job !== 'tmsis') return entry.run;
+  return listed?.find((item) => item.runId === entry.run.runId) ?? entry.run;
+}
+
+/** A T-MSIS run started here that is still running: the list is read again until the service reports it Completed or Failed. */
+const followsTmsisRun = (started: readonly Run[], listed: readonly BatchRun[] | undefined) => started.some((entry) => entry.job === 'tmsis' && currentRun(entry, listed).status === 'RUNNING');
 
 const RUN_SORT = {
   job: (entry: Run) => JOB_BY_KEY[entry.job].label,
@@ -90,6 +104,10 @@ export function JobsPage() {
   const tmsis = useQuery({
     queryKey: ['batch', user.subject, 'tmsis-runs'],
     queryFn: ({ signal }) => api.get<{ items: BatchRun[] }>(TMSIS, signal),
+    // While a T-MSIS run started here is running the list is read again every POLL_INTERVAL_MS (a read that is already under way is not doubled);
+    // it stops by itself once the service lists that run as Completed or Failed. The read is silent: the page shows no loading message for it.
+    refetchInterval: (query) => (followsTmsisRun(runs, query.state.data?.items) ? POLL_INTERVAL_MS : false),
+    refetchIntervalInBackground: true,
   });
 
   const start = useMutation({
@@ -168,10 +186,16 @@ export function JobsPage() {
     document.getElementById(field)?.focus();
   }
 
-  // The rows: the runs started here, then the T-MSIS runs of the service that are not among them.
+  // The rows: the runs started here (a T-MSIS run shows what the service lists for it; while the list cannot be read its row says so and keeps its status),
+  // then the T-MSIS runs of the service that are not among them. One row per run.
   const known = new Set(runs.map((entry) => entry.run.runId));
+  const started: Run[] = runs.map((entry) => {
+    if (entry.job !== 'tmsis') return entry;
+    const run = currentRun(entry, tmsis.data?.items);
+    return { job: entry.job, run, refreshFailed: tmsis.isError && run.status === 'RUNNING' };
+  });
   const listed: Run[] = (tmsis.data?.items ?? []).filter((item) => !known.has(item.runId)).map((item) => ({ job: 'tmsis' as const, run: item }));
-  const rows = [...runs, ...listed];
+  const rows = [...started, ...listed];
   const sorting = useSorting(rows, RUN_SORT);
 
   const errors = outcome?.kind === 'invalid' ? outcome.errors : [];
@@ -306,7 +330,7 @@ export function JobsPage() {
           </Button>
         </>
       )}
-      <Table bordered={false} fullWidth scrollable>
+      <ScrollableTable bordered={false} fullWidth label="Recent runs">
         <caption>Recent runs</caption>
         <thead>
           <tr>
@@ -348,7 +372,7 @@ export function JobsPage() {
             );
           })}
         </tbody>
-      </Table>
+      </ScrollableTable>
       {rows.length === 0 && <p>Choose a job and a business date above, then start it. Each run appears in this list; a finished run that writes a file has a Download button.</p>}
     </>
   );

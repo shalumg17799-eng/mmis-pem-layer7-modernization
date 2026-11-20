@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Alert, AlertText, Button, Table, Tag } from '@trussworks/react-uswds';
+import { Alert, AlertText, Button, Tag } from '@trussworks/react-uswds';
 import { useState } from 'react';
 import { LIST_NOTICES, withQuery, type NoticePage } from '../../../shared/api/types';
 import { useApi } from '../../../shared/api/useApi';
@@ -8,6 +8,7 @@ import { formatDate, noticeName } from '../../../shared/format/format';
 import { EmptyState } from '../../../shared/ui/EmptyState';
 import { PageHeading } from '../../../shared/ui/PageHeading';
 import { Pager } from '../../../shared/ui/Pager';
+import { ScrollableTable } from '../../../shared/ui/ScrollableTable';
 import { SortHeader, useSorting } from '../../../shared/ui/sorting';
 
 const CHANNEL_LABEL: Record<string, string> = { EMAIL: 'Email' };
@@ -64,7 +65,7 @@ export function NoticesPage() {
           <p>
             {total} {total === 1 ? 'notice' : 'notices'}
           </p>
-          <Table bordered={false} fullWidth scrollable>
+          <ScrollableTable bordered={false} fullWidth label="Notices">
             <caption>Notices</caption>
             <thead>
               <tr>
@@ -86,7 +87,7 @@ export function NoticesPage() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </ScrollableTable>
           <Pager page={page} size={PAGE_SIZE} total={total} label="Notices" onPage={setPage} />
         </>
       )}

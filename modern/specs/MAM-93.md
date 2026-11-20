@@ -6,9 +6,9 @@ service: web-ui
 type: Story
 title: "Console: run the batch jobs and download their legacy files (admin)"
 slug: ui-console-batch
-specVersion: 1
-descriptionSha256: 846ff59e81b28d8aa17e761743a07836e4c8145c16a8eda6fae1825c112a09dc
-jiraUpdated: 2026-11-18T09:24:05.776-0600
+specVersion: 2  # 2026-11-20: AC-4 also follows a started T-MSIS extract through its list until Completed or Failed, without a reload, then offers its Download; Out of scope line no longer excludes it; user order 2026-11-20 19:32, J7 (MAM-83 AC-1); tests and code follow (v1: file intakes only)
+descriptionSha256: 6c9dcbee1a4f9f5309e5e1588734352e96949b6ed819d9e0d9183a25dc99baff
+jiraUpdated: 2026-11-20T09:19:36.462-0600
 rules: []
 decisions: [D-020, D-017, D-015, D-025, D-024, D-009, D-023, D-004]
 dependsOn: [MAM-62, MAM-56, MAM-32, MAM-45, MAM-55, MAM-67, MAM-71, MAM-75]
@@ -42,8 +42,8 @@ Basis: modern/docs/ux/journeys.md#J7 (steps 1 and 2), D-015, D-020, modern/contr
 ### AC-4 File intake runs upload the file and follow the run
 Given admin1 picks Enrolment intake and then Sanction intake, each with a legacy file, business date 03/31/2026 and the batch id 'B0331'
 When They choose 'Run job'
-Then The page sends a multipart POST /api/v1/batch/intake-runs and a multipart POST /api/v1/batch/sanction-intake-runs with the file, businessDate 2026-03-31 and batchId B0331, and then refreshes the run from GET /api/v1/batch/intake-runs/{runId} and GET /api/v1/batch/sanction-intake-runs/{runId} until its status is Completed or Failed, showing the counts the service returns
-Basis: D-017, D-020, D-025, modern/contracts/openapi/enrollment-service.yaml#startIntakeRun, modern/contracts/openapi/enrollment-service.yaml#getIntakeRun, modern/contracts/openapi/sanctions-service.yaml#getSanctionIntakeRun, modern/docs/analysis/job-flow.md (PRVDAY01 STEP010, PRVSAN01 SANCIN)
+Then The page sends a multipart POST /api/v1/batch/intake-runs and a multipart POST /api/v1/batch/sanction-intake-runs with the file, businessDate 2026-03-31 and batchId B0331, and then refreshes the run from GET /api/v1/batch/intake-runs/{runId} and GET /api/v1/batch/sanction-intake-runs/{runId} until its status is Completed or Failed, showing the counts the service returns; a T-MSIS extract that admin1 started on the page is followed through the list GET /api/v1/batch/tmsis-extracts (the T-MSIS job has no run-status call), which the page reads again until the run listed for it is Completed or Failed, without a reload of the page, showing the status and counts the service lists for it in the one row of that run; a Completed run offers its Download
+Basis: D-017, D-020, D-025, modern/contracts/openapi/enrollment-service.yaml#startIntakeRun, modern/contracts/openapi/enrollment-service.yaml#getIntakeRun, modern/contracts/openapi/sanctions-service.yaml#getSanctionIntakeRun, modern/docs/analysis/job-flow.md (PRVDAY01 STEP010, PRVSAN01 SANCIN), user order 2026-11-20 19:32 (modern/docs/PROGRESS.md, KEEP GOING item 5), modern/docs/ux/journeys.md#J7 (step 1), MAM-83 AC-1, modern/contracts/openapi/tmsis-service.yaml#listTmsisExtracts
 
 ### AC-5 Failed runs and refusals are shown
 Given A run ends with status FAILED and an error text, and other requests are answered with 400, 403 or 422
@@ -74,7 +74,7 @@ Basis: .claude/skills/frontend-stack/SKILL.md section 5, modern/docs/architectur
 - The PRVDAY01 SORT step (D-009, dropped)
 - The export of the provider master in the 130-byte layout (GET /api/v1/legacy/provider-master has no screen in the inventory)
 - Comparing the legacy files with the legacy system's own output (Phase 9 parity)
-- Status polling for the screening run, revalidation sweep and directory extract beyond the 202 answer (QE-7)
+- Status polling for the screening run, revalidation sweep and directory extract beyond the 202 answer (QE-7); not the T-MSIS extract: a T-MSIS run started on the page is followed through its list (AC-4)
 
 ## Legacy trace (agent-owned, do not edit)
 Rules: none (enabler)

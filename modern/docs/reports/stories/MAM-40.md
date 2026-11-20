@@ -44,3 +44,21 @@ Checks run:        ./gradlew --no-daemon :services:provider-service:test -> 142/
 Not verified:      automated tests (Part D); AC-4 redelivery of the same event id live
 Questions for you: none
 ```
+
+## Lane 3 tests (2026-11-20)
+
+Outcome line unchanged. Tests for every AC of MAM-40.
+
+- Test files (14, recorded in `MAM-40.tests.sha256`): `ProviderAuditApiTest`, `AuditHistoryUseCasesTest`, `AuditTrailTest`, `ReadProviderHistoryTest`, `RecordNoticeSentTest`, `NoticeEventsListenerTest`, `ProviderReadFailureTest` (AC-7, database failure),
+  `features/MAM-40.feature`, `ProviderAuditSteps`, `TestEvents`, `HttpAnswerSteps`, `ProviderFixtureSteps`, `LogCapture`, `ProviderRows`.
+- Tests per AC (JUnit + Cucumber scenarios): AC-1 12+1, AC-2 10+1, AC-3 3+1, AC-4 9+1, AC-5 7+1, AC-6 6+1, AC-7 7+1, AC-8 9+1.
+- Written after the code. The two tests that failed in the first run (AC-1 scenario, AC-2 contract check) agreed with the story and the code and disagreed with the contract: **Q-131 A**, contract 1.1.0; both are unchanged and green.
+- No open defect of this story.
+Runs (all on 2026-11-20, from `modern/`, one Gradle build at a time through the shared lock, `--no-daemon`):
+- `./gradlew -I <init script: Spotless on src/test of provider-service only> :services:provider-service:spotlessApply` (formats the test sources only).
+- `./gradlew :services:provider-service:check --continue` (tests, Spotless on everything, ArchUnit, JaCoCo, PIT). Last run 21:00-21:09: **417 tests, 9 failures, 0 skipped**;
+  the 9 failures are the Q-124 tests (red by design until `PrvrecrdFile` is changed, see MAM-43); PIT **130 of 130 mutations killed (100 %)** on `domain` and `application`;
+  Spotless and ArchUnit passed.
+- `./gradlew :services:provider-service:jacocoTestReport -x test` (the report of the same run; with a failing test `check` does not reach `jacocoTestCoverageVerification`):
+  **line coverage 98.34 %** (768 of 781 lines; 98.84 % without `*Application`, as the gate counts), branch 88.31 %. Gate 85 %.
+- Not verified: reading a history of very many entries (not an AC).

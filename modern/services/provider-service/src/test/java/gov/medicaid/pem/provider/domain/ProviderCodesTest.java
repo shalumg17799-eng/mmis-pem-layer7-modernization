@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 class ProviderCodesTest {
 
-  @ParameterizedTest(name = "status {0} is {1}")
+  @ParameterizedTest(name = "[MAM-34 AC-1] status {0} is {1}")
   @CsvSource({"P,PENDING", "A,ACTIVE", "T,TERMINATED", "D,DENIED", "S,SUSPENDED"})
   @DisplayName(
       "[MAM-34 AC-1] enrolment status codes P, A, T, D, S (PRVRECRD 88-levels; S added by D-006)")
@@ -19,7 +19,7 @@ class ProviderCodesTest {
     assertThat(expected.code()).isEqualTo(code);
   }
 
-  @ParameterizedTest(name = "screen flag {0} is {1}")
+  @ParameterizedTest(name = "[MAM-34 AC-1] screen flag {0} is {1}")
   @CsvSource({"U,UNSCREENED", "P,PASS", "F,FAIL"})
   @DisplayName("[MAM-34 AC-1] screen flag codes U, P, F")
   void screenFlagCodes(String code, ScreenFlag expected) {
@@ -27,7 +27,7 @@ class ProviderCodesTest {
     assertThat(expected.code()).isEqualTo(code);
   }
 
-  @ParameterizedTest(name = "risk tier {0} is {1}")
+  @ParameterizedTest(name = "[MAM-34 AC-1] risk tier {0} is {1}")
   @CsvSource({"L,LIMITED", "M,MODERATE", "H,HIGH"})
   @DisplayName("[MAM-34 AC-1] risk tier codes L, M, H")
   void riskTierCodes(String code, RiskTier expected) {
@@ -35,7 +35,7 @@ class ProviderCodesTest {
     assertThat(expected.code()).isEqualTo(code);
   }
 
-  @ParameterizedTest(name = "provider type {0} is {1}")
+  @ParameterizedTest(name = "[MAM-34 AC-1] provider type {0} is {1}")
   @CsvSource({"IN,INDIVIDUAL", "GR,GROUP", "FA,FACILITY"})
   @DisplayName("[MAM-34 AC-1] provider type codes IN, GR, FA (D-008)")
   void providerTypeCodes(String code, ProviderType expected) {

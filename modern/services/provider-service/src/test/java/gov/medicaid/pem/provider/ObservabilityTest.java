@@ -16,6 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -85,11 +91,30 @@ class ObservabilityTest extends IntegrationTest {
   void healthFollowsTheDatabase() throws Exception {
     var docker = DockerClientFactory.instance().client();
     String postgres = PemContainers.POSTGRES.getContainerId();
+    ExecutorService probe = Executors.newSingleThreadExecutor();
     docker.pauseContainerCmd(postgres).exec();
     try {
-      assertThat(healthAnswer(503).path("status").asText()).isEqualTo("DOWN");
+      // Q-097 C, 2026-11-20: the pool must validate its idle connections (it skips a connection
+      // used
+      // less than 500 ms ago), and the answer is waited for with a limit, so a frozen database can
+      // never hang the build; the assertion is unchanged
+      Thread.sleep(1500);
+      Future<JsonNode> answer = probe.submit(() -> healthAnswer(503));
+      JsonNode down;
+      try {
+        down = answer.get(90, TimeUnit.SECONDS);
+      } catch (TimeoutException e) {
+        throw new AssertionError("no health answer within 90 s while the database was stopped", e);
+      } catch (ExecutionException e) {
+        if (e.getCause() instanceof AssertionError a) {
+          throw a;
+        }
+        throw e;
+      }
+      assertThat(down.path("status").asText()).isEqualTo("DOWN");
     } finally {
       docker.unpauseContainerCmd(postgres).exec();
+      probe.shutdownNow();
     }
     long end = System.nanoTime() + Duration.ofSeconds(60).toNanos();
     int status = 0;

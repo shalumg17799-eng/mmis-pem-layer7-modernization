@@ -1,4 +1,11 @@
+24ac1bb7880e5c99e94e1b2adb5da74cd65edf5c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/EventContract.java
+f17669343fa44d3b2bd7fd8e7003fa943d3e0d31  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutboxContractTest.java
+667a9c1ba95ba3f69bbda0f96b9a980fdf0f6a70  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java
 95f176096822cdf3a637d7756aaece328df69d39  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/StatusChangeSteps.java
+72e074954beb6ea103eeb844f81dcd29719ee241  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderWriteAtomicityTest.java
+810fd9457486bb9e34f05f6d3c4388093fe62752  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderWriteInputTest.java
+d0a7d3b1be15931dc427766f37b25c6b2d7034d1  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ChangeProviderStatusReasonTest.java
 e2d42f49b84dff9eb7ead06222bdc5342ac1d29e  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ChangeProviderStatusTest.java
-fd5e9539ac688036ddd2d268a714be4c2b4027ce  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionTest.java
+6d4a6d07fb923f49802e2ad46bb8c2a617da2142  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionResultTest.java
+1c3ae19be0490e5374ab86595696f5ff2a0f76df  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionTest.java
 2dcfd68c9c92dc4db0b0b3aa267e387cb4f04734  modern/services/provider-service/src/test/resources/features/MAM-33.feature

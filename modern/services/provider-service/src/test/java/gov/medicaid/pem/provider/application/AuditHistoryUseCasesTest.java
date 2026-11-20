@@ -324,7 +324,7 @@ class AuditHistoryUseCasesTest {
     return c;
   }
 
-  @ParameterizedTest(name = "{0} appends a {1} entry from {2} to {3}")
+  @ParameterizedTest(name = "[MAM-40 AC-5] {0} appends a {1} entry from {2} to {3}")
   @CsvSource({
     "TERMINATE, TERMINATED, A, T",
     "SUSPEND, SUSPENDED, A, S",

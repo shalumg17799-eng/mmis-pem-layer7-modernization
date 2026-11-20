@@ -46,6 +46,9 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 spotless {
+    // Keep each file's own line endings (2026-11-20, first CI run): the sources are CRLF in git (written on Windows, no
+    // .gitattributes), and the default policy expects the platform's endings, so every file failed spotlessCheck on Linux.
+    lineEndings = com.diffplug.spotless.LineEnding.PRESERVE
     java {
         target("src/**/*.java")
         googleJavaFormat() // the version Spotless 7.2.1 ships with

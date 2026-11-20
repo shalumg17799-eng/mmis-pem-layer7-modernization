@@ -1,0 +1,78 @@
+{
+  "story": "MAM-43",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/LogCapture.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/HttpAnswerSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderFixtureSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderMasterExportSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/adapter/legacy/PrvrecrdFileTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/LegacyMasterExportApiTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderReadFailureTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ExportProviderMasterTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-43.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ExportProviderMasterTest: PASSED",
+      "LegacyMasterExportApiTest: PASSED",
+      "MAM-43.feature 'Every record is exactly 130 bytes': PASSED",
+      "ProviderReadFailureTest: PASSED",
+      "PrvrecrdFileTest: PASSED"
+    ],
+    "AC-2": [
+      "ExportProviderMasterTest: PASSED",
+      "LegacyMasterExportApiTest: PASSED",
+      "MAM-43.feature 'Records are in NPI order with no header or trailer': PASSED",
+      "PrvrecrdFileTest: PASSED"
+    ],
+    "AC-3": [
+      "LegacyMasterExportApiTest: PASSED",
+      "MAM-43.feature 'An individual record has the PRVRECRD field positions': PASSED",
+      "PrvrecrdFileTest: PASSED"
+    ],
+    "AC-4": [
+      "LegacyMasterExportApiTest: PASSED",
+      "MAM-43.feature 'A group record keeps the owner NPI in bytes 121-130': PASSED",
+      "MAM-43.feature 'A legal name longer than 40 characters is cut to its first 40 and the owner NPI is not cut off': PASSED",
+      "PrvrecrdFileTest: PASSED"
+    ],
+    "AC-5": [
+      "LegacyMasterExportApiTest: PASSED",
+      "MAM-43.feature 'A suspended provider is exported with status S': PASSED",
+      "PrvrecrdFileTest: PASSED"
+    ],
+    "AC-6": [
+      "LegacyMasterExportApiTest: PASSED",
+      "MAM-43.feature 'A provider without a due date is exported with 99991231 and the codec reads the line back': PASSED",
+      "MAM-43.feature 'Unset values use the legacy padding': PASSED",
+      "PrvrecrdFileTest: PASSED"
+    ],
+    "AC-7": [
+      "LegacyMasterExportApiTest: PASSED",
+      "MAM-43.feature 'The export decodes to the same values as the API': PASSED",
+      "PrvrecrdFileTest: PASSED"
+    ],
+    "AC-8": [
+      "LegacyMasterExportApiTest: PASSED",
+      "MAM-43.feature 'Only ADMIN can export': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/adapter/legacy/PrvrecrdFile.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/api/LegacyFileController.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/ExportProviderMaster.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/JpaProviderStore.java"
+  ],
+  "rules": []
+}

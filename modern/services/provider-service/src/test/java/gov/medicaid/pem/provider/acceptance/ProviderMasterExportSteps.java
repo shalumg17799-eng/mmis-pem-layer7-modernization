@@ -111,6 +111,19 @@ public class ProviderMasterExportSteps {
     assertThat(bytes(npi, from, to)).isEqualTo(" ".repeat(to - from + 1));
   }
 
+  /**
+   * The line is read by the codec (an impossible date or a bad digit is an error) and has this due
+   * date.
+   */
+  @Then("the line of NPI {string} is read back by the PRVRECRD codec with the due date {string}")
+  public void readBackWithDueDate(String npi, String dueDate) {
+    FixedRecord r =
+        FixedWidthCodec.forLayout("PRVRECRD")
+            .read(line(npi).getBytes(StandardCharsets.US_ASCII), 1);
+    assertThat(r.get("PRV-NPI")).isEqualTo(npi);
+    assertThat(r.getDate("PRV-REVAL-DUE-DATE")).isEqualTo(LocalDate.parse(dueDate));
+  }
+
   @Then(
       "every export line decodes with the PRVRECRD codec to the fields the API returns for that NPI")
   public void decodes() throws Exception {

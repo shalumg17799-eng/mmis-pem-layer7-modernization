@@ -1,9 +1,14 @@
 openapi: 3.1.0
 info:
   title: PEM provider-service API
-  version: 1.0.0
+  version: 1.2.0
   description: 'provider-service (port 8081, database provider_db). Replaces: VSAM master + DB2 PROVIDER/PROVIDER_OWNER; status changes; PINQ
-    lookup. Contract-first; status DRAFT until Phase 3 approval, then 1.0.0.'
+    lookup. Contract-first; status DRAFT until Phase 3 approval, then 1.0.0. 1.1.0 (2026-11-20, Q-131 A, user decision): AuditEntry before and after
+    declare their members (ProviderSnapshot, with the parts AuditScreening, AuditRisk, AuditDecision, AuditStatusChange and AuditNotice) as the
+    service returns them (MAM-40); additive, no member renamed or removed, no operation changed. 1.2.0 (2026-11-20, Q-132, user decision):
+    searchProviders gets the optional query parameter afterNpi (keyset paging in ascending NPI order, for a caller that walks every match while the
+    data may change, such as the T-MSIS extract) and states the ascending NPI order that MAM-37 AC-6 already requires; total keeps counting every
+    match; additive: no operation added or removed, no member renamed, and a call without afterNpi answers exactly as in 1.1.0.'
   license:
     name: Proprietary
     identifier: LicenseRef-PEM-Proprietary
@@ -28,7 +33,17 @@ paths:
       summary: Search providers by NPI, Medicaid ID, name or status (replaces CICS PINQ)
       tags:
       - Providers
-      description: 'Roles: ANALYST, SUPERVISOR, ADMIN, SYSTEM. Legacy / decisions: PRVCICS1 inquiry; work-queue filters.'
+      description: 'Roles: ANALYST, SUPERVISOR, ADMIN, SYSTEM. Legacy / decisions: PRVCICS1 inquiry; work-queue filters; keyset paging Q-132
+        (1.2.0). Every given filter must match. The items are in ascending NPI order, with or without afterNpi (MAM-37 AC-6). Two ways to page, never
+        mixed in one call. (1) Offset paging, unchanged: page and size; a call without afterNpi answers exactly as in 1.1.0 (same results, same order,
+        same paging). (2) Keyset paging (1.2.0): afterNpi and size; the answer holds only the providers whose NPI is greater than afterNpi, in
+        ascending NPI order, at most size of them; page must be absent or 0 (any other page is a 400 problem) and the answer then has page 0. To walk
+        every match: the first call has no afterNpi (page absent or 0); each next call repeats the same filters and size and sets afterNpi to the npi
+        of the last item of the previous answer; the walk ends at the first answer whose items list is empty (an answer with fewer items than size
+        is the last one that holds providers, so a caller may also stop there). Because the key only moves forward, a provider that matches the
+        filters for the whole walk is returned exactly once, whatever changes elsewhere in the data during the walk. total is always the number of
+        ALL providers that match the filters (npi, medicaidId, name, status, screenFlag), never only those after the key: it is the same on every
+        answer of a walk while the data does not change, and a caller compares it between answers to notice a change (the Q-132 safety net).'
       x-roles: &id001
       - ANALYST
       - SUPERVISOR
@@ -88,7 +103,7 @@ paths:
           type: integer
           minimum: 0
           default: 0
-        description: Page number (0-based)
+        description: Page number (0-based). With afterNpi it must be absent or 0; any other page is a 400 problem.
       - name: size
         in: query
         required: false
@@ -97,18 +112,36 @@ paths:
           minimum: 1
           maximum: 200
           default: 20
-        description: Page size
+        description: Page size (the same with or without afterNpi)
+      - name: afterNpi
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^[0-9]{10}$
+          description: A position in NPI order (exactly 10 digits)
+          examples:
+          - '1003000444'
+        description: 'Keyset paging (1.2.0, Q-132). Present: the answer holds only the providers whose NPI is greater than afterNpi, in ascending NPI
+          order (10-digit NPIs compare the same as text and as numbers), at most size of them; every other filter combines with it; page must be
+          absent or 0. The value need not be on file or match the filters: it is only a position (normally the npi of the last item of the previous
+          answer). total still counts ALL providers that match the filters, not only those after the key. Absent: nothing changes, the answer is
+          exactly as in 1.1.0. Strict input (lesson b of the code reviews): a value that is not exactly 10 digits (empty, shorter, longer, letters, a
+          sign, spaces or other padding) or afterNpi given more than once is a 400 problem, never coerced and never ignored.'
       security:
       - bearerAuth: *id001
       responses:
         '200':
-          description: OK
+          description: 'OK. Without afterNpi: page page of the matches in ascending NPI order. With afterNpi: up to size matches whose NPI is greater
+            than afterNpi, in ascending NPI order, and page 0; an empty items list means there is nothing after the key (the end of a walk). In both,
+            total is the number of all matches of the filters.'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProviderPage'
         '400':
-          description: Invalid request
+          description: 'Invalid request: a malformed filter or paging value (npi, medicaidId, status, screenFlag, page, size, afterNpi; afterNpi not
+            exactly 10 digits or given more than once), or afterNpi together with a page other than 0.'
           content:
             application/problem+json:
               schema:
@@ -423,8 +456,30 @@ components:
           type: string
           maxLength: 200
       description: 'D-019: an analyst approval sets ACTIVE after a PASS screening.'
+    AuditDecision:
+      type: object
+      description: 'Part of after in an APPROVED or DENIED entry (MAM-40, 1.1.0): the decision as sent to decideProvider. Both members are always
+        written; reason is null when none was sent.'
+      required:
+      - decision
+      - reason
+      properties:
+        decision:
+          type: string
+          enum:
+          - APPROVE
+          - DENY
+        reason:
+          type:
+          - string
+          - 'null'
+          maxLength: 200
     AuditEntry:
       type: object
+      description: 'One entry of the provider history (MAM-40, D-018). actor is the user, or the producing service for an event. action is one of
+        REGISTERED, SCREENING_VERDICT, RISK_TIER_ASSIGNED, APPROVED, DENIED, TERMINATED, SUSPENDED, REINSTATED, REVALIDATION_PASSED, NOTICE_SENT.
+        before and after are ProviderSnapshot (members declared in 1.1.0, Q-131 A). correlationId is absent when the request or event had none
+        that is a uuid.'
       required:
       - at
       - actor
@@ -438,16 +493,25 @@ components:
         action:
           type: string
         before:
-          type:
-          - object
-          - 'null'
+          $ref: '#/components/schemas/ProviderSnapshot'
         after:
-          type:
-          - object
-          - 'null'
+          $ref: '#/components/schemas/ProviderSnapshot'
         correlationId: &id010
           type: string
           format: uuid
+    AuditNotice:
+      type: object
+      description: 'The only member of after in a NOTICE_SENT entry (MAM-40 AC-4, D-012, 1.1.0): the notice id and template of the NoticeSent event,
+        as received.'
+      required:
+      - noticeId
+      - template
+      properties:
+        noticeId:
+          type: string
+          format: uuid
+        template:
+          type: string
     AuditPage:
       type: object
       required:
@@ -469,6 +533,58 @@ components:
         total:
           type: integer
           minimum: 0
+    AuditRisk:
+      type: object
+      description: 'Part of after in a RISK_TIER_ASSIGNED entry (MAM-40, 1.1.0): the tier of the RiskTierAssigned event, as received.'
+      required:
+      - tier
+      properties:
+        tier:
+          type: string
+          enum:
+          - L
+          - M
+          - H
+    AuditScreening:
+      type: object
+      description: 'Part of after in a SCREENING_VERDICT entry (MAM-40, 1.1.0): the result of the ScreeningCompleted event, as received.'
+      required:
+      - result
+      properties:
+        result:
+          type: string
+          enum:
+          - PASS
+          - FAIL
+    AuditStatusChange:
+      type: object
+      description: 'Part of after in a TERMINATED, SUSPENDED or REINSTATED entry (MAM-40 AC-5, 1.1.0): the StatusChangeRequest as applied. All four
+        members are always written; reason and sanctionId are null when none was sent.'
+      required:
+      - action
+      - reason
+      - effectiveDate
+      - sanctionId
+      properties:
+        action:
+          type: string
+          enum:
+          - TERMINATE
+          - SUSPEND
+          - REINSTATE
+        reason:
+          type:
+          - string
+          - 'null'
+          maxLength: 60
+        effectiveDate:
+          type: string
+          format: date
+        sanctionId:
+          type:
+          - string
+          - 'null'
+          format: uuid
     FieldError:
       type: object
       required:
@@ -618,6 +734,7 @@ components:
           type: integer
     ProviderPage:
       type: object
+      description: One answer of searchProviders. The items are in ascending NPI order (MAM-37 AC-6).
       required:
       - items
       - page
@@ -631,12 +748,88 @@ components:
         page:
           type: integer
           minimum: 0
+          description: The page asked for; 0 with afterNpi (keyset paging, 1.2.0)
         size:
           type: integer
           minimum: 1
         total:
           type: integer
           minimum: 0
+          description: The number of ALL providers that match the filters, with or without afterNpi (never only those after the key, Q-132)
+    ProviderSnapshot:
+      type:
+      - object
+      - 'null'
+      description: 'The provider record as written to audit_log before or after one change (MAM-40; members declared in 1.1.0, Q-131 A). Null for
+        before in REGISTERED and NOTICE_SENT entries. A snapshot of the record carries all eleven provider members, nulls included; after also
+        carries the one part named for its action: screening (SCREENING_VERDICT), risk (RISK_TIER_ASSIGNED), decision (APPROVED, DENIED) or
+        statusChange (TERMINATED, SUSPENDED, REINSTATED); REVALIDATION_PASSED has no part. The after of NOTICE_SENT carries only notice. No member
+        is required because no member is in every entry. The schema itself admits null so that before and after can reference it directly.'
+      properties:
+        npi:
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+        medicaidId:
+          type: string
+          maxLength: 9
+        providerType:
+          type: string
+          enum:
+          - IN
+          - GR
+          - FA
+        taxonomy:
+          type: string
+          maxLength: 10
+        riskTier:
+          type:
+          - string
+          - 'null'
+          enum:
+          - L
+          - M
+          - H
+          - null
+        enrollStatus:
+          type: string
+          enum:
+          - P
+          - A
+          - T
+          - D
+          - S
+        screenFlag:
+          type: string
+          enum:
+          - U
+          - P
+          - F
+        effectiveDate:
+          type: string
+          format: date
+        endDate:
+          type:
+          - string
+          - 'null'
+          format: date
+        revalidationDueDate:
+          type:
+          - string
+          - 'null'
+          format: date
+        version:
+          type: integer
+        screening:
+          $ref: '#/components/schemas/AuditScreening'
+        risk:
+          $ref: '#/components/schemas/AuditRisk'
+        decision:
+          $ref: '#/components/schemas/AuditDecision'
+        statusChange:
+          $ref: '#/components/schemas/AuditStatusChange'
+        notice:
+          $ref: '#/components/schemas/AuditNotice'
     StatusChangeRequest:
       type: object
       required:

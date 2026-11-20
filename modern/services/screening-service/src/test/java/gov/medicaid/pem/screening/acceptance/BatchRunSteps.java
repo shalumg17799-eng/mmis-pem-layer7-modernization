@@ -59,12 +59,16 @@ public class BatchRunSteps {
   /** A run still going when the scenario ends would write into the next scenario's world. */
   @After(order = 20000)
   public void endRuns() throws Exception {
-    for (String id : startedRuns) {
-      waitForEnd(id);
-    }
-    if (rejecting) {
-      jdbc.execute("DROP TRIGGER IF EXISTS reject_scrnout ON screening_run");
-      jdbc.execute("DROP FUNCTION IF EXISTS reject_scrnout()");
+    try {
+      for (String id : startedRuns) {
+        waitForEnd(id);
+      }
+    } finally {
+      // the rejection never outlives the scenario, even when a run does not end within its bound
+      if (rejecting) {
+        jdbc.execute("DROP TRIGGER IF EXISTS reject_scrnout ON screening_run");
+        jdbc.execute("DROP FUNCTION IF EXISTS reject_scrnout()");
+      }
     }
   }
 

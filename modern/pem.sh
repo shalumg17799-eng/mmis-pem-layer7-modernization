@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PEM local stack, one command per task (MAM-24). The Makefile calls this script; use it directly where make is missing.
-#   ./pem.sh up | down | ps | logs | build | test | e2e | seed | j1 [runs] | journey <name> [runs] | reset
+#   ./pem.sh up | down | ps | logs | build | test | e2e | a11y | seed | j1 [runs] | journey <name> [runs] | reset
 # Only compose project "pem" is touched. Secrets: infra/.env.local (generated, git-ignored, never printed).
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -42,11 +42,21 @@ case "${1:-}" in
   logs) "${COMPOSE[@]}" logs -f --tail 100 ;;
   build) ./gradlew --no-daemon build -x test && (cd web-ui && npm run -s build) ;;
   test) ./gradlew --no-daemon checkAll && (cd web-ui && npm run -s lint && npm test) ;;
-  e2e)  # default Playwright suite (mocked gateway), then every journey J1-J7 on the live stack, each from a fresh seed
+  e2e)  # default Playwright suite (mocked gateway; it holds the accessibility gate and repository checks of MAM-86), then
+        # every journey J1-J7 on the live stack, each from a fresh seed, then the accessibility scans and keyboard journeys
     (cd web-ui && NODE_OPTIONS=--dns-result-order=ipv4first npx playwright test) || exit 1
     for j in j1-enrolment j2-rejected j3-screening-fails j4-inquiry j5-sanctions j6-revalidation j7-extracts; do
       "$0" journey "$j" 1 || exit 1
-    done ;;
+    done
+    "$0" a11y || exit 1 ;;
+  a11y)  # MAM-86: axe on every screen and state, focus, contrast and structure checks (read-only, from the seed state), then
+         # journeys J1-J7 with the keyboard only (they change data: each seeds itself); the stack is left at the seed state
+    # both parts always run and the stack is always reseeded; the target fails when either part failed
+    bash infra/scripts/seed.sh; a11y_failed=0
+    (cd web-ui && PEM_JOURNEYS=1 NODE_OPTIONS=--dns-result-order=ipv4first npx playwright test e2e/a11y/pages.a11y.spec.ts --reporter=line) || { echo "accessibility page scans FAILED" >&2; a11y_failed=1; }
+    (cd web-ui && PEM_JOURNEYS=1 NODE_OPTIONS=--dns-result-order=ipv4first npx playwright test e2e/a11y/keyboard-journeys.spec.ts --reporter=line) || { echo "keyboard journeys FAILED" >&2; a11y_failed=1; }
+    bash infra/scripts/seed.sh
+    [ "$a11y_failed" -eq 0 ] || exit 1 ;;
   seed) bash infra/scripts/seed.sh ;;
   journey)  # ./pem.sh journey <j1-enrolment|j5-sanctions|...> [runs]: a journey on the live stack, each run from a fresh seed
     name="${2:?usage: ./pem.sh journey <name> [runs]}"; runs="${3:-1}"
@@ -65,5 +75,5 @@ case "${1:-}" in
   reset)
     read -r -p "This deletes the pem data volumes (databases, Kafka). Type yes to continue: " answer
     if [ "$answer" = "yes" ]; then "${COMPOSE[@]}" down -v; else echo "nothing changed"; fi ;;
-  *) echo "usage: ./pem.sh up|down|ps|logs|build|test|e2e|seed|j1 [runs]|journey <name> [runs]|reset" >&2; exit 2 ;;
+  *) echo "usage: ./pem.sh up|down|ps|logs|build|test|e2e|a11y|seed|j1 [runs]|journey <name> [runs]|reset" >&2; exit 2 ;;
 esac

@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,16 @@ class JdbcScreeningRunsTest extends Lane3Test {
 
   @Autowired ScreeningRuns runs;
   @Autowired ScreeningStore store;
+
+  /**
+   * The runs of these tests are rows, not jobs: they are removed when the test ends, so that no row
+   * stays RUNNING (the base class waits for the end of every run).
+   */
+  @AfterEach
+  void removeTheRunsOfTheTest() {
+    jdbc.update("UPDATE screening SET run_id = NULL WHERE run_id IS NOT NULL");
+    jdbc.update("DELETE FROM screening_run");
+  }
 
   UUID newRun() {
     UUID id = UUID.randomUUID();

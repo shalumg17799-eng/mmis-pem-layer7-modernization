@@ -20,3 +20,52 @@ Not verified:      that the pinned versions exist and work together; AC-1 covera
                    AC-3 skipped-test failure and AC-4 smoke on a clean runner
 Questions for you: 1. Copy the workflow to the repository root and push? Options: A) not yet (default, AC-6); B) yes
 ```
+
+```
+Phase / item:      MAM-39 CI pipeline: switched on, first run (2026-11-20)
+Outcome:           IN PROGRESS (the first run is red; two causes found and fixed locally, to be proven by the next push)
+What was done:     User decision 19:32: the workflow was moved from modern/.github/workflows/ci.yml (inert, AC-6) to the
+                   repository root .github/workflows/ci.yml in commit f72d4e5 and pushed (branch modernization).
+Checks run:        GitHub Actions run 44750730590 (pem-ci, commit f72d4e5, 2026-11-20 19:39-19:41 IST): FAILURE.
+                     Contract lint                 success (1m19s: Redocly on the OpenAPI files, AsyncAPI validate, check_phase3.py)
+                     Gradle build and full check   failure at "Build and check" after 2m01s
+                     Web UI tests                  failure at "Install and test" after 18s
+                     Compose smoke test            skipped (it needs the Gradle job)
+                   The job logs cannot be read without a GitHub sign-in (gh is not installed; the public API gives only the
+                   steps and "Process completed with exit code 1"). Causes found by local analysis:
+                   1. Gradle job: spotlessCheck. 622 Java files are CRLF in git (written on Windows, no .gitattributes);
+                      Spotless expects the platform's line endings, so on Linux every one of them is a format violation.
+                      Fix: lineEndings = LineEnding.PRESERVE in buildSrc pem.java-conventions (each file keeps its own
+                      endings). Verified locally: buildSrc compiles; spotlessCheck of fixed-width, service-kit, risk,
+                      notification, tmsis, provider and versionCheck BUILD SUCCESSFUL.
+                   2. Web UI job: the workflow pinned Node 20.19.2, but 12 packages of the lock file need Node 22
+                      (vitest ^22.12.0, jsdom ^22.22.2, undici >=22.19.0, @axe-core/playwright >=22.12.0, ...).
+                      Fix: node-version 22.22.2 for the web UI job and the compose smoke job (contract lint stays on
+                      20.19.2, it passed).
+                   Also checked: no relative import of the web UI resolves only without case (583 imports); the lock file
+                   holds the Linux native packages (rolldown, lightningcss); no source file is hidden by .gitignore any more.
+Not verified:      That these are the ONLY causes: both jobs stopped at their first failure. The fixes are not pushed yet
+                   (commits only on the user's word; the next one is at the end of the plan). Known to be red in the next
+                   run until the lanes finish: the unit tests of the services that are still open.
+Next step:         push with the final commit and read the second run
+```
+
+## Local reproduction on Linux (2026-11-20 22:23 to 22:54, lead; nothing pushed)
+
+The two failed jobs of the first run were repeated in throwaway Linux containers on the development machine (official
+images, memory-capped, removed after each run; the repository was mounted read-only and copied inside the container).
+
+| Job | Image and tree | Commands | Result |
+|---|---|---|---|
+| Web UI tests | node:20.19.2-bookworm-slim, the committed tree (f72d4e5) | `npm ci --no-audit --no-fund`, `npm run -s lint` | both pass (284 packages; engine warnings only) |
+| Web UI tests | the same | `npx vitest run tests/console/provider-detail.test.tsx` | fails at start-up after 0.5 s: 1 error while loading the test environment (undici), no test runs. This is the failure of the first CI run: the install and the lint pass and `npm test` stops at once |
+| Web UI tests | node:22.22.2-bookworm-slim, the working tree of 22:31 | `npm ci --no-audit --no-fund && npm run -s lint && npm test` (the job's own commands) | **passes**: 292 packages, lint clean, 43 test files, 1092 of 1092 tests, no skipped test, 463 s, exit 0 |
+| Gradle build and full check (formatting only) | eclipse-temurin:21-jdk (21.0.13; the workflow pins 21.0.7), the working tree of 22:42 | `./gradlew --no-daemon spotlessCheck versionCheck` | `spotlessCheck` **passes** for infra:local-runtime, libs:fixed-width, libs:service-kit, libs:test-support, api-gateway and directory-service: sources with CRLF line endings are accepted on Linux with `lineEndings = PRESERVE`. The run then stopped at enrollment-service on real format violations (line wrapping in `IntakeLoad.java` and others: unfinished work of the enrollment lane, not line endings) |
+
+Not reached in the Gradle run (it stops at the first failure; to be repeated with `--continue` when the service lanes are
+done): notification, provider, revalidation, risk, sanctions, screening, tmsis and `versionCheck`. Not reproduced at all:
+the tests of the Gradle job (they start database and broker containers) and the compose smoke job.
+
+Also changed locally for the next run: the Gradle job's time limit is 150 minutes (was 90: the build is sequential and
+runs PIT for nine services); the pinned Node versions were checked against the Node release index (20.19.2 and 22.22.2
+exist).

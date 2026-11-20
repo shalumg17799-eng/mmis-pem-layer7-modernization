@@ -1,7 +1,8 @@
-import { Alert, AlertText, Table, Tag } from '@trussworks/react-uswds';
+import { Alert, AlertText, Tag } from '@trussworks/react-uswds';
 import { Link } from 'react-router-dom';
 import { APPLICATION_STATUS_LABEL, formatDate } from '../../../shared/format/format';
 import { EmptyState } from '../../../shared/ui/EmptyState';
+import { ScrollableTable } from '../../../shared/ui/ScrollableTable';
 import { SortHeader, useSorting } from '../../../shared/ui/sorting';
 import type { Application } from '../../../shared/api/types';
 import { useApplications } from './queries';
@@ -33,7 +34,7 @@ export function ApplicationsSection() {
       )}
       {query.status === 'success' && query.data.items.length > 0 && (
         <>
-          <Table bordered={false} fullWidth scrollable>
+          <ScrollableTable bordered={false} fullWidth label="My applications">
             <thead>
               <tr>
                 <SortHeader column="submitted" label="Submitted" sorting={sorting} />
@@ -59,7 +60,7 @@ export function ApplicationsSection() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </ScrollableTable>
           {query.data.total > query.data.items.length && (
             <p>
               Showing {query.data.items.length} of {query.data.total} applications.

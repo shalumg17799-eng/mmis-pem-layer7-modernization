@@ -1,6 +1,7 @@
-import { Table, Tag } from '@trussworks/react-uswds';
+import { Tag } from '@trussworks/react-uswds';
 import type { Sanction } from '../../../../shared/api/types';
 import { formatDate, SANCTION_ACTION_LABEL, withCode } from '../../../../shared/format/format';
+import { ScrollableTable } from '../../../../shared/ui/ScrollableTable';
 import { SortHeader, useSorting } from '../../../../shared/ui/sorting';
 
 /** Colour adds to the action badge; the word and the code name the action. Reinstate is the one that restores the enrolment. */
@@ -17,7 +18,7 @@ const SANCTION_SORT = {
 export function SanctionTable({ items }: { items: readonly Sanction[] }) {
   const sorting = useSorting(items, SANCTION_SORT);
   return (
-    <Table bordered={false} fullWidth scrollable>
+    <ScrollableTable bordered={false} fullWidth label="Sanction history">
       <caption className="usa-sr-only">Sanction history</caption>
       <thead>
         <tr>
@@ -39,6 +40,6 @@ export function SanctionTable({ items }: { items: readonly Sanction[] }) {
           </tr>
         ))}
       </tbody>
-    </Table>
+    </ScrollableTable>
   );
 }

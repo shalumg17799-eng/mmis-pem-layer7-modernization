@@ -47,3 +47,44 @@ curl -s -o REVALQ.D20260331 http://localhost:8080/api/v1/batch/revalidation-swee
   services. Job lines carry the legacy text where the story keeps it, for example
   `PRVENR01: STARTING ENROLLMENT LOAD - BATCH <id>` and `PROVIDERS TERMINATED=00001`.
 - Failed runs: see troubleshooting.md, "A batch run in status FAILED".
+
+## Performance smoke (MAM-88)
+
+One command loads 10,000 synthetic providers into the running stack, measures it against the Performance targets of
+`docs/architecture/nfr.md` (all marked DEFAULT there), writes the report and puts the stack back to the seed state. It
+**changes the shared stack**, so take the stack lock first and run it alone (no deploy, journey or test at the same time).
+From the repository root:
+
+```bash
+modern/kag/.venv/Scripts/python.exe modern/tools/perf/run_perf_smoke.py --stack-lock-held   # the real run
+modern/kag/.venv/Scripts/python.exe modern/tools/perf/run_perf_smoke.py --dry-run           # prints every step and command, touches nothing
+modern/kag/.venv/Scripts/python.exe modern/tools/perf/run_perf_smoke.py --render-report modern/tools/perf/out/perf-result.json   # report only
+```
+
+The runner does not take the lock itself and refuses to start without `--stack-lock-held`. Duration: **about 15 to 25 minutes**
+(seed 0.5 min, load and check 1 min, k6 2 x 1 min plus start-up, submits and one screening 2 to 4 min, the two jobs each
+under 1.5 min if the targets are met, then the closing wait for the re-screenings the sweep starts, 3 to 10 min, and the seed).
+It is bounded at about 65 minutes by the job time-outs (`--job-timeout` 900 s each, `--drain-timeout` 900 s). Free memory
+is checked before every heavy step and the run waits while it is under 1024 MB.
+
+| Step | What it does on the stack |
+|---|---|
+| (a) seed | `infra/scripts/seed.sh`: 16 providers, every service table at its seed state |
+| (b) load | `tools/perf/load_perf_dataset.py`: +10,000 rows in `provider_db.provider` and `revalidation_db.tracked_provider` (NPIs 1007xxxxxx); checks AC-1 |
+| (c) AC-2 | a throwaway `k6` container (compose service `k6`, profile `perf`, image `grafana/k6` pinned by version and digest in `infra/docker-compose.yml`, `--rm --no-deps`) calls the gateway as `http://pem-apps:8080` with 20 users for 60 s: `tools/perf/k6/search.js`, then `detail.js` |
+| (d) AC-3 | 80 applications (`POST /api/v1/applications`, PROVIDER token, groups 1008nnnnnn): 40 one at a time, 40 five at a time; waits until the new providers are screened; times one `POST /api/v1/screenings` to COMPLETED |
+| (e) AC-4 | the T-MSIS extract, then the revalidation sweep (about 1,700 cases on a late-2026 business date, one re-screening and one notice each), each timed from the POST to COMPLETED |
+| (f) restore | always, also after a failure: waits until no revalidation case is DUE or IN_SCREENING, runs the seed, checks 16 providers (API), 16 rows in both tables, 0 perf rows, 0 applications, 0 cases |
+
+There is no separate unload: the seed truncates both tables the loader fills. **Left in place** (the seed does not reset
+them): `tmsis_db` (one extract run, its rows and one archive generation), the Spring Batch job tables and the Kafka topics. The
+only container the run starts is the throwaway k6 one; no pem container is stopped, restarted or recreated, and no password or token is
+printed or written (the ANALYST token reaches k6 through the environment of the `docker compose run` process only).
+
+Output: `modern/tools/perf/out/perf-result.json` (git-ignored, with the k6 summaries in `out/k6/`) and
+`modern/docs/reports/performance-report.md`: every target of nfr.md with its measured value, MET or NOT MET, DEFAULT marked as
+nfr.md marks it, the note that the 90 s job limit is a projection of 15 minutes for 100,000 providers, the machine conditions,
+and every missed target listed as it is (nothing is tuned). Exit code 0: every step ran and the seed state is restored
+(targets may still be NOT MET); 1: a step failed or the restore failed (read the log and the report; run
+`bash modern/infra/scripts/seed.sh` by hand if the restore says FAILED); 2: not started (no `--stack-lock-held`).
+The service must be deployed with contract 1.2.0 for the walk to use `afterNpi`; before that deploy the runner says so and walks by page.

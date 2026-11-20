@@ -1,0 +1,50 @@
+{
+  "story": "MAM-36",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "tests": [
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/ObservabilityKitTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/config/PemKitAutoConfigurationTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/CorrelationIdFilterTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/CorrelationIdTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ObservabilityTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/PlatformChecksTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutageTest.java",
+    "modern/services/provider-service/src/test/resources/junit-platform.properties"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ObservabilityKitTest: PASSED",
+      "ObservabilityTest: PASSED",
+      "PlatformChecksTest: PASSED"
+    ],
+    "AC-2": [
+      "PlatformChecksTest: PASSED"
+    ],
+    "AC-3": [
+      "ObservabilityKitTest: PASSED"
+    ],
+    "AC-4": [
+      "CorrelationIdFilterTest: PASSED",
+      "CorrelationIdTest: PASSED",
+      "ObservabilityKitTest: PASSED",
+      "ObservabilityTest: PASSED",
+      "PemKitAutoConfigurationTest: PASSED",
+      "PlatformChecksTest: PASSED"
+    ],
+    "AC-5": [
+      "ProviderOutageTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/libs/service-kit/src/main/java/gov/medicaid/pem/kit/events/CorrelationIdRecordInterceptor.java",
+    "modern/services/enrollment-service/.../application/SubmitApplication.java",
+    "modern/services/provider-service/.../application/RegisterProvider.java"
+  ],
+  "rules": []
+}

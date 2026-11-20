@@ -10,9 +10,9 @@ adff04be6197e25b699d8b7451f7c816b6fa068a  modern/services/provider-service/src/t
 131a329d39c8363c6e7946b64e66d643819a2920  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/CucumberSpringConfig.java
 e16682f485425f96b5efefc464dbfc4118e356db  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/CucumberSuiteTest.java
 36f98fcacb73a1b682606eefed7d39ecf0c02732  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/WalkingSkeletonSteps.java
-58ee2b339e695dffccf2d500b5e7c34c486874aa  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderLookupRolesTest.java
+d0b8c5a512fcf4122a94fb3f8e5b7321148a6916  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderLookupRolesTest.java
 b4e42bfa751ca9e976dc68e8de37543433a93b23  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/FindProviderTest.java
-4ca7711514533e6056c64355795a2048342dd545  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ProviderCodesTest.java
+c2ab26c680b05008c43a7d79dc3351f741b5a064  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ProviderCodesTest.java
 f9ae391bb3769b96008e8d8eaeeb441823a4d380  modern/services/provider-service/src/test/resources/features/MAM-34.feature
 7ce30eb93b2bb43b244033ffd33ce3fb11d8ce32  modern/web-ui/e2e/provider-lookup.spec.ts
 68e401cde4ef473802ea7c999ce46daebeb6c346  modern/web-ui/tests/console/provider-lookup.test.tsx

@@ -69,3 +69,32 @@ Test titles that named the old format were corrected for honesty (AC tags kept);
 The full default Playwright suite (16 specs, journeys excluded, `--workers=1`, `NODE_OPTIONS=--dns-result-order=ipv4first`, one run): **152 of 152 pass** (8.4 min). The Playwright suite was not run before the correction (no time; the UI agent's static list was used), so there is no before count for it.
 
 **Hashes:** re-recorded with `test_protection.py record MAM-93` with exactly the files of the story's `.tests.sha256`; `check` and `sha256sum -c` are OK.
+
+## 2026-11-20 20:25 The T-MSIS run is followed on the Batch jobs page, without a reload (user order 19:32, item 5), by the test-writer
+
+New file `modern/web-ui/tests/admin/batch-jobs-tmsis-follow.test.tsx` (20 tests, LF), added to `MAM-93.tests.sha256` (now 4 files; the other three are byte for byte unchanged).
+Why: the page puts the answer of the POST (always RUNNING) into its local `runs`; the T-MSIS job has no `statusPath` (no run-status call in the contract, a list and a file only), so the poller of `JobsPage.tsx` never follows it;
+and `JobsPage.tsx:172-173` throws away the service's copy of every run that is already in `runs`. So the row stays "Running" until a reload. (The older wording "until the list is read again" was imprecise: the list IS read again
+right after the start, the stale local copy wins.) A refetch of the list alone does not fix it; the listed status has to replace the stale local entry, or the page has to follow the run through the list.
+
+Which story and AC: **MAM-93**, the page story, not the journey story MAM-83. AC-4 ("refreshes the run until its status is Completed or Failed, showing the counts the service returns") is the follow rule, now also for T-MSIS; AC-5 ("no failure is shown as Completed or silently dropped") covers
+Failed and the unreadable list; AC-6 (a Completed run has a Download button that requests the file of that run) carries the MAM-83 AC-1 need (the admin downloads the file of the run just started), tagged `[MAM-93 AC-6][MAM-83 AC-1]`; AC-8 is the screen-reader rule.
+The spec text of MAM-93 AC-4 names the file intakes only and its "Out of scope" line still says polling beyond the 202 answer is out of scope (QE-7, overtaken by the contracts 1.1.0 for three jobs and by this order for T-MSIS): the spec was not edited (not a test-writer file); the lead decides whether to add one sentence to AC-4 (MODERNIZATION.md section 8: spec and Jira must agree).
+
+| Level | Command | Tests | Result | Reason |
+|---|---|---|---|---|
+| Vitest | `vitest run tests/admin/batch-jobs-tmsis-follow.test.tsx` (PowerShell, lowercase drive, real timers, 114 s) | 20 | **17 failed, 3 passed** | the row of the started run stays "Running" (the list is never read again after the start): 9 x `expected 'Running' to be 'Completed'` or `'Failed'`; counts `''` instead of `rows 12, archiveGeneration 7`; 4 x the Error cell is `''` instead of "The status could not be refreshed"; 3 x the list is not read again (`expected 0 to be greater than or equal to 2`, `2` vs `4`, `2` vs `5`) |
+| Vitest | same file, the 3 regression checks | 3 | 3 passed | the follow of the screening run, the revalidation sweep and the directory extract is unchanged, and the T-MSIS list is not read again for them |
+
+AC to test (all `[MAM-93 AC-n]`): AC-4 (8): Running to Completed from the service list; counts of the finished row; one row per run and the older run keeps its row; the form is not reset (no reload); a run the list does not show yet keeps its Running row; the list is read about once per
+`POLL_INTERVAL_MS` while Running (between floor(3.5 s / 1 s) - 1 and ceil(3.5 s / 1 s) + 1 reads: steady, no storm); no further list request once Completed; none once Failed. AC-5 (6): Failed with its error text; no Download on a Failed run; the unreadable list gives the existing wording
+"The status could not be refreshed" in the Error cell; the status is not guessed (still Running); another job still runs meanwhile; when the list is readable again the row is Completed with its counts and the note is gone. AC-6 + MAM-83 AC-1 (1): Download of the followed run requests
+`/api/v1/batch/tmsis-extracts/{runId}/file` of THAT run with the token, saves `TMSISOUT.D20260331` byte for byte, and never requests the older run's file. Regression AC-4 (3, it.each): the other jobs with a status call (the two intakes keep the tests of `batch-jobs.test.tsx`).
+AC-8 (2): while the run is followed, and while the list keeps failing, no live-region text (`role` status or alert, `aria-live`) appears twice; the page has no live region of its own for run status, its live regions are "Loading recent runs" and the alerts, and a poll must not announce them again.
+The list handler answers after 40 ms, so that a read under way can show in the page (a MutationObserver then sees a "Loading..." flash on every poll).
+
+**Checked that the tests can go green and catch the defects** (in a copy of `src` and `tests` in the session's scratchpad, never in the repository): a small fix (read the list every `POLL_INTERVAL_MS` while a local T-MSIS entry is RUNNING in the list, show the listed status and counts, set the failure note while the list read fails)
+made 70 of 70 pass (the 20 new tests and the 50 of `batch-jobs.test.tsx`). A first version of that fix kept asking after the run had ended (the follow was keyed on the local status): the two "stops asking" tests failed with `expected 5 to be 3`. A variant that shows "Loading recent runs" on every refetch
+made both AC-8 tests fail with `[ 'Loading recent runs' ] to deeply equal []`.
+
+`tsc --noEmit -p tsconfig.json` and `eslint --max-warnings 0` on the new file: no findings. Hashes: `test_protection.py record MAM-93` with the three files of the story plus the new file; `check MAM-93` prints OK.

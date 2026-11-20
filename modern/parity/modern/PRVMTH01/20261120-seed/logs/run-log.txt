@@ -1,12 +1,13 @@
-11:21:25 scenario month-seed: job PRVMTH01, run id 20261120-seed, business date 2026-11-20
-11:21:26 memory ok before seed: 2061 MB free
-11:21:36 seed.sh done: seed files loaded: 10
-11:21:36 seed state: 16 providers
-11:21:40 memory ok before PRVREV01 revalidation sweep: 1995 MB free
-11:21:40 PRVREV01 revalidation sweep: POST /api/v1/batch/revalidation-sweeps -> 202
-11:21:42 PRVREV01 revalidation sweep: run b95a2698-b1ce-41b6-8fd7-96cc48f26665 COMPLETED counts={'queued': 4, 'noDueDate': 0} error=None
-11:21:43 memory ok before PRVTMS01 T-MSIS extract: 2091 MB free
-11:21:43 PRVTMS01 T-MSIS extract: POST /api/v1/batch/tmsis-extracts -> 202
-11:21:43 PRVTMS01 T-MSIS extract: run c39fa96e-1ff9-4ea6-8454-73fe0a7981c1 RUNNING counts={'rows': 0, 'futureEnrolments': 0} error=None
-11:21:45 T-MSIS run listed as finished: done (COMPLETED)
-11:21:45 T-MSIS run c39fa96e-1ff9-4ea6-8454-73fe0a7981c1 COMPLETED counts={'rows': 8, 'futureEnrolments': 0, 'archiveGeneration': 16} error=None
+17:44:34 scenario month-seed: job PRVMTH01, run id 20261120-seed, business date 2026-11-20
+17:44:35 memory ok before seed: 1825 MB free
+17:44:50 seed.sh done: seed files loaded: 10
+17:44:50 seed state: 16 providers
+17:44:53 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
+17:44:55 memory ok before PRVREV01 revalidation sweep: 1659 MB free
+17:44:55 PRVREV01 revalidation sweep: POST /api/v1/batch/revalidation-sweeps -> 202
+17:44:57 PRVREV01 revalidation sweep: run 7f29f390-4ba4-46fe-9182-f3a5d910abfc COMPLETED counts={'queued': 4, 'noDueDate': 0} error=None
+17:44:59 memory ok before PRVTMS01 T-MSIS extract: 1717 MB free
+17:44:59 PRVTMS01 T-MSIS extract: POST /api/v1/batch/tmsis-extracts -> 202
+17:44:59 PRVTMS01 T-MSIS extract: run 8e22f755-2153-4c53-bb80-e2c04e64d6c4 RUNNING counts={'rows': 0, 'futureEnrolments': 0} error=None
+17:45:01 T-MSIS run listed as finished: done (COMPLETED)
+17:45:01 T-MSIS run 8e22f755-2153-4c53-bb80-e2c04e64d6c4 COMPLETED counts={'rows': 8, 'futureEnrolments': 0, 'archiveGeneration': 27} error=None

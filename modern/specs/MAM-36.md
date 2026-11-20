@@ -14,8 +14,8 @@ decisions: [D-024]
 dependsOn: [MAM-31, MAM-24, MAM-29, MAM-46, MAM-17]
 mainJourney: false
 labels: [svc-platform, kag-L-S008, agentic, decision-D-024]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 252f65310e60e05158d4f21a8f74fe93ef36cb3937e77ac4156c7d3f1ef99fb7
 ---
 ## Business requirement
 Operations staff and developers must be able to tell at a glance whether each part of the system is healthy, and to follow one request or business change across every service when something goes wrong.

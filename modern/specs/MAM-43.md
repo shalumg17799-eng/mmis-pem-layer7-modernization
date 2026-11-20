@@ -6,16 +6,16 @@ service: provider-service
 type: Story
 title: "Export the provider master in the legacy 130-byte PRVRECRD layout"
 slug: prv-legacy-master
-specVersion: 1
-descriptionSha256: ae25fa30ecbb391d016e0ad52c0124ad605a0a140d1046cd5083dca30a8d7b69
-jiraUpdated: 2026-11-18T09:16:38.269-0600
+specVersion: 2  # 2026-11-20: AC-6 now exports an unset revalidation due date as 99991231 (v1: 00000000); Q-124 A, user, 2026-11-20 19:32; tests and code follow
+descriptionSha256: f32eb3400d75188f7c2c4584b25e9ffe6b84d6661a1403581d5a088452eb4780
+jiraUpdated: 2026-11-20T08:14:51.916-0600
 rules: []
 decisions: [D-004, D-006, D-007, D-023]
 dependsOn: [MAM-17, MAM-42]
 mainJourney: false
 labels: [svc-provider-service, kag-L-S024, agentic, decision-D-004, decision-D-006, decision-D-007, decision-D-023]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 6e7fd54f211c9aaf8173ef3efacdc778473fb005ed2b7361abdc90285cb94380
 ---
 ## Business requirement
 For the planned side-by-side comparison with the old system, an administrator must be able to export all providers in the old fixed 130-byte master record layout, so that the result can be compared byte for byte with the file the old system produced. Every field is included, among them the owner of a group or facility.
@@ -54,8 +54,8 @@ Basis: D-006, modern/docs/analysis/data-layouts.md (PRV-ENROLL-STATUS byte 33)
 ### AC-6 Unset values use the legacy padding
 Given provider 1003000222 is PENDING with riskTier null, screenFlag U and revalidationDueDate null
 When the ADMIN exports the master
-Then byte 32 is a space, byte 34 is 'U' and bytes 43-50 are '00000000'
-Basis: modern/docs/analysis/data-layouts.md (PRV-RISK-TIER X(01), PRV-REVAL-DUE-DATE 9(08)), .claude/skills/synthetic-data/SKILL.md section 2 (alphanumeric right-padded with spaces, numeric display left zero-filled), D-029 (the legacy treats a zero due date as unset)
+Then byte 32 is a space, byte 34 is 'U' and bytes 43-50 are '99991231' (the value for no revalidation due date)
+Basis: modern/docs/analysis/data-layouts.md (PRV-RISK-TIER X(01), PRV-REVAL-DUE-DATE 9(08)), .claude/skills/synthetic-data/SKILL.md section 2 (alphanumeric right-padded with spaces, numeric display left zero-filled), the unset due date follows the test-data convention of Q-106 (99991231) and the user's decision Q-124 A of 2026-11-20 (the dat-codec can then read the export back), D-029 (still describes only what the legacy did with a zero due date)
 
 ### AC-7 The export decodes to the same values as the API
 Given the export of AC-1

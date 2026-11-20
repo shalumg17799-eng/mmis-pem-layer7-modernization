@@ -1,4 +1,11 @@
+759d64d03f5c7403a292be5466ef6dcffadd407e196badf98bf020783c5cfd8a  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/EventContract.java
+6ca6a393ac7c3c8d8eca509b771436eae4c54bf27152d910dec41015d75be463  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutboxContractTest.java
+84697b951375d15992cfa4c23df7baddfffe2ef8d97428034be0c5d407e1ac9f  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java
 1c9ec537085a414c4135c1a94ea05b6352297cba9d446669185abbe13f0532d7  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/StatusChangeSteps.java
+02bb3d6f973783fa2f2b0e7caf5497b5b450c9cb7dc6b47b83ae1d4bf159179f  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderWriteAtomicityTest.java
+11ed01880896c462f1089b8e87b6804c8cd90cd3be07dcaa5b737e6c5182c34a  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderWriteInputTest.java
+efd1d189bbdacf22e75ec82650ef0c873e7e65703e36c4abd4bcb73be0441de3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ChangeProviderStatusReasonTest.java
 8180ed6374a9cea9114c302c8fd110619aee0a1d7f2707f517ac45b8c4b1f9ef  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ChangeProviderStatusTest.java
-9956aeadca2aa5f7174c4a0abca7ffa67accb7a068c6b775cce009e76d84f048  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionTest.java
+d89f76380e9e7948798bc68c634fc226b605402e051976e7cdd23f43c89dcb3b  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionResultTest.java
+3b7b40bff6ed2e3b43a01e80a97d41c96b2159b598e56752eaa59ced244f5c6d  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionTest.java
 20fc70dc6bed4194d7cce28622a913e41a4c9c852d693f97e9fc6979df39d7f3  modern/services/provider-service/src/test/resources/features/MAM-33.feature

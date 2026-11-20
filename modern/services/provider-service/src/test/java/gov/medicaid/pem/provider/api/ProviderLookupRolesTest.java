@@ -39,7 +39,7 @@ class ProviderLookupRolesTest extends IntegrationTest {
     }
   }
 
-  @ParameterizedTest(name = "{0} may read any provider")
+  @ParameterizedTest(name = "[MAM-34 AC-1] {0} may read any provider")
   @ValueSource(strings = {"ANALYST", "SUPERVISOR", "ADMIN", "SYSTEM"})
   @DisplayName("[MAM-34 AC-1] staff roles and SYSTEM read any provider")
   void staffRoles(String role) throws Exception {

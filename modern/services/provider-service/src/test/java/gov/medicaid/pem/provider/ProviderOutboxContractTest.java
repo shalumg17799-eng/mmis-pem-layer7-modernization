@@ -3,9 +3,13 @@ package gov.medicaid.pem.provider;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.medicaid.pem.provider.infrastructure.EnrollmentEventsListener;
+import gov.medicaid.pem.provider.infrastructure.VerdictEventsListener;
 import gov.medicaid.pem.testsupport.PemJwt;
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +41,8 @@ class ProviderOutboxContractTest extends IntegrationTest {
   @Autowired JdbcTemplate jdbc;
   @Autowired ObjectMapper json;
   @Autowired EnrollmentEventsListener enrollment;
+  @Autowired VerdictEventsListener verdicts;
+  @Autowired Clock clock;
 
   @BeforeEach
   void clean() {
@@ -192,9 +198,43 @@ class ProviderOutboxContractTest extends IntegrationTest {
     assertThat(UUID.fromString(id)).isNotNull();
   }
 
+  // ---- ProviderStatusChanged from a passed revalidation (MAM-30) -------------------------------
+
+  @Test
+  @DisplayName(
+      "[MAM-30 AC-5] a passed revalidation announces ProviderStatusChanged that keeps to the contract, with the new due date and no null where the contract says string")
+  void passedRevalidation() throws Exception {
+    ProviderRows.individual(NPI)
+        .status("A")
+        .flag("P")
+        .riskTier("L")
+        .due(LocalDate.of(2026, 3, 31))
+        .insert(jdbc);
+    Map<String, Object> data = new LinkedHashMap<>(TestEvents.screening(NPI, "PASS"));
+    data.put("reason", "REVALIDATION");
+
+    verdicts.onEvent(
+        TestEvents.envelope(
+            json,
+            UUID.randomUUID(),
+            "ScreeningCompleted",
+            "screening-service",
+            NPI,
+            UUID.randomUUID().toString(),
+            data));
+
+    String event = the("ProviderStatusChanged");
+    assertThat(CONTRACT.violations("ProviderStatusChangedEnvelope", event)).isEmpty();
+    JsonNode announced = json.readTree(event);
+    assertThat(announced.at("/data/from").asText()).isEqualTo("A");
+    assertThat(announced.at("/data/to").asText()).isEqualTo("A");
+    assertThat(announced.at("/data/revalidationDueDate").asText())
+        .isEqualTo(LocalDate.now(clock).plusYears(5).toString());
+  }
+
   // ---- ProviderStatusChanged from a sanction status change (MAM-33) ----------------------------
 
-  @ParameterizedTest(name = "{0} with a reason keeps to the contract")
+  @ParameterizedTest(name = "[MAM-33 AC-5] {0} with a reason keeps to the contract")
   @ValueSource(strings = {"TERMINATE", "SUSPEND", "REINSTATE"})
   @DisplayName(
       "[MAM-33 AC-5] a status change with a reason announces ProviderStatusChanged that keeps to the contract")
@@ -212,7 +252,7 @@ class ProviderOutboxContractTest extends IntegrationTest {
         .isEmpty();
   }
 
-  @ParameterizedTest(name = "{0} without a reason keeps to the contract")
+  @ParameterizedTest(name = "[MAM-33 AC-5] {0} without a reason keeps to the contract")
   @ValueSource(strings = {"TERMINATE", "SUSPEND", "REINSTATE"})
   @DisplayName(
       "[MAM-33 AC-5] a status change without a reason (optional in the contract) announces ProviderStatusChanged with no null where the contract says string")

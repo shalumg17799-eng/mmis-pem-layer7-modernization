@@ -59,3 +59,19 @@ Not verified:      the start-up refusal of attempt 1 is reported as a flaky test
 Questions for you: Q-099 (readiness group with db and kafka, needed for AC-5) stays open as you logged it
 Next step:         MAM-30 (provider-service due date)
 ```
+
+## Lane 3 tests (2026-11-20)
+
+Outcome line unchanged. AC-5 of provider-service (Q-099 B) and the correction of a hanging recorded test.
+
+- New: `ProviderOutageTest.healthFollowsTheDatabase` [MAM-36 AC-5]: with the test's own Testcontainers Postgres paused mid-test `/actuator/health` answers 503 DOWN, and 200 UP again within 60 s of the database coming back. Every wait has a limit (90 s for the answer, 60 s for the recovery; the database is un-paused in a `finally`).
+- Found and corrected: the recorded `ObservabilityTest.healthFollowsTheDatabase` could hang the build indefinitely (the pool's 500 ms validation bypass plus pgjdbc without a socket timeout); the correction without weakening the assertion is in `MAM-36/red-report.md`. A default limit of 6 minutes for every test is in `junit-platform.properties`.
+- Production observation: with a frozen database `/actuator/health` can block (no JDBC `socketTimeout`); a stopped database is answered at once. Not changed (production code); suggested: a `socketTimeout` on the datasource.
+- `MAM-36.tests.sha256` re-recorded.
+Runs (all on 2026-11-20, from `modern/`, one Gradle build at a time through the shared lock, `--no-daemon`):
+- `./gradlew -I <init script: Spotless on src/test of provider-service only> :services:provider-service:spotlessApply` (formats the test sources only).
+- `./gradlew :services:provider-service:check --continue` (tests, Spotless on everything, ArchUnit, JaCoCo, PIT). Last run 21:00-21:09: **417 tests, 9 failures, 0 skipped**;
+  the 9 failures are the Q-124 tests (red by design until `PrvrecrdFile` is changed, see MAM-43); PIT **130 of 130 mutations killed (100 %)** on `domain` and `application`;
+  Spotless and ArchUnit passed.
+- `./gradlew :services:provider-service:jacocoTestReport -x test` (the report of the same run; with a failing test `check` does not reach `jacocoTestCoverageVerification`):
+  **line coverage 98.34 %** (768 of 781 lines; 98.84 % without `*Application`, as the gate counts), branch 88.31 %. Gate 85 %.

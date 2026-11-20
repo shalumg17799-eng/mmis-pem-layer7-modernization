@@ -6,43 +6,43 @@
       "size": 20,
       "items": [
         {
-          "screeningId": "c4b1a958-7718-49a8-abdc-cf97c97d4bfd",
+          "screeningId": "c4852f57-838b-4f8a-a79a-107fee38e735",
           "npi": "1006133288",
           "reason": "INITIAL",
           "status": "COMPLETED",
-          "result": "FAIL",
+          "result": "PASS",
           "results": [
             {
               "source": "LICBOARD",
-              "result": "F",
-              "verdictAt": "2026-11-20T11:21:13.937957Z",
-              "detail": "LICENCE NOT FOUND",
+              "result": "P",
+              "verdictAt": "2026-11-20T17:44:20.108421Z",
+              "detail": "LICENCE SD20001 TX ACTIVE UNTIL 2030-12",
               "errorCode": null
             },
             {
               "source": "OIGLEIE",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.937949Z",
+              "verdictAt": "2026-11-20T17:44:20.085464Z",
               "detail": "NOT EXCLUDED",
               "errorCode": null
             },
             {
               "source": "SAMGOV",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.937954Z",
+              "verdictAt": "2026-11-20T17:44:20.108133Z",
               "detail": "NOT DEBARRED",
               "errorCode": null
             },
             {
               "source": "SSADMF",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.937948Z",
+              "verdictAt": "2026-11-20T17:44:20.073831Z",
               "detail": "NOT DECEASED",
               "errorCode": null
             }
           ],
-          "startedAt": "2026-11-20T11:21:13.924395Z",
-          "completedAt": "2026-11-20T11:21:13.938032Z"
+          "startedAt": "2026-11-20T17:44:19.913199Z",
+          "completedAt": "2026-11-20T17:44:20.108575Z"
         }
       ],
       "page": 0
@@ -55,7 +55,7 @@
       "size": 20,
       "items": [
         {
-          "screeningId": "59b28017-da26-475e-bb28-30a2f5981872",
+          "screeningId": "75bdae39-5fa1-4e8b-891e-c28385bd0467",
           "npi": "1006144350",
           "reason": "INITIAL",
           "status": "COMPLETED",
@@ -64,34 +64,34 @@
             {
               "source": "LICBOARD",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.956783Z",
+              "verdictAt": "2026-11-20T17:44:20.350578Z",
               "detail": "NOT APPLICABLE",
               "errorCode": null
             },
             {
               "source": "OIGLEIE",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.959936Z",
+              "verdictAt": "2026-11-20T17:44:20.367531Z",
               "detail": "NOT EXCLUDED",
               "errorCode": null
             },
             {
               "source": "SAMGOV",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.959932Z",
+              "verdictAt": "2026-11-20T17:44:20.386406Z",
               "detail": "NOT DEBARRED",
               "errorCode": null
             },
             {
               "source": "SSADMF",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.959934Z",
+              "verdictAt": "2026-11-20T17:44:20.370707Z",
               "detail": "NOT DECEASED",
               "errorCode": null
             }
           ],
-          "startedAt": "2026-11-20T11:21:13.950854Z",
-          "completedAt": "2026-11-20T11:21:13.959994Z"
+          "startedAt": "2026-11-20T17:44:20.327130Z",
+          "completedAt": "2026-11-20T17:44:20.386521Z"
         }
       ],
       "page": 0
@@ -104,7 +104,7 @@
       "size": 20,
       "items": [
         {
-          "screeningId": "0a12f3b8-37ae-42cc-ae94-7cd2728fa02e",
+          "screeningId": "b34fbb14-f1d4-4359-9f4e-c2216008346f",
           "npi": "1006153716",
           "reason": "INITIAL",
           "status": "COMPLETED",
@@ -113,34 +113,34 @@
             {
               "source": "LICBOARD",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.975580Z",
+              "verdictAt": "2026-11-20T17:44:20.440972Z",
               "detail": "NOT APPLICABLE",
               "errorCode": null
             },
             {
               "source": "OIGLEIE",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.979196Z",
+              "verdictAt": "2026-11-20T17:44:20.537213Z",
               "detail": "NOT EXCLUDED",
               "errorCode": null
             },
             {
               "source": "SAMGOV",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.979080Z",
+              "verdictAt": "2026-11-20T17:44:20.537814Z",
               "detail": "NOT DEBARRED",
               "errorCode": null
             },
             {
               "source": "SSADMF",
               "result": "P",
-              "verdictAt": "2026-11-20T11:21:13.979092Z",
+              "verdictAt": "2026-11-20T17:44:20.534918Z",
               "detail": "NOT DECEASED",
               "errorCode": null
             }
           ],
-          "startedAt": "2026-11-20T11:21:13.969565Z",
-          "completedAt": "2026-11-20T11:21:13.979261Z"
+          "startedAt": "2026-11-20T17:44:20.422904Z",
+          "completedAt": "2026-11-20T17:44:20.538005Z"
         }
       ],
       "page": 0

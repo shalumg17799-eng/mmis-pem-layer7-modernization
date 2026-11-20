@@ -14,8 +14,8 @@ decisions: [D-006, D-013, D-014, D-023, D-024, D-026, D-027]
 dependsOn: [MAM-17]
 mainJourney: false
 labels: [svc-provider-service, kag-L-S021, agentic, decision-D-006, decision-D-013, decision-D-014, decision-D-023, decision-D-024, decision-D-026, decision-D-027]
-builtCommit:
-testsSha256: 97d8c78ce8cddafc2b9f3d81e5802c068376c10f4622a43cf046baca58d0b164
+builtCommit: pending-user-commit
+testsSha256: b73c8f93bc4c4c30c5f1d79cea2c15760e6fb3867ce6a700121b28b2f7fc25cc
 ---
 ## Business requirement
 When a sanction is applied to an enrolled provider, the provider's enrolment status must change accordingly: a termination ends the enrolment, a suspension pauses it and is shown separately from a denial, and a reinstatement makes the provider active again. The change can only be requested through the provider service, so that no other system rewrites the provider record. It is applied whatever the provider's current status is, it is announced to the other services, and an unknown action or an incomplete request is refused.

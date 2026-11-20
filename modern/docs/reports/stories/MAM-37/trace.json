@@ -1,0 +1,93 @@
+{
+  "story": "MAM-37",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/LogCapture.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutageTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/HttpAnswerSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderFixtureSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderKeysetWalkSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderSearchSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/KeysetFixtures.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderKeysetContractTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderKeysetSearchApiTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderKeysetWalkTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderReadFailureTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderSearchApiTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-37.feature",
+    "modern/services/provider-service/src/test/resources/junit-platform.properties"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-37.feature 'Look up a provider by NPI and see every field': PASSED",
+      "ProviderSearchApiTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-37.feature 'An unknown NPI gives 404 and no data of any other provider': PASSED",
+      "ProviderSearchApiTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-37.feature 'The NPI typed in the request is the key, with no carry-over': PASSED",
+      "ProviderSearchApiTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-37.feature 'The status code is returned as stored, including S': PASSED",
+      "ProviderSearchApiTest: PASSED"
+    ],
+    "AC-5": [
+      "MAM-37.feature 'Search by Medicaid ID or NPI': PASSED",
+      "ProviderSearchApiTest: PASSED"
+    ],
+    "AC-6": [
+      "MAM-37.feature 'A name search treats % and _ as plain characters': PASSED",
+      "MAM-37.feature 'Search by name, status and screen flag with paging (work queues)': PASSED",
+      "ProviderSearchApiTest: PASSED"
+    ],
+    "AC-7": [
+      "MAM-37.feature 'Role checks: a provider sees only their own record': PASSED",
+      "ProviderSearchApiTest: PASSED"
+    ],
+    "AC-8": [
+      "MAM-37.feature 'A read failure is not reported as 'not found'': PASSED",
+      "ProviderOutageTest: PASSED",
+      "ProviderReadFailureTest: PASSED"
+    ],
+    "AC-9": [
+      "MAM-37.feature 'Walk all providers of a filter by key (afterNpi) in NPI order, none missed or repeated': PASSED",
+      "ProviderKeysetContractTest: PASSED",
+      "ProviderKeysetSearchApiTest: PASSED",
+      "ProviderKeysetWalkTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/api/ProviderController.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/api/ProviderResponse.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/FindProvider.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/ProviderSearch.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/ProviderStore.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/JpaProviderChanges.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/JpaProviderStore.java"
+  ],
+  "rules": [
+    "R-PRVCICS1-ADD-04",
+    "R-PRVCICS1-ADD-05",
+    "R-PRVCICS1-ADD-07",
+    "R-PRVCICS1-cbl-00003",
+    "R-PRVCICS1-cbl-00015",
+    "R-PRVCICS1-cbl-00019",
+    "R-PRVCICS1-cbl-00021",
+    "R-PRVCICS1-cbl-00022",
+    "R-PRVCICS1-cbl-00023"
+  ]
+}

@@ -1,3 +1,3 @@
 4341ac3cfa652af97f298f9efb623dcd18852132  modern/web-ui/e2e/admin-risk.spec.ts
-cf48fb87eb7388e530e356d3f4000887181c21b3  modern/web-ui/tests/admin/risk-rules.test.tsx
+bac0701878ceae791f3efbbb016263e786796a29  modern/web-ui/tests/admin/risk-rules.test.tsx
 a69b3e0c2d91144a42fd797722344e70ca50572c  modern/web-ui/tests/support/risk.ts

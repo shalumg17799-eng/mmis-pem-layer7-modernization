@@ -1,0 +1,104 @@
+{
+  "story": "MAM-33",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/EventContract.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutboxContractTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/StatusChangeSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderWriteAtomicityTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderWriteInputTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ChangeProviderStatusReasonTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ChangeProviderStatusTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionResultTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-33.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ChangeProviderStatusTest: PASSED",
+      "MAM-33.feature 'Terminate sets TERMINATED and counts it': PASSED",
+      "StatusActionResultTest: PASSED",
+      "StatusActionTest: PASSED"
+    ],
+    "AC-2": [
+      "ChangeProviderStatusTest: PASSED",
+      "MAM-33.feature 'Suspend sets SUSPENDED, not DENIED': PASSED",
+      "StatusActionResultTest: PASSED",
+      "StatusActionTest: PASSED"
+    ],
+    "AC-3": [
+      "ChangeProviderStatusTest: PASSED",
+      "MAM-33.feature 'Reinstate sets ACTIVE': PASSED",
+      "StatusActionResultTest: PASSED",
+      "StatusActionTest: PASSED"
+    ],
+    "AC-4": [
+      "ChangeProviderStatusTest: PASSED",
+      "MAM-33.feature 'The change applies whatever the current status is': PASSED",
+      "StatusActionTest: PASSED"
+    ],
+    "AC-5": [
+      "ChangeProviderStatusTest: PASSED",
+      "MAM-33.feature 'The new status is saved and announced': PASSED",
+      "ProviderOutboxContractTest: PASSED",
+      "ProviderWriteAtomicityTest: PASSED",
+      "StatusActionTest: PASSED"
+    ],
+    "AC-6": [
+      "ChangeProviderStatusReasonTest: PASSED",
+      "ChangeProviderStatusTest: PASSED",
+      "MAM-33.feature 'An unknown action or an incomplete request is refused': PASSED",
+      "ProviderWriteInputTest: PASSED",
+      "StatusActionTest: PASSED"
+    ],
+    "AC-7": [
+      "ChangeProviderStatusTest: PASSED",
+      "MAM-33.feature 'An unknown provider gives 404 and changes nothing': PASSED"
+    ],
+    "AC-8": [
+      "MAM-33.feature 'Only SYSTEM and SUPERVISOR can change the status': PASSED",
+      "ProviderWriteInputTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/adapter/legacy/PrvrecrdFile.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/api/ProviderController.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/ChangeProviderStatus.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/StatusChangeCommand.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/StatusChangeMetrics.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/Provider.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/StatusAction.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/MicrometerStatusChangeMetrics.java"
+  ],
+  "rules": [
+    "R-PRVSAN01-ADD-04",
+    "R-PRVSAN01-ADD-07",
+    "R-PRVSAN01-cbl-00004",
+    "R-PRVSAN01-cbl-00005",
+    "R-PRVSAN01-cbl-00006",
+    "R-PRVSAN01-cbl-00007",
+    "R-PRVSAN01-cbl-00014",
+    "R-PRVSAN01-cbl-00015",
+    "R-PRVSAN01-cbl-00016",
+    "R-PRVSAN01-cbl-00026",
+    "R-PRVSAN01-cbl-00028",
+    "R-PRVSAN01-cbl-00030",
+    "R-PRVSAN01-cbl-00031",
+    "R-PRVSAN01-cbl-00034",
+    "R-PRVSAN01-cbl-00035",
+    "R-PRVSAN01-cbl-00040",
+    "R-PRVSAN01-cbl-00041",
+    "R-PRVSAN01-cbl-00042",
+    "R-PRVSAN01-cbl-00043"
+  ]
+}

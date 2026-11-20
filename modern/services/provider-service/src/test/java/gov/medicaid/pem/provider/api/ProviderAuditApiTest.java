@@ -327,7 +327,7 @@ class ProviderAuditApiTest extends IntegrationTest {
     };
   }
 
-  @ParameterizedTest(name = "{0} on the history is refused with 405")
+  @ParameterizedTest(name = "[MAM-40 AC-8] {0} on the history is refused with 405")
   @ValueSource(strings = {"PUT", "PATCH", "DELETE", "POST"})
   @DisplayName(
       "[MAM-40 AC-8] PUT, PATCH, DELETE and POST on the history are 405 problems that allow only reading")
@@ -344,7 +344,7 @@ class ProviderAuditApiTest extends IntegrationTest {
     assertThat(actions(read(""))).containsExactly("KEEP");
   }
 
-  @ParameterizedTest(name = "{0} by an ADMIN on the history is refused with 405")
+  @ParameterizedTest(name = "[MAM-40 AC-8] {0} by an ADMIN on the history is refused with 405")
   @ValueSource(strings = {"PUT", "PATCH", "DELETE"})
   @DisplayName("[MAM-40 AC-8] not even an ADMIN can change or delete the history")
   void adminCannotEither(String name) throws Exception {

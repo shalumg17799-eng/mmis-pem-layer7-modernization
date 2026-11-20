@@ -1,3 +1,8 @@
+> **Read this first (2026-11-20 22:45).** The report block below was written at 16:41 and describes the build as it was
+> then. Several of its statements are out of date (line numbers, the size of the version catalog, which modules have
+> tests, the CI run). The section "Review round" at the end gives the current facts; where the two differ, that
+> section is right.
+
 ```
 Phase / item:      MAM-16 (local L-S001) Gradle multi-project build with quality gates (JaCoCo, PIT, ArchUnit, Spotless)
 Outcome:           PARTIAL. AC-1, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8 have evidence. AC-2 is open for its package part:
@@ -129,3 +134,84 @@ Questions for you: 1. enrollment-service and sanctions-service keep their legacy
 Next step:         lead decides question 1; then MAM-16 can go In Review (code-reviewer on the buildSrc change: Toml.kt,
                    VersionCheck.kt, SkippedTestGuard.kt, the two edited build files and the demonstration script)
 ```
+
+## Review round (2026-11-20)
+
+### First review (code-reviewer, 16:55): MUST-FIX, three items
+
+The fixes were made by the devops-engineer at about 16:57. That agent was stopped at 18:03 (the 20:00 deadline) before it
+reported, so the lead ran the proofs at 22:09 to 22:16 and wrote this section.
+
+1. `SkippedTestGuard.kt` did not see a disabled test template. **Fix:** `afterSuite` (lines 43-45) also collects a suite
+   that is SKIPPED with zero tests and is not the root suite (a `@Disabled` `@ParameterizedTest`, `@RepeatedTest` or
+   `@TestFactory`, or a disabled class that holds only such templates). **Proof:** `tools/checks/demo-build-gates.sh`, re-run
+   22:11 to 22:16, 7 of 7 steps PASS, among them "AC-7 with a @Disabled class, a @Disabled method, a failed assumption and a
+   @Disabled @ParameterizedTest, @RepeatedTest, @TestFactory and parameterized-only class :libs:fixed-width:test fails
+   (exit 1) and names each" (7 tests named) and "AC-7 after the temporary classes are removed :libs:fixed-width:test passes
+   again (exit 0; 257 tests, 0 failures, 0 skipped)". Nothing was left behind (MAM-42 hash check OK, no TempSkippedDemo
+   class in the tree).
+2. `checkAll` depended on three task paths that do not exist. **Fix:** `build.gradle.kts:25-28` depends on `versionCheck`
+   and on the `check` task of every subproject that has one. **Proof:** `./gradlew --no-daemon checkAll --dry-run` at 22:09:
+   BUILD SUCCESSFUL in 1m; `:versionCheck` is in the plan once; 14 module `check` tasks are listed (the 14 includes of
+   settings.gradle.kts); 9 `pitest` tasks are in the plan. This shows that the task graph resolves. A whole `checkAll` has
+   NOT been run (see "Not verified").
+3. The report overstated the evidence: corrected by this section.
+
+### Second review (two independent code-reviewers, 22:17 to 22:34)
+
+Items 1 and 2 are confirmed as fixed in the code. The review found this section's first version wrong in one sentence (it
+said every module's check had run with the guard) and several statements of the 16:41 block out of date. Both are corrected
+here. A second reviewer tried to refute the claim "no skipped test and no module escapes the gates" and found the limits
+listed under "Known limits".
+
+### Current facts that replace statements of the 16:41 block
+
+- **Line numbers** in `buildSrc/src/main/kotlin/pem.java-conventions.gradle.kts` today: Java toolchain :15; Spotless :48-59
+  (google-java-format :54; `lineEndings = PRESERVE` :51, added 19:49 for the Linux CI run); skipped-test guard registered
+  :80-82; JaCoCo verification :94-108 (LINE, COVEREDRATIO, minimum 0.85 at :101); `check` depends on the coverage
+  verification :111 and on `:versionCheck` :112. In `pem.spring-service.gradle.kts`: PIT target classes domain and
+  application :58, mutation threshold 70 :63, `check` depends on `pitest` :69.
+- **Version catalog** (after the library upgrade of MAM-84): 20 versions, 24 libraries, 21 build files; `versionCheck` on
+  the real catalog passes (demonstration of 22:11).
+- **ArchUnit**: `PlatformChecksTest` exists in 9 of the 9 services. The api-gateway applies the Java conventions only: it
+  has no domain or application package, so it has no `pitest` task and no `PlatformChecksTest`; it is outside AC-4 and
+  AC-5 by design (the dry-run shows 9 `pitest` tasks for 10 service modules).
+- **tmsis-service** has tests now (483 tests, 0 failures, 0 skipped at 18:57).
+- **Module test runs made with the fixed guard** (results on disk, 2026-11-20): libs:fixed-width 22:16 (257 tests),
+  libs:service-kit 17:29 (110), api-gateway 17:30 (48), risk-service 17:34 (351), sanctions-service 17:43 (326),
+  directory-service 17:51 (433), notification-service 18:49 (249), tmsis-service 18:57 (483), provider-service 22:25 (610;
+  its whole `check` with PIT ran 22:18 to 22:28). All: 0 failures, 0 skipped.
+- **CI** ran once, for commit f72d4e5 (run 44750730590): contract lint passed; "Gradle build and full check" failed in its
+  build step; "Web UI tests" failed in "Install and test"; the compose smoke test was skipped. The lead's reading: Spotless
+  rejected the CRLF sources on Linux (fix: `lineEndings = PRESERVE`), and the web UI tests need Node 22 (reproduced at
+  22:31 in a Linux container: with Node 20.19.2 the install and the lint pass and the test run fails at start-up; fix:
+  Node 22.22.2 in ci.yml). Both fixes are local and unproven on GitHub until the next push.
+
+### Not verified
+
+- A whole `./gradlew --no-daemon build checkAll` in one run (AC-1 literally). On this machine the modules are checked one
+  at a time because of memory. It would be red today for other reasons: revalidation-service has format violations and
+  screening-service has failing tests (their service lanes follow).
+- The `check` of enrollment-service (last results on disk: 2026-11-19 18:58), screening-service (2026-11-19 18:36) and
+  revalidation-service (no results) has not run with the fixed guard.
+- libs:test-support and infra:local-runtime have no test sources: their test task has nothing to run and the coverage
+  verification is skipped without execution data (AC-3 names the services).
+- A skipped, pending or undefined Cucumber scenario through the guard (reasoned by the second reviewer from the library
+  code: a skipped scenario is reported as a skipped test and fails the build; pending and undefined fail as errors), and
+  the error log when failures and skips happen in one run.
+- AC-3 at 84 %, AC-4 at 69 %, AC-5 with a violating class and AC-6 with an unformatted file as failing runs: they rest on
+  the configuration lines above and on passing gates.
+- The CI workflow with both gates on GitHub (needs the next push).
+
+### Known limits (found by the second reviewer by reading the Gradle 8.14.7 and JUnit 5.14 code, not by a run)
+
+- The guard does not see a disabled or aborted **class template** (`@ParameterizedClass` or `@ClassTemplate`, new in JUnit
+  5.13): Gradle reports such a class as a successful suite with zero tests. No test in the repository uses a class
+  template (search of 2026-11-20). A build check that closes this gap is being added (section "Gate extension" below, when
+  it is done).
+- A JUnit 4 test (`org.junit.Test`) would never be discovered, because only the JUnit Platform engines for Jupiter and
+  Cucumber are present. No test source uses JUnit 4.
+- `-PpemVersionCatalog=<path>` points `versionCheck` at another file; it is meant for the demonstration only.
+
+AC-2 stays as question Q-123 says (default A: the legacy readers of enrollment-service and sanctions-service stay in their
+packages; the user's plan of 19:32 names this default for closing MAM-16).

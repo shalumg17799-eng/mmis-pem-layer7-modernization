@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Alert, AlertHeading, AlertText, Button, Table, Tag } from '@trussworks/react-uswds';
+import { Alert, AlertHeading, AlertText, Button, Tag } from '@trussworks/react-uswds';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ApiError } from '../../../shared/api/client';
 import { applicationPath, type Application } from '../../../shared/api/types';
@@ -7,6 +7,7 @@ import { useApi } from '../../../shared/api/useApi';
 import { useAuth, useSession } from '../../../shared/auth/AuthProvider';
 import { APPLICATION_STATUS_LABEL, formatDate, PROVIDER_TYPE_LABEL, withCode } from '../../../shared/format/format';
 import { PageHeading } from '../../../shared/ui/PageHeading';
+import { ScrollableTable } from '../../../shared/ui/ScrollableTable';
 import { SummaryList } from '../../../shared/ui/SummaryList';
 import { Timeline } from './Timeline';
 
@@ -78,7 +79,7 @@ function ApplicationView({ application, received }: { application: Application; 
       {errors.length === 0 ? (
         <p>No validation errors</p>
       ) : (
-        <Table bordered={false} fullWidth scrollable>
+        <ScrollableTable bordered={false} fullWidth label="Validation errors">
           <caption>Validation errors</caption>
           <thead>
             <tr>
@@ -96,7 +97,7 @@ function ApplicationView({ application, received }: { application: Application; 
               </tr>
             ))}
           </tbody>
-        </Table>
+        </ScrollableTable>
       )}
       {application.status === 'REJECTED' && (
         <p>

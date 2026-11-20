@@ -47,7 +47,25 @@ public abstract class Lane3Test extends IntegrationTest {
     MOCK.resetAll();
     TestSources.stubToken();
     ScreeningWorld.cleanSources();
+    dropLeakedRejections();
     cleanTables();
+  }
+
+  /**
+   * Safety net: a rejection that an earlier test did not lift (for example a test that was cut off)
+   * never reaches the next test.
+   */
+  private void dropLeakedRejections() {
+    List<String> leaked =
+        jdbc.queryForList(
+            "SELECT t.tgname || '|' || c.relname FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid"
+                + " WHERE NOT t.tgisinternal AND t.tgname LIKE 'reject\\_%'",
+            String.class);
+    for (String entry : leaked) {
+      String name = entry.substring(0, entry.indexOf('|'));
+      jdbc.execute("DROP TRIGGER IF EXISTS " + name + " ON " + entry.substring(name.length() + 1));
+      jdbc.execute("DROP FUNCTION IF EXISTS " + name + "()");
+    }
   }
 
   /**
@@ -56,8 +74,8 @@ public abstract class Lane3Test extends IntegrationTest {
    */
   @AfterEach
   protected void liftRejections() {
-    for (String name : List.copyOf(rejections)) {
-      lift(name);
+    for (String entry : List.copyOf(rejections)) {
+      lift(entry.substring(0, entry.indexOf('|')));
     }
     until(
         "no screening run is RUNNING any more",

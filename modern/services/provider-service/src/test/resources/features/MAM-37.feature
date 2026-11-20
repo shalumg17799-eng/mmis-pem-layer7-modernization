@@ -175,3 +175,26 @@ Feature: Search and read providers by NPI, Medicaid ID, name, status and screen 
     And answer 1 has status 503 and media type "application/problem+json"
     And answer 1 carries the header "X-Correlation-Id" with value "7d2f9c4e-1b3a-4c5d-8e6f-000000000123"
     And the failure is logged at ERROR with correlation id "7d2f9c4e-1b3a-4c5d-8e6f-000000000123"
+
+  @AC-9
+  Scenario: Walk all providers of a filter by key (afterNpi) in NPI order, none missed or repeated
+    Given only these providers are stored:
+      | npi        | medicaidId | enrollStatus | screenFlag | riskTier |
+      | 1003001500 | MCD001500  | P            | P          | L        |
+    And 450 ACTIVE providers are stored with consecutive NPIs from "1003001001"
+    When an "ANALYST" caller sends GET "/api/v1/providers?status=A&page=1&size=200"
+    And an "ANALYST" caller starts a walk by key over "status=A" with size 200
+    And a "SUPERVISOR" caller sends the status change "TERMINATE" with reason "LEIE exclusion" and effective date "2026-01-15" for provider "1003001100"
+    And "ANALYST" sends the decision "APPROVE" for provider "1003001500"
+    And the walk continues by key until a page holds fewer than 200 items
+    And an "ANALYST" caller sends GET "/api/v1/providers?status=A&afterNpi=ABC"
+    And an "ANALYST" caller sends GET "/api/v1/providers?status=A&afterNpi=12345"
+    Then answer 1 has 200 items, page 1, size 200 and total 450
+    And the walk has 3 pages
+    And the walk lists the providers in ascending NPI order
+    And the walk lists every NPI from "1003001001" to "1003001450" except "1003001100" exactly once
+    And the walk lists no provider twice
+    And page 2 of the walk lists "1003001201"
+    And the walk lists "1003001100,1003001500" at most once
+    And answer 2 is a problem+json with status 400
+    And answer 3 is a problem+json with status 400

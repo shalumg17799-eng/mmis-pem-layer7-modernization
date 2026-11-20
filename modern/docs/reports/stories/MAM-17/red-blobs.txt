@@ -1,4 +1,10 @@
+24ac1bb7880e5c99e94e1b2adb5da74cd65edf5c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/EventContract.java
+f17669343fa44d3b2bd7fd8e7003fa943d3e0d31  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutboxContractTest.java
+667a9c1ba95ba3f69bbda0f96b9a980fdf0f6a70  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java
+33229c8cf04a97462f1cc3e3ae8f70ae5cbe702c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/TestEvents.java
 d3dee950c11caf44feba15a7e85c3a27bb8edaf3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/RegistrationSteps.java
 be42ff25950210892ad2c2a24dac5edbd14f1da0  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/RegisterProviderTest.java
 df18228d93185d7ea117471efc9d005293bdb8af  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ProviderRegistrationTest.java
+d94c4102ab697af3a9d5bf58b4332b5e429e9f13  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/infrastructure/ListenerTransactionTest.java
+3038faf5975e15eeceea4eae015a03083a466bb5  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/infrastructure/UnsafeCorrelationIdFromEventsTest.java
 651339fb8b190e3bd13042fe570ebc9cf652cd88  modern/services/provider-service/src/test/resources/features/MAM-17.feature

@@ -14,8 +14,8 @@ decisions: [D-012, D-018, D-023]
 dependsOn: [MAM-17, MAM-21, MAM-23, MAM-27, MAM-33]
 mainJourney: false
 labels: [svc-provider-service, kag-L-S023, agentic, decision-D-012, decision-D-018, decision-D-023]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 525abd48710eba9fc82cef95d7bc969ad1c766c921176a3643815819c977213b
 ---
 ## Business requirement
 Every change to a provider's record, and every notice sent about the provider, must be kept in a history that supervisors and administrators can read: who or what made the change, when, what the record looked like before and after, and which request it belongs to. The history can be read page by page, and nobody can edit or delete it.

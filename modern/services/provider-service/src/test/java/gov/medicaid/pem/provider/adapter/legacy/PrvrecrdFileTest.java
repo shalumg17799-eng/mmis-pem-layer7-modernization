@@ -257,7 +257,7 @@ class PrvrecrdFileTest {
     assertThat(bytes(individual, 118, 130)).isEqualTo(" ".repeat(13));
   }
 
-  @ParameterizedTest(name = "status {0} is written as byte 33 {1}")
+  @ParameterizedTest(name = "[MAM-43 AC-5] status {0} is written as its code in byte 33")
   @EnumSource(EnrollStatus.class)
   @DisplayName(
       "[MAM-43 AC-5] every enrolment status is written as its code, S for a suspended provider")
@@ -277,7 +277,7 @@ class PrvrecrdFileTest {
     assertThat(bytes(written, 33, 33)).isEqualTo("S");
   }
 
-  @ParameterizedTest(name = "screen flag {0} is written as byte 34")
+  @ParameterizedTest(name = "[MAM-43 AC-3] screen flag {0} is written as its code in byte 34")
   @EnumSource(ScreenFlag.class)
   @DisplayName("[MAM-43 AC-3] every screen flag is written as its code in byte 34")
   void everyScreenFlag(ScreenFlag flag) {
@@ -306,7 +306,7 @@ class PrvrecrdFileTest {
     assertThat(bytes(file.write(List.of(p)), 34, 34)).isEqualTo(flag.code());
   }
 
-  @ParameterizedTest(name = "risk tier {0} is written as byte 32")
+  @ParameterizedTest(name = "[MAM-43 AC-3] risk tier {0} is written as its code in byte 32")
   @EnumSource(RiskTier.class)
   @DisplayName("[MAM-43 AC-3] every risk tier is written as its code in byte 32")
   void everyTier(RiskTier tier) {
@@ -337,7 +337,7 @@ class PrvrecrdFileTest {
 
   @Test
   @DisplayName(
-      "[MAM-43 AC-6] an unset risk tier is a space in byte 32 and an unset due date is 00000000; the screen flag U stays")
+      "[MAM-43 AC-6] an unset risk tier is a space in byte 32 and an unset due date is 99991231; the screen flag U stays")
   void unsetValuesUseTheLegacyPadding() {
     Provider i = individual();
     Provider pending =
@@ -368,7 +368,149 @@ class PrvrecrdFileTest {
     assertThat(bytes(written, 33, 33)).isEqualTo("P");
     assertThat(bytes(written, 34, 34)).isEqualTo("U");
     assertThat(bytes(written, 35, 42)).isEqualTo("20261118");
-    assertThat(bytes(written, 43, 50)).isEqualTo("00000000");
+    assertThat(bytes(written, 43, 50)).isEqualTo("99991231");
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-43 AC-6] only the due date uses 99991231 for no value: an unset effective date stays 00000000 (Q-124 A)")
+  void onlyTheDueDateIsNineNines() {
+    Provider i = individual();
+    Provider noDates =
+        new Provider(
+            i.npi(),
+            i.medicaidId(),
+            i.providerType(),
+            i.taxonomy(),
+            i.riskTier(),
+            i.enrollStatus(),
+            i.screenFlag(),
+            null,
+            null,
+            null,
+            i.lastName(),
+            i.firstName(),
+            i.licenseNo(),
+            i.licenseState(),
+            null,
+            null,
+            null,
+            0);
+
+    String written = file.write(List.of(noDates));
+
+    assertThat(written).hasSize(130);
+    assertThat(bytes(written, 35, 42)).isEqualTo("00000000");
+    assertThat(bytes(written, 43, 50)).isEqualTo("99991231");
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-43 AC-6] a due date that is set is written as it is, and next to it a provider without one gets 99991231, record by record")
+  void dueDateIsDecidedPerRecord() {
+    Provider withDue = individual();
+    Provider i = individual();
+    Provider withoutDue =
+        new Provider(
+            "1003000222",
+            i.medicaidId(),
+            i.providerType(),
+            i.taxonomy(),
+            i.riskTier(),
+            i.enrollStatus(),
+            i.screenFlag(),
+            i.effectiveDate(),
+            null,
+            null,
+            i.lastName(),
+            i.firstName(),
+            i.licenseNo(),
+            i.licenseState(),
+            null,
+            null,
+            null,
+            0);
+
+    String[] lines = file.write(List.of(withDue, withoutDue, withDue)).split("\n", -1);
+
+    assertThat(lines).hasSize(3);
+    assertThat(bytes(lines[0], 43, 50)).isEqualTo("20311118");
+    assertThat(bytes(lines[1], 43, 50)).isEqualTo("99991231");
+    assertThat(bytes(lines[2], 43, 50)).isEqualTo("20311118");
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-43 AC-6] a group or facility without a due date also gets 99991231 in bytes 43-50 and keeps its owner NPI in 121-130")
+  void organisationWithoutDueDate() {
+    Provider o =
+        organisation(ProviderType.FACILITY, "SAMPLE HOSPITAL 01", "SAMPLE HOSP", "1990000222");
+    Provider noDue =
+        new Provider(
+            o.npi(),
+            o.medicaidId(),
+            o.providerType(),
+            o.taxonomy(),
+            null,
+            EnrollStatus.PENDING,
+            ScreenFlag.UNSCREENED,
+            o.effectiveDate(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            o.legalName(),
+            o.dbaName(),
+            o.ownerNpi(),
+            0);
+
+    String written = file.write(List.of(noDue));
+
+    assertThat(written).hasSize(130);
+    assertThat(bytes(written, 32, 32)).isEqualTo(" ");
+    assertThat(bytes(written, 43, 50)).isEqualTo("99991231");
+    assertThat(bytes(written, 121, 130)).isEqualTo("1990000222");
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-43 AC-6] a record without a due date is read back by the PRVRECRD codec without an error: due date 9999-12-31, every other field as written (Q-124 A)")
+  void recordWithoutDueDateIsReadBackByTheCodec() {
+    Provider i = individual();
+    Provider pending =
+        new Provider(
+            "1003000222",
+            "MCD000222",
+            ProviderType.INDIVIDUAL,
+            "207Q00000X",
+            null,
+            EnrollStatus.PENDING,
+            ScreenFlag.UNSCREENED,
+            LocalDate.of(2026, 11, 18),
+            null,
+            null,
+            i.lastName(),
+            i.firstName(),
+            i.licenseNo(),
+            i.licenseState(),
+            null,
+            null,
+            null,
+            0);
+
+    String written = file.write(List.of(pending));
+
+    FixedRecord r =
+        FixedWidthCodec.forLayout("PRVRECRD").read(written.getBytes(StandardCharsets.US_ASCII), 1);
+    assertThat(r.getDate("PRV-REVAL-DUE-DATE")).isEqualTo(LocalDate.of(9999, 12, 31));
+    assertThat(r.getDate("PRV-EFFECTIVE-DATE")).isEqualTo(LocalDate.of(2026, 11, 18));
+    assertThat(r.get("PRV-NPI")).isEqualTo("1003000222");
+    assertThat(r.get("PRV-RISK-TIER")).isEmpty();
+    assertThat(r.get("PRV-ENROLL-STATUS")).isEqualTo("P");
+    assertThat(r.get("PRV-SCREEN-FLAG")).isEqualTo("U");
+    assertThat(r.get("PRV-LAST-NAME")).isEqualTo("RIVERA");
   }
 
   @Test

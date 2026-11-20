@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Table, Tag } from '@trussworks/react-uswds';
+import { Tag } from '@trussworks/react-uswds';
 import {
   auditPath,
   LIST_NOTICES,
@@ -27,6 +27,7 @@ import {
   sourceName,
   withCode,
 } from '../../../../shared/format/format';
+import { ScrollableTable } from '../../../../shared/ui/ScrollableTable';
 import { SortHeader, useSorting } from '../../../../shared/ui/sorting';
 import { useScreenings } from '../../approval/ScreeningResults';
 import { Panel } from './Panel';
@@ -66,14 +67,14 @@ function ScreeningPanel({ npi }: { npi: string }) {
           <p>Results appear here after the automatic checks have run for this provider.</p>
         </>
       )}
-      {screenings.map((screening) => {
+      {screenings.map((screening, index) => {
         const heading = `${SCREENING_REASON_LABEL[screening.reason] ?? screening.reason} screening on ${screening.startedAt ? formatDate(screening.startedAt) : 'an unknown date'}: ${
           screening.result ? (SCREENING_OVERALL_LABEL[screening.result] ?? screening.result) : 'in progress'
         }`;
         return (
           <div key={screening.screeningId}>
             <h3>{heading}</h3>
-            <Table bordered={false} fullWidth scrollable>
+            <ScrollableTable bordered={false} fullWidth label={screenings.length > 1 ? `${heading} (${index + 1} of ${screenings.length})` : heading}>
               <caption className="usa-sr-only">{heading}</caption>
               <thead>
                 <tr>
@@ -97,7 +98,7 @@ function ScreeningPanel({ npi }: { npi: string }) {
                   </tr>
                 ))}
               </tbody>
-            </Table>
+            </ScrollableTable>
           </div>
         );
       })}
@@ -115,7 +116,7 @@ const REVALIDATION_SORT = {
 function RevalidationTable({ items }: { items: RevalidationCasePage['items'] }) {
   const sorting = useSorting(items, REVALIDATION_SORT);
   return (
-    <Table bordered={false} fullWidth scrollable>
+    <ScrollableTable bordered={false} fullWidth label="Revalidation cases">
       <caption className="usa-sr-only">Revalidation cases</caption>
       <thead>
         <tr>
@@ -135,7 +136,7 @@ function RevalidationTable({ items }: { items: RevalidationCasePage['items'] }) 
           </tr>
         ))}
       </tbody>
-    </Table>
+    </ScrollableTable>
   );
 }
 
@@ -148,7 +149,7 @@ const NOTICE_SORT = {
 function NoticesTable({ items }: { items: NoticePage['items'] }) {
   const sorting = useSorting(items, NOTICE_SORT);
   return (
-    <Table bordered={false} fullWidth scrollable>
+    <ScrollableTable bordered={false} fullWidth label="Notices sent">
       <caption className="usa-sr-only">Notices sent</caption>
       <thead>
         <tr>
@@ -168,7 +169,7 @@ function NoticesTable({ items }: { items: NoticePage['items'] }) {
           </tr>
         ))}
       </tbody>
-    </Table>
+    </ScrollableTable>
   );
 }
 
@@ -181,7 +182,7 @@ const AUDIT_SORT = {
 function AuditTable({ items }: { items: AuditPage['items'] }) {
   const sorting = useSorting(items, AUDIT_SORT);
   return (
-    <Table bordered={false} fullWidth scrollable>
+    <ScrollableTable bordered={false} fullWidth label="Audit history">
       <caption className="usa-sr-only">Audit history</caption>
       <thead>
         <tr>
@@ -199,7 +200,7 @@ function AuditTable({ items }: { items: AuditPage['items'] }) {
           </tr>
         ))}
       </tbody>
-    </Table>
+    </ScrollableTable>
   );
 }
 

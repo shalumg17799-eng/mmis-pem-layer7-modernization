@@ -55,7 +55,7 @@ class StatusActionTest {
         .isEqualTo(EnrollStatus.ACTIVE);
   }
 
-  @ParameterizedTest(name = "from {0}")
+  @ParameterizedTest(name = "[MAM-33 AC-4] from {0}")
   @EnumSource(EnrollStatus.class)
   @DisplayName("[MAM-33 AC-4] every action applies whatever the current status")
   void anyCurrentStatus(EnrollStatus current) {

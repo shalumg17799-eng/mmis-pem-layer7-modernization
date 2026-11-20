@@ -1,7 +1,8 @@
-11:21:49 scenario dir-seed: job PRVDIR01, run id 20261120-seed, business date 2026-11-20
-11:21:50 memory ok before seed: 2053 MB free
-11:22:01 seed.sh done: seed files loaded: 10
-11:22:02 seed state: 16 providers
-11:22:06 memory ok before PRVDIR01 directory extract: 2196 MB free
-11:22:06 PRVDIR01 directory extract: POST /api/v1/batch/directory-extracts -> 202
-11:22:06 PRVDIR01 directory extract: run d119ac41-1a42-49c2-9778-8da2b640099b COMPLETED counts={'rows': 8} error=None
+17:45:05 scenario dir-seed: job PRVDIR01, run id 20261120-seed, business date 2026-11-20
+17:45:06 memory ok before seed: 1732 MB free
+17:45:24 seed.sh done: seed files loaded: 10
+17:45:24 seed state: 16 providers
+17:45:27 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
+17:45:29 memory ok before PRVDIR01 directory extract: 1412 MB free
+17:45:29 PRVDIR01 directory extract: POST /api/v1/batch/directory-extracts -> 202
+17:45:29 PRVDIR01 directory extract: run bb3d61b1-84db-4dd0-9519-ba7f336b45e0 COMPLETED counts={'rows': 8} error=None

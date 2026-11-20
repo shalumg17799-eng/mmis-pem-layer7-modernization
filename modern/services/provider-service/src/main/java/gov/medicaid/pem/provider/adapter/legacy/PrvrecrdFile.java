@@ -15,11 +15,16 @@ import org.springframework.stereotype.Component;
  * codec. The type code selects the REDEFINES view: IN writes the individual fields, GR and FA the
  * organisation fields (legal name, DBA name, owner NPI in bytes 121-130). Alphanumeric values are
  * right-padded with spaces and cut on the right when longer (an alphanumeric MOVE, only in this
- * legacy-format writer); an unset date is zeros and an unset risk tier a space. One record per
- * line, no header or trailer.
+ * legacy-format writer); an unset risk tier is a space and an unset effective date zeros, but a
+ * provider with no revalidation due date gets 99991231 in bytes 43-50 (Q-124 A, the value the
+ * legacy run and the synthetic master use, Q-106 A), which the codec reads back as 9999-12-31. One
+ * record per line, no header or trailer.
  */
 @Component
 public class PrvrecrdFile implements ExportProviderMaster.MasterFile {
+
+  /** What the legacy master holds in PRV-REVAL-DUE-DATE when there is no due date (Q-124 A). */
+  private static final LocalDate NO_DUE_DATE = LocalDate.of(9999, 12, 31);
 
   private final FixedWidthCodec codec = FixedWidthCodec.forLayout("PRVRECRD");
 
@@ -39,7 +44,10 @@ public class PrvrecrdFile implements ExportProviderMaster.MasterFile {
     put(r, "PRV-ENROLL-STATUS", p.enrollStatus() == null ? null : p.enrollStatus().code());
     put(r, "PRV-SCREEN-FLAG", p.screenFlag() == null ? null : p.screenFlag().code());
     date(r, "PRV-EFFECTIVE-DATE", p.effectiveDate());
-    date(r, "PRV-REVAL-DUE-DATE", p.revalidationDueDate());
+    date(
+        r,
+        "PRV-REVAL-DUE-DATE",
+        p.revalidationDueDate() == null ? NO_DUE_DATE : p.revalidationDueDate());
     if ("IN".equals(type)) {
       put(r, "PRV-LAST-NAME", p.lastName());
       put(r, "PRV-FIRST-NAME", p.firstName());

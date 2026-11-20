@@ -152,7 +152,10 @@ public class ProviderController {
   /**
    * searchProviders (MAM-37): x-roles ANALYST, SUPERVISOR, ADMIN, SYSTEM. Every given filter must
    * match: exact NPI, exact Medicaid ID, name contains, status and screen flag; with no filter the
-   * page lists every provider (work queues). An NPI that is not on file gives an empty page.
+   * page lists every provider (work queues). An NPI that is not on file gives an empty page. With
+   * the optional afterNpi (contract 1.2.0, Q-132, MAM-37 AC-9) the page holds the matching
+   * providers after that NPI in NPI order (keyset paging); it must be exactly 10 digits and page
+   * must be 0.
    */
   @GetMapping
   @PreAuthorize("hasAnyRole('ANALYST', 'SUPERVISOR', 'ADMIN', 'SYSTEM')")
@@ -163,7 +166,8 @@ public class ProviderController {
       @RequestParam(required = false) String status,
       @RequestParam(required = false) String screenFlag,
       @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "20") int size) {
+      @RequestParam(defaultValue = "20") int size,
+      @RequestParam(required = false) String afterNpi) {
     if (npi != null && !NPI.matcher(npi).matches()) {
       throw ApiException.badRequest("The NPI must be 10 digits.");
     }
@@ -171,18 +175,22 @@ public class ProviderController {
       throw ApiException.badRequest("The Medicaid ID must be 1 to 9 characters.");
     }
     pageable(page, size);
+    if (afterNpi != null) {
+      keyset(afterNpi, page);
+    }
     ProviderSearch.Page p;
     try {
+      var criteria =
+          new ProviderSearch.Criteria(
+              npi,
+              medicaidId,
+              name,
+              status == null ? null : EnrollStatus.fromCode(status),
+              screenFlag == null ? null : ScreenFlag.fromCode(screenFlag));
       p =
-          search.find(
-              new ProviderSearch.Criteria(
-                  npi,
-                  medicaidId,
-                  name,
-                  status == null ? null : EnrollStatus.fromCode(status),
-                  screenFlag == null ? null : ScreenFlag.fromCode(screenFlag)),
-              page,
-              size);
+          afterNpi == null
+              ? search.find(criteria, page, size)
+              : search.findAfter(criteria, afterNpi, size);
     } catch (IllegalArgumentException e) {
       throw ApiException.badRequest(e.getMessage());
     }
@@ -220,6 +228,19 @@ public class ProviderController {
       m.put("correlationId", e.correlationId());
     }
     return m;
+  }
+
+  /**
+   * The strict afterNpi of contract 1.2.0: exactly 10 digits (a repeated parameter arrives as "a,b"
+   * and fails the pattern), and page absent or 0.
+   */
+  private static void keyset(String afterNpi, int page) {
+    if (!NPI.matcher(afterNpi).matches()) {
+      throw ApiException.badRequest("afterNpi must be exactly 10 digits and given once.");
+    }
+    if (page != 0) {
+      throw ApiException.badRequest("page must be absent or 0 when afterNpi is given.");
+    }
   }
 
   private static void pageable(int page, int size) {

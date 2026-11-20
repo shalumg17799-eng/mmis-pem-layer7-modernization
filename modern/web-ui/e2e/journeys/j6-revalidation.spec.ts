@@ -10,7 +10,7 @@
 // one case per due provider through the API and that the queue never lists a provider twice.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test';
 import { signIn, type PemUser } from '../support/keycloak';
 import { expectNoAxeViolations } from '../support/page';
 
@@ -71,12 +71,19 @@ async function runJob(page: Page, option: string, startPath: string): Promise<{ 
   return run;
 }
 
-/** Clicks the Download button of the newest completed run of a job and returns the bytes the browser saved. */
-async function downloadFile(page: Page, label: string): Promise<Buffer> {
-  const runs = page.getByRole('table', { name: /Recent runs/ });
-  const button = runs.getByRole('button', { name: new RegExp(`^Download ${label}`) }).first();
-  await expect(button).toBeVisible({ timeout: 120_000 });
-  const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+/**
+ * Clicks the Download button in the row of ONE run and returns the bytes the browser saved. Corrected 2026-11-20 (Q-097 C, review of
+ * the J7 correction): the click is bound to the run, not to the first Download button of a job. The row must show Completed, the
+ * button must belong to that row, the browser must request exactly the file path of that run, and the saved name is the legacy DD name.
+ */
+async function downloadFile(page: Page, row: Locator, filePath: string, savedName: string): Promise<Buffer> {
+  await expect(row.getByRole('cell').nth(2), 'the run shows Completed').toHaveText('Completed', { timeout: 120_000 });
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.waitForRequest((request) => new URL(request.url()).pathname === filePath && request.method() === 'GET'),
+    row.getByRole('button', { name: /^Download / }).click(),
+  ]);
+  expect(download.suggestedFilename()).toBe(savedName);
   return readFileSync(await download.path());
 }
 
@@ -118,14 +125,14 @@ test.describe('MAM-81 journey J6: monthly revalidation', () => {
     expect(finished.counts?.queued).toBe(due.length);
     expect(finished.error ?? null).toBeNull();
     const runs = admin.getByRole('table', { name: /Recent runs/ });
-    await expect(runs.getByRole('row').filter({ hasText: 'Revalidation sweep' }).filter({ hasText: /Completed/ }).first()).toBeVisible(
-      { timeout: 120_000 },
-    );
+    const sweepRows = runs.getByRole('row').filter({ hasText: 'Revalidation sweep' });
+    await expect(sweepRows).toHaveCount(1);
+    await expect(sweepRows.getByRole('cell').nth(2)).toHaveText('Completed', { timeout: 120_000 });
     await expectNoAxeViolations(admin);
 
     // AC-5: the REVALQ file downloaded in the browser: 80-byte records, NPI 1-10, due date 11-18 CCYYMMDD,
     // RESCREEN-REQUIRED from byte 19, spaces to byte 80, one record per queued provider; same bytes as the API gives.
-    const revalq = await downloadFile(admin, 'Revalidation sweep');
+    const revalq = await downloadFile(admin, sweepRows, `/api/v1/batch/revalidation-sweeps/${run.runId}/queue-file`, 'REVALQ.D20260331');
     const viaApi = await request.get(`${GATEWAY}/api/v1/batch/revalidation-sweeps/${run.runId}/queue-file`, {
       headers: { Authorization: `Bearer ${adminToken}` },
     });

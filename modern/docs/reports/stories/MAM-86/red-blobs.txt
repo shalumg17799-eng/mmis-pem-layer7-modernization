@@ -1,0 +1,11 @@
+755da2505cf2f2fc686294a76a6ce87fcc4bba94  modern/web-ui/e2e/a11y/gate.a11y.spec.ts
+1555e2a31c1c2f1c5527dbfad964cd6ba0c262a6  modern/web-ui/e2e/a11y/keyboard-journeys.spec.ts
+6f32573c1f3004390e5a436e3ac5f7cd3830b637  modern/web-ui/e2e/a11y/pages.a11y.spec.ts
+f46f42b1b0e17cc03a6bf933e5c066688d69acb3  modern/web-ui/e2e/a11y/policy.a11y.spec.ts
+7f63b99b16c4737f97d741937ed867b60268eaed  modern/web-ui/e2e/a11y/support/api.ts
+3f5e75746812bbd094b39dd69ae69338891220b3  modern/web-ui/e2e/a11y/support/axe-gate.ts
+d6d5a5a39d347ccb8dbaf2aaee44fc78dd4c9ba0  modern/web-ui/e2e/a11y/support/focus.ts
+2c1162d92ea006a5fd385f458e95f347e506da63  modern/web-ui/e2e/a11y/support/keyboard.ts
+bee75cec79d51f5a4258e26640666155b4eea945  modern/web-ui/e2e/a11y/support/screens.ts
+df2aee5275e7e3be5b50e3e5fe66e2e02192d6c2  modern/web-ui/e2e/a11y/support/sessions.ts
+07c8206b4e1b7206e3027a001eeb7a2fc52e2e6c  modern/web-ui/e2e/a11y/support/structure.ts

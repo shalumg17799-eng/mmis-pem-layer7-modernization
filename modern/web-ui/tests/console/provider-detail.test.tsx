@@ -151,6 +151,25 @@ describe('[MAM-80 AC-6] an unrecognised status keeps the legacy catch-all label 
     expect(banner().map((heading) => text(heading))).toEqual(['Status: Denied (blank)']);
     expect(rows).toContainEqual(['Enrolment status', 'Denied (blank)']);
   });
+
+  // Code review of the web UI, MUST-FIX 2 (2026-11-20): AC-3 says exactly one label is shown for a provider. The short list
+  // "Provider" of the same page used the plain code lookup and said "Unknown (X)" / "Unknown ()" for the same provider.
+  it.each([
+    ['X', 'Denied (X)'],
+    ['', 'Denied (blank)'],
+  ] as const)('[MAM-80 AC-3][MAM-80 AC-6] status "%s": the list "Provider" reads "%s" in its Status row, the same label as the banner and the Enrolment status row', async (status, label) => {
+    await openDetail(rivera({ enrollStatus: status as never }));
+    await recordTable();
+
+    expect(recordRows(screen.getByRole('region', { name: 'Provider' }))).toContainEqual(['Status', label]);
+  });
+
+  it.each(['X', ''] as const)('[MAM-80 AC-3][MAM-80 AC-6] status "%s": the word "Unknown" appears nowhere on the page, because the legacy catch-all label is the only one', async (status) => {
+    await openDetail(rivera({ enrollStatus: status as never }));
+    await recordTable();
+
+    expect(text(screen.getByRole('main'))).not.toContain('Unknown');
+  });
 });
 
 describe('[MAM-80 AC-7] unknown providers and failures are told apart', () => {

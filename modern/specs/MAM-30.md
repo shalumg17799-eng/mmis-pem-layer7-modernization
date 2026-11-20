@@ -14,8 +14,8 @@ decisions: [D-003, D-004]
 dependsOn: [MAM-27]
 mainJourney: false
 labels: [svc-provider-service, kag-L-S020, agentic, decision-D-003, decision-D-004]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 0b6fd18c059b3c0f7d05875ce28cb092518588550dfa680e5e5e55d0ff8a4991
 ---
 ## Business requirement
 The date by which an active provider must be revalidated is exactly five years after the approval, or after the last completed revalidation, on the same day and month. It is always a real calendar date with a four-digit year, also after the year 2065 and also for approvals on 29 February. Only an approval or a passed revalidation moves the date; screening, risk assessment and a failed re-screening never do. Other services that track due dates are told when the date changes.

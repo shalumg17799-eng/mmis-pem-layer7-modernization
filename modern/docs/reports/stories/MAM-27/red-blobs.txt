@@ -1,4 +1,9 @@
+24ac1bb7880e5c99e94e1b2adb5da74cd65edf5c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/EventContract.java
+f17669343fa44d3b2bd7fd8e7003fa943d3e0d31  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutboxContractTest.java
+667a9c1ba95ba3f69bbda0f96b9a980fdf0f6a70  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java
 975731b626ffd6270881dced1cc45d031358ce18  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ApprovalSteps.java
+72e074954beb6ea103eeb844f81dcd29719ee241  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderWriteAtomicityTest.java
+810fd9457486bb9e34f05f6d3c4388093fe62752  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderWriteInputTest.java
 d3003217df29ad1ea810f2ce0777f222bb8025f3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/DecideProviderTest.java
 020cb846cba4f494ab55c9475091790bd7a4f677  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ApprovalTest.java
 de8f95296bf9377e1f726ce5840d32b02d866ebe  modern/services/provider-service/src/test/resources/features/MAM-27.feature

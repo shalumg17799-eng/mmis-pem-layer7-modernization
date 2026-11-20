@@ -81,6 +81,7 @@ class Runner:
         self.notes = []
         self.problems = []
         self.log_lines = []
+        self.seed_note_text = None
         self.mem_wait_s = 0
         self._tok = None
         self._tok_at = 0
@@ -274,10 +275,44 @@ class Runner:
         with open(src, "rb") as f:
             data = f.read()
         lines = [ln for ln in data.split(b"\n") if ln]
-        self.put("inputs/" + (our_name or golden_name), data, "input as sent to the legacy run (same bytes)",
+        if golden_name.startswith("provider-master"):
+            role = ("copy of the master the legacy run loaded, for reference only: the modern stack is seeded from SQL "
+                    "(infra/scripts/seed.sh), not from this file; the real modern BEFORE master is before/provider-master.ascii")
+        else:
+            role = "input as sent to the legacy run (same bytes; this file is uploaded to the modern run)"
+        self.put("inputs/" + (our_name or golden_name), data, role,
                  extra={"records": len(lines), "recordLength": len(lines[0]) if lines else 0,
                         "lineEnds": "LF after every record"})
         return data
+
+    def check_seed(self, before):
+        """The premise 'the SQL seed equals the master the legacy run loaded' is checked here, not assumed: the BEFORE
+        export against the golden provider-master-seed-sorted.dat, record by record (matched by NPI)."""
+        path = os.path.join(self.golden, "inputs", "provider-master-seed-sorted.dat")
+        try:
+            with open(path, "rb") as f:
+                dat = f.read().replace(b"\n", b"")
+        except OSError as e:
+            self.seed_note_text = "SEED PREMISE: not checked, the golden .dat could not be read (%r)" % e
+            return
+        a = {dat[i:i + 130][:10]: dat[i:i + 130] for i in range(0, len(dat), 130)}
+        lines = [ln[:-1] if ln.endswith(b"\r") else ln for ln in before.split(b"\n") if ln]
+        b = {ln[:10]: ln for ln in lines}
+        diff = []
+        for npi in sorted(set(a) | set(b)):
+            x, y = a.get(npi), b.get(npi)
+            if x is None or y is None:
+                diff.append(f"{npi.decode('ascii', 'replace')} (only on one side)")
+            elif x != y:
+                at = [i + 1 for i in range(min(len(x), len(y))) if x[i] != y[i]]
+                diff.append(f"{npi.decode('ascii', 'replace')} bytes {at[0]}-{at[-1]}")
+        if diff:
+            self.seed_note_text = ("SEED PREMISE (checked at run time): the exported BEFORE master differs from the legacy "
+                                   "provider-master-seed-sorted.dat in %d of %d records: %s" % (len(diff), len(a), "; ".join(diff)))
+        else:
+            self.seed_note_text = ("SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy "
+                                   "provider-master-seed-sorted.dat byte for byte (%d of %d records)" % (len(a), len(a)))
+        self.log(self.seed_note_text)
 
     # ---- batch run helpers -----------------------------------------------------------------------
     def follow(self, label, start_path, payload=None, multipart=None, run_path=None, timeout=240):
@@ -347,6 +382,7 @@ class Runner:
         self.seed()
         seed_npis = {p["npi"] for p in self.providers()}
         before = self.export_stable()
+        self.check_seed(before)
         self.put_records("before/provider-master", before, 130, "provider master export BEFORE (seed state, 16 providers)",
                          "before/provider-master.ebcdic.ascii")
         apps = self.copy_input(app_file, "appinput.dat")
@@ -402,6 +438,7 @@ class Runner:
     def month(self):
         self.seed()
         before = self.export_stable()
+        self.check_seed(before)
         self.put_records("before/provider-master", before, 130, "provider master export BEFORE (seed state)",
                          "before/provider-master.ebcdic.ascii")
         self.copy_input("provider-master-seed-sorted.dat")
@@ -444,6 +481,7 @@ class Runner:
     def directory(self):
         self.seed()
         before = self.export_stable()
+        self.check_seed(before)
         self.put_records("before/provider-master", before, 130, "provider master export BEFORE (seed state)",
                          "before/provider-master.ebcdic.ascii")
         self.copy_input("provider-master-seed-sorted.dat")
@@ -460,6 +498,7 @@ class Runner:
     def sanctions(self):
         self.seed()
         before = self.export_stable()
+        self.check_seed(before)
         self.put_records("before/provider-master", before, 130, "provider master export BEFORE (seed state)",
                          "before/provider-master.ebcdic.ascii")
         self.copy_input("provider-master-seed-sorted.dat")
@@ -504,7 +543,7 @@ class Runner:
             "modernBuild": {"gitHead": head.stdout.strip(), "pemAppsImageAndCreated": docker.stdout.strip(),
                             "workingTree": "uncommitted changes of the lead (no commit in this task)"},
             "memoryPauseSeconds": self.mem_wait_s,
-            "runs": self.runs, "flowNotes": list(flow_notes) + [SEED_NOTE], "problems": self.problems,
+            "runs": self.runs, "flowNotes": list(flow_notes) + [self.seed_note_text or SEED_NOTE_UNCHECKED], "problems": self.problems,
             "normalised": ["record separator only: the API returns one record per line (LF); the .ascii file holds the "
                            "same records back to back like the converted golden files; no field is changed"],
             "files": self.files,
@@ -515,10 +554,7 @@ class Runner:
         self.log(f"manifest written, problems: {len(self.problems)}")
 
 
-SEED_NOTE = (
-    "SEED PREMISE: the SQL seed holds NULL where provider-master-seed.dat has the due date 99991231 for four providers "
-    "(1005914035, 1005925213, 1005933068, 1005960046); the export writes an unset date as 00000000, so bytes 43-50 of those "
-    "four records differ between the modern and the legacy BEFORE file (the other 12 records and all other bytes are equal).")
+SEED_NOTE_UNCHECKED = "SEED PREMISE: not checked in this run (the BEFORE export was not compared with the golden .dat)."
 
 FLOW_NOTES = {
     "day": [
@@ -543,8 +579,9 @@ FLOW_NOTES = {
         "(the 3 new and the 2 seed providers: 20 rows). after-step010 = master right after PRVENR01; after-step040 = master "
         "after PRVRSK01 (tier and due date rewritten for every record). The baseline legacy run stopped after STEP010 (RC 4), "
         "so it has no SCRNOUT and no tier; the modern baseline run went on through screening and tiering.",
-        "Modern screening verdicts come from the mocked sources (D-005): an application whose licence is unknown to the licence "
-        "board mock (1006133288, SD20001) fails screening (flag F, no tier); the legacy stubs returned P for everyone.",
+        "Modern screening verdicts come from the mocked sources (D-005): each licence is looked up in the licence-board mock "
+        "(WireMock, infra/wiremock/mappings/license-board); the legacy stubs returned P for everyone. The verdict of every "
+        "new provider is in logs/screenings-of-new-providers.json.",
     ],
     "month": [
         "Run on the seed state, like the legacy PRVMTH01 (the legacy run did not run PRVDAY01 first).",

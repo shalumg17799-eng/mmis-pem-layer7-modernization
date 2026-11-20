@@ -57,7 +57,7 @@ class ProviderWriteInputTest extends IntegrationTest {
     assertThat(r.getResponse().getContentType()).startsWith("application/problem+json");
   }
 
-  @ParameterizedTest(name = "effectiveDate {0} is refused")
+  @ParameterizedTest(name = "[MAM-33 AC-6] effectiveDate {0} is refused")
   @ValueSource(
       strings = {
         "2026-03-31T00:00:00",
@@ -112,7 +112,7 @@ class ProviderWriteInputTest extends IntegrationTest {
     assertProblem(send("/api/v1/providers/{npi}/approval", body, PemJwt.admin()), 403);
   }
 
-  @ParameterizedTest(name = "decision body {0} is refused")
+  @ParameterizedTest(name = "[MAM-27 AC-4] decision body {0} is refused")
   @ValueSource(strings = {"not json", "", "{\"decision\":\"MAYBE\"}", "{\"decision\":42}", "{}"})
   @DisplayName(
       "[MAM-27 AC-4] a decision whose body is not JSON or names no valid decision is a 400 problem and changes nothing")

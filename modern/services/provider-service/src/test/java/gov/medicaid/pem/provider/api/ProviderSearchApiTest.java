@@ -132,7 +132,7 @@ class ProviderSearchApiTest extends IntegrationTest {
         .assertResponse("searchProviders", 200, r.getResponse().getContentAsString());
   }
 
-  @ParameterizedTest(name = "npi={0} is refused")
+  @ParameterizedTest(name = "[MAM-37 AC-5] npi={0} is refused")
   @ValueSource(strings = {"12AB", "100300011", "10030001111", "1003 00111", " "})
   @DisplayName("[MAM-37 AC-5] an NPI that is not 10 digits is a 400 problem")
   void malformedNpi(String npi) throws Exception {
@@ -141,7 +141,7 @@ class ProviderSearchApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.status").value(400));
   }
 
-  @ParameterizedTest(name = "medicaidId=[{0}] is refused")
+  @ParameterizedTest(name = "[MAM-37 AC-5] medicaidId=[{0}] is refused")
   @ValueSource(strings = {"", " ", "ABCDEFGHIJ"})
   @DisplayName(
       "[MAM-37 AC-5] a Medicaid ID that is empty or longer than 9 characters is a 400 problem")
@@ -230,7 +230,7 @@ class ProviderSearchApiTest extends IntegrationTest {
     assertThat(npis(ok(search("name", "100%")))).containsExactly("1003000555");
   }
 
-  @ParameterizedTest(name = "status={0} screenFlag={1} is refused")
+  @ParameterizedTest(name = "[MAM-37 AC-6] status={0} screenFlag={1} is refused")
   @CsvSource({"X,", "p,", "'',", ",Z", ",u", "PP,"})
   @DisplayName(
       "[MAM-37 AC-6] a status or screen flag that is not one of the contract codes is a 400 problem")
@@ -332,6 +332,42 @@ class ProviderSearchApiTest extends IntegrationTest {
     }
   }
 
+  // ---- AC-4: the status as stored
+  // ----------------------------------------------------------------
+
+  @ParameterizedTest(name = "[MAM-37 AC-4] status {0} is read as {0}")
+  @ValueSource(strings = {"P", "A", "T", "D", "S"})
+  @DisplayName(
+      "[MAM-37 AC-4] a provider with each status code P, A, T, D and S is read with exactly that code in a lookup and in a search; S is never shown as D")
+  void statusIsReturnedAsStored(String code) throws Exception {
+    ProviderRows.individual("1003000901").status(code).insert(jdbc);
+
+    JsonNode read =
+        json.readTree(
+            mvc.perform(get("/api/v1/providers/1003000901").with(PemJwt.analyst()))
+                .andReturn()
+                .getResponse()
+                .getContentAsString());
+    JsonNode found = ok(search("npi", "1003000901"));
+
+    assertThat(read.path("enrollStatus").asText()).isEqualTo(code);
+    assertThat(found.path("items").get(0).path("enrollStatus").asText()).isEqualTo(code);
+    if ("S".equals(code)) {
+      assertThat(read.path("enrollStatus").asText()).isNotEqualTo("D");
+    }
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-37 AC-4] a suspended and a denied provider side by side keep their own codes S and D, and searching S finds only the suspended one")
+  void suspendedAndDeniedAreDifferent() throws Exception {
+    ProviderRows.individual("1003000902").status("S").insert(jdbc);
+    ProviderRows.individual("1003000903").status("D").insert(jdbc);
+
+    assertThat(npis(ok(search("status", "S")))).containsExactly("1003000902");
+    assertThat(npis(ok(search("status", "D")))).containsExactly("1003000903");
+  }
+
   // ---- AC-3: nothing is carried between requests
   // ----------------------------------------------------
 
@@ -368,7 +404,7 @@ class ProviderSearchApiTest extends IntegrationTest {
   // ---- AC-7: roles
   // ------------------------------------------------------------------------------------
 
-  @ParameterizedTest(name = "{0} may search")
+  @ParameterizedTest(name = "[MAM-37 AC-7] {0} may search")
   @ValueSource(strings = {"ANALYST", "SUPERVISOR", "ADMIN", "SYSTEM"})
   @DisplayName("[MAM-37 AC-7] staff roles and SYSTEM may search")
   void staffMaySearch(String role) throws Exception {

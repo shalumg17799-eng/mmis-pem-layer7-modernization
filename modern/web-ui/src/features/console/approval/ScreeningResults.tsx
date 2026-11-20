@@ -1,9 +1,10 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
-import { Alert, AlertText, Table } from '@trussworks/react-uswds';
+import { Alert, AlertText } from '@trussworks/react-uswds';
 import { screeningsPath, type ScreeningPage } from '../../../shared/api/types';
 import { useApi } from '../../../shared/api/useApi';
 import { useSession } from '../../../shared/auth/AuthProvider';
 import { formatDate, SCREEN_RESULT_LABEL, screeningDetailText, sourceName, withCode } from '../../../shared/format/format';
+import { ScrollableTable } from '../../../shared/ui/ScrollableTable';
 
 /** GET /api/v1/screenings?npi= (screening-service, D-018): every screening of the provider with its per-source results. */
 export function useScreenings(npi: string | undefined) {
@@ -33,7 +34,7 @@ export function ScreeningResults({ query }: { query: UseQueryResult<ScreeningPag
   const results = latest?.results ?? [];
   if (results.length === 0) return <p>No screening results yet.</p>;
   return (
-    <Table bordered={false} fullWidth scrollable>
+    <ScrollableTable bordered={false} fullWidth label="Screening results">
       <caption>Screening results</caption>
       <thead>
         <tr>
@@ -55,6 +56,6 @@ export function ScreeningResults({ query }: { query: UseQueryResult<ScreeningPag
           </tr>
         ))}
       </tbody>
-    </Table>
+    </ScrollableTable>
   );
 }

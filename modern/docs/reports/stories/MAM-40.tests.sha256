@@ -1,0 +1,14 @@
+a575f994f3a953655ebb372239ceb94d81eb85a98e4ed5a8fe4a7389b136734d  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/LogCapture.java
+84697b951375d15992cfa4c23df7baddfffe2ef8d97428034be0c5d407e1ac9f  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java
+e0021f3ebb6ff881753de50b7394f277a7732916c1dc5999127837ae18179641  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/TestEvents.java
+9936105f7fdcb455147e52982ac7188dde192c9e768d5d4d36b0680b305fb8c8  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/HttpAnswerSteps.java
+b2979f733fb3e72aec0001702b086c760b762f451e9f39e88348e839ce3c564f  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderAuditSteps.java
+ac47cca01a1a988d6422aef61e6e891b882d621949fdeae3e735d5c941a8bce3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ProviderFixtureSteps.java
+25bd2d85251b76a1e310ece9de6516d56e6053d3c6cd31eb9a018d530796ff95  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderAuditApiTest.java
+3bb016a8f5251962f9a12cdbd1c342004ad18eeb736837bfb60211521ea6ab7c  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderReadFailureTest.java
+59073dc75f3956a32fc0599ff4ca0fba37438cebbfec6e8329a115ce0e95971b  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/AuditHistoryUseCasesTest.java
+caf28b39cba18046f4c4b404bbcf7f8b0da60e1eafcf61660803ee7370eafd68  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/AuditTrailTest.java
+cf136876c39d201975ad7e0b3144b7254c6222a472c791e48d59182f4311cb99  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ReadProviderHistoryTest.java
+5ef50094734a537bdb8b63a649480f5a4993becf55870038ec43eaa41da0acb1  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/RecordNoticeSentTest.java
+b35be92ef36f3d5f48951af42c03f4a86976451464b3105c9b4eea73ae25db27  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/infrastructure/NoticeEventsListenerTest.java
+cede3fd39bd7c3a540a242487335bbb636ae4f2d1fd4dc1aefafd8acdeef1d0d  modern/services/provider-service/src/test/resources/features/MAM-40.feature

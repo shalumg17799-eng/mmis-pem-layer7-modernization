@@ -1,3 +1,3 @@
 ea30e927c6e66f41118cda75ad2018209f05ce38  modern/web-ui/e2e/console-detail.spec.ts
-64d41bb815a666de2145f6073d0ba2a4a061284b  modern/web-ui/tests/console/provider-detail.test.tsx
+9e63bd1c3d8d8b6b407775ef24dc4e0c35af5b9e  modern/web-ui/tests/console/provider-detail.test.tsx
 ca655e52b5d8f89882ba7c030186bef24ad29ade  modern/web-ui/tests/support/detail.ts

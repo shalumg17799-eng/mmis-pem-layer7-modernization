@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Alert, AlertText, Button, Form, Label, Select, Table, TextInput } from '@trussworks/react-uswds';
+import { Alert, AlertText, Button, Form, Label, Select, TextInput } from '@trussworks/react-uswds';
 import { useState, type FormEvent } from 'react';
 import { ApiError } from '../../../shared/api/client';
 import { SEARCH_DIRECTORY, withQuery, type DirectoryPage } from '../../../shared/api/types';
@@ -8,6 +8,7 @@ import { PROVIDER_TYPE_LABEL, withCode } from '../../../shared/format/format';
 import { EmptyState } from '../../../shared/ui/EmptyState';
 import { PageHeading } from '../../../shared/ui/PageHeading';
 import { Pager } from '../../../shared/ui/Pager';
+import { ScrollableTable } from '../../../shared/ui/ScrollableTable';
 import { SortHeader, useSorting } from '../../../shared/ui/sorting';
 
 const PAGE_SIZE = 20;
@@ -97,7 +98,7 @@ export function PublicDirectory() {
       {data && data.items.length > 0 && criteria && (
         <>
           <p>{`${data.total} ${data.total === 1 ? 'provider' : 'providers'} found`}</p>
-          <Table bordered={false} fullWidth scrollable>
+          <ScrollableTable bordered={false} fullWidth label="Active providers">
             <caption>Active providers</caption>
             <thead>
               <tr>
@@ -117,7 +118,7 @@ export function PublicDirectory() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </ScrollableTable>
           <Pager page={criteria.page} size={PAGE_SIZE} total={data.total} label="Active providers" onPage={(page) => setCriteria({ ...criteria, page })} />
         </>
       )}

@@ -6,13 +6,13 @@
   "businessDate": "2026-11-20",
   "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
   "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
-  "startedUtc": "2026-11-20T11:22:10Z",
-  "finishedUtc": "2026-11-20T11:22:37Z",
+  "startedUtc": "2026-11-20T17:45:34Z",
+  "finishedUtc": "2026-11-20T17:46:07Z",
   "gateway": "http://localhost:8080",
   "user": "admin1 (ADMIN)",
   "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
   "modernBuild": {
-    "gitHead": "6763144",
+    "gitHead": "f72d4e5",
     "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
     "workingTree": "uncommitted changes of the lead (no commit in this task)"
   },
@@ -22,7 +22,7 @@
       "step": "PRVSAN01 sanction intake",
       "startPath": "/api/v1/batch/sanction-intake-runs",
       "startHttpStatus": 202,
-      "runId": "ad8fc151-ad51-485b-9372-adcda85b205f",
+      "runId": "b3bfb518-24d5-4ba5-973b-157349ba23ba",
       "status": "COMPLETED",
       "businessDate": "2026-11-20",
       "counts": {
@@ -34,14 +34,14 @@
         "terminated": 1
       },
       "error": null,
-      "startedAt": "2026-11-20T11:22:27.318935Z",
-      "endedAt": "2026-11-20T11:22:27.500791Z",
+      "startedAt": "2026-11-20T17:45:57.273337Z",
+      "endedAt": "2026-11-20T17:45:57.718165Z",
       "job": "PRVSAN01"
     }
   ],
   "flowNotes": [
     "Run on the seed state, like the legacy PRVSAN01 (ad-hoc lab deck). Status changes reach the provider master by events; the export is taken after it became stable.",
-    "SEED PREMISE: the SQL seed holds NULL where provider-master-seed.dat has the due date 99991231 for four providers (1005914035, 1005925213, 1005933068, 1005960046); the export writes an unset date as 00000000, so bytes 43-50 of those four records differ between the modern and the legacy BEFORE file (the other 12 records and all other bytes are equal)."
+    "SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)"
   ],
   "problems": [],
   "normalised": [
@@ -52,13 +52,13 @@
       "path": "before/provider-master.delivered",
       "role": "provider master export BEFORE (seed state) (as delivered by the API, one record per line)",
       "bytes": 2095,
-      "sha256": "bd8064301c7cbc40f6c1efdf14ebea7589a1e9d89c89a512366e6ee18e6f2d74"
+      "sha256": "abcf97779a571a3822262f9c5baa8058cebf985c212eca0b5e3b9a56125f6b57"
     },
     {
       "path": "before/provider-master.ascii",
       "role": "provider master export BEFORE (seed state) (record stream, records back to back)",
       "bytes": 2080,
-      "sha256": "1544f0905b402d70782793f94fcf3a4f9432f52ca7cf4bdbd599c203dd4ec526",
+      "sha256": "2062175f6cd1aaa1860b5ad2bdf717e191fb046d4445b4499503c9f1888fce00",
       "recordLength": 130,
       "records": 16,
       "goldenCounterpart": "before/provider-master.ebcdic.ascii",
@@ -67,7 +67,7 @@
     },
     {
       "path": "inputs/provider-master-seed-sorted.dat",
-      "role": "input as sent to the legacy run (same bytes)",
+      "role": "copy of the master the legacy run loaded, for reference only: the modern stack is seeded from SQL (infra/scripts/seed.sh), not from this file; the real modern BEFORE master is before/provider-master.ascii",
       "bytes": 2096,
       "sha256": "3febd267db27375183df9859f57776ed0d9c986b7a9fe08c3480dcefe741563c",
       "records": 16,
@@ -76,7 +76,7 @@
     },
     {
       "path": "inputs/sancin.dat",
-      "role": "input as sent to the legacy run (same bytes)",
+      "role": "input as sent to the legacy run (same bytes; this file is uploaded to the modern run)",
       "bytes": 486,
       "sha256": "caa42d0042c3aa1070cc8177c66549ba557c848e895114b5134e8be288a1a37a",
       "records": 6,
@@ -87,13 +87,13 @@
       "path": "after/provider-master-after.delivered",
       "role": "provider master export AFTER (status changes arrive by events) (as delivered by the API, one record per line)",
       "bytes": 2095,
-      "sha256": "27f7068da60551d6ce1e9c4139b075044d8fafac5ea99d59d9d80ba539a17d07"
+      "sha256": "6972fd708ddb47161327eb4d8ece5565a6c403a283cff59455bb9e16ab4e2ef4"
     },
     {
       "path": "after/provider-master-after.ascii",
       "role": "provider master export AFTER (status changes arrive by events) (record stream, records back to back)",
       "bytes": 2080,
-      "sha256": "10b5d7c4ecdb04aba4d34958bdb1555386ae5493077230b091c1bdb009e453e7",
+      "sha256": "548fb8e99dcbc2f22285fb4fbd5a6a3b444ae1263b552499b8a3c26b7473214e",
       "recordLength": 130,
       "records": 16,
       "goldenCounterpart": "after/provider-master-after.ebcdic.ascii",
@@ -104,25 +104,25 @@
       "path": "logs/sanction-history.json",
       "role": "GET /api/v1/sanctions after the run (HTTP 200)",
       "bytes": 2688,
-      "sha256": "04b234a4712c399887761a51487a5bf20afbe720f6f48356f7be03ceb82b89bd"
+      "sha256": "9c4caf1985f1ada85d74d03ee04be4d8e07693557bfc42e009e45c8d4058c466"
     },
     {
       "path": "logs/notices.json",
       "role": "GET /api/v1/notices after the run (HTTP 200); modern counterpart of the PRVNT* CALLs",
       "bytes": 1160,
-      "sha256": "4e8f3dd3eab393893637db6dbb4cc0ebc1cd48264e87fbab2b1dae2f4afedcdf"
+      "sha256": "16f1c9c97c15336c394f4463bcf36b5695e2a010b5c91d23cc4569bfd31d2ba9"
     },
     {
       "path": "logs/modern-job-lines.txt",
       "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
       "bytes": 2699,
-      "sha256": "cb25567f254918051173cf08bf9e98140dc0aab50eac1739d99c37b687f7009f"
+      "sha256": "a406d5b12fa690472b7a299753f2a79df525e49c93477a6a322dc886d1b3b71a"
     },
     {
       "path": "logs/run-log.txt",
       "role": "log of this script",
-      "bytes": 566,
-      "sha256": "1ff8976d9bb41de523772d6200e977d0cfc18b27712bfb8aa853b7253147b3fa"
+      "bytes": 721,
+      "sha256": "b39e9de2418741f98dd1a21abb2c982ee7905b4819fed984e60077b824aec868"
     }
   ]
 }

@@ -1,0 +1,73 @@
+{
+  "story": "MAM-30",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/EventContract.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutboxContractTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderRows.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/TestEvents.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/RevalidationDueDateSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/CompleteRevalidationTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/RevalidationDueDateTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-30.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "RevalidationDueDateTest: PASSED"
+    ],
+    "AC-2": [
+      "RevalidationDueDateTest: PASSED"
+    ],
+    "AC-3": [
+      "RevalidationDueDateTest: PASSED"
+    ],
+    "AC-4": [
+      "CompleteRevalidationTest: PASSED",
+      "MAM-30.feature 'A passed revalidation sets the next due date and announces it': PASSED",
+      "RevalidationDueDateTest: PASSED"
+    ],
+    "AC-5": [
+      "CompleteRevalidationTest: PASSED",
+      "MAM-30.feature 'A passed revalidation sets the next due date and announces it': PASSED",
+      "ProviderOutboxContractTest: PASSED"
+    ],
+    "AC-6": [
+      "MAM-30.feature 'A failed re-screening leaves the due date and status alone': PASSED"
+    ],
+    "AC-7": [
+      "MAM-30.feature 'Only approval and a passed revalidation move the date': PASSED"
+    ],
+    "AC-8": [
+      "MAM-30.feature 'A redelivered revalidation result is applied once': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/adapter/legacy/PrvrecrdFile.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/CompleteRevalidation.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/Approval.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/Provider.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/Revalidation.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/VerdictEventsListener.java"
+  ],
+  "rules": [
+    "R-PRVRSK01-ADD-02",
+    "R-PRVRSK01-cbl-00008",
+    "R-PRVRSK01-cbl-00039",
+    "R-PRVRSK01-cbl-00040",
+    "R-PRVRSK01-cbl-00041",
+    "R-PRVRSK01-cbl-00042",
+    "R-PRVRSK01-cbl-00043",
+    "R-PRVRSK01-cbl-00044",
+    "R-PRVRSK01-cbl-00045",
+    "R-PRVRSK01-cbl-00046"
+  ]
+}

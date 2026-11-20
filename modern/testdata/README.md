@@ -117,3 +117,35 @@ in 1003000000-1003000999 or 1990000000-1990000999, so applying with them is neve
 `seed/screening_db/02-screenings.sql`, `seed/sanctions_db/01-sanctions.sql`, `seed/directory_db/02-directory.sql` and
 `seed/revalidation_db/01-revalidation.sql`. MAM-51 AC-1 compares the provider list with `fixed-width/provider-master-seed.dat`
 (exactly the 16 NPIs above); the edge providers live in a separate file for that reason.
+
+## Large performance set (MAM-88): generated at run time, never stored
+
+The performance smoke needs 10,000 providers. They are **not committed**: `generate.py perf` writes them into a folder that git ignores
+(or outside the repository) and refuses an `--out` inside `modern/testdata`. Same seed (20260115, one `random.Random` stream, no set is
+iterated, so the output does not depend on `PYTHONHASHSEED`), same bytes.
+
+```
+python modern/tools/data/generate.py perf --out <folder> [--count 10000]     # --out is required; --count defaults to 10000 (1 to 50000)
+python modern/tools/perf/load_perf_dataset.py [--count 10000] [--out <folder>] [--dry-run]    # generate, check offline, load, print counts
+bash modern/infra/scripts/seed.sh                                            # remove the set again (restores exactly the 16 seeded providers)
+```
+
+| File written to `--out` (exactly these three) | Content |
+|---|---|
+| `provider-master-perf.dat` | PRVRECRD, 130-byte records (layout read from the graph export), one LF after each, in NPI order. |
+| `provider-perf.sql` | The same providers as rows of `provider_db.provider`: the 18-column list of `seed/provider_db/01-providers.sql`, one row per line, 1,000 rows per `INSERT ... ON CONFLICT DO NOTHING`. No `TRUNCATE`: it is loaded on top of the seed, 16 + 10,000, and may be loaded twice. |
+| `revalidation-perf.sql` | The same providers as rows of `revalidation_db.tracked_provider` (`npi, enroll_status, reval_due_date`): the revalidation sweep reads that read model, which `ProviderStatusChanged` events fill and a SQL load does not. |
+
+- **Disjoint from everything else:** NPIs in the block `1007000000`-`1007999999` (valid check digit), none of them an NPI of the 16 seeded providers, of any
+  small-set file, of the reserved ranges, of `aws-transform/test-data` or of a `hit-<npi>.json` stub; Medicaid IDs `9` + 8 digits, none in the small set;
+  `public_id = uuid5(seed namespace, npi)`.
+- **Names:** individuals `TESTPROV PERFnnnnn` with a licence SD10001-SD10007 / TX (the licence-board stub answers these ACTIVE, so a perf screening takes the
+  clean path); groups and facilities `SAMPLE PERF GROUP nnnnn` / `SAMPLE PERF FACILITY nnnnn`, half with a DBA `SAMPLE PERF DBA nnnnn`, owner = a perf individual.
+- **Mix at 10,000 (exact quotas, not luck):** IN 6000, GR 1500, FA 2500; status A 6000, T 1200, S 800, P 1200, D 800; screen flag by status (P:U, D:F, A/T/S:P);
+  tier only for A, T and S by the legacy taxonomy rule; of the ACTIVE ones 900 are due on or before 2026-01-15, 900 fall in the rest of 2026 and 4200 are due from
+  2027; 840 terminated and 240 suspended providers are overdue (the sweep must skip them). Pending and denied carry the no-date value `99991231` (NULL in SQL).
+  Effective dates 2000-01-01 to 2026-01-15; `end_date` only for terminated providers.
+- **What the load fills:** `provider_db.provider` (read by provider-service; tmsis-service, screening-service and directory-service reach it only through
+  provider-service's API) and `revalidation_db.tracked_provider`. Nothing else: `directory_db`, `enrollment_db` and the rest are filled by the runs themselves.
+- **Removing it:** `make seed` (`seed.sh`) TRUNCATEs both tables (`provider`, `tracked_provider`). It does not reset `tmsis_db` (no seed folder), so the extract
+  runs and rows of a measured T-MSIS extract stay.

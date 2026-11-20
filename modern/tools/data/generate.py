@@ -3,6 +3,9 @@
 
 Run:   python modern/tools/data/generate.py            (writes modern/testdata/)
        python modern/tools/data/generate.py --out DIR   (writes the same tree under DIR; used by the determinism check)
+       python modern/tools/data/generate.py perf --out DIR [--count 10000]
+                                                        (MAM-88: the large performance set, perf_dataset.py; --out is required
+                                                         and the files are never stored in the repository; see testdata/README.md)
 
 Seed 20260115, which is also the frozen business date 2026-01-15, recorded in modern/testdata/README.md. The
 generator draws from ONE random stream, random.Random(20260115): first exactly the draws of testdata/generate_seed.py
@@ -284,6 +287,10 @@ def write_manifest(root: Path) -> None:
 
 
 def main():
+    if sys.argv[1:2] == ["perf"]:                  # MAM-88: a separate mode with its own options; nothing above changes
+        import perf_dataset
+        perf_dataset.main(sys.argv[2:])
+        return
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--out", type=Path, default=TESTDATA, help="output root (default modern/testdata)")
     args = ap.parse_args()

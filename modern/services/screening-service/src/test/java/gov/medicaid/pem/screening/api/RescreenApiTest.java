@@ -337,7 +337,6 @@ class RescreenApiTest extends Lane3Test {
         "bad id with spaces",
         "x<script>alert(1)</script>",
         "semi;colon",
-        "line\nbreak",
         "FORGED-LOG-LINE ERROR something terrible happened",
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       })
@@ -357,6 +356,36 @@ class RescreenApiTest extends Lane3Test {
     awaitCompleted(NPI, 1);
     String eventId = completedEvent(NPI).path("correlationId").asText();
     assertThat(eventId).isNotEqualTo(hostile).matches("[A-Za-z0-9._:-]{1,64}");
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-28 AC-1] a correlation id with a line break is never taken over: the request is refused before it reaches the application, or its id is replaced (lesson g)")
+  void correlationIdWithLineBreak() throws Exception {
+    provider();
+    String hostile = "line\nbreak";
+    MvcResult r =
+        mvc.perform(
+                MockMvcRequestBuilders.post(PATH)
+                    .with(PemJwt.analyst())
+                    .header("X-Correlation-Id", hostile)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"npi\":\"" + NPI + "\"}"))
+            .andReturn();
+    assertThat(r.getResponse().getStatus()).isIn(202, 400);
+    if (r.getResponse().getStatus() == 202) {
+      assertThat(r.getResponse().getHeader("X-Correlation-Id"))
+          .isNotNull()
+          .isNotEqualTo(hostile)
+          .matches("[A-Za-z0-9._:-]{1,64}");
+      awaitCompleted(NPI, 1);
+      assertThat(completedEvent(NPI).path("correlationId").asText())
+          .isNotEqualTo(hostile)
+          .matches("[A-Za-z0-9._:-]{1,64}");
+    } else {
+      assertThat(screeningCount(NPI)).isZero();
+      assertThat(ScreeningWorld.providerReads(NPI)).isZero();
+    }
   }
 
   @Test

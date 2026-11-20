@@ -1,5 +1,5 @@
 import type { Provider } from '../../../shared/api/types';
-import { ENROLL_STATUS_LABEL, formatDate, providerName, SCREEN_FLAG_LABEL, withCode } from '../../../shared/format/format';
+import { formatDate, providerName, SCREEN_FLAG_LABEL, statusWithCatchAll, withCode } from '../../../shared/format/format';
 import { SummaryList } from '../../../shared/ui/SummaryList';
 
 /**
@@ -14,7 +14,8 @@ export function ProviderTable({ provider }: { provider: Provider }) {
       rows={[
         ['NPI', provider.npi],
         ['Name', providerName(provider)],
-        ['Status', withCode(provider.enrollStatus, ENROLL_STATUS_LABEL)],
+        // one label for one provider: the legacy catch-all "Denied (X)" as the banner and the record list show it (MAM-80 AC-3, AC-6)
+        ['Status', statusWithCatchAll(provider.enrollStatus)],
         ['Screening result', withCode(provider.screenFlag, SCREEN_FLAG_LABEL)],
         ['Revalidation due', provider.revalidationDueDate ? formatDate(provider.revalidationDueDate) : 'Not set'],
       ]}

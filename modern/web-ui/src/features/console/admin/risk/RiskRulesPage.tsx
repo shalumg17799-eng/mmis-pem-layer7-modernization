@@ -22,12 +22,22 @@ interface Row {
 }
 
 interface Draft {
+  /**
+   * The table the rows are based on (its version and default tier when it was loaded or saved). Save sends this version, never the
+   * version of a newer answer of the query: a refetch (window focus) must not turn an edit of version 1 into a PUT of version 2, which
+   * would overwrite what another administrator saved (MAM-92 AC-5, lost update).
+   */
+  base: { version: number; defaultTier: Tier };
   defaultTier: Tier;
   rows: Row[];
 }
 
 let nextKey = 0;
-const toDraft = (set: RiskRuleSet): Draft => ({ defaultTier: set.defaultTier, rows: set.rules.map((rule) => ({ key: (nextKey += 1), prefix: rule.taxonomyPrefix, tier: rule.tier })) });
+const toDraft = (set: RiskRuleSet): Draft => ({
+  base: { version: set.version, defaultTier: set.defaultTier },
+  defaultTier: set.defaultTier,
+  rows: set.rules.map((rule) => ({ key: (nextKey += 1), prefix: rule.taxonomyPrefix, tier: rule.tier })),
+});
 
 type Outcome = { kind: 'invalid'; rows: number[]; attempt: number } | { kind: 'refused'; heading: string; detail?: string; attempt: number };
 
@@ -85,7 +95,7 @@ export function RiskRulesPage() {
   });
 
   function onSave() {
-    if (!query.data || !draft || put.isPending) return;
+    if (!draft || put.isPending) return;
     const invalid = draft.rows.flatMap((row, index) => (PREFIX.test(row.prefix) ? [] : [index]));
     if (invalid.length > 0) {
       attempts.current += 1;
@@ -94,7 +104,7 @@ export function RiskRulesPage() {
       return;
     }
     setOutcome(null);
-    put.mutate({ version: query.data.version, defaultTier: draft.defaultTier, rules: draft.rows.map((row) => ({ taxonomyPrefix: row.prefix, tier: row.tier })) });
+    put.mutate({ version: draft.base.version, defaultTier: draft.defaultTier, rules: draft.rows.map((row) => ({ taxonomyPrefix: row.prefix, tier: row.tier })) });
   }
 
   function update(rowKey: number, change: Partial<Row>) {
@@ -147,7 +157,12 @@ export function RiskRulesPage() {
               </ul>
             </ErrorSummary>
           )}
-          <h2>{`Version ${query.data.version} (default tier: ${withCode(query.data.defaultTier, RISK_TIER_LABEL)})`}</h2>
+          {query.data.version !== draft.base.version && (
+            <Alert type="warning" slim role="status">
+              <AlertText>{`Another administrator saved version ${query.data.version} after you opened version ${draft.base.version}. The rows below are still based on version ${draft.base.version}, so saving them will be refused and the current table will be shown.`}</AlertText>
+            </Alert>
+          )}
+          <h2>{`Version ${draft.base.version} (default tier: ${withCode(draft.base.defaultTier, RISK_TIER_LABEL)})`}</h2>
           <p>
             A prefix is the first 3 characters of the specialty code (taxonomy) of a provider, for example 207. A provider whose specialty starts with a listed prefix gets that risk
             level; every other provider gets the default tier.
@@ -180,6 +195,9 @@ export function RiskRulesPage() {
                 return (
                   <tr key={row.key}>
                     <td>
+                      <Label htmlFor={`prefix-${row.key}`} className="margin-top-0" error={invalid}>
+                        {`Taxonomy prefix, row ${index + 1}`}
+                      </Label>
                       {invalid && (
                         <span id={`prefix-error-${row.key}`} className="usa-error-message">
                           {BAD_PREFIX}
@@ -191,7 +209,6 @@ export function RiskRulesPage() {
                         type="text"
                         value={row.prefix}
                         maxLength={3}
-                        aria-label={`Taxonomy prefix, row ${index + 1}`}
                         aria-describedby={invalid ? `prefix-error-${row.key}` : undefined}
                         aria-invalid={invalid ? true : undefined}
                         validationStatus={invalid ? 'error' : undefined}
@@ -199,7 +216,10 @@ export function RiskRulesPage() {
                       />
                     </td>
                     <td>
-                      <Select id={`tier-${row.key}`} name={`tier-${row.key}`} value={row.tier} aria-label={`Tier, row ${index + 1}`} onChange={(event) => update(row.key, { tier: event.target.value as Tier })}>
+                      <Label htmlFor={`tier-${row.key}`} className="margin-top-0">
+                        {`Tier, row ${index + 1}`}
+                      </Label>
+                      <Select id={`tier-${row.key}`} name={`tier-${row.key}`} value={row.tier} onChange={(event) => update(row.key, { tier: event.target.value as Tier })}>
                         {TIERS.map((tier) => (
                           <option key={tier} value={tier}>
                             {withCode(tier, RISK_TIER_LABEL)}

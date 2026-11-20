@@ -160,6 +160,28 @@ services:
       retries: 10
     mem_limit: 32m
 
+  # MAM-88 load generator of the performance smoke. Profile "perf": no normal command starts it (./pem.sh up and the e2e use
+  # --profile apps only) and it has no depends_on, so running it never starts, recreates or restarts another service.
+  # Started only by modern/tools/perf/run_perf_smoke.py, always as
+  #   docker compose --project-name pem --env-file infra/.env.local -f infra/docker-compose.yml --profile perf run --rm --no-deps -T k6 run /scripts/<script>.js
+  # It joins the compose network and calls the gateway by its service name (BASE_URL), not through host.docker.internal: the traffic then
+  # stays inside Docker (no Docker Desktop host port forwarder in the measurement), it needs no extra_hosts entry on Linux CI, and it does
+  # not depend on host.docker.internal resolving. The ANALYST token is passed through from the runner's environment (never written here).
+  k6:
+    profiles: [perf]
+    image: grafana/k6:2.4.0@sha256:d41bb79cd8de5a7ad619b53570e3712633e8bff0937010a5c6c57a4747e7a276
+    entrypoint: ["k6"]
+    command: ["version"]
+    restart: "no"
+    environment:
+      - K6_NO_USAGE_REPORT=true     # k6 sends an anonymous usage report by default: off
+      - BASE_URL=http://pem-apps:8080
+      - ANALYST_TOKEN               # no value here: taken from the environment of the docker compose process, if set
+    volumes:
+      - ../tools/perf/k6:/scripts:ro      # the k6 scripts, read-only
+      - ../tools/perf/out:/out            # runner-written inputs (npis.json) and the summaries k6 exports (git-ignored folder)
+    mem_limit: 512m
+
 volumes:
   pem-pgdata:
   pem-kafka:

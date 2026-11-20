@@ -1,13 +1,14 @@
-11:20:49 scenario day-valid-only: job PRVDAY01, run id 20261120-valid-only, business date 2026-11-20
-11:20:51 memory ok before seed: 2347 MB free
-11:21:09 seed.sh done: seed files loaded: 10
-11:21:09 seed state: 16 providers
-11:21:12 APPINPUT: 3 records of 200 bytes, same bytes as the legacy run
-11:21:13 memory ok before PRVENR01 intake: 2112 MB free
-11:21:13 PRVENR01 intake: POST /api/v1/batch/intake-runs -> 202
-11:21:15 PRVENR01 intake: run f5f6d755-9ac1-45fa-9285-282a79a7ea62 COMPLETED counts={'read': 3, 'written': 3, 'errored': 0, 'skipped': 0} error=None
-11:21:15 new providers registered, screened and tiered by events: done (new=3/3, unscreened-or-untiered=[])
-11:21:19 memory ok before PRVSCR01 screening run: 2021 MB free
-11:21:19 PRVSCR01 screening run: POST /api/v1/batch/screening-runs -> 202
-11:21:21 PRVSCR01 screening run: run b274024e-5661-44d4-a06f-65c6fd606568 COMPLETED counts={'read': 19, 'screened': 2, 'skipped': 17, 'failed': 0} error=None
-11:21:21 every provider screened and tiered after the screening run: done (unscreened-or-untiered=[])
+17:43:50 scenario day-valid-only: job PRVDAY01, run id 20261120-valid-only, business date 2026-11-20
+17:43:52 memory ok before seed: 1532 MB free
+17:44:13 seed.sh done: seed files loaded: 10
+17:44:13 seed state: 16 providers
+17:44:16 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
+17:44:16 APPINPUT: 3 records of 200 bytes, same bytes as the legacy run
+17:44:18 memory ok before PRVENR01 intake: 1543 MB free
+17:44:18 PRVENR01 intake: POST /api/v1/batch/intake-runs -> 202
+17:44:21 PRVENR01 intake: run 3b38474e-dc56-4b7f-97aa-3628b0898966 COMPLETED counts={'read': 3, 'written': 3, 'errored': 0, 'skipped': 0} error=None
+17:44:23 new providers registered, screened and tiered by events: done (new=3/3, unscreened-or-untiered=[])
+17:44:27 memory ok before PRVSCR01 screening run: 1754 MB free
+17:44:27 PRVSCR01 screening run: POST /api/v1/batch/screening-runs -> 202
+17:44:29 PRVSCR01 screening run: run fd36eaf1-ad04-479c-8245-b1e8da8d96e8 COMPLETED counts={'read': 19, 'screened': 2, 'skipped': 17, 'failed': 0} error=None
+17:44:29 every provider screened and tiered after the screening run: done (unscreened-or-untiered=[])

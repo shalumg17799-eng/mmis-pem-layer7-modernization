@@ -6,16 +6,16 @@ service: provider-service
 type: Story
 title: "Search and read providers by NPI or Medicaid ID, role-checked (PINQ replacement back end)"
 slug: prv-search-read
-specVersion: 1
-descriptionSha256: ebf30d774651143a0bb16ee826a3c24530e83464538f62d6b4383f60bbcc0be6
-jiraUpdated: 2026-11-18T09:16:01.887-0600
+specVersion: 2  # 2026-11-20: AC-9 added (optional keyset parameter afterNpi on searchProviders; Q-132, user, 2026-11-20 20:22); AC-1 to AC-8 unchanged; tests and code follow
+descriptionSha256: 5a99630179c21d80a4846336dc27b72ca9a89c78165052107b9ef7c7766284f9
+jiraUpdated: 2026-11-20T10:11:17.348-0600
 rules: [R-PRVCICS1-ADD-04, R-PRVCICS1-ADD-05, R-PRVCICS1-ADD-07, R-PRVCICS1-cbl-00003, R-PRVCICS1-cbl-00015, R-PRVCICS1-cbl-00019, R-PRVCICS1-cbl-00021, R-PRVCICS1-cbl-00022, R-PRVCICS1-cbl-00023]
 decisions: [D-006, D-022, D-023, D-024]
 dependsOn: [MAM-34]
 mainJourney: true
 labels: [svc-provider-service, kag-L-S022, agentic, decision-D-006, decision-D-022, decision-D-023, decision-D-024, slice-main-journey]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 48d4505bd729709abbb978a4e6809e22f2f2ee112b69572bdcd23d7c0f92fd91
 ---
 ## Business requirement
 Analysts, supervisors, administrators and system accounts must be able to look up a provider by the NPI they type or by Medicaid ID, and to search by name, status and screening result to build work queues, seeing every stored detail and the current status. A provider may only see their own record. The lookup must tell 'no such provider' apart from a technical failure, and nobody without the right role may read provider data.
@@ -68,6 +68,12 @@ Given the provider database is unavailable
 When an ANALYST sends GET /api/v1/providers/1003000111 with X-Correlation-Id 7d2f9c4e-1b3a-4c5d-8e6f-000000000123
 Then the response is an RFC 7807 problem with a 5xx status (not 404) and the same X-Correlation-Id header, and the failure is logged with that correlation id
 Basis: R-PRVCICS1-ADD-04, D-022, D-024, .claude/skills/java-microservices/SKILL.md sections 6 and 11
+
+### AC-9 Walk all providers of a filter by key (afterNpi) in NPI order, none missed or repeated
+Given provider-service holds 450 ACTIVE providers NPI 1003001001 to 1003001450 and provider 1003001500, which is PENDING
+When an ANALYST sends GET /api/v1/providers?status=A&page=1&size=200 (no afterNpi); then walks all providers with status=A and size=200 using the optional parameter afterNpi (the first page from the start of the NPI order, every further page with afterNpi set to the last NPI of the page before, until a page holds fewer than 200 items), and between the first and the second page of that walk provider 1003001100 (already on the first page) is terminated and provider 1003001500 is approved; then sends GET /api/v1/providers?status=A&afterNpi=ABC and GET /api/v1/providers?status=A&afterNpi=12345
+Then the request without afterNpi answers as before the parameter existed (200 items, page 1, size 200, total 450, as in AC-6); the walk returns the providers in ascending NPI order and every provider that matches status=A during the whole walk (1003001001 to 1003001450 except 1003001100) exactly once, none skipped (1003001201 is on the second page) and none twice, while 1003001100 and 1003001500, which changed status during the walk, each appear at most once; the two malformed keys are refused with 400 application/problem+json
+Basis: Q-132 (user decision of 2026-11-20), MAM-71 AC-5 (no provider is missed or repeated), R-PRVTMS01-cbl-00003 and R-PRVDIR01-cbl-00002 (the legacy read the master in key order with READ NEXT: PRVTMS01:92-95, PRVDIR01:73), modern/contracts/openapi/provider-service.yaml (searchProviders: the optional parameter afterNpi, added by the minor version bump of Q-132)
 
 ## Out of scope
 - The console search and detail screens, the 'No provider found' text and the status banner (ui-console-search, ui-console-detail).
