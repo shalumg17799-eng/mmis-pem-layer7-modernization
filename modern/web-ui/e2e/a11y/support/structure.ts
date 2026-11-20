@@ -87,7 +87,8 @@ export async function readFacts(page: Page): Promise<Facts> {
     // perspective or layout/paint containment), and one that is the containing block of a fixed one (the same, without `position`).
     const anchorsFixed = (s: CSSStyleDeclaration): boolean =>
       ['transform', 'translate', 'rotate', 'scale', 'perspective', 'filter'].some((name) => !['', 'none'].includes(s.getPropertyValue(name))) || /\b(layout|paint|strict|content)\b/.test(s.getPropertyValue('contain'));
-    // Boxes to which `overflow` does not apply (an inline box, a table, a row or a column): they clip nothing.
+    // Boxes that are skipped as clippers: an inline box and a display contents box have no padding box of their own; a table row, a row
+    // group and a column do not clip; a table box is skipped too (whether the browser clips by a table box was not tried).
     const NO_OVERFLOW = /^(inline|contents|table|inline-table|table-(row|row-group|header-group|footer-group|column|column-group))$/;
     // Is the part of `node` that the ancestors leave visible smaller than 2 by 2 pixels? Walks the containing blocks of the box (an
     // absolutely positioned box is not clipped by a wrapper that is not its containing block). An ancestor with overflow hidden or clip
@@ -101,7 +102,7 @@ export async function readFacts(page: Page): Promise<Facts> {
       let top = own.top;
       let bottom = own.bottom;
       let placed = getComputedStyle(node).position; // how the box that is followed up the tree is placed
-      for (let up = node.parentElement; up !== null; up = up.parentElement) {
+      for (let up = node.parentElement; up !== null && up !== document.body && up !== document.documentElement; up = up.parentElement) {
         const s = getComputedStyle(up);
         const isContainingBlock = placed === 'absolute' ? s.position !== 'static' || anchorsFixed(s) : placed === 'fixed' ? anchorsFixed(s) : true;
         if (!isContainingBlock) continue;

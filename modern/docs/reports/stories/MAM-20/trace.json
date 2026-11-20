@@ -32,65 +32,56 @@
     "AC-1": [
       "ApplicationRecordsTest: PASSED",
       "HttpScreeningSourcesTest: PASSED",
+      "MAM-20.feature 'A source that returns an error is recorded as not answered': PASSED",
+      "MAM-20.feature 'Whichever source returns an error is recorded as not answered after one retry, the other three are still recorded': PASSED",
       "ScreenProviderReasonsTest: PASSED",
       "ScreeningEventContractTest: PASSED",
       "SourceAnswerShapeTest: PASSED",
-      "SourceRulesNotAnsweredTest: PASSED",
-      "MAM-20.feature 'A source that returns an error is recorded as not answered': PASSED",
-      "MAM-20.feature 'Whichever source returns an error is recorded as not answered after one retry, the other three are still recorded': PASSED"
+      "SourceRulesNotAnsweredTest: PASSED"
     ],
     "AC-2": [
       "BatchRunRepositoryTest: PASSED",
       "HttpScreeningSourcesTest: PASSED",
+      "MAM-20.feature 'A slow source does not hold the screening': PASSED",
+      "MAM-20.feature 'Whichever source is slow, the screening is completed within 5 seconds': PASSED",
       "SlowSourceBudgetTest: PASSED",
       "SourceRulesNotAnsweredTest: PASSED",
-      "TimeoutDetailRepeatedTest: PASSED",
-      "MAM-20.feature 'A slow source does not hold the screening': PASSED",
-      "MAM-20.feature 'Whichever source is slow, the screening is completed within 5 seconds': PASSED"
+      "TimeoutDetailRepeatedTest: PASSED"
     ],
     "AC-3": [
       "HttpScreeningSourcesTest: PASSED",
+      "MAM-20.feature 'A licence the board does not know fails without an error code': PASSED",
       "ProviderServiceClientTest: PASSED",
-      "SourceRulesNotAnsweredTest: PASSED",
-      "MAM-20.feature 'A licence the board does not know fails without an error code': PASSED"
+      "SourceRulesNotAnsweredTest: PASSED"
     ],
     "AC-4": [
       "ApplicationRecordsTest: PASSED",
       "HttpScreeningSourcesTest: PASSED",
+      "MAM-20.feature 'Groups and facilities are not checked against a licence': PASSED",
       "ProviderServiceClientTest: PASSED",
-      "SourceRulesNotAnsweredTest: PASSED",
-      "MAM-20.feature 'Groups and facilities are not checked against a licence': PASSED"
+      "SourceRulesNotAnsweredTest: PASSED"
     ],
     "AC-5": [
       "ApplicationRecordsTest: PASSED",
+      "MAM-20.feature 'A provider that cannot be read is not screened on made-up data and is screened once when provider-service is back': PASSED",
       "ProviderServiceClientTest: PASSED",
       "ProviderUnavailableTest: PASSED",
-      "ScreenProviderReasonsTest: PASSED",
-      "MAM-20.feature 'A provider that cannot be read is not screened on made-up data and is screened once when provider-service is back': PASSED"
+      "ScreenProviderReasonsTest: PASSED"
     ]
   },
   "codeUnits": [
-    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Source.java",
-    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceResult.java",
-    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceRules.java",
-    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Verdict.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFacts.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFactsSource.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreenProvider.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningSources.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Source.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceResult.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceRules.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Verdict.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/HttpScreeningSources.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderEventsListener.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderReadRetry.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClient.java"
   ],
-  "rules": [
-    "R-PRVSCR01-ADD-05",
-    "R-PRVSCR01-cbl-00010",
-    "R-PRVSCR01-cbl-00032"
-  ],
-  "decisions": [
-    "D-024",
-    "D-016",
-    "D-005"
-  ]
+  "rules": []
 }

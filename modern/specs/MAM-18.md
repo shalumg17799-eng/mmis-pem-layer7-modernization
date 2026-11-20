@@ -14,7 +14,7 @@ decisions: [D-005, D-016, D-010, D-014]
 dependsOn: [MAM-17, MAM-37, MAM-47]
 mainJourney: true
 labels: [svc-screening-service, kag-L-S029, agentic, decision-D-005, decision-D-016, decision-D-010, decision-D-014, slice-main-journey]
-builtCommit: pending-user-commit
+builtCommit: 6e24725
 testsSha256: 0657a95cd567cd8c9836339937f30fc53f80aa0525c4a3d72f8b7f77b20ddb30
 ---
 ## Business requirement

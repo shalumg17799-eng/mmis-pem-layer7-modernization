@@ -19,6 +19,7 @@
   "testIds": {
     "AC-1": [
       "MAM-25.feature 'All four sources pass: the screening passes': PASSED",
+      "ScreenProviderReasonsTest: PASSED",
       "ScreenProviderTest: PASSED",
       "VerdictTest: PASSED"
     ],
@@ -35,8 +36,10 @@
       "MAM-25.feature 'Results are kept and never overwritten': PASSED"
     ],
     "AC-5": [
+      "ApplicationRecordsTest: PASSED",
       "MAM-25.feature 'ScreeningCompleted is published for every completed screening': PASSED",
-      "ScreenProviderTest: PASSED"
+      "ScreenProviderTest: PASSED",
+      "ScreeningEventContractTest: PASSED"
     ],
     "AC-6": [
       "MAM-25.feature 'Failed screenings can be listed with the failing source': PASSED",

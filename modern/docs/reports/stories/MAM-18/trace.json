@@ -22,10 +22,14 @@
   ],
   "testIds": {
     "AC-1": [
+      "ApplicationRecordsTest: PASSED",
       "MAM-18.feature 'Screening starts when a provider is registered': PASSED",
-      "ScreenProviderTest: PASSED"
+      "ScreenProviderReasonsTest: PASSED",
+      "ScreenProviderTest: PASSED",
+      "ScreeningEventContractTest: PASSED"
     ],
     "AC-2": [
+      "HttpScreeningSourcesTest: PASSED",
       "MAM-18.feature 'A clean provider passes all four sources': PASSED",
       "SourceRulesTest: PASSED"
     ],
@@ -38,10 +42,12 @@
       "SourceRulesTest: PASSED"
     ],
     "AC-5": [
+      "HttpScreeningSourcesTest: PASSED",
       "MAM-18.feature 'A debarred provider fails SAM (E205)': PASSED",
       "SourceRulesTest: PASSED"
     ],
     "AC-6": [
+      "HttpScreeningSourcesTest: PASSED",
       "MAM-18.feature 'A deceased provider fails SSA DMF (E204)': PASSED",
       "SourceRulesTest: PASSED"
     ],

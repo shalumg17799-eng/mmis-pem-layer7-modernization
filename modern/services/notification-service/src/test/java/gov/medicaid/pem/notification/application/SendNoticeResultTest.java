@@ -32,9 +32,12 @@ class SendNoticeResultTest {
 
   record Sent(String type, String subject, Object data) {}
 
+  record Failed(Notice notice, String cause) {}
+
   final List<String> asked = new ArrayList<>();
   final List<Mail> mails = new ArrayList<>();
   final List<Notice> stored = new ArrayList<>();
+  final List<Failed> failed = new ArrayList<>();
   final List<Sent> sent = new ArrayList<>();
   final Map<String, Template> templates =
       Map.of(
@@ -51,6 +54,7 @@ class SendNoticeResultTest {
           },
           (to, subject, body) -> mails.add(new Mail(to, subject, body)),
           stored::add,
+          (notice, cause) -> failed.add(new Failed(notice, cause)),
           (type, subject, data) -> sent.add(new Sent(type, subject, data)),
           Clock.fixed(NOW, ZoneOffset.UTC));
 
@@ -86,8 +90,9 @@ class SendNoticeResultTest {
 
   @Test
   @DisplayName(
-      "[MAM-59 AC-6] a template that is not set up returns nothing and is one WARN line naming the"
-          + " template, the NPI and the event")
+      "[MAM-59 AC-6] a template that is not set up returns nothing, is recorded as a FAILED notice"
+          + " with the cause NOTICE TEMPLATE NOT FOUND <code> and is one WARN line naming the"
+          + " template, the NPI, FAILED, the event and the cause (D-024)")
   void missingTemplateIsReturnedAndLogged() {
     UUID event = UUID.randomUUID();
 
@@ -96,9 +101,14 @@ class SendNoticeResultTest {
     assertThat(result).isEmpty();
     assertThat(log.messages(Level.WARN))
         .containsExactly(
-            "no notice template EXTRACT_READY: nothing sent for NPI 1003000111 (event "
+            "NOTICE EXTRACT_READY FOR NPI 1003000111 STATUS FAILED (event "
                 + event
-                + ")");
+                + "), cause: NOTICE TEMPLATE NOT FOUND EXTRACT_READY");
+    assertThat(failed).hasSize(1);
+    assertThat(failed.get(0).notice().templateCode()).isEqualTo("EXTRACT_READY");
+    assertThat(failed.get(0).notice().npi()).isEqualTo("1003000111");
+    assertThat(failed.get(0).notice().eventId()).isEqualTo(event);
+    assertThat(failed.get(0).cause()).isEqualTo("NOTICE TEMPLATE NOT FOUND EXTRACT_READY");
     assertThat(mails).isEmpty();
     assertThat(stored).isEmpty();
     assertThat(sent).isEmpty();

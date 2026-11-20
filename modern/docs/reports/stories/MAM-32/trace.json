@@ -41,34 +41,34 @@
       "BatchRunApiTest: PASSED",
       "BatchRunRepositoryTest: PASSED",
       "JdbcScreeningRunsTest: PASSED",
-      "RunScreeningBatchTest: PASSED",
-      "StartScreeningBatchTest: PASSED",
+      "MAM-32.feature 'A request without a business date is refused': PASSED",
       "MAM-32.feature 'Only an administrator or the scheduler starts screening for a business date': PASSED",
       "MAM-32.feature 'The 202 answer is the RUNNING BatchRun of the screening job': PASSED",
-      "MAM-32.feature 'A request without a business date is refused': PASSED"
+      "RunScreeningBatchTest: PASSED",
+      "StartScreeningBatchTest: PASSED"
     ],
     "AC-2": [
       "ApplicationRecordsTest: PASSED",
       "BatchRunFileTest: PASSED",
+      "MAM-32.feature 'A provider list of several pages is read page by page until no page remains': PASSED",
+      "MAM-32.feature 'Only unscreened providers are screened and every page is read once': PASSED",
       "ProviderContractUseTest: PASSED",
       "ProviderServiceClientTest: PASSED",
       "RunScreeningBatchTest: PASSED",
-      "ScreeningEventContractTest: PASSED",
-      "MAM-32.feature 'Only unscreened providers are screened and every page is read once': PASSED",
-      "MAM-32.feature 'A provider list of several pages is read page by page until no page remains': PASSED"
+      "ScreeningEventContractTest: PASSED"
     ],
     "AC-3": [
       "BatchRunFileTest: PASSED",
       "JdbcScreeningRunsTest: PASSED",
+      "MAM-32.feature 'The SCRNOUT file has four 67-byte rows per screened provider': PASSED",
       "RunScreeningBatchTest: PASSED",
       "ScrnoutRoundTripTest: PASSED",
-      "ScrnoutWriterTest: PASSED",
-      "MAM-32.feature 'The SCRNOUT file has four 67-byte rows per screened provider': PASSED"
+      "ScrnoutWriterTest: PASSED"
     ],
     "AC-4": [
       "BatchRunFileTest: PASSED",
-      "ScrnoutWriterTest: PASSED",
-      "MAM-32.feature 'A failed provider's rows show the failing source': PASSED"
+      "MAM-32.feature 'A failed provider's rows show the failing source': PASSED",
+      "ScrnoutWriterTest: PASSED"
     ],
     "AC-5": [
       "ApplicationRecordsTest: PASSED",
@@ -76,8 +76,8 @@
       "BatchRunFileTest: PASSED",
       "BatchRunRepositoryTest: PASSED",
       "JdbcScreeningRunsTest: PASSED",
-      "RunScreeningBatchTest: PASSED",
-      "MAM-32.feature 'The run records how many providers it read, screened, skipped and failed': PASSED"
+      "MAM-32.feature 'The run records how many providers it read, screened, skipped and failed': PASSED",
+      "RunScreeningBatchTest: PASSED"
     ],
     "AC-6": [
       "BatchRunApiTest: PASSED",
@@ -85,26 +85,26 @@
       "BatchRunFailureTest: PASSED",
       "BatchRunRepositoryTest: PASSED",
       "JdbcScreeningRunsTest: PASSED",
+      "MAM-32.feature 'A run during which provider-service answers 5xx is FAILED and stops reading': PASSED",
+      "MAM-32.feature 'A run whose SCRNOUT file cannot be written is FAILED, never COMPLETED': PASSED",
       "ProviderServiceClientTest: PASSED",
       "RunScreeningBatchTest: PASSED",
       "ScreenProviderReasonsTest: PASSED",
-      "StartScreeningBatchTest: PASSED",
-      "MAM-32.feature 'A run during which provider-service answers 5xx is FAILED and stops reading': PASSED",
-      "MAM-32.feature 'A run whose SCRNOUT file cannot be written is FAILED, never COMPLETED': PASSED"
+      "StartScreeningBatchTest: PASSED"
     ],
     "AC-7": [
       "BatchRunDatabaseErrorTest: PASSED",
       "BatchRunFailureTest: PASSED",
       "BatchRunRepositoryTest: PASSED",
       "JdbcScreeningRunsTest: PASSED",
+      "MAM-32.feature 'Running again does not screen anyone twice': PASSED",
       "RunScreeningBatchTest: PASSED",
-      "ScrnoutWriterTest: PASSED",
-      "MAM-32.feature 'Running again does not screen anyone twice': PASSED"
+      "ScrnoutWriterTest: PASSED"
     ],
     "AC-8": [
       "BatchRunApiTest: PASSED",
-      "MAM-32.feature 'Only an administrator can download the SCRNOUT file': PASSED",
-      "MAM-32.feature 'An unknown run id is not found': PASSED"
+      "MAM-32.feature 'An unknown run id is not found': PASSED",
+      "MAM-32.feature 'Only an administrator can download the SCRNOUT file': PASSED"
     ]
   },
   "codeUnits": [
@@ -150,12 +150,5 @@
     "R-PRVSCR01-cbl-00060",
     "R-PRVSCR01-cbl-00061",
     "R-PRVSCR01-cbl-00062"
-  ],
-  "decisions": [
-    "D-020",
-    "D-024",
-    "D-005",
-    "D-004",
-    "D-009"
   ]
 }

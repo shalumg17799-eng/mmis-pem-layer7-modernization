@@ -134,3 +134,27 @@ same 6 failed tasks as run 4 (test and spotlessJavaCheck of enrollment-service, 
 screening-service) and 109 failed tests (run 4: 169; the lanes' work in progress moved on between the two snapshots).
 Every other module passed again. Run 4 needed 61 minutes because of tests of an unfinished lane that waited for
 database connections; a run without such waits takes about 24 minutes on the runner.
+
+## Sixth run (2026-11-21 03:23, commit 6e24725, run 44824148226): one module left
+
+| Job | Result | Duration |
+|---|---|---|
+| Contract lint | success | 59s |
+| Web UI tests | success (third green run in a row) | 1m08s |
+| Gradle build and full check | failure, with `--continue` and annotations | 19m29s |
+| Compose smoke test | skipped (it needs the Gradle job; it passed on its own in run 3) | |
+
+Read from the annotations through the public API. **Failed Gradle tasks: 2, both in revalidation-service**, the one
+service whose lane was still in its test step when the commit was taken; failed tests in the JUnit XML files: 0.
+
+- `:services:revalidation-service:compileTestJava`: two test files of the lane's test-writer were caught by the commit in
+  the middle of an edit (a broken literal in `RequestFailureTest.java:173` and in `RevalqGoldenFileTest.java:84`). The
+  test-writer corrected both at 03:24 and they compile in the working tree; the next commit carries the corrected files.
+  Cause on the lead's side: the commit waits for the build lock, but a test-writer edits files without holding it. For
+  the run that is meant to be green the commit is taken only when no lane is editing.
+- `:services:revalidation-service:spotlessJavaCheck`: `ExecuteSweep.java` and three more production files (known since
+  run 4; the lane's developer step formats them).
+
+**New in this run: enrollment-service and screening-service passed their whole check on GitHub, on Linux** (tests, JaCoCo,
+PIT, Spotless, `testSourceCheck`; 467 and 705 tests in the local runs), and every other module passed again. What keeps
+the Gradle job red is now this one module, and with it the compose smoke test from starting.

@@ -14,8 +14,8 @@ decisions: [D-024, D-016, D-005]
 dependsOn: [MAM-18, MAM-25]
 mainJourney: false
 labels: [svc-screening-service, kag-L-S030, agentic, decision-D-024, decision-D-016, decision-D-005]
-builtCommit:
-testsSha256:
+builtCommit: 6e24725
+testsSha256: b30ae2b98c24cd52be17fa43fe9db31014676e78b43b04f842d504414252607b
 ---
 ## Business requirement
 Real sources are sometimes down, slow or have no record of a licence, and some providers (groups and facilities) hold no individual licence at all. Without a clear rule a provider could be passed by mistake, or a screening could hang for ever. This story defines what is recorded in these cases so that nobody is approved on an answer that was never received, so that organisations can still be enrolled, and so that an analyst can see why a screening failed and run it again.

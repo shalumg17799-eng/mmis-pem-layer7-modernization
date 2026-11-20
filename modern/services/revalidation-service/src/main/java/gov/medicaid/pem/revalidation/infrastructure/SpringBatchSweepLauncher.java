@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Starts a sweep's job in the background on one thread, so that runs never overlap (as the
- * single-thread executor of MAM-45 did) and the manual trigger answers 202 at once. runId makes each
- * run its own job instance; businessDate is the explicit business date (D-020).
+ * single-thread executor of MAM-45 did) and the manual trigger answers 202 at once. runId makes
+ * each run its own job instance; businessDate is the explicit business date (D-020).
  */
 @Component
 public class SpringBatchSweepLauncher implements SweepJobLauncher, DisposableBean {
@@ -28,8 +28,8 @@ public class SpringBatchSweepLauncher implements SweepJobLauncher, DisposableBea
   private final TaskExecutorJobLauncher launcher;
   private final Job job;
 
-  public SpringBatchSweepLauncher(
-      JobRepository repo, @Qualifier("revalidationSweepJob") Job job) throws Exception {
+  public SpringBatchSweepLauncher(JobRepository repo, @Qualifier("revalidationSweepJob") Job job)
+      throws Exception {
     this.launcher = new TaskExecutorJobLauncher();
     this.launcher.setJobRepository(repo);
     this.launcher.setTaskExecutor(new TaskExecutorAdapter(thread));
@@ -47,7 +47,8 @@ public class SpringBatchSweepLauncher implements SweepJobLauncher, DisposableBea
     try {
       launcher.run(job, parameters);
     } catch (Exception e) {
-      throw new IllegalStateException("job " + job.getName() + " not started: " + e.getMessage(), e);
+      throw new IllegalStateException(
+          "job " + job.getName() + " not started: " + e.getMessage(), e);
     }
   }
 

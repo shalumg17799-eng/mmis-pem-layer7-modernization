@@ -18,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The work of one revalidation sweep run (MAM-45, PRVREV01), called by the step of its Spring Batch
  * job (ADR-004, Q-102 A): every tracked provider is evaluated; each due ACTIVE provider without an
- * open case gets one DUE case and one RevalidationDue, and the run records its counts and its REVALQ
- * file, all in the step's one transaction (D-029, ADR-003). A run whose job does not complete is
- * recorded FAILED with the reason (D-024).
+ * open case gets one DUE case and one RevalidationDue, and the run records its counts and its
+ * REVALQ file, all in the step's one transaction (D-029, ADR-003). A run whose job does not
+ * complete is recorded FAILED with the reason (D-024).
  */
 @Service
 public class ExecuteSweep {
@@ -75,9 +75,14 @@ public class ExecuteSweep {
     return new Result(evaluated, opened.size(), noDueDate);
   }
 
-  /** A run whose job did not complete: FAILED with the reason (D-024). */
+  /** A run whose job did not complete: FAILED with the short reason (D-024). */
   public void failed(UUID runId, LocalDate businessDate, String reason) {
-    LOG.error("Revalidation sweep {} for {} FAILED: {}", runId, businessDate, reason);
+    failed(runId, businessDate, reason, null);
+  }
+
+  /** The same; the whole exception of the failure, if there is one, goes to the log. */
+  public void failed(UUID runId, LocalDate businessDate, String reason, Throwable cause) {
+    LOG.error("Revalidation sweep {} for {} FAILED: {}", runId, businessDate, reason, cause);
     runs.fail(runId, reason, clock.instant());
   }
 }

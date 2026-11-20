@@ -119,19 +119,24 @@ public class JdbcRevalidationStore
   private static final String CASE_COLUMNS =
       "SELECT public_id, npi, due_date, status, opened_at, closed_at FROM revalidation_case";
 
+  /** Locks the row: the second of two simultaneous completions waits, then sees the case closed. */
   @Override
   public Optional<RevalidationCase> findCase(UUID caseId) {
     return jdbc
-        .query(CASE_COLUMNS + " WHERE public_id = ?", JdbcRevalidationStore::caseRow, caseId)
+        .query(
+            CASE_COLUMNS + " WHERE public_id = ? FOR UPDATE",
+            JdbcRevalidationStore::caseRow,
+            caseId)
         .stream()
         .findFirst();
   }
 
+  /** Locks the row, like findCase: a case closed in the meantime is not returned. */
   @Override
   public Optional<RevalidationCase> openCaseOf(String npi) {
     return jdbc
         .query(
-            CASE_COLUMNS + " WHERE npi = ? AND status IN ('DUE','IN_SCREENING')",
+            CASE_COLUMNS + " WHERE npi = ? AND status IN ('DUE','IN_SCREENING') FOR UPDATE",
             JdbcRevalidationStore::caseRow,
             npi)
         .stream()

@@ -7,6 +7,9 @@ import gov.medicaid.pem.revalidation.application.SweepRun;
 import gov.medicaid.pem.revalidation.application.SweepRuns;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -31,6 +34,10 @@ public class SweepController {
 
   static final String JOB = "revalidation-sweep";
 
+  /** The contract's format date: yyyy-MM-dd and nothing else, an impossible date is no date. */
+  private static final DateTimeFormatter ISO_DATE =
+      DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
+
   private final RunSweep sweep;
   private final SweepRuns runs;
 
@@ -39,8 +46,12 @@ public class SweepController {
     this.runs = runs;
   }
 
-  /** Contract BatchRunRequest. */
-  public record BatchRunRequest(LocalDate businessDate) {}
+  /**
+   * Contract BatchRunRequest. The date is read as text and parsed strictly: a date-time such as
+   * 2026-03-31T00:00:00Z, a number or an array is not a date, and Jackson's default LocalDate
+   * reading would accept them.
+   */
+  public record BatchRunRequest(String businessDate) {}
 
   /** Contract BatchRun. */
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -78,7 +89,15 @@ public class SweepController {
     if (request == null || request.businessDate() == null) {
       throw ApiException.badRequest("businessDate is required.");
     }
-    return BatchRun.of(sweep.start(request.businessDate()));
+    return BatchRun.of(sweep.start(parseBusinessDate(request.businessDate())));
+  }
+
+  private static LocalDate parseBusinessDate(String text) {
+    try {
+      return LocalDate.parse(text, ISO_DATE);
+    } catch (DateTimeParseException e) {
+      throw ApiException.badRequest("businessDate must be a date in the form yyyy-mm-dd.");
+    }
   }
 
   /** The run with its status, counts and error (Q-046 answer A): x-roles ADMIN. */

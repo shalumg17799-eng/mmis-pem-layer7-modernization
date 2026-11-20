@@ -1,6 +1,7 @@
 package gov.medicaid.pem.revalidation.infrastructure;
 
 import gov.medicaid.pem.revalidation.application.ExecuteSweep;
+import gov.medicaid.pem.revalidation.application.FailureReason;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.batch.core.BatchStatus;
@@ -21,8 +22,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  * the job parameters runId and businessDate (D-020). One step, "sweep", evaluates every tracked
  * provider in one transaction (cases, RevalidationDue events, counts and REVALQ file together) and
  * records its counts in the Spring Batch tables (read = providers evaluated, write = cases opened,
- * filter = providers not queued). A job that does not complete marks its run FAILED with the reason
- * (D-024).
+ * filter = providers not queued). A job that does not complete marks its run FAILED with a short
+ * reason without SQL text, and the log has the whole exception (D-024).
  */
 @Configuration
 public class SweepJobConfig {
@@ -69,18 +70,10 @@ public class SweepJobConfig {
         }
         String runId = job.getJobParameters().getString("runId");
         LocalDate businessDate = job.getJobParameters().getLocalDate("businessDate");
-        sweep.failed(UUID.fromString(runId), businessDate, reason(job));
+        Throwable first = job.getAllFailureExceptions().stream().findFirst().orElse(null);
+        String reason = first == null ? job.getStatus().name() : FailureReason.of(first);
+        sweep.failed(UUID.fromString(runId), businessDate, reason, first);
       }
     };
-  }
-
-  /** The first failure's message, as the run recorded it before Spring Batch (MAM-45). */
-  private static String reason(JobExecution job) {
-    return job.getAllFailureExceptions().stream()
-        .findFirst()
-        .map(e -> e.getMessage() == null ? e.toString() : e.getMessage())
-        .orElse(job.getExitStatus().getExitDescription().isBlank()
-            ? job.getStatus().name()
-            : job.getExitStatus().getExitDescription());
   }
 }

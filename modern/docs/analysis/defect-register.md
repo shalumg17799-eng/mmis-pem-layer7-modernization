@@ -43,3 +43,16 @@ No defect is OPEN. The anti-pattern self-check found **12 of 12**: AP-01 (D-001)
 AP-05 (D-012), AP-06 (D-013), AP-07 (D-015), AP-08 (D-011), AP-09 (WRKSTORE nests SCRNREC and ERRCODES, COPYBOOKS/WRKSTORE.cpy:22-23:
 a build concern only, solved by per-service models), AP-10 (PRVRECRD REDEFINES, COPYBOOKS/PRVRECRD.cpy:34,41: solved by D-007 and the
 type-specific model), AP-11 (PRVSCRPR symbolic override, JCL/PROCS/PRVSCRPR.jcl: the proc is never called), AP-12 (D-014).
+
+## Decisions recorded after Phase 2 that are not legacy defects
+
+Kept outside the table above on purpose: the table lists defects of the legacy estate (the knowledge graph holds one
+Defect node per table row), and the entries below are conventions of the new system that the user decided.
+
+- **D-030: "no revalidation due date" is written as 99991231 in the 130-byte master** (decided by the user on
+  2026-11-20, answer A to Q-124 in `questions.md`; recorded here on 2026-11-21). The master export of provider-service
+  writes 99991231 in bytes 43-50 for a provider with no revalidation due date. That is the value the synthetic test data
+  uses, and so the captured legacy run (Q-106, default A); the export no longer writes 00000000. A reader of the file
+  takes 99991231 as "no due date" (Q-135, default A: the API leaves the member out for such a provider). Stated in
+  MAM-43 AC-6 (spec version 2); live since deploy 4 (2026-11-20 23:02); in the parity re-run of 2026-11-20 23:17 the 46
+  rows concerned compare byte for byte. D-029 is unchanged: the legacy sweep itself treats a zero due date as due.

@@ -27,12 +27,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * The legacy REVALQ checked against the real output of the legacy job (parity golden run
- * PRVMTH01 20261120-seed, modern/parity/golden/PRVMTH01/20261120-seed): the 130-byte provider master
- * that STEP010 PRVREV01 read (16 synthetic providers in every status), the 80-byte REVALQ it wrote
- * (4 records, translated from EBCDIC to ASCII), and the business date of that run, 2026-11-20 (the
- * MVS system date; no control card exists, see the run's manifest.json). The sweep rule and the
- * file writer of revalidation-service, given that master and that date, must produce those bytes
+ * The legacy REVALQ checked against the real output of the legacy job (parity golden run PRVMTH01
+ * 20261120-seed, modern/parity/golden/PRVMTH01/20261120-seed): the 130-byte provider master that
+ * STEP010 PRVREV01 read (16 synthetic providers in every status), the 80-byte REVALQ it wrote (4
+ * records, translated from EBCDIC to ASCII), and the business date of that run, 2026-11-20 (the MVS
+ * system date; no control card exists, see the run's manifest.json). The sweep rule and the file
+ * writer of revalidation-service, given that master and that date, must produce those bytes
  * (cobol-to-java section 7: a golden-file test once golden files exist; Phase 9 compares the same
  * files).
  *
@@ -81,9 +81,7 @@ class RevalqGoldenFileTest {
           new TrackedProvider(
               r.get("PRV-NPI"), r.get("PRV-ENROLL-STATUS"), r.getDate("PRV-REVAL-DUE-DATE")));
       at += MASTER_RECORD;
-      while (at < all.length && (all[at] == '
-' || all[at] == '
-')) {
+      while (at < all.length && (all[at] == '\n' || all[at] == '\r')) {
         at++; // the line end of the text copy: LF, or CRLF when the file was checked out so
       }
     }

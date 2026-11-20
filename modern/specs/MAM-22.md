@@ -14,8 +14,8 @@ decisions: [D-016, D-005]
 dependsOn: [MAM-18, MAM-25]
 mainJourney: false
 labels: [svc-screening-service, kag-L-S031, agentic, decision-D-016, decision-D-005]
-builtCommit:
-testsSha256:
+builtCommit: 6e24725
+testsSha256: 79458fd0a52187da982d662e798a2057493a35f407d04451de858c6ab0fd0265
 ---
 ## Business requirement
 A group or facility is only as trustworthy as the person who owns it. When the provider is an organisation, the state must also check its owner against the federal list of excluded providers, and a provider whose owner is excluded must not pass screening. This story adds the owner check to the exclusion source, with its own error so that the analyst can see that the owner, not the provider itself, is the problem.

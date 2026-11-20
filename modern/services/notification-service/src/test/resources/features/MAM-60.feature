@@ -70,3 +70,15 @@ Feature: List the notices sent and the notice templates
       | PROVIDER   | 403    |
       | SYSTEM     | 403    |
       | NONE       | 401    |
+
+  # Code review 2026-11-20, MUST-FIX 1: an approval that could not be sent must show as FAILED (J1), not leave no trace.
+
+  @AC-5
+  Scenario: An approval that could not be sent shows as FAILED to staff and to the provider
+    Given the notice log is empty
+    And the "APPROVED" notice template is missing
+    When notification-service consumes ProviderStatusChanged for "1003000111" from "P" to "A"
+    And "ANALYST" lists the notices with "npi=1003000111"
+    Then the notice list holds a notice for "1003000111" with template "APPROVED", channel "EMAIL" and status "FAILED"
+    When "PROVIDER" lists the notices with ""
+    Then the notice list holds a notice for "1003000111" with template "APPROVED", channel "EMAIL" and status "FAILED"

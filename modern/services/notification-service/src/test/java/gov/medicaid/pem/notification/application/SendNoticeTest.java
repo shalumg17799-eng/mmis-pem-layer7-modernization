@@ -23,8 +23,11 @@ class SendNoticeTest {
 
   record Sent(String type, String subject, Object data) {}
 
+  record Failed(Notice notice, String cause) {}
+
   final List<Mail> mails = new ArrayList<>();
   final List<Notice> stored = new ArrayList<>();
+  final List<Failed> failed = new ArrayList<>();
   final List<Sent> sent = new ArrayList<>();
   final Map<String, Template> templates =
       Map.of(
@@ -36,6 +39,7 @@ class SendNoticeTest {
           code -> Optional.ofNullable(templates.get(code)),
           (to, subject, body) -> mails.add(new Mail(to, subject, body)),
           stored::add,
+          (notice, cause) -> failed.add(new Failed(notice, cause)),
           (type, subject, data) -> sent.add(new Sent(type, subject, data)),
           Clock.fixed(Instant.parse("2026-11-18T10:00:00Z"), ZoneOffset.UTC));
 
@@ -67,11 +71,18 @@ class SendNoticeTest {
   }
 
   @Test
-  @DisplayName("[MAM-59] a template that is not set up sends nothing and announces nothing")
+  @DisplayName(
+      "[MAM-59] a template that is not set up sends nothing and announces nothing, and is recorded"
+          + " as a FAILED notice with the cause NOTICE TEMPLATE NOT FOUND REVALIDATION_DUE (D-024)")
   void missingTemplate() {
-    notices.send("1003000111", "REVALIDATION_DUE", UUID.randomUUID());
+    UUID event = UUID.randomUUID();
+    notices.send("1003000111", "REVALIDATION_DUE", event);
     assertThat(mails).isEmpty();
     assertThat(stored).isEmpty();
     assertThat(sent).isEmpty();
+    assertThat(failed).hasSize(1);
+    assertThat(failed.get(0).notice().templateCode()).isEqualTo("REVALIDATION_DUE");
+    assertThat(failed.get(0).notice().eventId()).isEqualTo(event);
+    assertThat(failed.get(0).cause()).isEqualTo("NOTICE TEMPLATE NOT FOUND REVALIDATION_DUE");
   }
 }

@@ -289,3 +289,39 @@ workflow journals; one section per review.
 - green3 (47/47) started 01:28:40, before the last write of structure.ts (01:30:28, after the mutants). Only the default suite (01:33:50, 51/51) covers the final bytes; red-report should say so.
 - questions.md:1188 still reads 'DEFAULT APPLIED - revisit' and does not mention the 'seen' definition. The lead should record it.
 
+## review:enrollment-service (verdict APPROVE)
+
+- IntakeJobConfig.java:116-119: a restart or shutdown during a run leaves the run RUNNING with no result. The file is held only in memory and destroy() does not wait for the job. Fix: wait for the job in destroy() and mark leftover RUNNING runs FAILED at startup.
+- IntakeJobConfig.java:77-91: after shutdown, TaskExecutorJobLauncher catches TaskRejectedException without rethrowing it. POST then answers 202 RUNNING, the run never ends and the file stays in the map. Fix: refuse new runs once destroy() has run.
+- IntakeLoad.java:146,167-173: counts are written outside the record's transaction. If that write fails after a commit, the FAILED run shows one record too few (the re-run still skips it correctly). Option: write the counts inside the record transaction.
+- IntakeLoad.java:30-33: the Javadoc says the already-processed check is part of the record transaction. It is a separate autocommit read (line 123). Fix the comment or move the check into fromFile.
+- JdbcIntakeRuns.java:72-82: alreadyProcessed scans every row on application.raw_record for each record, so cost grows with file size times stored applications. Add an index on raw_record or intake_run_id in a new Flyway migration.
+- No lock per business date. Two service instances could run the same date at the same time and load rejected records twice. Only one instance runs today; consider pg_advisory_xact_lock on the business date.
+- An online POST racing an intake record for the same NPI hits the unique index application_one_validated_per_npi. The run then ends FAILED (and the online call gets 500) instead of E103 skipped. Map DuplicateKeyException to E103.
+- IntakeJobConfig.java:42-44: the single-thread executor has an unbounded queue, and every queued upload (up to 1 MB each) stays in memory. Bound the queue or keep the files on disk.
+- RequestProblems.java:36-42: the 413 problem+json is not declared in enrollment-service.yaml. Follows Q-120/Q-143 option B; needs a contract change approved by the user.
+- The intake stores the Individual and Organization fields unchecked (e.g. an ownerNpi that is not 10 digits, a 1-character licenseState). GET /applications can then return values that break the Application schema. Raise a question; no legacy rule covers this.
+- Intake events get a new random correlationId each (the intake-load thread has none in its MDC), and a non-UUID request id is replaced without the old-to-new mapping being logged. Pass the request's correlation id or the run id into the job.
+- Reports are stale. MAM-56.md, MAM-57.md and both red-reports still list 21 red tests and defects 1-8 as open. Spec fields builtCommit and testsSha256 are empty for MAM-56 and MAM-57. Update these Definition-of-Done items.
+- IntakeLoad.records: a blank line after the final newline is read as a 0-byte record, so the run ends FAILED after every record has been processed. Raise a question: should a trailing empty line be ignored?
+- ListApplications uses hasRole(PROVIDER), but ReadApplication uses hasRole(PROVIDER) && !isStaff. A user with both roles is treated differently (the list is stricter). Align the two.
+- Test noise: after the last test class, a cached context's scheduler polled a Postgres container that was already stopped ('HikariPool-2 Connection refused' at 21:17:17Z in run1.log). Stop the poller when the context closes. No test failed.
+
+## review:screening-service (verdict APPROVE)
+
+- ProviderEventsListener.java:39 screens without checking for an INITIAL screening, and RunScreeningBatch.java:52 is check-then-act: a lagging or concurrent registration event and batch run can create two INITIAL screenings and two ScreeningCompleted. Ask; e.g. consumer check + partial unique index.
+- HttpScreeningSources.java:103-108: when the provider's own LEIE lookup says excluded but the owner lookup gets no answer, OIGLEIE is C 'COULD NOT BE REACHED', hiding a confirmed E201 (verdict FAIL either way). No AC covers it: raise a question, recommend F/E201.
+- Caveat 1 does not hold as stated: in spring-web 6.2.19 (javap) TimeoutHandler sets its flag before it cancels and reports its own cancel as HttpTimeoutException; 'Request cancelled' comes only from another cancel. HttpScreeningSources.java:199 is harmless; the flake's root cause is still open.
+- Q-144 (open, needs the user): screening-service.yaml requestScreening lists no 503, yet ScreeningController.java:61 answers 503 (MAM-28 AC-2). Same kind of drift: getScreening, getScreeningRun and results-file answer an undocumented 400 for a non-uuid id.
+- Q-142 (kit fix planned after the lanes): a safe non-uuid X-Correlation-Id or incoming event correlationId is copied into ScreeningCompleted although events.yaml says format uuid; KitEventOutbox passes it through unchanged.
+- ScreeningRunController.java:38-39: the STRICT uuuu-MM-dd parser accepts '+12026-03-31' and '-0001-03-31' (run on JDK 21): 202, providers are screened, then the run FAILS at the file (codec year check) and those screenings are in no SCRNOUT. Check ^\d{4}-\d{2}-\d{2}$ first (as in the tmsis review).
+- Non-database run errors show internal detail to ADMIN: ProviderFactsSource.java:15 embeds cause.toString() (Spring class names, provider-service problem body, internal URL on I/O errors). Map to 'provider-service answered <status>'. FailureReason.java:29-30 fallback is not cut to 200.
+- A run left RUNNING by a crash or restart (or by a TaskRejectedException at shutdown, where TaskExecutorJobLauncher fails the job without calling listeners) stays RUNNING for ever; mark orphaned RUNNING runs FAILED at start-up.
+- ScreenProvider.java:40-50 and both listeners hold the DB transaction, i.e. one of 5 Hikari connections, across the provider-service read and four source calls (up to ~9 s). Do the HTTP work first, then one short transaction for screening, results, outbox and marker.
+- ProviderReadRetry: the endless retry that AC-5 asks for blocks the whole partition when provider-service fails for one NPI only (poison event). Add a metric or alert, or decide on a maximum elapsed time followed by the DLT.
+- ProviderServiceClient.java:40-56 and 77: a 200 body without providerType is taken as an organisation (LICBOARD P NOT APPLICABLE) and a page row without npi or screenFlag becomes ''. Validate (type IN/GR/FA, 10-digit npi) and fail; an unknown type is never a guess (cobol-to-java 2).
+- ProviderServiceClient.java:66 pages by offset: providers registered during a run can be read twice (read count too high) or skipped. Contract 1.2.0 afterNpi (keyset paging) avoids it.
+- RequestScreening: accepted 202 work is lost at shutdown (one thread, destroyMethod shutdown, ScreeningExecutorConfig.java:12-14); line 47 catches HttpClientErrorException in the application layer, and other provider-service 4xx (token 401/403) escape as a generic 500.
+- Tests and DoD records: FailureReason has no unit test (6 PIT survivors, 5 uncovered); SlowSourceBudgetTest measured 4.4-4.6 s of the 5 s budget (caveat 2) and may flake on a slow CI; specs MAM-20/22/28/32 still have empty builtCommit and testsSha256.
+- Logs: source WARN lines (HttpScreeningSources.java:167) run on virtual threads without the MDC correlation id, and an I/O error's toString carries the SAM URL with the provider's name; ScreeningController.java:60 logs only the message of the 503 cause.
+

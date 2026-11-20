@@ -51,3 +51,42 @@ Update 2026-11-19 (Q-102 answer A, user): the sweep now runs as a Spring Batch j
                    revalidation-sweep launched/completed and step sweep. Reseeded afterwards. The Part D draft
                    RunSweepTest.java (part-d-drafts) targets the old executor constructor and is obsolete.
 ```
+
+## Lane 3 tests (2026-11-20)
+
+Outcome line unchanged. `MAM-45.tests.sha256` holds 28 files (recorded 2026-11-21, `test_protection.py check MAM-45`: OK). Tests were
+written after the code (see `MAM-45/red-report.md`); 235 of the 254 tests of this story pass, 19 fail on two defects of the code.
+
+- Test files: `MAM-45.feature` and `RevalidationSteps` (Cucumber, 50 scenarios and examples), unit `SweepRuleTest`,
+  `ExecuteSweepTest`, `ExecuteSweepFileFailureTest`, `RunSweepTest`, `RevalqFileTest`, `RevalqGoldenFileTest`; integration
+  `SweepApiTest`, `SweepJobTest`, `SweepFailureTest`, `JdbcRevalidationStoreTest`, `EventListenersTest`, `RequestFailureTest`,
+  `RevalidationCorrelationIdTest`; contract `RevalidationContractTest`, `RevalidationDueEventContractTest`,
+  `ConsumedEventFixturesTest`; `PlatformChecksTest` (ArchUnit, schema, one open case per provider, health); support
+  `IntegrationTest`, `RevalidationFixtures`, `InMemoryStore`, `ContractFile`, `EventsContractFile`, the Cucumber configuration.
+- Tests per AC (JUnit + Cucumber examples, run 2): AC-1 57 (6 red), AC-2 22, AC-3 27, AC-4 21, AC-5 9, AC-6 13, AC-7 33,
+  AC-8 69 (13 red), platform 3.
+- Lessons: a 400 for every non-ISO business date (AC-1): **fails** on 6 forms; a short reason without SQL text for a failed run
+  (AC-8): **fails** (13 tests); the work of a run is one transaction, a re-run applies it once (AC-8): green; business date,
+  not the clock (AC-1): green; events conform to `events.yaml` and carry safe correlation ids (AC-4): green; 401/403/400 are
+  problem+json (AC-1): green; byte level REVALQ, also against the legacy golden file (AC-7): green. Not applicable: lesson d
+  (the service calls no other service), lesson e (no text search; the NPI filter of MAM-48 is exact), error codes E1xx/E2xx.
+- Commands (from `modern/`, one Gradle run at a time through the shared lock): test sources formatted with the init script
+  `rev-spotless-tests-only.gradle` (spotlessApply + compileTestJava), then `./gradlew --no-daemon
+  :services:revalidation-service:check --continue`, then `jacocoTestReport -x test`.
+- Results (run 2, 2026-11-21 03:24-03:34): 529 tests of the module, 19 failed, 0 skipped. `testSourceCheck` and `versionCheck`
+  pass. PIT 41 mutations, 41 killed (100 %, test strength 100 %). JaCoCo line coverage 389/390 = 99.74 % without
+  `*Application` (the one missed line is `SweepJobConfig.java:83`, the fallback of `reason(job)` for a job that fails with no exception; line 81 has one branch missing, a failure without a message); the verification task
+  itself did not run: with `-x test` Gradle refuses it for a missing task dependency, so the 85 % gate is computed from the
+  report, not enforced by Gradle. Spotless: 4 production files (below).
+- Defects (tests kept):
+  1. `api/SweepController.java:43` (record `BatchRunRequest(LocalDate)`), AC-1: expected 400 problem for a business date that is
+     not `yyyy-mm-dd`; actual 202 for `2026-03-31T00:00:00`, `...T00:00:00Z`, `" 2026-03-31"`, `"2026-03-31 "`,
+     `[2026,3,31]` and the number `20260331` (read as epoch day: business date `+57440-11-26`).
+  2. `application/RunSweep.java:40-42`, `infrastructure/SweepJobConfig.java:78-86`, `infrastructure/SpringBatchSweepLauncher.java:50`,
+     `infrastructure/JdbcRevalidationStore.java:204`, AC-8: expected a reason of at most 200 characters without SQL text (D-024);
+     actual 301 to 374 characters starting `PreparedStatementCallback; uncategorized SQLException for SQL [INSERT INTO ...`.
+  3. Spotless (production code, reported, not fixed): `application/ExecuteSweep.java` (class javadoc, line 18),
+     `infrastructure/RevalidationAdapters.java` (line 8), `infrastructure/SpringBatchSweepLauncher.java` (lines 17, 28, 47),
+     `infrastructure/SweepJobConfig.java`. ArchUnit: green.
+- Not verified: the monthly cron (out of scope here; the service has no `@Scheduled` trigger, java-microservices section 10
+  expects one); Jira text against the spec (not re-compared); code review.

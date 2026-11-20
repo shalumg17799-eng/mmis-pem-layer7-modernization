@@ -90,9 +90,7 @@ class RequestFailureTest {
               .claim("preferred_username", token)
               .claim(
                   "realm_access",
-                  Map.of(
-                      "roles",
-                      List.of(token.startsWith("admin") ? "ADMIN" : "ANALYST")))
+                  Map.of("roles", List.of(token.startsWith("admin") ? "ADMIN" : "ANALYST")))
               .issuedAt(Instant.now())
               .expiresAt(Instant.now().plusSeconds(3600))
               .build();
@@ -169,8 +167,7 @@ class RequestFailureTest {
             l -> {
               assertThat(l.level()).isEqualTo(Level.ERROR.toString());
               assertThat(l.throwable()).as("an exception is attached").isNotBlank();
-              assertThat(l.message() + "
-" + l.throwable()).contains("SYNTHETIC DISK FULL");
+              assertThat(l.message() + " " + l.throwable()).contains("SYNTHETIC DISK FULL");
             });
   }
 
@@ -207,7 +204,10 @@ class RequestFailureTest {
         jdbc, "start", "INSERT", "sweep_run", "true", "SYNTHETIC DISK FULL");
 
     HttpResponse<String> r =
-        post("/api/v1/batch/revalidation-sweeps", "admin-token", "{\"businessDate\":\"2026-03-31\"}");
+        post(
+            "/api/v1/batch/revalidation-sweeps",
+            "admin-token",
+            "{\"businessDate\":\"2026-03-31\"}");
 
     assertReadsAsAShortFailure(r);
     assertThat(RevalidationFixtures.count(jdbc, "SELECT count(*) FROM sweep_run")).isZero();
@@ -231,7 +231,8 @@ class RequestFailureTest {
     post("/api/v1/revalidations/" + caseId + "/completion", "analyst-token", body);
     RevalidationFixtures.dropFailures(jdbc);
 
-    HttpResponse<String> again = post("/api/v1/revalidations/" + caseId + "/completion", "analyst-token", body);
+    HttpResponse<String> again =
+        post("/api/v1/revalidations/" + caseId + "/completion", "analyst-token", body);
 
     assertThat(again.statusCode()).as(again.body()).isEqualTo(200);
     assertThat(RevalidationFixtures.caseStatus(jdbc, caseId)).isEqualTo("COMPLETED");

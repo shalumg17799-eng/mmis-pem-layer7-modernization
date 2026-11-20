@@ -27,50 +27,44 @@
   "testIds": {
     "AC-1": [
       "HttpScreeningSourcesTest: PASSED",
+      "MAM-22.feature 'An excluded owner fails the group (E203)': PASSED",
       "ProviderServiceClientTest: PASSED",
       "ScreenProviderReasonsTest: PASSED",
       "ScreeningEventContractTest: PASSED",
-      "SourceRulesOwnerTest: PASSED",
-      "MAM-22.feature 'An excluded owner fails the group (E203)': PASSED"
+      "SourceRulesOwnerTest: PASSED"
     ],
     "AC-2": [
       "HttpScreeningSourcesTest: PASSED",
-      "SourceRulesOwnerTest: PASSED",
-      "MAM-22.feature 'A clean owner passes, and both NPIs are looked up': PASSED"
+      "MAM-22.feature 'A clean owner passes, and both NPIs are looked up': PASSED",
+      "SourceRulesOwnerTest: PASSED"
     ],
     "AC-3": [
       "HttpScreeningSourcesTest: PASSED",
+      "MAM-22.feature 'A blank or empty owner NPI is no owner': PASSED",
+      "MAM-22.feature 'Providers without an owner NPI are checked on their own NPI only': PASSED",
       "ProviderContractUseTest: PASSED",
       "ProviderServiceClientTest: PASSED",
-      "SourceRulesOwnerTest: PASSED",
-      "MAM-22.feature 'Providers without an owner NPI are checked on their own NPI only': PASSED",
-      "MAM-22.feature 'A blank or empty owner NPI is no owner': PASSED"
+      "SourceRulesOwnerTest: PASSED"
     ],
     "AC-4": [
       "HttpScreeningSourcesTest: PASSED",
-      "SourceRulesOwnerTest: PASSED",
-      "MAM-22.feature 'A provider and its owner both on the LEIE report E201 naming both': PASSED"
+      "MAM-22.feature 'A provider and its owner both on the LEIE report E201 naming both': PASSED",
+      "SourceRulesOwnerTest: PASSED"
     ],
     "AC-5": [
       "HttpScreeningSourcesTest: PASSED",
-      "SourceAnswerShapeTest: PASSED",
-      "MAM-22.feature 'An owner lookup that fails is recorded as not answered after one retry': PASSED"
+      "MAM-22.feature 'An owner lookup that fails is recorded as not answered after one retry': PASSED",
+      "SourceAnswerShapeTest: PASSED"
     ]
   },
   "codeUnits": [
-    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceRules.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFacts.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreenProvider.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceRules.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/HttpScreeningSources.java",
     "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClient.java"
   ],
   "rules": [
-    "R-PRVSCR01-cbl-00010",
-    "R-PRVSCR01-cbl-00033",
-    "R-PRVSCR01-cbl-00034"
-  ],
-  "decisions": [
-    "D-016",
-    "D-005"
+    "R-PRVSCR01-cbl-00033"
   ]
 }

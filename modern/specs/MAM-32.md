@@ -14,8 +14,8 @@ decisions: [D-020, D-024, D-005, D-004, D-009]
 dependsOn: [MAM-25, MAM-42, MAM-37]
 mainJourney: false
 labels: [svc-screening-service, kag-L-S034, agentic, decision-D-020, decision-D-024, decision-D-005, decision-D-004, decision-D-009]
-builtCommit:
-testsSha256:
+builtCommit: 6e24725
+testsSha256: 46dc0c687ad4cf4acb083e477c4f2116c60c73cdb50bfa72b3554c47f8ec657c
 ---
 ## Business requirement
 The daily enrolment job used to screen every provider that was still unscreened and write one line per check into a fixed-format file that other programmes and, later, the parity comparison depend on. The new system must still be able to do the same on demand for a business date: screen every provider that is still unscreened, produce the same file, and tell the administrator how many providers were read, screened and failed. Unlike the legacy job it must say clearly when something went wrong instead of finishing silently.

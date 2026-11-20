@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * startRevalidationSweep (MAM-45, PRVREV01 and PRVMTH01 STEP010): records a RUNNING run for an
  * explicit business date (D-020) and starts its Spring Batch job in the background (ADR-004, Q-102
  * A); the job's step does the work (ExecuteSweep). A run that cannot be started is recorded FAILED
- * with the reason (D-024).
+ * with a short reason without SQL text (FailureReason); the log has the whole exception (D-024).
  */
 @Service
 public class RunSweep {
@@ -37,8 +37,8 @@ public class RunSweep {
     try {
       launcher.launch(run.runId(), businessDate);
     } catch (RuntimeException e) {
-      String reason = e.getMessage() == null ? e.toString() : e.getMessage();
-      LOG.error("Revalidation sweep {} for {} FAILED: {}", run.runId(), businessDate, reason);
+      String reason = FailureReason.of(e);
+      LOG.error("Revalidation sweep {} for {} FAILED: {}", run.runId(), businessDate, reason, e);
       runs.fail(run.runId(), reason, clock.instant());
     }
     return run;

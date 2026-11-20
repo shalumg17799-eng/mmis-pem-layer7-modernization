@@ -1143,7 +1143,7 @@ the concurrent-change case must be a test. Plan of the lead: contract 1.2.0 (arc
 right after the provider lane's gate and before the provider deploy; the tmsis part in step e with the two MUST-FIX items
 of its review.
 
-## Q-133. (backlog-planner, MAM-93, 2026-11-20 20:50) The "Out of scope" line of MAM-93 is stale for three more jobs (status: DEFAULT APPLIED - revisit)
+## Q-133. (backlog-planner, MAM-93, 2026-11-20 20:50) The "Out of scope" line of MAM-93 is stale for three more jobs (status: DEFAULT APPLIED 2026-11-21 - revisit)
 
 MAM-93 still lists "status polling for the screening run, revalidation sweep and directory extract beyond the 202 answer" as
 out of scope, although the contracts have had run-status calls for these three jobs since Q-105 (answered), the Batch jobs
@@ -1152,6 +1152,17 @@ by the user's order of 19:32.)
 Options: A) drop the exclusion and name the three jobs in AC-4, with their status calls in the technical notes (text only:
 behaviour, contracts and tests already agree); B) leave the text. **Default applied: A**, to be written into Jira and the
 spec by the backlog-planner in the wrap-up of this run (no code or test change).
+**Applied 2026-11-21 (backlog-planner), default A, text only.** Jira description of MAM-93 and modern/specs/MAM-93.md (specVersion 3,
+descriptionSha256 0ecacfbc..., after the review correction below) now carry the same text: the Out of scope bullet is removed; AC-4 names the screening run (getScreeningRun),
+the revalidation sweep (getRevalidationSweep) and the directory extract (getDirectoryExtract) with their status calls and gains the
+contract references, Q-105 and Q-133 in its Basis; the technical notes name the three calls; one comment (53463) was added to MAM-93.
+All three jobs qualified (contract call, page code JobsPage.tsx:137-151, recorded test in batch-jobs-tmsis-follow.test.tsx), so no
+job stays excluded. The recorded test of these three asserts the follow until Completed, with the counts; the Failed end of a refresh
+is asserted by a recorded test only for the enrolment intake (same code path), not separately for these three.
+Review correction 2026-11-21 (backlog-planner): the Basis line of AC-4 (Jira and spec, same text) now says that the Failed end of these
+three jobs is asserted only for the enrolment intake (batch-jobs.test.tsx) and that the recorded test of the three drives them to
+Completed only; correcting comment 53465 added to MAM-93; spec stays at version 3. Open for the lead: ask the test-writer for
+Failed-after-refresh cases for the screening run, the revalidation sweep and the directory extract, then re-record MAM-93.tests.sha256.
 
 ## Q-134. (provider lane, MAM-36 AC-1, 2026-11-20 21:15) No JDBC socket timeout: health can block while the database is frozen (status: DEFAULT APPLIED - revisit)
 
@@ -1212,6 +1223,8 @@ corrected 23:38). Totals: MATCH 168 (was 128), EXPECTED 41, UNEXPECTED 27 (was 6
   revalidation due date. All 46 rows of group U-1 now match, and the modern master before each run equals the legacy file
   byte for byte. The text of Q-124 above ("nothing is changed") describes the state before the answer. Proposal of the
   parity-checker: record the convention as decision D-030 in the defect register (bookkeeping of the user's answer).
+  Recorded on 2026-11-21 as D-030 in `defect-register.md`, in a section below the defect table (it is a convention of
+  the new system, not a legacy defect, so the table and the graph's 29 Defect nodes are unchanged).
 - **Q-130 (default A) is applied**: the licence stub knows SD20001 / TX (loaded 22:13). Group U-10 is gone: application
   1006133288 passes the screening on both sides.
 - **Q-125** (effective date of a new provider): 9 rows remain (3 new providers in 3 files). Default: accept.
@@ -1322,3 +1335,67 @@ Options: A) build the same start-up recovery into every service that runs a batc
 time); B) only tmsis-service now, the others stay on the list of review notes.
 **Default applied: B** (the rule for the review rounds is MUST-FIX only, and only the tmsis review rated it so).
 **Recommended: A**, as one item after the open lanes, so that all six jobs behave the same.
+
+## Q-146. (revalidation lane, MAM-45, 2026-11-21 03:40) The events and log lines of a sweep do not carry the correlation id of the request that started it (status: DEFAULT APPLIED - revisit)
+
+The sweep runs on the job's own thread, which has no log context, so every RevalidationDue event of a run gets a new
+correlation id and the job's log lines carry none of the starting request. No acceptance criterion asks for more, and no
+test is red. Options: A) pass the id of the starting request to the job as a non-identifying job parameter and use it for
+the run's log lines and events (the same for all six batch jobs, so that they behave alike); B) keep it as it is.
+**Default applied: B** (no criterion asks for it; a change for one job only would make the jobs differ).
+**Recommended: A, as one item for all six batch jobs** (together with Q-145 A), tests first.
+
+## Q-147. (revalidation lane, MAM-45 and MAM-32, 2026-11-21 03:40) The revalidation sweep and the screening run have no configured schedule (status: DEFAULT APPLIED - revisit)
+
+ADR-004 (accepted 2026-11-18) says "cron in configuration; a manual trigger for ADMIN" for the batch jobs. Built and
+tested: the manual start for all six jobs, and a configured schedule for the T-MSIS extract only (MAM-75 AC-7,
+`pem.tmsis.cron`, month end 22:00 UTC). The approved stories MAM-45 (sweep) and MAM-32 (screening run) list "the cron
+expression of the schedule (configuration, ADR-004)" under Out of scope, and no story has a criterion for a scheduled
+start of these two jobs, so none was built: revalidation-service and screening-service contain no schedule. The operations
+runbook says so ("none configured"). In the legacy estate itself only PRVDAY01 is submitted by the automation
+(PRVAUTOM.rexx); nothing in the estate schedules PRVMTH01. Effect today: a provider becomes due for revalidation only when
+an administrator starts the sweep (Batch jobs page or the ADMIN call), which journey J6 does.
+Options: A) add a scheduled start for the sweep (monthly) and for the screening run (daily) in the way of the T-MSIS
+extract: a criterion per job (in MAM-45 and MAM-32, or one new story), tests first, the cron in configuration, "-" turns
+it off; the run times are a business choice (proposal: the sweep at month end before the T-MSIS extract, as PRVMTH01 runs
+STEP010 before STEP020; the screening run once a day); B) leave both jobs manual, as the approved stories say.
+**Default applied: B** (it is the approved scope, and a new story or criterion is a backlog change for the user to
+approve). **Recommended: A.** The directory extract has no schedule either; the legacy never scheduled PRVDIR01.
+
+## Q-148. (revalidation lane, MAM-48 / MAM-49, 2026-11-21 03:40) A sweep that runs between a passed re-screening and the arrival of the new due date would open a second case (status: DEFAULT APPLIED - revisit)
+
+revalidation-service follows the due date that provider-service owns (D-003). After a re-screening with PASS the case is
+closed at once; the new due date arrives a moment later with the provider's event. A sweep that starts in that window
+still sees the old date and opens a new case for the same provider. Options: A) accept it: the event arrives within
+seconds and the sweep runs once a month; B) let the sweep skip a provider whose latest case was closed after its due date
+until a newer date has arrived (a change of the MAM-45 criteria). **Default applied: A** (no change).
+
+Lead note (2026-11-21 03:43), not a question: the same lane observed, without a test, that two completions of one
+revalidation case at the same moment are both answered 200 (MAM-48 AC-3 says a closed case is refused with 409): the
+second request's screening is not stored, yet it is told the case was completed. The stored case stays correct. This is
+inside an approved criterion, so it is fixed in the lane, failing test first (the update that closes the case must report
+whether it closed anything).
+
+## Q-149. (code review of screening-service, MAM-32 / MAM-18, 2026-11-21 03:50) A registration event and a screening run at the same moment can screen one provider twice (status: DEFAULT APPLIED - revisit)
+
+The listener for a newly registered provider screens without looking for an earlier INITIAL screening
+(ProviderEventsListener.java:39), and the batch run checks "no initial screening yet" and then screens
+(RunScreeningBatch.java:52, check, then act). If the event of a provider is late or is processed while a screening run
+reads the same provider, two INITIAL screenings and two ScreeningCompleted events can result. Not seen in any test or
+journey; reasoned from the code by the reviewer, who rated it a note, not MUST-FIX.
+Options: A) make it impossible: the listener checks first, and the database refuses a second INITIAL screening of one
+provider (a partial unique index: a schema change of a working service); B) leave it.
+**Default applied: B** (a schema change needs the user's approval; the window is short and the second screening repeats
+the first). **Recommended: A.**
+
+## Q-150. (code review of screening-service, MAM-22, 2026-11-21 03:50) Provider itself excluded, but the lookup of its owner gets no answer: the OIGLEIE result is C, not F with E201 (status: DEFAULT APPLIED - revisit)
+
+MAM-22 AC-4 says a provider that is itself on the LEIE gets F with E201; AC-5 says a failed owner lookup is C "not
+answered" (written for a provider that is not on the list). No criterion covers both at once. As built
+(HttpScreeningSources.java:103-108) the failed owner lookup wins: the OIGLEIE result is C "COULD NOT BE REACHED" although
+the provider's own exclusion was confirmed. The screening result is FAIL either way; what differs is what the analyst
+reads (no E201, and a text that suggests trying again).
+Options: A) a confirmed exclusion of the provider itself is reported as F with E201 even when the owner lookup got no
+answer (the detail says that the owner could not be checked); B) keep C.
+**Default applied: B** (as built; no criterion says otherwise and the screening fails in both cases). **Recommended: A**,
+tests first (a new example for MAM-22).

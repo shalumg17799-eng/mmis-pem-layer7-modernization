@@ -14,8 +14,8 @@ decisions: [D-005, D-029, D-018, D-023]
 dependsOn: [MAM-25]
 mainJourney: false
 labels: [svc-screening-service, kag-L-S033, agentic, decision-D-005, decision-D-029, decision-D-018, decision-D-023]
-builtCommit:
-testsSha256:
+builtCommit: 6e24725
+testsSha256: 06d7f272b55d75e45c95e18c2e8d8c0b5216204b180cd20b4a4252a33b3a2df0
 ---
 ## Business requirement
 A provider's situation changes over time: a licence lapses, a name appears on an exclusion list, a source that was down comes back, and every enrolled provider must be revalidated about every five years. The state therefore needs to be able to screen a provider again without waiting for a new application. An analyst can ask for a fresh screening, and the monthly revalidation process triggers one automatically. Earlier results are kept so that the history is complete.

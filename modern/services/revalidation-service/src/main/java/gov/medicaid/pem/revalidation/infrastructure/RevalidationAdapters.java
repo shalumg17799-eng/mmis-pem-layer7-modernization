@@ -5,7 +5,9 @@ import gov.medicaid.pem.revalidation.application.EventOutbox;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** The outbox bridge (sweeps run as a Spring Batch job: SweepJobConfig, SpringBatchSweepLauncher). */
+/**
+ * The outbox bridge (sweeps run as a Spring Batch job: SweepJobConfig, SpringBatchSweepLauncher).
+ */
 @Configuration
 public class RevalidationAdapters {
 
