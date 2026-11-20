@@ -66,10 +66,16 @@ For the build agents (test-writer, java-developer, ui-developer, code-reviewer) 
 - Configuration: only in `<svc>-service.yml` with service-specific environment variable names; shared settings come
   from `pem-common.yml` (do not repeat its keys).
 - Then `./gradlew --no-daemon :services:<svc>:check` (tests, JaCoCo 85% lines, PIT 70% on domain + application,
-  Spotless, `versionCheck`). A skipped test (`@Disabled`, a failed assumption, an unmet condition) fails the test task and
-  is named in the message; every version in `gradle/libs.versions.toml` and in the build files must be exact (no `+`,
-  `latest` or range) and recorded in ADR-010 (MAM-16; `tools/checks/demo-build-gates.sh` shows both gates failing and
-  passing). Write `modern/docs/reports/stories/<KEY>/trace.json`
+  Spotless, `versionCheck`, `testSourceCheck`). A skipped test (`@Disabled`, a failed assumption, an unmet condition) fails
+  the test task and is named in the message; every version in `gradle/libs.versions.toml` and in the build files must be
+  exact (no `+`, `latest` or range) and recorded in ADR-010 (MAM-16; `tools/checks/demo-build-gates.sh` shows the gates
+  failing and passing). `testSourceCheck` reads the test sources (`src/test` of every module and `src/main` of
+  `libs/test-support`) and fails, naming file:line and the construct, on `@Disabled`, `@Ignore`, a conditional-execution
+  annotation (`@EnabledOnOs`, `@DisabledIf` and the like), an assumption (`Assumptions`, `assumeTrue(`), a JUnit 3 or 4
+  class (any `org.junit.` or `junit.framework.` name that is not `org.junit.jupiter` or `org.junit.platform`, among them the
+  wildcard `import org.junit.*;` that an IDE writes) or a Cucumber tag filter (`cucumber.filter.tags`, `@ExcludeTags`); the same words in a comment
+  or a string literal do not fail it. A finding is fixed by running the test or deleting it, because the check has no
+  allow-list (tdd-workflow 4). Write `modern/docs/reports/stories/<KEY>/trace.json`
   (`{"story", "acs", "tests", "codeUnits", "rules"}`).
 
 ## 5. Review and reporting

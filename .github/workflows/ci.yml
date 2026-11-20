@@ -27,8 +27,36 @@ jobs:
           distribution: temurin
           java-version: "21.0.7"
       # AC-1: unit, acceptance, integration, contract, ArchUnit, JaCoCo (85% per service) and PIT; any failure is red
+      # --continue: every module is checked even when one fails, so one run shows every failure (the job is still red)
       - name: Build and check
-        run: ./gradlew --no-daemon build checkAll
+        run: ./gradlew --no-daemon --continue build checkAll 2>&1 | tee "$RUNNER_TEMP/gradle.log"
+      # The job log needs a GitHub sign-in; annotations do not. On a failure the failed tasks, the first lines of each
+      # "What went wrong" and the failed tests are written as error annotations (names and messages only, no log dump).
+      - name: Failure summary (annotations)
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import glob, os, re
+          import xml.etree.ElementTree as ET
+          NL = chr(10)
+          esc = lambda s: s.replace('%', '%25').replace(chr(13), '').replace(NL, '%0A')[:6000]
+          log = open(os.path.join(os.environ['RUNNER_TEMP'], 'gradle.log'), errors='replace').read()
+          tasks = re.findall(r'^> Task (\S+) FAILED', log, re.M)
+          print('::error title=Failed Gradle tasks (%d)::%s' % (len(tasks), esc(NL.join(tasks) or 'none found in the log')))
+          for i, w in enumerate(re.findall(r'\* What went wrong:\n((?:.+\n){1,14})', log)[:5]):
+              print('::error title=What went wrong %d::%s' % (i + 1, esc(w)))
+          failed = []
+          for f in sorted(glob.glob('**/build/test-results/test/*.xml', recursive=True)):
+              try:
+                  root = ET.parse(f).getroot()
+              except ET.ParseError:
+                  continue
+              for tc in root.iter('testcase'):
+                  node = tc.find('failure') if tc.find('failure') is not None else tc.find('error')
+                  if node is not None:
+                      failed.append('%s > %s: %s' % (tc.get('classname', '').split('.')[-1], tc.get('name', '')[:120], (node.get('message') or '')[:160].replace(NL, ' ')))
+          print('::error title=Failed tests (%d)::%s' % (len(failed), esc(NL.join(failed[:40]) or 'none in the JUnit XML files')))
+          PY
 
   contract-lint:
     name: Contract lint
@@ -69,8 +97,31 @@ jobs:
         working-directory: modern/web-ui
         run: |
           npm ci --no-audit --no-fund
-          npm run -s lint
+          npm run -s lint 2>&1 | tee "$RUNNER_TEMP/lint.log"
           npm test
+      - name: Failure summary (annotations)
+        if: failure()
+        working-directory: modern/web-ui
+        run: |
+          python3 - <<'PY'
+          import json, os
+          NL = chr(10)
+          esc = lambda s: s.replace('%', '%25').replace(chr(13), '').replace(NL, '%0A')[:6000]
+          path = 'test-results/vitest.json'
+          lint = os.path.join(os.environ.get('RUNNER_TEMP', ''), 'lint.log')
+          lint_text = open(lint, errors='replace').read().strip() if os.path.exists(lint) else None
+          if lint_text is None:
+              print('::error title=Web UI install::npm ci did not finish (no lint output exists)')
+          elif lint_text:
+              print('::error title=Web UI lint::%s' % esc(NL.join(lint_text.split(NL)[:40])))
+          if not os.path.exists(path):
+              print('::error title=Web UI tests::no test-results/vitest.json: the tests did not start or did not write their result')
+          else:
+              data = json.load(open(path, encoding='utf-8'))
+              failed = ['%s: %s' % (a.get('fullName', '')[:160], (a.get('failureMessages') or [''])[0].split(NL)[0][:160])
+                        for f in data.get('testResults', []) for a in f.get('assertionResults', []) if a.get('status') != 'passed']
+              print('::error title=Web UI tests not passed (%d of %d)::%s' % (len(failed), data.get('numTotalTests', 0), esc(NL.join(failed[:40]) or 'none listed')))
+          PY
 
   compose-smoke:
     name: Compose smoke test
@@ -107,6 +158,8 @@ jobs:
             status=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$c")
             if [ "$status" != "healthy" ]; then echo "=== $c ($status)"; docker logs --tail 200 "$c"; fi
           done
+          # names and states only as an annotation (readable without a sign-in); the logs stay in the job log
+          echo "::error title=Compose smoke test::$(docker ps -a --filter label=com.docker.compose.project=pem --format '{{.Names}}={{.Status}}' | tr '\n' ' ' | cut -c1-900)"
       - name: Stop the stack
         if: always()
         run: make down

@@ -331,6 +331,9 @@ expected_sources() {
 }
 
 # name | the source line (line 6 of the file) | the construct the message must name. File: TempSkippedDemoSrc<name>.java
+# The two Wildcard cases are the form an IDE writes when it collapses imports: import org.junit.*; puts the JUnit 4 @Test in scope
+# (junit 4.13.2 is on every service's test class path through Testcontainers), so a JUnit 4 class that never runs needs no other
+# org.junit line; the allowed wildcards (org.junit.jupiter.api.*, org.junit.platform.suite.api.*) are in the quiet file of step c.
 SRC_CASES=(
   'Disabled|@Disabled("MAM-16 demo")|@Disabled'
   'DisabledQualified|@org.junit.jupiter.api.Disabled|@Disabled'
@@ -352,7 +355,9 @@ SRC_CASES=(
   'Junit4Runner|import org.junit.runner.RunWith;|org.junit.runner'
   'Junit4Rule|import org.junit.Rule;|org.junit.Rule'
   'Junit4Qualified|org.junit.Assert.assertTrue(true);|org.junit.Assert'
+  'Junit4Wildcard|import org.junit.*;|org.junit.*'
   'Junit3|class DemoCase extends junit.framework.TestCase {}|junit.framework.TestCase'
+  'Junit3Wildcard|import junit.framework.*;|junit.framework.*'
   'CucumberKeyTags|@ConfigurationParameter(key = "cucumber.filter.tags", value = "not @slow")|"cucumber.filter.tags"'
   'CucumberKeyName|System.setProperty("cucumber.filter.name", "slow");|"cucumber.filter.name"'
   'CucumberConstTags|@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@fast")|FILTER_TAGS_PROPERTY_NAME'
@@ -430,7 +435,10 @@ package gov.medicaid.pem.fixedwidth;
 /* A block comment
    over two lines: @ExcludeTags("slow") disabledWithoutDocker TestAbortedException */
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.provider.*;
 import org.junit.platform.suite.api.Suite;
+import org.junit.platform.suite.api.*;
 
 class TempSkippedDemoQuietTest {
   // the apostrophe in this comment (don't) does not open a char literal

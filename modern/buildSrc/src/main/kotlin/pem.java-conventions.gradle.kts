@@ -110,4 +110,5 @@ tasks.jacocoTestCoverageVerification {
 tasks.check {
     dependsOn(tasks.jacocoTestCoverageVerification)
     dependsOn(":versionCheck") // MAM-16 AC-8: every version of the catalog and of the build files is exact (root project task)
+    dependsOn(":testSourceCheck") // MAM-16 AC-7: no skip mechanism in a test source (root project task)
 }

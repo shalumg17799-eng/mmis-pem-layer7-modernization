@@ -1,6 +1,6 @@
 # Accessibility report (MAM-86)
 
-Date: 2026-11-20 (runs between 22:30 and 23:31, local time of the build host).
+Date: 2026-11-20 (first runs between 22:30 and 23:31) and the correction round after an independent review, 2026-11-20 23:54 to 2026-11-21 00:09 (local time of the build host). The results below are those of the correction round.
 Standard checked: WCAG 2.0 and 2.1, levels A and AA, with axe-core 4.14.1 (through @axe-core/playwright 4.14.0), plus keyboard checks written for this story.
 Browser: Chromium of Playwright 1.65.1, desktop window 1280 by 720, one worker.
 What was tested: the build that the running stack serves at http://localhost:5173 (`modern/web-ui/dist`, files dated 2026-11-20 22:02), against the gateway at http://localhost:8080 and the real Keycloak at http://localhost:8180.
@@ -12,21 +12,21 @@ Nothing in `modern/web-ui/src` was changed or built for this report.
 |---|---|---|
 | AC-1 zero axe violations on the 13 screens | PASS | 13 of 13 screens, plus 2 further states, report 0 violations for wcag2a, wcag2aa, wcag21a, wcag21aa |
 | AC-2 error, empty and refused states | PASS | apply form with errors, provider search with "No provider found", console route refused with 403: 0 violations each; two more error states scanned too |
-| AC-3 keyboard-only pass per journey | PASS | J1 to J7 all completed with the keyboard only (section "Keyboard-only journeys") |
+| AC-3 keyboard-only pass per journey | PASS | J1 to J7 all completed with the keyboard only, each with every outcome check of its mouse journey (section "Keyboard-only journeys") |
 | AC-4 focus visible and tab order logical | FAIL | 8 of 13 screens pass completely. On 5 screens (and on the filled work queues) the Tab key stops on a table container that does nothing (defect D1) |
 | AC-5 contrast and status not left to colour | PASS | contrast rule ran on every screen with no text below 4.5:1; every status badge shows its text with its code |
 | AC-6 page structure | FAIL | 12 of 13 screens pass. On the risk-rules screen 10 inputs have no label element (defect D2) |
 | AC-7 a violation breaks the run | PASS for the gate; wiring of the page scans into `make e2e` is for the lead (see "How a violation breaks the run") | checker fails naming page and rule; a separate real Playwright run exits non-zero; no suppression without a written justification |
 
-Tests: 97 written, 90 passed, 7 failed (final runs, 2026-11-20 23:17 to 23:31). The 7 failures are the two defects below (6 tests for D1, 1 test for D2). They failed with the same message in every run of the pages file after the test faults were repaired (portal.home, portal.notices, console.provider-detail, console.approval and console.risk-rules in all four runs; public.directory and the filled work queues in the last three), so they are not timing faults.
+Tests: 100 written (pages 77, keyboard journeys 7, gate 4, repository checks 12), 93 passed, 7 failed (final runs of the correction round, 2026-11-20 23:55 to 2026-11-21 00:09, each under the stack lock, seed before and after). The 7 failures are the two defects below (6 tests for D1, 1 test for D2). They failed with the same message in every run of the pages file after the test faults were repaired, including the run of this round, so they are not timing faults. The correction round added 3 tests (repository checks that every test is counted under its own criterion) and moved 2 tests into the group of their own criterion; see "Correction round" and "How the tests are counted by the trace tool".
 
 ## How it was run
 
 1. Under the shared stack lock: `bash infra/scripts/seed.sh` (seed state, 16 providers), then the run, then the seed again before the lock was released.
 2. Page scans (read-only): `PEM_JOURNEYS=1 npx playwright test e2e/a11y/pages.a11y.spec.ts` from `modern/web-ui` with `NODE_OPTIONS=--dns-result-order=ipv4first`.
 3. Keyboard journeys (change data): `PEM_JOURNEYS=1 npx playwright test e2e/a11y/keyboard-journeys.spec.ts`. The file seeds the stack itself before each of the seven journeys.
-4. Gate and repository checks (need only the web UI): `npx playwright test e2e/a11y` without `PEM_JOURNEYS`; this runs exactly 13 tests (the pages and keyboard files register no test without `PEM_JOURNEYS`, like the journeys).
-5. JSON reports for the trace tool: `modern/web-ui/test-results/playwright-a11y-pages.json`, `playwright-a11y-journeys.json`, `playwright-a11y-gate.json` (tests are mapped by `[MAM-86 AC-n]` in the title of their group).
+4. Gate and repository checks (need only the web UI): `npx playwright test e2e/a11y` without `PEM_JOURNEYS`; this runs exactly 16 tests: the gate (4) and the repository checks (12); the pages and keyboard files register no test without `PEM_JOURNEYS`, like the journeys.
+5. JSON reports for the trace tool: `modern/web-ui/test-results/playwright-a11y-pages.json`, `playwright-a11y-journeys.json`, `playwright-a11y-gate.json` (the trace tool maps a test to an acceptance criterion by the bracket tag `[MAM-86 AC-n]` in the titles of its groups and of the test, so every test sits in a group tagged with its own criterion, and a repository check enforces that). Each run writes its own file with `PLAYWRIGHT_JSON_OUTPUT_NAME` and its own artefact folder with `--output=test-results/artifacts-a11y-<part>`, so that one run does not delete the report of another.
 
 Data used by the page scans. The seven console screens and the public directory read the live stack at its seed state. The five portal screens and the approval page are answered with synthetic gateway data in the browser (`e2e/support/gateway-routes.ts` is reused), because the seed holds no application, notice or screened pending provider for the portal user and a scan must not write. Keycloak sign-in is always real. The same portal screens and the approval page are also scanned with live data inside the keyboard journeys J1 and J2 (see below).
 
@@ -91,38 +91,50 @@ On all 13 screens: exactly one h1 and it equals the title of the screen inventor
 
 ## Keyboard-only journeys (AC-3)
 
+Durations are those of the correction round, run while another lane compiled on the same machine (about twice as long as in the first round, where J1 took 42 s); each test has a limit of 480 s.
+
 Rules kept by the journeys file and its helper (checked by a test that reads both files): input only through `page.keyboard` (Tab, Shift+Tab, Enter, the space bar, the arrow keys, typed text, Control+A); no mouse call, no `click`, `fill`, `check`, `selectOption`, `dispatchEvent`, no element-level `press` or `type`, no programmatic `focus`. A control is reached by pressing Tab (Shift+Tab when it lies above the focus) until it has the focus, with a bound of 120 presses; when it cannot be reached the step fails with the name of the control and the list of controls the focus passed (proved on a sample page by the test "a control that Tab never reaches fails the step with its name").
 Things done before the page has the focus: typing the first address of a tab (`page.goto`), as a person types it in the address bar. The Keycloak sign-in form is completed with the keyboard too: Tab to the user name, type, Tab to the password, type, Enter.
 Exception for a native file dialog (`setInputFiles`): not used. None of the seven journeys uploads a file.
-Each journey starts from the seed state (the file runs `bash infra/scripts/seed.sh` first), ends with the same outcome checks as its mouse version in `e2e/journeys` (status reached, notice, file downloaded; read from the page or the API), and scans the pages it meets with the same axe checker (0 violations in every scan).
+Each journey starts from the seed state (the file runs `bash infra/scripts/seed.sh` first) and scans the pages it meets with the one axe checker of this story (0 violations in every scan).
 
-### J1 A provider applies and is enrolled: PASS (42 s)
+Outcome checks. The first version of the file did not repeat everything its mouse version in `e2e/journeys` checks (a review on 2026-11-20 found the gaps, and this report had wrongly said "the same checks"). The file was corrected and compared with the seven mouse journeys assertion by assertion. Added after the review:
+
+- J1: the scan of the apply form; the screening has reason INITIAL and status COMPLETED (besides result PASS and the four sources); the "Failed screening" list is shown before the check that the provider is not in it (before, a missing list would have passed that check).
+- J2: the scan of the empty apply form when it is first shown.
+- J3: the submitted application is VALIDATED; the provider stays Pending (P) after the failed screening; the screening read from the API is FAIL, with OIGLEIE F and error code E203.
+- J5: the three form fields (Action, Reason, Effective date) are shown; the refusal of the unknown action code is `application/problem+json`.
+- J7: the new T-MSIS run is the newest T-MSIS row and the only row for that run (the row count is the earlier number of runs plus one, at most 20); TMSISOUT and DIROUT each hold exactly one record per active provider (the count, besides the set of NPIs, so a duplicated record fails); the directory search answers 200 and every name it returns contains HOSPICE.
+
+J4 and J6 already had all of their mouse checks. Differences that remain on purpose, none of them a weaker outcome check: the keyboard journeys reach a page with a link or a menu entry where the mouse journeys type an address (`page.goto`), so they also prove that the link works; and the keyboard journeys scan with the four WCAG tags of AC-1 (the story's checker), while the mouse journeys use the older helper `e2e/support/page.ts`, which runs every axe rule, including best-practice rules. The scans of the keyboard journeys are therefore narrower in rules than those of the mouse journeys; the page scans of AC-1 are the ones that count for the criterion.
+
+### J1 A provider applies and is enrolled: PASS (81 s)
 
 1. provider1 opens /portal and signs in with the keyboard; "My enrolment" is shown.
-2. Tab to "Apply for enrolment" in the page, Enter.
+2. Tab to "Apply for enrolment" in the page, Enter. The apply form is scanned.
 3. Tab and type NPI, Medicaid ID; Tab to Provider type and choose "Individual (IN)" with the arrow keys; type taxonomy, last name, first name, licence number and state; Tab to "Submit application", Enter. Status "Validated" (API: VALIDATED, no errors).
-4. (System) registered, screened PASS on the four sources, risk tier L (read from the API).
-5. analyst1 signs in with the keyboard at the work queues; the provider is under Pending approval and not under Failed screening.
+4. (System) registered, screened PASS on the four sources (exactly one screening, reason INITIAL, status COMPLETED), risk tier L (read from the API).
+5. analyst1 signs in with the keyboard at the work queues; the provider is under Pending approval and not under Failed screening (the Failed screening list is shown first).
 6. Tab to "Review" in the row, Enter; the arrow keys choose "Approve (becomes Active)"; Tab to "Record decision", Enter. Answer 200, status A, revalidation due date five years after the approval date; the page says "Decision recorded" with "Active (A)" and the date.
 7. A visitor opens /directory, types RIVERA in Name, Enter: MARIA RIVERA is listed.
 8. The notice is in Mailpit; the provider uses the menu (Tab to "My notices", Enter; Tab to "My provider record", Enter): "Enrolment approved (APPROVED)" is listed and the record shows "Active (A)".
 
-### J2 An application is rejected: PASS (32 s)
+### J2 An application is rejected: PASS (50 s)
 
-1. provider1 signs in with the keyboard at /portal/apply; types everything except the taxonomy; Tab to "Submit application", Enter. Answer 422, the page stays on the form.
+1. provider1 signs in with the keyboard at /portal/apply (the empty form is scanned); types everything except the taxonomy; Tab to "Submit application", Enter. Answer 422, the page stays on the form.
 2. The error summary takes the focus ("1 error in the application"); E104 is shown twice (summary and field), no other code; the first Tab reaches the summary entry "E104: ..."; Enter puts the focus on "Taxonomy code".
 3. Through the menu ("My enrolment") one row is "Rejected"; Tab to "View", Enter: "Application status", Rejected, exactly one error row (E104, taxonomy); API agrees.
 4. The REJECTED notice is listed ("Application rejected (REJECTED)") through the menu entry "My notices"; the provider was not registered (API 404).
 
-### J3 Screening fails and the analyst denies: PASS (20 s)
+### J3 Screening fails and the analyst denies: PASS (82 s)
 
-Set-up by API (as the mouse journey): the group application with owner 1990000111, screened FAIL.
+Set-up by API (as the mouse journey): the group application with owner 1990000111 is accepted as VALIDATED and screened FAIL: the provider stays Pending (P) and the API shows the screening FAIL with OIGLEIE F and E203.
 1. analyst1 signs in with the keyboard at the work queues: the provider is under Failed screening and not under Pending approval.
 2. Tab to the NPI link in the row, Enter: the detail shows OIG exclusion list (LEIE) "Fail (F)" with E203.
 3. Tab to "Approve or deny", Enter; the arrow keys choose "Deny (becomes Denied)"; Tab to Reason and type it; Tab to "Record decision", Enter. Answer 200, status D, "Denied (D)" on the page.
 4. The DENIED notice is listed and the email is in Mailpit.
 
-### J4 Analyst inquiry: PASS (25 s)
+### J4 Analyst inquiry: PASS (135 s)
 
 Set-up by API: apply, screened, approved.
 1. analyst1 signs in with the keyboard at the provider search; types the NPI, Enter. One row; request carries `npi`.
@@ -132,17 +144,17 @@ Set-up by API: apply, screened, approved.
 5. analyst1 uses the menu (Tab to "Provider search", Enter), types an unknown NPI, Enter: "No provider found" (API: 200, total 0).
 6. provider1 signs in at a console address: "Access denied"; Tab to "Go to My enrolment", Enter; the menu "My provider record" shows their NPI and no other provider's NPI; the API answers 403 for the console list and for another provider.
 
-### J5 A supervisor suspends and reinstates a provider: PASS (22 s)
+### J5 A supervisor suspends and reinstates a provider: PASS (66 s)
 
-1. supervisor1 signs in with the keyboard at the provider detail of TESTPROV ALPHA; Tab to "Record sanction", Enter.
+1. supervisor1 signs in with the keyboard at the provider detail of TESTPROV ALPHA; Tab to "Record sanction", Enter; the form shows Action, Reason and Effective date.
 2. Enter on "Record sanction" with an empty form: "2 errors in the sanction"; Tab reaches "Choose an action", Enter puts the focus on Action; nothing was stored.
 3. The arrow keys choose "Suspend (S)"; type reason and date 03/31/2026; Tab to "Record sanction", the space bar. Answer 201, result S, "Suspended (S)" on the page, notice SUS in the list and in Mailpit.
 4. A visitor types ALPHA in /directory, Enter: "No providers found"; the provider left the directory.
 5. Tab to "Provider detail", Enter; Tab to "Record sanction", Enter; "Reinstate (R)", reason, date 04/30/2026, space bar: 201, result A, "Active (A)", notice RST.
 6. Tab to "Provider detail", Enter: the history panel lists both actions with reasons and dates (API: S then R, in order).
-7. An unknown action code (API) is refused with 422 and nothing is stored.
+7. An unknown action code (API) is refused with 422 as `application/problem+json` and nothing is stored.
 
-### J6 Monthly revalidation: PASS (28 s)
+### J6 Monthly revalidation: PASS (55 s)
 
 1. admin1 signs in with the keyboard at the batch jobs; the arrow keys choose "Revalidation sweep"; type 03/31/2026; Tab to "Run job", Enter. Answer 202; the run completes with `queued` equal to the number of due providers; the row shows "Completed".
 2. Tab to "Download" in the row of that run, Enter: file REVALQ.D20260331, 80-byte records, due date, RESCREEN-REQUIRED, same bytes as the API.
@@ -150,12 +162,36 @@ Set-up by API: apply, screened, approved.
 4. Each case becomes COMPLETED and each provider gets a later due date.
 5. A second sweep started with the keyboard adds no case.
 
-### J7 Month-end extracts and the public directory: PASS (25 s)
+### J7 Month-end extracts and the public directory: PASS (40 s)
 
-1. admin1 signs in with the keyboard; the arrow keys choose "T-MSIS extract"; date; Enter. The page follows the run to "Completed" with its archive generation and row count and without a reload (no navigation, the typed date is still in the form).
-2. Tab to "Download" in the row of that run, Enter: TMSISOUT.D20260331, 120-byte records for exactly the active providers, same bytes as the API.
-3. Arrow Up to "Directory extract (DIROUT)"; Enter; Tab to its "Download", Enter: DIROUT.D20260331, 100-byte records, composed names (TESTPROV ALPHA without licence number, SAMPLE CLINIC 01), exactly the active providers.
-4. A visitor types HOSPICE in /directory, Enter: only the active hospice, with its composed name; the terminated one is not listed.
+1. admin1 signs in with the keyboard; the arrow keys choose "T-MSIS extract"; date; Enter. The page follows the run to "Completed" with its archive generation and row count and without a reload (no navigation, the typed date is still in the form); it is the newest T-MSIS row and the only row for the run.
+2. Tab to "Download" in the row of that run, Enter: TMSISOUT.D20260331, 120-byte records for exactly the active providers (one record each), same bytes as the API.
+3. Arrow Up to "Directory extract (DIROUT)"; Enter; Tab to its "Download", Enter: DIROUT.D20260331, 100-byte records, composed names (TESTPROV ALPHA without licence number, SAMPLE CLINIC 01), exactly the active providers (one record each).
+4. A visitor types HOSPICE in /directory, Enter: only the active hospice, with its composed name; the terminated one is not listed (the API answers 200 and every name contains HOSPICE).
+
+## How the tests are counted by the trace tool
+
+`modern/tools/trace/build_rule_trace.py` reads `modern/web-ui/test-results/playwright*.json` and maps a test to a criterion only through the bracket form `[MAM-86 AC-n]` in the group titles and the title, joined with spaces. The review found two tests in a group of another criterion (a Tab-walk test of AC-4 in the group "[MAM-86 AC-1] other states", and the contrast test of AC-5 in the group "[MAM-86 AC-7]"): the tool counted them for both criteria, so AC-1 would have shown a failure. Both tests now sit in a group of their own criterion, and `policy.a11y.spec.ts` checks every test of the four spec files (a sample test proves that the checker flags a wrong group). The counts below are the output of the tool's own functions (`tests()` of `build_rule_trace.py`, imported; `main()` not run, so no file of the tool was written) over the three JSON reports of the correction round:
+
+| Criterion | Tests the tool counts | Passed | Failed | Verdict in this report |
+|---|---|---|---|---|
+| AC-1 | 19 | 19 | 0 | PASS |
+| AC-2 | 5 | 5 | 0 | PASS |
+| AC-3 | 11 | 11 | 0 | PASS |
+| AC-4 | 14 | 8 | 6 | FAIL (D1) |
+| AC-5 | 30 | 30 | 0 | PASS |
+| AC-6 | 14 | 13 | 1 | FAIL (D2) |
+| AC-7 | 7 | 7 | 0 | PASS |
+| Total | 100 | 93 | 7 | |
+
+What the groups hold. AC-1: the 13 screens, 2 further states, 3 repository checks that every test is counted under its own criterion, and the check that no test is skipped. AC-2: 5 states. AC-3: the 7 journeys, 3 checks that the keyboard files contain no mouse call, and the helper test that names an unreachable control. AC-4: the 13 Tab walks and the walk of the filled work queues. AC-5: 13 contrast tests, 13 status-text tests, 3 further status tests, and the test that the contrast rule is not disabled. AC-6: 13 screens and the filled work queues. AC-7: 2 gate tests and 5 repository checks of suppressions.
+
+## Correction round (2026-11-20 evening, after an independent review)
+
+The review found two faults in the tests and in this report; both are corrected, and no production code was touched.
+
+1. The keyboard journeys checked less than the mouse journeys, so the statement "the same outcome checks" was false (J1, J2, J3, J5 and J7; the list is under "Keyboard-only journeys"). The missing assertions were added; J1 to J7 were run again from the seed and all pass, so the UI does meet the added checks. The omissions that remain are listed there as differences on purpose.
+2. Two tests were counted for the wrong criterion by the trace tool (see the section above). Fixed, and guarded by a repository check.
 
 ## How a violation breaks the run (AC-7)
 
@@ -193,5 +229,6 @@ Test faults found and repaired while writing the tests (not UI defects): the Tab
 - Reading order was judged from the position of each focus stop (rule and tolerance above), not by a person reading the page.
 - States not scanned: loading states, "The list could not be loaded" alerts, the sort and pager controls in use, the signed-out page, the landing page, the not-found page, the sign-in callback pages, other form errors than the ones listed. The Keycloak sign-in page is out of scope.
 - Five portal screens and the approval page were scanned with synthetic gateway answers (live data is only seen on them in J1 to J4 through the same checker). The work-queue lists were scanned filled only with synthetic answers (live data in J1, J3 and J6).
+- Every result is for the build that the stack serves (`modern/web-ui/dist`, files dated 2026-11-20 22:02), which was not rebuilt. After that build, the source in `modern/web-ui/src` changed: git history shows commit 14e0707 (2026-11-20 23:57, "web UI review fixes") touching ten page files with tables and a new `shared/ui/ScrollableTable.tsx`, and `RiskRulesPage.tsx` differs between that commit (visible `Label` elements per row) and the working tree (aria-label only, modified 23:56). I did not read these changes closely, did not build, and did not run the tests against them. They may fix D1 and D2, but until a build is deployed and the pages file is run again the 7 red tests stay as reported here. When D1 and D2 are fixed, no test has to change: the same 7 tests turn green.
 - The pages and keyboard specs run only with `PEM_JOURNEYS=1`; they are not part of `make e2e` until the lines in the story result are added to `modern/pem.sh`.
-- One final run was started while the host reported 575 MB free memory (the rule is to wait below 1024 MB); it completed normally.
+- In the first round one final run was started while the host reported 575 MB free memory (the rule is to wait below 1024 MB); it completed normally. In the correction round the free memory was 1382, 3088 and 1876 MB before the three runs, so no run was started below the limit.

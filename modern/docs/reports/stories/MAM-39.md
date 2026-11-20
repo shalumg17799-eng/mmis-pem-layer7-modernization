@@ -69,3 +69,25 @@ the tests of the Gradle job (they start database and broker containers) and the 
 Also changed locally for the next run: the Gradle job's time limit is 150 minutes (was 90: the build is sequential and
 runs PIT for nine services); the pinned Node versions were checked against the Node release index (20.19.2 and 22.22.2
 exist).
+
+## Second run (2026-11-20 23:57, commit 14e0707, run 44792814928): red, but far further
+
+| Job | Result | Time on the runner |
+|---|---|---|
+| Contract lint | success | 1m18s |
+| Web UI tests | failure in "Install and test" | 1m08s |
+| Gradle build and full check | failure in "Build and check" | 45m02s (the first run failed after 2m01s) |
+| Compose smoke test | skipped (it needs the Gradle job) | |
+
+What this shows: the line-ending fix works on GitHub (the Gradle job got past the format check of the first modules and
+ran builds and tests for 45 minutes before its first failure; without `--continue` it stops there). The commit was a
+snapshot taken while three lanes were still working, so a red run was expected: screening-service has failing tests,
+enrollment-service and revalidation-service have unfinished sources with format violations. The web UI job ended after
+68 seconds, too early for a whole test run: at commit time an accessibility spec was being edited and a first attempt of
+a UI fix (taken out again at 23:58, question Q-137) broke one recorded test, so either the lint or that test failed. The
+job logs cannot be read without a sign-in, so the exact line is not known.
+
+Changed for the next run (local at 00:45, in the next push): the Gradle job runs with `--continue` and, on a failure,
+writes the failed tasks, the first lines of each "What went wrong" and the failed tests as error annotations; the web UI
+job writes the lint output or the failed tests the same way. Annotations can be read through the public API without a
+sign-in (`<check_run_url>/annotations`), so every later run can be diagnosed from here.

@@ -102,6 +102,10 @@ export const SCREENS: Screen[] = [
     ready: (page) => page.getByRole('table', { name: 'Search results' }),
     // main state: the results of a name search that returns providers of every status of the seed (A, P, D, S, T)
     prepare: async (page) => {
+      // The page pre-fills the NPI of the last search made in this tab (MAM-77 AC-6, sessionStorage). The main state is a search by name
+      // only, so the NPI is emptied first: an NPI typed by an earlier test of the file (the "No provider found" test of AC-2 types
+      // 1003000999) would be combined with the name and the search would find nothing.
+      await page.getByLabel(/^NPI/).fill('');
       await page.getByLabel(/^Name/).fill('TESTPROV');
       await page.getByRole('button', { name: 'Search' }).click();
       await expect(page.getByRole('table', { name: 'Search results' })).toBeVisible({ timeout: 30_000 });

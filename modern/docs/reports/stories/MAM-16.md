@@ -215,3 +215,116 @@ listed under "Known limits".
 
 AC-2 stays as question Q-123 says (default A: the legacy readers of enrollment-service and sanctions-service stay in their
 packages; the user's plan of 19:32 names this default for closing MAM-16).
+
+## Gate extension (2026-11-20 late)
+
+Decision of the lead after the second review: close the gaps of the run-time guard with a second, static layer. Built by the
+devops-engineer (Gradle runs between 23:19 and 00:14; the date turned during the work). No behaviour of any service changed, no test file of
+any story was touched, and the listener `SkippedTestGuard` behaves as before: only its KDoc was corrected (it claimed that
+Cucumber "needs no special case", which no run had shown; it now says what the demonstration showed and names what the listener
+cannot see).
+
+### What the check fails on
+
+The root task `testSourceCheck` (`buildSrc/.../pem/build/TestSourceCheck.kt`, plain Kotlin, no new dependency) reads every
+`.java`, `.kt` and `.properties` file under `src/test` of every module, and every `.java` and `.kt` file under `src/main` of
+`libs/test-support` (shared test support, which `tools/checks/test_protection.py` also treats as test code). It fails, naming
+`file:line`, the construct and the reason, on:
+
+- `@Disabled` and JUnit 4 `@Ignore`; every annotation whose simple name starts with `Enabled` or `Disabled` (the 14 JUnit
+  conditions `EnabledIf` to `DisabledInNativeImage`, qualified or not); `disabledWithoutDocker`; the type `ExecutionCondition`;
+- the types `Assumptions` (JUnit and AssertJ), `TestAbortedException`, `AssumptionViolatedException`, and a call of a method
+  named `assume` or `assuming` plus a capital letter (`assumeTrue(`, `assumeFalse(`, `assumeThat(`, `assumingThat(`,
+  `assumeThatThrownBy(`, and the like);
+- JUnit 4: any `org.junit.` name that is not `org.junit.jupiter` or `org.junit.platform` (`Test`, `Ignore`, `Before`, `After`,
+  `Assert`, `Rule`, `runner`, ...), as import or fully qualified; added by me: `junit.framework` (JUnit 3 is in the same jar and
+  also has no engine);
+- **Cucumber filters: included**, because a filter drops scenarios without a skip ever being reported, so neither the listener
+  nor a reader of the test results can see it, and it is the cheapest way to turn a red scenario green: the keys
+  `cucumber.filter.tags` and `cucumber.filter.name` (a `.properties` line that is not a comment, or a string literal that is
+  exactly the key), the constants `FILTER_TAGS_PROPERTY_NAME` and `FILTER_NAME_PROPERTY_NAME`, `@IncludeTags` and `@ExcludeTags`.
+  The tags of the feature files (`@MAM-37`, `@AC-1`) are not filters and are not read.
+
+What counts as code, one rule (also in the KDoc of the task): the scanner blanks comments (Kotlin block comments nest, Java
+ones do not) and the content of string literals, text blocks and char literals, then matches line by line. A literal still open
+at the end of its line ends there, so a lexer mistake hides at most one line. The same words in a comment or in a string do not
+fail; the only exception is the exact Cucumber key as a literal (it exists only as text). One finding per rule per line.
+No allow-list: the tree needs none, and a finding is fixed by running the test or deleting it (tdd-workflow 4). The message
+starts "Test source check failed: N skip mechanism(s) in the test sources. A test cannot be skipped to get to green
+(tdd-workflow 4, MAM-16 AC-7): run the test or delete it; ...". The task fails when it reads no file (a wrong path must not
+pass), and it declares no outputs, so Gradle never treats it as up to date.
+
+### Where it is wired
+
+- Task registered in `build.gradle.kts` next to `versionCheck`; `checkAll` depends on it (`dependsOn(testSourceCheck)`).
+- `pem.java-conventions.gradle.kts` (`tasks.check`): `dependsOn(":testSourceCheck")` next to the `versionCheck` line, so every
+  module's `check` runs it. It is a repository-wide scan, like `versionCheck`: a finding in one module fails every module's check.
+- `tools/checks/demo-build-gates.sh`: new block "AC-7 (second layer)", 51 steps; `DEMO_ONLY=ac8|ac7-runtime|ac7-source` runs one
+  block; the clean-up check now covers the three folders where temporary files are written.
+
+### Demonstration (run under the shared Gradle lock, `--no-daemon`, free memory checked before every call)
+
+Red, before the check existed (Gradle: "Task 'testSourceCheck' not found in root project 'pem-modern' and its subprojects"):
+
+- Whole script, 23:19 to 23:31: the 7 existing steps PASS (4 AC-8, the 2 AC-7 runtime steps, the clean-up check); 50 of the 51
+  new steps FAIL, and one new step passed without reading anything (the Kotlin nested-comment step). That step was changed
+  to count only when line 6 of the same file is named.
+- `DEMO_ONLY=ac7-source`, 23:46 to 23:56: `== waited 240 s for free memory; 51 step(s) failed ==`; the only PASS is the clean-up
+  check. Example lines: `FAIL AC-7 source: one @Disabled alone (exit 1; expected exit 1 and
+  'TempSkippedDemoSrcAlone.java:6: @Disabled (')`, and `FAIL AC-7 source: dry run of checkAll (exit 0; :testSourceCheck x0,
+  :versionCheck x1, module checks 14 of 14)`.
+
+Green, after the check (whole script, 00:04 to 00:14, `== waited 0 s for free memory; 0 step(s) failed ==`, 58 PASS; nothing
+left behind: no TempSkippedDemo file in the three folders, `test_protection.py check MAM-42` OK):
+
+- one construct alone: exit 1, `Test source check failed: 1 skip mechanism(s) in the test sources. A test cannot be skipped to
+  get to green ...` and `libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/TempSkippedDemoSrcAlone.java:6: @Disabled
+  (the test is switched off): @Disabled("MAM-16 demo: the only construct")`;
+- 44 temporary sources in one run (one per construct; none compiles, on purpose, because the check reads text; only
+  `testSourceCheck` ran while they existed): exit 1, "44 skip mechanism(s)" (one finding per source, nothing counted twice,
+  nothing else flagged), and 44 PASS lines that each name the file, line 6 and the construct, among them
+  `TempSkippedDemoSrcEnabledOnOs.java:6: @EnabledOnOs (conditional execution: the test is skipped when its condition is not met)`,
+  `TempSkippedDemoSrcJunit4Test.java:6: org.junit.Test (JUnit 4: no engine for it is on the class path, so the test is never
+  discovered or run)`, `TempSkippedDemoSrcCucumberKeyTags.java:6: "cucumber.filter.tags"`, `TempSkippedDemoSrcSupport.java:6:
+  @Disabled` (src/main of libs/test-support), `TempSkippedDemoSrcKotlin.kt:6: @Disabled` and
+  `TempSkippedDemoSrcProperties.properties:6: cucumber.filter.tags`. The Kotlin file has `@EnabledOnOs` inside a nested comment
+  on line 3: not flagged;
+- no false alarm: a Java file with the words in a Javadoc, a line comment, a two-line block comment, a string, a text block, an
+  escaped string and a char literal that holds a quote, plus `@JsonIgnore`, `@EnableScheduling`, `assumed()`, `assume()` and the
+  allowed `org.junit.jupiter` and `org.junit.platform` imports; a Kotlin file with a nested comment and a raw string; a
+  properties file with the key in `#` and `!` comment lines; a feature file with `@ignore @wip @MAM-37` tags; and
+  `libs/fixed-width/TempSkippedDemoOutside.java` with `@Disabled`, `org.junit.Test` and `assumeTrue(`: exit 0, "read 360 files =
+  357 of the real tree + 3 temporary" (the feature file and the file outside `src/test` are not read);
+- the real tree: exit 0, `testSourceCheck: read 357 test source files (356 Java, 0 Kotlin, 1 properties) in 13 modules: no
+  @Disabled, @Ignore, conditional execution, assumption, JUnit 3 or 4 class, or Cucumber tag filter.` The script counts the files
+  without Gradle (`find`) and requires the same number: 357;
+- plan: `:libs:fixed-width:check --dry-run` has `:testSourceCheck` once (and `:versionCheck` once); `checkAll --dry-run` has
+  `:testSourceCheck` once, `:versionCheck` once and 14 module `check` tasks (14 modules have a build file).
+
+Other proofs: `./gradlew --no-daemon -q help` passed after each of the two edits (one lock hold, 23:57 to 00:04), and the
+task passed on the real tree before it was wired. A script applied the edits and put the old files back if a stage did not
+verify, so the lock was never free over a build that did not compile (not needed: both stages compiled at the first try).
+Before the Gradle run, the design was tried on the real tree with a throw-away Python port of the scanner (353 files, 0
+findings), and the new block of the script was run offline against a fake `gradlew`; those runs are not the proof.
+
+### Result on the real tree
+
+No finding: nothing was changed and nothing was excepted to get to green. The lead's search of 22:40 (no file with a skip
+construct) is confirmed by the check itself and by the independent Python port.
+
+### Still not verified
+
+- A whole `check` of a module, or `checkAll`, with the task wired in: only the plan (`--dry-run`) and the task alone were run.
+- The behaviour that the second review reasoned from the library code (a disabled class template reported as a successful suite,
+  a JUnit 4 test never discovered) was not run; the check rejects the source constructs that cause it, which the demonstration
+  shows.
+- Not covered by any layer: a filter or exclusion outside `src/test` (a Gradle `includeTags`, `excludeTestsMatching`,
+  `enabled = false` or `onlyIf` on a test task, `cucumber.filter.tags` in `gradle.properties`, an environment variable or a
+  `-D` option); today the only `enabled = false` in the `.kts` files is the `pitest` switch of `pemSkipPit`. Tests that JUnit
+  discovers but cannot run (a private or static `@Test` method) are reported by JUnit 5.13 and later as discovery issues of
+  warning level; whether the parameter `junit.platform.discovery.issue.severity.critical` would turn them into failures was not
+  tried.
+- The web UI tests (Vitest, Playwright: `skip`, `only`, `fixme`) are outside this task and unchecked.
+- The scanner has no unit test of its own (`buildSrc` has no test dependency; adding one is a new dependency): the
+  demonstration is its test. A Kotlin string template that contains a quote can confuse the lexer for the rest of that line.
+- Linux (the CI run): the scanner uses `java.io.File` and forward slashes; only a Windows run with Git Bash was made.

@@ -7,18 +7,26 @@ import org.gradle.api.tasks.testing.TestListener
 import org.gradle.api.tasks.testing.TestResult
 
 /**
- * MAM-16 AC-7 (tdd-workflow 4: "a test cannot be skipped to get to green").
+ * MAM-16 AC-7 (tdd-workflow 4: "a test cannot be skipped to get to green"), first layer: the run-time listener.
  *
- * Collects every test whose result is SKIPPED: a method or class annotated @Disabled, a failed JUnit assumption, an
- * unmet enabled-if or disabled-if condition (for example Testcontainers without Docker), or a Cucumber scenario the JUnit
- * Platform engine reports as aborted. Cucumber scenarios arrive here as ordinary test results (class = the suite class,
- * name = the scenario), so they need no special case.
+ * Collects every test whose result is SKIPPED, which is how JUnit reports a method or class annotated @Disabled, a failed
+ * assumption and an unmet enabled-if or disabled-if condition. tools/checks/demo-build-gates.sh has shown the JUnit Jupiter
+ * forms: a @Disabled class, a @Disabled method, a failed assumption, and a disabled parameterized test, repeated test or test
+ * factory. Not shown by any run: a skipped Cucumber scenario. Its engine reports a scenario as a test result of the suite
+ * class (class = the suite class, name = the scenario), so it is expected to be collected like any other test.
  *
  * Two shapes reach the listener differently. A plain test (or a class holding plain tests) is reported through [afterTest].
  * A test template (@ParameterizedTest, @RepeatedTest, @TestFactory) has no test of its own until it runs, so when it is
  * disabled, or sits in a disabled class that holds nothing else, Gradle reports only a SKIPPED suite with zero tests through
  * [afterSuite]; [afterSuite] collects those suites too. A skipped suite that does hold tests is not collected again, its
  * tests are already named by [afterTest].
+ *
+ * What this listener cannot see (second review, 2026-11-20): a disabled or aborted class template (annotated with
+ * ParameterizedClass or ClassTemplate, JUnit 5.13 and later), which Gradle completes as a successful suite without tests, and a JUnit 4 test,
+ * which no engine discovers, so it never runs and is never reported. The second layer, the root task testSourceCheck
+ * (TestSourceCheck.kt, wired like versionCheck), reads the test sources and fails on the source constructs that cause these
+ * cases and on every other skip mechanism. A Cucumber tag filter drops scenarios without any skip being reported; the source
+ * check rejects the filter keys too.
  *
  * The listener only observes: it never changes a result. After the run [failIfAny] fails the test task and names each
  * skipped test. When tests also failed, Gradle fails the task itself with its normal output; [afterSuite] then logs the

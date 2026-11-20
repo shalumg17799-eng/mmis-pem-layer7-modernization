@@ -195,9 +195,6 @@ export function RiskRulesPage() {
                 return (
                   <tr key={row.key}>
                     <td>
-                      <Label htmlFor={`prefix-${row.key}`} className="margin-top-0" error={invalid}>
-                        {`Taxonomy prefix, row ${index + 1}`}
-                      </Label>
                       {invalid && (
                         <span id={`prefix-error-${row.key}`} className="usa-error-message">
                           {BAD_PREFIX}
@@ -209,6 +206,7 @@ export function RiskRulesPage() {
                         type="text"
                         value={row.prefix}
                         maxLength={3}
+                        aria-label={`Taxonomy prefix, row ${index + 1}`}
                         aria-describedby={invalid ? `prefix-error-${row.key}` : undefined}
                         aria-invalid={invalid ? true : undefined}
                         validationStatus={invalid ? 'error' : undefined}
@@ -216,10 +214,7 @@ export function RiskRulesPage() {
                       />
                     </td>
                     <td>
-                      <Label htmlFor={`tier-${row.key}`} className="margin-top-0">
-                        {`Tier, row ${index + 1}`}
-                      </Label>
-                      <Select id={`tier-${row.key}`} name={`tier-${row.key}`} value={row.tier} onChange={(event) => update(row.key, { tier: event.target.value as Tier })}>
+                      <Select id={`tier-${row.key}`} name={`tier-${row.key}`} value={row.tier} aria-label={`Tier, row ${index + 1}`} onChange={(event) => update(row.key, { tier: event.target.value as Tier })}>
                         {TIERS.map((tier) => (
                           <option key={tier} value={tier}>
                             {withCode(tier, RISK_TIER_LABEL)}
