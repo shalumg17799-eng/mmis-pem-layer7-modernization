@@ -14,8 +14,8 @@ public interface ProviderSearch {
   record Page(List<Provider> items, int page, int size, long total) {}
 
   /**
-   * The filters of searchProviders: exact NPI, exact Medicaid ID (the legacy alternate index),
-   * name contains (any of last, first, legal or DBA name, ignoring case), status and screen flag.
+   * The filters of searchProviders: exact NPI, exact Medicaid ID (the legacy alternate index), name
+   * contains (any of last, first, legal or DBA name, ignoring case), status and screen flag.
    */
   record Criteria(
       String npi, String medicaidId, String name, EnrollStatus status, ScreenFlag screenFlag) {}

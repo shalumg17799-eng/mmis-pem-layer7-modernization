@@ -7,7 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import gov.medicaid.pem.screening.application.Fakes.Outbox;
 import gov.medicaid.pem.screening.application.Fakes.RunsFake;
 import gov.medicaid.pem.screening.application.Fakes.Store;
-import gov.medicaid.pem.screening.domain.Source;
 import gov.medicaid.pem.screening.domain.SourceResult;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -22,8 +21,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * MAM-32: the steps of the batch screening (PRVSCR01) without Spring: which providers are screened
- * (R-PRVSCR01-cbl-00022: screen flag U, AC-7: no INITIAL screening yet), the failed count, the
- * file and the run status (D-024).
+ * (R-PRVSCR01-cbl-00022: screen flag U, AC-7: no INITIAL screening yet), the failed count, the file
+ * and the run status (D-024).
  */
 class RunScreeningBatchTest {
 
@@ -161,7 +160,8 @@ class RunScreeningBatchTest {
   }
 
   @Test
-  @DisplayName("[MAM-32 AC-6] a failed run is recorded FAILED with the reason, the read count and the end time")
+  @DisplayName(
+      "[MAM-32 AC-6] a failed run is recorded FAILED with the reason, the read count and the end time")
   void failed() {
     UUID run = batch.open(DATE).runId();
     batch.failed(run, DATE, 200, "provider-service could not be read");

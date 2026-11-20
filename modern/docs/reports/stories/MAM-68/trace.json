@@ -1,13 +1,48 @@
 {
   "story": "MAM-68",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7"],
-  "tests": [
-    "modern/web-ui/tests/portal/provider-record.test.tsx",
-    "modern/web-ui/e2e/portal-record.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
   ],
+  "tests": [
+    "modern/web-ui/e2e/portal-record.spec.ts",
+    "modern/web-ui/tests/portal/provider-record.test.tsx"
+  ],
+  "testIds": {
+    "AC-1": [
+      "portal-record.spec.ts: PASSED",
+      "provider-record.test.tsx: PASSED"
+    ],
+    "AC-2": [
+      "portal-record.spec.ts: PASSED",
+      "provider-record.test.tsx: PASSED"
+    ],
+    "AC-3": [
+      "provider-record.test.tsx: PASSED"
+    ],
+    "AC-4": [
+      "portal-record.spec.ts: PASSED",
+      "provider-record.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "portal-record.spec.ts: PASSED",
+      "provider-record.test.tsx: PASSED"
+    ],
+    "AC-6": [
+      "provider-record.test.tsx: PASSED"
+    ],
+    "AC-7": [
+      "portal-record.spec.ts: PASSED"
+    ]
+  },
   "codeUnits": [
-    "modern/web-ui/src/features/portal/provider/ProviderRecord.tsx",
-    "modern/web-ui/src/features/portal/home/ProviderSummary.tsx"
+    "modern/web-ui/src/features/portal/home/ProviderSummary.tsx",
+    "modern/web-ui/src/features/portal/provider/ProviderRecord.tsx"
   ],
   "rules": []
 }

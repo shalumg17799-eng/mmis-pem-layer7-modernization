@@ -1,7 +1,7 @@
 # MAM-39: CI pipeline for the PEM modernization (build and check, contract lint, web-ui tests, compose smoke test).
-# INERT ON PURPOSE (AC-6): this file lives in modern/.github/workflows/, where GitHub does not run it. To run it, copy it to
-# the repository root .github/workflows/ci.yml (see modern/docs/runbooks/ci.md). Every action and tool is pinned to an
-# exact version (AC-5). Synthetic data only; secrets are generated on the runner by infra/scripts/gen-env-local.sh.
+# ACTIVE since 2026-11-20 (user decision, 19:32): moved from modern/.github/workflows/, where it was inert on purpose
+# (AC-6), to the repository root so that GitHub runs it (see modern/docs/runbooks/ci.md). Every action and tool is pinned
+# to an exact version (AC-5). Synthetic data only; secrets are generated on the runner by infra/scripts/gen-env-local.sh.
 name: pem-ci
 
 on:

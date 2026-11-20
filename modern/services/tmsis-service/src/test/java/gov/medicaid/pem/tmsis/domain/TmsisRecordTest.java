@@ -29,7 +29,8 @@ class TmsisRecordTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-71 AC-1] a provider in status {0} is not reported (P pending, T terminated, D denied, S suspended)")
+      name =
+          "[MAM-71 AC-1] a provider in status {0} is not reported (P pending, T terminated, D denied, S suspended)")
   @ValueSource(strings = {"P", "T", "D", "S"})
   void everyOtherLegacyStatusIsSkipped(String status) {
     assertThat(TmsisRecord.of("M00000444", "1003000444", status, "26090")).isEmpty();

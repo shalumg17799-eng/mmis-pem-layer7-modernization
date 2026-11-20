@@ -4,8 +4,11 @@
 //   [UX-OVERHAUL 2] breadcrumb: after the menu in the tab order, Enter follows it, zero axe violations
 //   [UX-OVERHAUL 3] sorting: aria-sort and the order of the rows on click, Enter and Space; dark ink on the sorted header; axe
 //   [UX-OVERHAUL 5] Tools panel: supervisor, administrator, analyst; axe; keyboard
+//   [UX-OVERHAUL 6] the main menu is on one line under the title (CSS of the polish, B-iv item 6)
+//   [UX-OVERHAUL 17] badges read in sentence case in the browser (the USWDS tag style is overridden, B-iv item 2)
 //   [UX-OVERHAUL 13] page not found: axe, the button to the start page with the keyboard
 import { expect, test, type Page } from '@playwright/test';
+import { APPLICATION } from './support/gateway';
 import { json, mockApi } from './support/gateway-routes';
 import { signIn } from './support/keycloak';
 import { expectNoAxeViolations, expectShellStructure, focusIsVisible, tabTo } from './support/page';
@@ -165,4 +168,44 @@ test('[UX-OVERHAUL 13] the page-not-found page has zero axe violations and its b
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { level: 1, name: 'My enrolment' })).toBeVisible();
   await expect(page).toHaveURL(/\/portal$/);
+});
+
+for (const [user, start, entries] of [
+  ['provider1', '/portal', 4],
+  ['admin1', '/console/providers', 3],
+] as const) {
+  test(`[UX-OVERHAUL 6] ${user}: the ${entries} menu entries are on one line, under the title of the application`, async ({ page }) => {
+    await mockApi(page, {
+      'GET /api/v1/applications': () => EMPTY_PAGE,
+      'GET /api/v1/providers/1003000111': () => NO_RECORD,
+    });
+    await signIn(page, user, start);
+    const links = page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('link');
+    await expect(links).toHaveCount(entries);
+
+    const boxes = await links.evaluateAll((elements) =>
+      elements.map((element) => {
+        const box = element.getBoundingClientRect();
+        return { top: box.top, bottom: box.bottom, left: box.left };
+      }),
+    );
+    expect(Math.max(...boxes.map((box) => box.top)) - Math.min(...boxes.map((box) => box.top))).toBeLessThan(2);
+    expect(boxes.map((box) => box.left)).toEqual([...boxes.map((box) => box.left)].sort((a, b) => a - b));
+    const title = await page.getByRole('link', { name: 'PEM Provider Enrollment' }).boundingBox();
+    expect(title).not.toBeNull();
+    expect(title!.y + title!.height).toBeLessThanOrEqual(Math.min(...boxes.map((box) => box.top)) + 1);
+  });
+}
+
+test('[UX-OVERHAUL 17] a badge reads "Validated" in the browser, not "VALIDATED": the capitals of the USWDS tag are switched off', async ({ page }) => {
+  await mockApi(page, {
+    'GET /api/v1/applications': () => json(200, { items: [APPLICATION], page: 0, size: 20, total: 1 }),
+    'GET /api/v1/providers/1003000111': () => NO_RECORD,
+  });
+  await signIn(page, 'provider1', '/portal');
+
+  const badge = page.getByRole('row').filter({ hasText: '1003000111' }).locator('.usa-tag');
+  await expect(badge).toHaveText('Validated');
+  await expect(badge).toHaveCSS('text-transform', 'none');
+  expect(await badge.evaluate((element) => (element as HTMLElement).innerText)).toBe('Validated');
 });

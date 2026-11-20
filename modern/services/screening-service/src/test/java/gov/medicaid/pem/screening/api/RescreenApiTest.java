@@ -23,10 +23,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
  * MAM-28 on the API: POST /api/v1/screenings (requestScreening) against the contract: the 202
- * answer, the refusals (400, 404, 401, 403 as problem+json), the roles, and what the lessons of
- * the earlier reviews ask of this endpoint (a provider-service that does not answer ends in a
- * visible 503 within its limit, the NPI filter takes no wildcards, the correlation id is never
- * taken unsanitised).
+ * answer, the refusals (400, 404, 401, 403 as problem+json), the roles, and what the lessons of the
+ * earlier reviews ask of this endpoint (a provider-service that does not answer ends in a visible
+ * 503 within its limit, the NPI filter takes no wildcards, the correlation id is never taken
+ * unsanitised).
  */
 class RescreenApiTest extends Lane3Test {
 
@@ -41,7 +41,8 @@ class RescreenApiTest extends Lane3Test {
   // ---- AC-1: the 202 answer ---------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-28 AC-1] the 202 answer is a Screening of the contract: RUNNING, MANUAL, no result yet")
+  @DisplayName(
+      "[MAM-28 AC-1] the 202 answer is a Screening of the contract: RUNNING, MANUAL, no result yet")
   void acceptedAnswerIsTheContractScreening() throws Exception {
     provider();
     MvcResult r = post(PATH, PemJwt.analyst(), "{\"npi\":\"" + NPI + "\"}");
@@ -61,7 +62,8 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-1] the finished screening read by id is a Screening of the contract with four results")
+  @DisplayName(
+      "[MAM-28 AC-1] the finished screening read by id is a Screening of the contract with four results")
   void finishedScreeningIsTheContractScreening() throws Exception {
     provider();
     JsonNode s = screen(NPI);
@@ -73,7 +75,8 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-1] two requests for the same provider make two screenings, both kept (D-018)")
+  @DisplayName(
+      "[MAM-28 AC-1] two requests for the same provider make two screenings, both kept (D-018)")
   void historyIsKept() throws Exception {
     provider();
     String first = screen(NPI).path("screeningId").asText();
@@ -86,14 +89,17 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-1] the content type of the 202 is application/json, as the contract says")
+  @DisplayName(
+      "[MAM-28 AC-1] the content type of the 202 is application/json, as the contract says")
   void contentType() {
-    assertThat(ContractFile.mediaTypes("requestScreening", 202)).containsExactly("application/json");
+    assertThat(ContractFile.mediaTypes("requestScreening", 202))
+        .containsExactly("application/json");
   }
 
   // ---- AC-2: refused requests -------------------------------------------------------------
 
-  @ParameterizedTest(name = "[MAM-28 AC-2] the body <{0}> is refused with 400 problem+json and starts nothing")
+  @ParameterizedTest(
+      name = "[MAM-28 AC-2] the body <{0}> is refused with 400 problem+json and starts nothing")
   @ValueSource(
       strings = {
         "{}",
@@ -124,13 +130,13 @@ class RescreenApiTest extends Lane3Test {
   @Test
   @DisplayName("[MAM-28 AC-2] a request without any body is refused with 400 problem+json")
   void noBody() throws Exception {
-    MvcResult r =
-        mvc.perform(MockMvcRequestBuilders.post(PATH).with(PemJwt.analyst())).andReturn();
+    MvcResult r = mvc.perform(MockMvcRequestBuilders.post(PATH).with(PemJwt.analyst())).andReturn();
     assertProblem(r, 400);
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-2] a body of the wrong media type is not accepted as a screening request")
+  @DisplayName(
+      "[MAM-28 AC-2] a body of the wrong media type is not accepted as a screening request")
   void wrongMediaType() throws Exception {
     provider();
     MvcResult r =
@@ -145,7 +151,8 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-2] an NPI provider-service does not know is 404 problem+json of the contract, nothing is created")
+  @DisplayName(
+      "[MAM-28 AC-2] an NPI provider-service does not know is 404 problem+json of the contract, nothing is created")
   void unknownNpi() throws Exception {
     ScreeningWorld.providerUnknown("1003000999");
     MvcResult r = post(PATH, PemJwt.analyst(), "{\"npi\":\"1003000999\"}");
@@ -170,7 +177,9 @@ class RescreenApiTest extends Lane3Test {
   void roles(String role, int status) throws Exception {
     provider();
     MvcResult r = post(PATH, token(role), "{\"npi\":\"" + NPI + "\"}");
-    assertThat(r.getResponse().getStatus()).as(r.getResponse().getContentAsString()).isEqualTo(status);
+    assertThat(r.getResponse().getStatus())
+        .as(r.getResponse().getContentAsString())
+        .isEqualTo(status);
     if (status != 202) {
       assertProblem(r, status);
       assertThat(ContractFile.problemViolations(body(r))).isEmpty();
@@ -181,7 +190,8 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-6] a forbidden role with a malformed body gets the 403 or 400, never a 202")
+  @DisplayName(
+      "[MAM-28 AC-6] a forbidden role with a malformed body gets the 403 or 400, never a 202")
   void forbiddenWithBadBody() throws Exception {
     MvcResult r = post(PATH, PemJwt.provider(NPI), "{\"npi\":\"123\"}");
     assertThat(r.getResponse().getStatus()).isIn(400, 403);
@@ -189,7 +199,8 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-6] the contract lists the same roles as the code: ANALYST, SUPERVISOR, SYSTEM")
+  @DisplayName(
+      "[MAM-28 AC-6] the contract lists the same roles as the code: ANALYST, SUPERVISOR, SYSTEM")
   void contractRoles() {
     assertThat(ContractFile.roles("requestScreening"))
         .containsExactlyInAnyOrder("ANALYST", "SUPERVISOR", "SYSTEM");
@@ -198,43 +209,59 @@ class RescreenApiTest extends Lane3Test {
   // ---- lesson d: provider-service does not answer -----------------------------------------
 
   @Test
-  @DisplayName("[MAM-28 AC-2] provider-service answering 500 ends in a visible 503, not a 500 or a hang (lesson d)")
+  @DisplayName(
+      "[MAM-28 AC-2] provider-service answering 500 ends in a visible 503, not a 500 or a hang (lesson d)")
   @Timeout(value = 30, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   void providerDownIsServiceUnavailable() throws Exception {
     ScreeningWorld.providerAnswers(NPI, 500);
-    assertThat(statusOfRequest()).isEqualTo(503);
+    assertServiceUnavailable(tryRequest());
     assertThat(screeningCount(NPI)).isZero();
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-2] provider-service that resets the connection ends in a visible 503 (lesson d)")
+  @DisplayName(
+      "[MAM-28 AC-2] provider-service that resets the connection ends in a visible 503 (lesson d)")
   @Timeout(value = 30, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   void providerResetIsServiceUnavailable() throws Exception {
     ScreeningWorld.providerFault(NPI, Fault.CONNECTION_RESET_BY_PEER);
-    assertThat(statusOfRequest()).isEqualTo(503);
+    assertServiceUnavailable(tryRequest());
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-2] provider-service that does not answer within the limit ends in a visible 503 within the limit, never a hang (lesson d)")
+  @DisplayName(
+      "[MAM-28 AC-2] provider-service that does not answer within the limit ends in a visible 503 within the limit, never a hang (lesson d)")
   @Timeout(value = 40, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   void providerHangIsServiceUnavailableInTime() throws Exception {
     ScreeningWorld.providerSlow(
         ScreeningWorld.individual(NPI, "TESTPROV", "ECHO", "MD55555", "TX"), 20_000);
     long start = System.nanoTime();
-    int status = statusOfRequest();
+    MvcResult r = tryRequest();
     Duration took = Duration.ofNanos(System.nanoTime() - start);
-    assertThat(took).as("the call is cut off at the read limit (5 s) plus a margin").isLessThan(Duration.ofSeconds(12));
-    assertThat(status).isEqualTo(503);
+    assertThat(took)
+        .as("the call is cut off at the read limit (5 s) plus a margin")
+        .isLessThan(Duration.ofSeconds(12));
+    assertServiceUnavailable(r);
     assertThat(screeningCount(NPI)).isZero();
   }
 
-  /** The status of the request; an exception that escapes the controller counts as 500. */
-  private int statusOfRequest() {
+  /**
+   * The answer of the request; null when an exception escaped the controller (no answer at all).
+   */
+  private MvcResult tryRequest() {
     try {
-      return post(PATH, PemJwt.analyst(), "{\"npi\":\"" + NPI + "\"}").getResponse().getStatus();
+      return post(PATH, PemJwt.analyst(), "{\"npi\":\"" + NPI + "\"}");
     } catch (Exception e) {
-      return 500;
+      return null;
     }
+  }
+
+  /** 503 problem+json of the contract; no answer, a 500 or a 202 all fail the test. */
+  private void assertServiceUnavailable(MvcResult r) throws Exception {
+    assertThat(r)
+        .as("an exception escaped the controller: no 503 problem+json was answered")
+        .isNotNull();
+    assertProblem(r, 503);
+    assertThat(ContractFile.problemViolations(body(r))).isEmpty();
   }
 
   // ---- lesson e: wildcards in the filters -------------------------------------------------
@@ -246,8 +273,7 @@ class RescreenApiTest extends Lane3Test {
     provider();
     screen(NPI);
     MvcResult r =
-        mvc.perform(
-                MockMvcRequestBuilders.get(PATH).queryParam("npi", npi).with(PemJwt.analyst()))
+        mvc.perform(MockMvcRequestBuilders.get(PATH).queryParam("npi", npi).with(PemJwt.analyst()))
             .andReturn();
     assertProblem(r, 400);
   }
@@ -267,7 +293,8 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-1] the screening list answers 400 problem+json for a size or page out of range")
+  @DisplayName(
+      "[MAM-28 AC-1] the screening list answers 400 problem+json for a size or page out of range")
   void pagingOutOfRange() throws Exception {
     assertProblem(get(PATH + "?size=0", PemJwt.analyst()), 400);
     assertProblem(get(PATH + "?size=201", PemJwt.analyst()), 400);
@@ -278,7 +305,8 @@ class RescreenApiTest extends Lane3Test {
   // ---- lesson h: problem+json for the refusals --------------------------------------------
 
   @Test
-  @DisplayName("[MAM-28 AC-6] a request without a token gets 401 problem+json, also for the read endpoints (lesson h)")
+  @DisplayName(
+      "[MAM-28 AC-6] a request without a token gets 401 problem+json, also for the read endpoints (lesson h)")
   void unauthenticatedIsProblemJson() throws Exception {
     assertProblem(get(PATH, null), 401);
     assertProblem(get(PATH + "/" + UUID.randomUUID(), null), 401);
@@ -302,7 +330,8 @@ class RescreenApiTest extends Lane3Test {
   // ---- lesson g: the correlation id -------------------------------------------------------
 
   @ParameterizedTest(
-      name = "[MAM-28 AC-1] the hostile correlation id header number {index} is never taken over (lesson g)")
+      name =
+          "[MAM-28 AC-1] the hostile correlation id header number {index} is never taken over (lesson g)")
   @ValueSource(
       strings = {
         "bad id with spaces",
@@ -331,7 +360,8 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-1] a valid correlation id of the request is echoed in the response header")
+  @DisplayName(
+      "[MAM-28 AC-1] a valid correlation id of the request is echoed in the response header")
   void validCorrelationIdIsEchoed() throws Exception {
     provider();
     String id = UUID.randomUUID().toString();
@@ -348,7 +378,8 @@ class RescreenApiTest extends Lane3Test {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-1] the ScreeningCompleted event of a requested screening carries the correlation id of the request (java-microservices 11)")
+  @DisplayName(
+      "[MAM-28 AC-1] the ScreeningCompleted event of a requested screening carries the correlation id of the request (java-microservices 11)")
   void correlationIdFollowsTheRequestIntoTheEvent() throws Exception {
     provider();
     String id = UUID.randomUUID().toString();

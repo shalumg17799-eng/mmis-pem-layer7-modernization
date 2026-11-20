@@ -258,7 +258,8 @@ public class IntakeRunSteps {
   @When("an ADMIN downloads the error file of the run")
   public void adminDownloads() throws Exception {
     answer = IntakeApi.errorFile(mvc, lastRun(), PemJwt.admin());
-    errorFile = answer.getResponse().getContentAsString(java.nio.charset.StandardCharsets.ISO_8859_1);
+    errorFile =
+        answer.getResponse().getContentAsString(java.nio.charset.StandardCharsets.ISO_8859_1);
   }
 
   @When("{string} downloads the error file of the run")
@@ -284,7 +285,7 @@ public class IntakeRunSteps {
   // ---- the answer -------------------------------------------------------------------------------
 
   @Then("the intake answer is {int}")
-  public void answerIs(int status) {
+  public void answerIs(int status) throws Exception {
     assertThat(answer.getResponse().getStatus())
         .as("answer %s", answer.getResponse().getContentAsString())
         .isEqualTo(status);
@@ -321,7 +322,7 @@ public class IntakeRunSteps {
     assertThat(log.messages()).contains(line);
   }
 
-  @Then("{int} intake run(s) exist after the call")
+  @Then("the number of intake runs is {int}")
   public void runsExist(int count) {
     assertThat(jdbc.queryForObject("SELECT count(*) FROM intake_run", Integer.class))
         .isEqualTo(count);
@@ -331,8 +332,7 @@ public class IntakeRunSteps {
 
   private List<JsonNode> applicationsAsAnalyst(String query) throws Exception {
     MvcResult r =
-        mvc.perform(
-                get("/api/v1/applications?size=200" + query).with(PemJwt.analyst()))
+        mvc.perform(get("/api/v1/applications?size=200" + query).with(PemJwt.analyst()))
             .andReturn();
     assertThat(r.getResponse().getStatus()).isEqualTo(200);
     List<JsonNode> items = new ArrayList<>();
@@ -355,8 +355,7 @@ public class IntakeRunSteps {
   @Then(
       "the ANALYST sees one VALIDATED application for NPI {string} with source {string}, Medicaid ID {string}, type {string}, taxonomy {string} and the individual RIVERA MARIA MD12345 TX")
   public void individualShown(
-      String npi, String source, String medicaidId, String type, String taxonomy)
-      throws Exception {
+      String npi, String source, String medicaidId, String type, String taxonomy) throws Exception {
     List<JsonNode> items = applicationsAsAnalyst("&npi=" + npi);
     assertThat(items).hasSize(1);
     JsonNode a = items.get(0);
@@ -393,7 +392,10 @@ public class IntakeRunSteps {
     for (JsonNode a : items) {
       assertThat(ContractFile.violations("Application", a)).isEmpty();
       String text = a.toString();
-      assertThat(text).doesNotContain(RESERVED_TEXT).doesNotContain("20260115").doesNotContain("20310115");
+      assertThat(text)
+          .doesNotContain(RESERVED_TEXT)
+          .doesNotContain("20260115")
+          .doesNotContain("20310115");
     }
     List<String> payloads =
         jdbc.queryForList(

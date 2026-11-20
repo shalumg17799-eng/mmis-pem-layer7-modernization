@@ -119,8 +119,7 @@ class IntakeRunDatasetsTest extends IntakeIntegrationTest {
     run(BASELINE, "2026-01-15");
     List<String> records = AppInputFile.datasetRecords(BASELINE);
     assertThat(subjects("ApplicationValidated"))
-        .containsExactlyInAnyOrder(
-            npi(records.get(0)), npi(records.get(1)), npi(records.get(2)));
+        .containsExactlyInAnyOrder(npi(records.get(0)), npi(records.get(1)), npi(records.get(2)));
     assertThat(subjects("ApplicationRejected"))
         .containsExactlyInAnyOrder(
             npi(records.get(4)), npi(records.get(5)), npi(records.get(6)), npi(records.get(7)));
@@ -162,7 +161,8 @@ class IntakeRunDatasetsTest extends IntakeIntegrationTest {
   // ---- appinput-scenarios.dat -----------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-57 AC-1] the scenarios file: all eight applications are written, nothing errored or skipped")
+  @DisplayName(
+      "[MAM-57 AC-1] the scenarios file: all eight applications are written, nothing errored or skipped")
   void scenariosCounts() throws Exception {
     JsonNode run = run(SCENARIOS, "2026-01-15");
     JsonNode counts = run.path("counts");
@@ -189,7 +189,13 @@ class IntakeRunDatasetsTest extends IntakeIntegrationTest {
             row ->
                 assertThat(row.values())
                     .containsExactly(
-                        "RIVERA", "MARIA MD", "MD12345", "TX", "IN", "207Q00000X", "986485495",
+                        "RIVERA",
+                        "MARIA MD",
+                        "MD12345",
+                        "TX",
+                        "IN",
+                        "207Q00000X",
+                        "986485495",
                         "LEGACY_FILE"));
   }
 
@@ -243,7 +249,8 @@ class IntakeRunDatasetsTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-3] every application of the scenarios file keeps its 200-byte record and the link to the run")
+  @DisplayName(
+      "[MAM-56 AC-3] every application of the scenarios file keeps its 200-byte record and the link to the run")
   void scenariosKeepTheRawRecord() throws Exception {
     JsonNode run = run(SCENARIOS, "2026-01-15");
     for (String record : AppInputFile.datasetRecords(SCENARIOS)) {
@@ -258,7 +265,8 @@ class IntakeRunDatasetsTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-4] the scenarios file: eight ApplicationValidated events, one per NPI, none rejected")
+  @DisplayName(
+      "[MAM-56 AC-4] the scenarios file: eight ApplicationValidated events, one per NPI, none rejected")
   void scenariosEvents() throws Exception {
     run(SCENARIOS, "2026-01-15");
     List<String> npis =
@@ -267,7 +275,8 @@ class IntakeRunDatasetsTest extends IntakeIntegrationTest {
     assertThat(subjects("ApplicationRejected")).isEmpty();
   }
 
-  // ---- appinput-bad-length.dat -------------------------------------------------------------------
+  // ---- appinput-bad-length.dat
+  // -------------------------------------------------------------------
 
   @Test
   @DisplayName(

@@ -14,8 +14,8 @@ decisions: [D-020, D-017, D-015, D-025, D-024, D-009, D-023, D-004]
 dependsOn: [MAM-62, MAM-56, MAM-32, MAM-45, MAM-55, MAM-67, MAM-71, MAM-75]
 mainJourney: false
 labels: [svc-web-ui, kag-L-S066, agentic, decision-D-020, decision-D-017, decision-D-015, decision-D-025, decision-D-024, decision-D-009, decision-D-023, decision-D-004]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 4842945aceae2e0c88db2e102549a964aebebc013610ddfe5f78ba2d230ea5e5
 ---
 ## Business requirement
 The scheduled jobs of the old system (enrolment intake, screening, revalidation sweep, sanction intake, directory extract and the monthly extract for the federal reporting feed) can be run on demand by an administrator for a business date that the administrator chooses. The page shows each run with its date, status and counts, shows why a run failed, and lets the administrator download the legacy-format files that the runs produce, so they can be compared with the old system.

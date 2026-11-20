@@ -14,8 +14,8 @@ decisions: [D-006, D-012, D-013, D-018, D-023, D-024, D-026, D-027]
 dependsOn: [MAM-33]
 mainJourney: false
 labels: [svc-sanctions-service, kag-L-S041, agentic, decision-D-006, decision-D-012, decision-D-013, decision-D-018, decision-D-023, decision-D-024, decision-D-026, decision-D-027]
-builtCommit:
-testsSha256: f8cb75b87a8fb1170196945f5f48d167e5b55d82dc8f473e8aa5df506559c86f
+builtCommit: 2e20ead
+testsSha256: 5f94978ef3d3c0dbfd1ed6a7d153dbc524ecccb43e362d37784c6a3c51cd79f3
 ---
 ## Business requirement
 A supervisor can terminate, suspend or reinstate a provider, giving a reason and an effective date. The system checks that the action is one of the three known ones and that the provider exists, changes the provider's status through the provider service, keeps a permanent history of every sanction, and announces the sanction so that a notice can be sent. A suspension is a status of its own and is no longer confused with a denial. As in the old program, a sanction is applied whatever the provider's current status is. Nothing is recorded as applied if the status could not be changed.

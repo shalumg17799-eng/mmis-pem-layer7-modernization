@@ -16,6 +16,7 @@ import gov.medicaid.pem.tmsis.TmsisApi;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -30,10 +31,10 @@ import org.springframework.test.web.servlet.MvcResult;
  * archive generation is added and no ExtractProduced event is published.
  *
  * <p>Code review lessons (2026-11-19) for services that run a job: a database error is reported
- * with a short reason, without SQL text, and the full exception is logged (a); the write that
- * marks work as done is in the transaction of the work, so a failure between leaves nothing (c); a
- * call to a service that does not answer ends in a visible FAILED run within the configured
- * timeout, never in a hang (d).
+ * with a short reason, without SQL text, and the full exception is logged (a); the write that marks
+ * work as done is in the transaction of the work, so a failure between leaves nothing (c); a call
+ * to a service that does not answer ends in a visible FAILED run within the configured timeout,
+ * never in a hang (d).
  *
  * <p>Time limits: the whole class is limited by JUnit, a run is awaited for 25 seconds at most, and
  * the slow provider-service answers only after 15 seconds, so a missing timeout fails a test, it
@@ -49,7 +50,9 @@ class FailedRunApiTest extends IntegrationTest {
     TestProviderService.holds(Prov.active("1003000333"), Prov.active("1003000111"));
   }
 
-  /** The run failed: the BatchRun as listed, after the run has ended; fails the test if not FAILED. */
+  /**
+   * The run failed: the BatchRun as listed, after the run has ended; fails the test if not FAILED.
+   */
   JsonNode failedRun(String date) throws Exception {
     JsonNode run = api.runToEnd(date);
     assertThat(run.path("status").asText()).as("the run: " + run).isEqualTo("FAILED");
@@ -120,14 +123,16 @@ class FailedRunApiTest extends IntegrationTest {
   void tokenFailure() throws Exception {
     twoActive();
     TestProviderService.tokenFails(Fault.SERVER_ERROR);
-    TestClock.set("2026-01-15T12:00:00Z"); // the cached token (valid until 10:05) has expired
+    // a clock far ahead of every other test: the cached token has expired, a new one is asked for
+    TestClock.set("2035-01-01T00:00:00Z");
     JsonNode run = failedRun(DATE);
     assertThat(run.path("error").asText()).isNotBlank();
     assertNothingLeftBehind(run.path("runId").asText());
   }
 
   @Test
-  @DisplayName("[MAM-75 AC-6] after a failed run the next run for the same date works and has its file")
+  @DisplayName(
+      "[MAM-75 AC-6] after a failed run the next run for the same date works and has its file")
   void nextRunAfterAFailure() throws Exception {
     twoActive();
     TestProviderService.providerFails(Fault.SERVER_ERROR);
@@ -179,7 +184,7 @@ class FailedRunApiTest extends IntegrationTest {
   void tokenEndpointDoesNotAnswer() throws Exception {
     twoActive();
     TestProviderService.tokenFails(Fault.SLOW);
-    TestClock.set("2026-01-15T12:00:00Z");
+    TestClock.set("2035-01-01T00:00:00Z");
     long start = System.nanoTime();
     JsonNode run = failedRun(DATE);
     Duration took = Duration.ofNanos(System.nanoTime() - start);
@@ -259,7 +264,9 @@ class FailedRunApiTest extends IntegrationTest {
         .isEqualTo("FAILED");
     String stored =
         jdbc.queryForObject(
-            "SELECT failure_reason FROM extract_run WHERE public_id = ?::uuid", String.class, runId);
+            "SELECT failure_reason FROM extract_run WHERE public_id = ?::uuid",
+            String.class,
+            runId);
     return new Seen(answer, listed, stored, runId);
   }
 
@@ -351,13 +358,41 @@ class FailedRunApiTest extends IntegrationTest {
       "[MAM-75 AC-6] the job execution of a run that failed on a database error is FAILED as well (Spring Batch repository)")
   void jobExecutionIsFailed() throws Exception {
     Seen seen = failedOnDatabaseError(Failure.OUTBOX_INSERT);
-    assertThat(
-            jdbc.queryForObject(
-                "SELECT e.status FROM batch_job_execution e JOIN batch_job_execution_params p"
-                    + " ON p.job_execution_id = e.job_execution_id"
-                    + " WHERE p.parameter_name = 'runId' AND p.parameter_value = ?",
-                String.class,
-                seen.runId()))
-        .isEqualTo("FAILED");
+    Awaitility.await("job execution of run " + seen.runId() + " has ended")
+        .atMost(Duration.ofSeconds(20))
+        .pollInterval(Duration.ofMillis(100))
+        .until(() -> !"STARTED".equals(jobStatus(seen.runId())));
+    assertThat(jobStatus(seen.runId())).isEqualTo("FAILED");
+  }
+
+  String jobStatus(String runId) {
+    return jdbc.queryForObject(
+        "SELECT e.status FROM batch_job_execution e JOIN batch_job_execution_params p"
+            + " ON p.job_execution_id = e.job_execution_id"
+            + " WHERE p.parameter_name = 'runId' AND p.parameter_value = ?",
+        String.class,
+        runId);
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-75 AC-6] an enrolment date that is no date in provider-service's answer fails the run visibly: FAILED, a short reason, nothing archived")
+  void invalidEnrolmentDate() throws Exception {
+    TestProviderService.holds(Prov.active("1003000111").effective("31/12/2026"));
+    JsonNode run = failedRun(DATE);
+    assertThat(run.path("error").asText()).isNotBlank().hasSizeLessThanOrEqualTo(200);
+    assertNothingLeftBehind(run.path("runId").asText());
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-75 AC-6] a Medicaid ID longer than the 9 bytes of the record fails the run visibly with a short reason and no SQL text, nothing is cut or archived (D-024, lesson a)")
+  void medicaidIdTooLong() throws Exception {
+    TestProviderService.holds(Prov.active("1003000111").medicaid("M000001119999"));
+    JsonNode run = failedRun(DATE);
+    String error = run.path("error").asText();
+    assertThat(error).isNotBlank().hasSizeLessThanOrEqualTo(200);
+    assertThat(error.toLowerCase()).doesNotContain(SQL_WORDS);
+    assertNothingLeftBehind(run.path("runId").asText());
   }
 }

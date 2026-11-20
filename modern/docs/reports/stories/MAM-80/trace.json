@@ -1,17 +1,82 @@
 {
   "story": "MAM-80",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
-  "tests": [
-    "modern/web-ui/tests/console/provider-detail.test.tsx",
-    "modern/web-ui/tests/support/detail.ts",
-    "modern/web-ui/e2e/console-detail.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
   ],
+  "tests": [
+    "modern/web-ui/e2e/console-detail.spec.ts",
+    "modern/web-ui/tests/console/provider-detail.test.tsx",
+    "modern/web-ui/tests/support/detail.ts"
+  ],
+  "testIds": {
+    "AC-1": [
+      "console-detail.spec.ts: PASSED",
+      "provider-detail.test.tsx: PASSED"
+    ],
+    "AC-2": [
+      "console-detail.spec.ts: PASSED",
+      "provider-detail.test.tsx: PASSED"
+    ],
+    "AC-3": [
+      "console-detail.spec.ts: PASSED",
+      "provider-detail.test.tsx: PASSED"
+    ],
+    "AC-4": [
+      "provider-detail.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "provider-detail.test.tsx: PASSED"
+    ],
+    "AC-6": [
+      "console-detail.spec.ts: PASSED",
+      "provider-detail.test.tsx: PASSED"
+    ],
+    "AC-7": [
+      "console-detail.spec.ts: PASSED",
+      "provider-detail.test.tsx: PASSED"
+    ],
+    "AC-8": [
+      "console-detail.spec.ts: PASSED"
+    ]
+  },
   "codeUnits": [
     "modern/web-ui/src/features/console/providers/ProviderDetail.tsx",
     "modern/web-ui/src/features/console/providers/ProviderLoader.tsx",
     "modern/web-ui/src/features/portal/provider/ProviderRecord.tsx",
-    "modern/web-ui/src/shared/ui/ProviderRecordTable.tsx",
-    "modern/web-ui/src/shared/format/format.ts"
+    "modern/web-ui/src/shared/format/format.ts",
+    "modern/web-ui/src/shared/ui/ProviderRecordTable.tsx"
   ],
-  "rules": []
+  "rules": [
+    "R-PRVCICS1-ADD-01",
+    "R-PRVCICS1-ADD-06",
+    "R-PRVCICS1-cbl-00005",
+    "R-PRVCICS1-cbl-00006",
+    "R-PRVCICS1-cbl-00007",
+    "R-PRVCICS1-cbl-00008",
+    "R-PRVCICS1-cbl-00009",
+    "R-PRVCICS1-cbl-00010",
+    "R-PRVCICS1-cbl-00026",
+    "R-PRVCICS1-cbl-00027",
+    "R-PRVCICS1-cbl-00028",
+    "R-PRVCICS1-cbl-00029",
+    "R-PRVCICS1-cbl-00030",
+    "R-PRVCICS1-cbl-00031",
+    "R-PRVCICS1-cbl-00032",
+    "R-PRVCICS1-cbl-00033",
+    "R-PRVCICS1-cbl-00034",
+    "R-PRVCICS1-cbl-00035",
+    "R-PRVCICS1-cbl-00036",
+    "R-PRVCICS1-cbl-00037",
+    "R-PRVCICS1-cbl-00038",
+    "R-PRVCICS1-cbl-00039",
+    "R-PRVCICS1-cbl-00040",
+    "R-PRVCICS1-cbl-00041"
+  ]
 }

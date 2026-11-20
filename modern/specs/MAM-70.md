@@ -14,8 +14,8 @@ decisions: [D-012, D-023, D-024]
 dependsOn: [MAM-62, MAM-60]
 mainJourney: true
 labels: [svc-web-ui, kag-L-S057, agentic, decision-D-012, decision-D-023, decision-D-024, slice-main-journey]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: e8d6c32b098c614074a4d239992a8455f4575d51f460e323950983a446441ab5
 ---
 ## Business requirement
 A provider can see every notice the programme has sent to them, such as approval, denial, rejection, suspension, reinstatement, termination and revalidation notices, with the date, a plain name for the notice, how it was sent and whether it was delivered. A provider sees only their own notices.

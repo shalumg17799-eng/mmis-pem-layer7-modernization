@@ -102,7 +102,8 @@ Coverage (AC-2): statuses P, A, T, D, S; screen flags U, P, F; tiers L, M, H; ta
 225 and the others 207, 193, 282. Tiers follow the legacy rule (332/251 High, 341/291/225 Moderate, else Limited).
 
 **Licence-board stub (MAM-47):** the licences of the seeded individuals, SD10001, SD10002, SD10003, SD10004,
-SD10005, SD10006 and SD10007 (state TX), must be answered ACTIVE.
+SD10005, SD10006 and SD10007 (state TX), must be answered ACTIVE. So must the licence of the valid intake individual
+(application 1006133288 of `fixed-width/appinput-baseline.dat`): SD20001 (state TX), see `infra/wiremock/mappings/license-board/clean-SD20001.json`.
 
 ## Journey applicants: never seeded (MAM-50 AC-4)
 

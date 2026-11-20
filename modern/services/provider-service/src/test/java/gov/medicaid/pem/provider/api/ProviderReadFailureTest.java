@@ -77,8 +77,7 @@ class ProviderReadFailureTest extends IntegrationTest {
   @DisplayName(
       "[MAM-37 AC-8] the problem gives a short reason (at most 200 characters) with no SQL text, table, driver or class name")
   void reasonIsShortAndPlain() throws Exception {
-    MvcResult r =
-        whileUnreadable(get("/api/v1/providers/1003000111").with(PemJwt.analyst()));
+    MvcResult r = whileUnreadable(get("/api/v1/providers/1003000111").with(PemJwt.analyst()));
 
     assertThat(r.getResponse().getStatus()).isEqualTo(503);
     assertThat(r.getResponse().getContentType()).startsWith("application/problem+json");
@@ -111,11 +110,9 @@ class ProviderReadFailureTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName(
-      "[MAM-43 AC-1] a failing export is a 503 problem, never a short or empty file")
+  @DisplayName("[MAM-43 AC-1] a failing export is a 503 problem, never a short or empty file")
   void failingExportIsNotAnEmptyFile() throws Exception {
-    MvcResult r =
-        whileUnreadable(get("/api/v1/legacy/provider-master").with(PemJwt.admin()));
+    MvcResult r = whileUnreadable(get("/api/v1/legacy/provider-master").with(PemJwt.admin()));
 
     assertThat(r.getResponse().getStatus()).isEqualTo(503);
     assertThat(r.getResponse().getContentType()).startsWith("application/problem+json");
@@ -170,7 +167,8 @@ class ProviderReadFailureTest extends IntegrationTest {
                 }
               });
       assertThat(log.lines())
-          .anyMatch(l -> l.logger().endsWith("ProviderProblems") && echoed.equals(l.correlationId()));
+          .anyMatch(
+              l -> l.logger().endsWith("ProviderProblems") && echoed.equals(l.correlationId()));
     }
   }
 }

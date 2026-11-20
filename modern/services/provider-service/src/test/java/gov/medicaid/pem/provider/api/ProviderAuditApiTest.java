@@ -1,11 +1,11 @@
 package gov.medicaid.pem.provider.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,10 +82,12 @@ class ProviderAuditApiTest extends IntegrationTest {
     return out;
   }
 
-  // ---- AC-1, AC-2: order and shape -----------------------------------------------------------------
+  // ---- AC-1, AC-2: order and shape
+  // -----------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-40 AC-1] entries come oldest first by time, whatever order they were written in")
+  @DisplayName(
+      "[MAM-40 AC-1] entries come oldest first by time, whatever order they were written in")
   void orderedByTime() throws Exception {
     audit("THIRD", T0.plusSeconds(30), "a", null, null, null);
     audit("FIRST", T0.plusSeconds(10), "a", null, null, null);
@@ -95,8 +97,7 @@ class ProviderAuditApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName(
-      "[MAM-40 AC-1] entries with the same time keep the order in which they were written")
+  @DisplayName("[MAM-40 AC-1] entries with the same time keep the order in which they were written")
   void sameTimeKeepsInsertionOrder() throws Exception {
     for (String action : new String[] {"E1", "E2", "E3", "E4"}) {
       audit(action, T0, "a", null, null, null);
@@ -116,8 +117,7 @@ class ProviderAuditApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName(
-      "[MAM-40 AC-1] the history of one provider holds none of another provider's entries")
+  @DisplayName("[MAM-40 AC-1] the history of one provider holds none of another provider's entries")
   void onlyThisProvidersEntries() throws Exception {
     ProviderRows.individual("1003000444").insert(jdbc);
     audit("MINE", T0, "a", null, null, null);
@@ -182,13 +182,15 @@ class ProviderAuditApiTest extends IntegrationTest {
         "{\"enrollStatus\":\"A\"}",
         UUID.randomUUID());
     MvcResult r =
-        mvc.perform(get("/api/v1/providers/1003000111/audit").with(PemJwt.supervisor())).andReturn();
+        mvc.perform(get("/api/v1/providers/1003000111/audit").with(PemJwt.supervisor()))
+            .andReturn();
 
     OpenApiContract.of("provider-service")
         .assertResponse("getProviderAudit", 200, r.getResponse().getContentAsString());
   }
 
-  // ---- AC-6: paging ----------------------------------------------------------------------------------
+  // ---- AC-6: paging
+  // ----------------------------------------------------------------------------------
 
   private void twentyFiveEntries() {
     for (int i = 1; i <= 25; i++) {
@@ -197,7 +199,8 @@ class ProviderAuditApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-40 AC-6] the first page holds 20 of 25 entries by default, and the answer says so")
+  @DisplayName(
+      "[MAM-40 AC-6] the first page holds 20 of 25 entries by default, and the answer says so")
   void firstPage() throws Exception {
     twentyFiveEntries();
 
@@ -249,7 +252,8 @@ class ProviderAuditApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-40 AC-6] the largest page size is 200; 0, 201, a negative page or text is a 400 problem")
+  @DisplayName(
+      "[MAM-40 AC-6] the largest page size is 200; 0, 201, a negative page or text is a 400 problem")
   void pagingLimits() throws Exception {
     twentyFiveEntries();
 
@@ -263,7 +267,8 @@ class ProviderAuditApiTest extends IntegrationTest {
     }
   }
 
-  // ---- AC-7: roles and refusals -----------------------------------------------------------------------
+  // ---- AC-7: roles and refusals
+  // -----------------------------------------------------------------------
 
   @Test
   @DisplayName("[MAM-40 AC-7] an NPI that is not 10 digits is a 400 problem, before any lookup")
@@ -281,7 +286,8 @@ class ProviderAuditApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-40 AC-7] a SUPERVISOR who is also a PROVIDER keeps the SUPERVISOR right, ANALYST plus PROVIDER does not")
+  @DisplayName(
+      "[MAM-40 AC-7] a SUPERVISOR who is also a PROVIDER keeps the SUPERVISOR right, ANALYST plus PROVIDER does not")
   void roleCombinations() throws Exception {
     mvc.perform(
             get("/api/v1/providers/1003000111/audit")
@@ -294,7 +300,8 @@ class ProviderAuditApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-40 AC-7] the history of an NPI that is not on file is a 404 problem, even though other providers have entries")
+  @DisplayName(
+      "[MAM-40 AC-7] the history of an NPI that is not on file is a 404 problem, even though other providers have entries")
   void unknownProvider() throws Exception {
     audit("MINE", T0, "a", null, null, null);
 
@@ -306,7 +313,8 @@ class ProviderAuditApiTest extends IntegrationTest {
     assertThat(r.getResponse().getContentAsString()).doesNotContain("MINE");
   }
 
-  // ---- AC-8: append-only -----------------------------------------------------------------------------------
+  // ---- AC-8: append-only
+  // -----------------------------------------------------------------------------------
 
   private MockHttpServletRequestBuilder method(String name) {
     String url = "/api/v1/providers/1003000111/audit";
@@ -321,7 +329,8 @@ class ProviderAuditApiTest extends IntegrationTest {
 
   @ParameterizedTest(name = "{0} on the history is refused with 405")
   @ValueSource(strings = {"PUT", "PATCH", "DELETE", "POST"})
-  @DisplayName("[MAM-40 AC-8] PUT, PATCH, DELETE and POST on the history are 405 problems that allow only reading")
+  @DisplayName(
+      "[MAM-40 AC-8] PUT, PATCH, DELETE and POST on the history are 405 problems that allow only reading")
   void onlyReadingIsDefined(String name) throws Exception {
     audit("KEEP", T0, "a", null, null, null);
 
@@ -348,7 +357,8 @@ class ProviderAuditApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-40 AC-8] an anonymous caller who tries to delete the history gets 401, not 405")
+  @DisplayName(
+      "[MAM-40 AC-8] an anonymous caller who tries to delete the history gets 401, not 405")
   void anonymousDelete() throws Exception {
     mvc.perform(delete("/api/v1/providers/1003000111/audit")).andExpect(status().isUnauthorized());
   }
@@ -377,7 +387,9 @@ class ProviderAuditApiTest extends IntegrationTest {
     Path dir = Path.of("").toAbsolutePath();
     while (dir != null) {
       for (Path c :
-          List.of(dir.resolve("src/main"), dir.resolve("services/provider-service/src/main"),
+          List.of(
+              dir.resolve("src/main"),
+              dir.resolve("services/provider-service/src/main"),
               dir.resolve("modern/services/provider-service/src/main"))) {
         if (Files.isDirectory(c.resolve("java/gov/medicaid/pem/provider"))) {
           return c;

@@ -14,8 +14,8 @@ decisions: [D-015, D-020, D-021, D-004, D-006, D-014]
 dependsOn: [MAM-43, MAM-42, MAM-37]
 mainJourney: false
 labels: [svc-tmsis-service, kag-L-S050, agentic, decision-D-015, decision-D-020, decision-D-021, decision-D-004, decision-D-006, decision-D-014]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 3e0331fa9a82caa9a1325de622909ff25977e6fa55f2830c7bb40051f1fc915b
 ---
 ## Business requirement
 Each month the state reports its enrolled providers to the federal Medicaid statistical data programme (T-MSIS). The monthly provider file must list every active provider, one fixed-width record per provider, in exactly the layout the legacy job produced, so the new file can be compared byte for byte with the old one. Each record carries the Medicaid ID, the NPI, an active status and a reporting period written the legacy way, as a two-digit year followed by the day of the year, taken from the business date of the run. Providers who are pending, denied, suspended or terminated are not reported.

@@ -47,7 +47,8 @@ class FutureEnrolmentTest {
         Arguments.of("the year 2000", "2000-01-01", "2026-03-31", false),
         Arguments.of("the year 2099", "2099-06-01", "2026-03-31", true),
         Arguments.of("the year 2100", "2100-01-01", "2026-03-31", true),
-        Arguments.of("an enrolment year 2099 in a business year 2100", "2099-12-31", "2100-01-01", false),
+        Arguments.of(
+            "an enrolment year 2099 in a business year 2100", "2099-12-31", "2100-01-01", false),
         Arguments.of("the same far year", "2101-05-05", "2101-01-01", false),
         Arguments.of("the next far year", "2102-01-01", "2101-12-31", true),
         Arguments.of("a business date in a leap year", "2029-01-01", "2028-02-29", true));

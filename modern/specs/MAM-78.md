@@ -14,8 +14,8 @@ decisions: [D-004, D-020, D-015]
 dependsOn: [MAM-71]
 mainJourney: false
 labels: [svc-tmsis-service, kag-L-S052, agentic, decision-D-004, decision-D-020, decision-D-015]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 1151085c719b093b2aad576a9e0b6503ad7da983bf8fdbbe7c220cf6898a124d
 ---
 ## Business requirement
 While preparing the monthly T-MSIS file, the system checks the enrolment start date of each active provider. When the year of that date is later than the year of the run's business date, the date is probably a data-entry mistake, so the system raises a warning that names the provider. The warning never stops the provider from being reported. The check must work for any year: the legacy check compared only two-digit years, so it wrongly warned about every provider enrolled before the year 2000 and could never warn about a date after 2099.

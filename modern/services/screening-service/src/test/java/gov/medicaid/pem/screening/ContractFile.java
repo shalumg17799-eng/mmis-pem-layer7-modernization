@@ -19,8 +19,8 @@ import org.yaml.snakeyaml.Yaml;
  * modern/contracts/openapi/screening-service.yaml (1.1.0) for the contract tests: the roles and
  * media types of an operation, and a response body checked against a component schema (required
  * properties, no properties outside the schema, enums, constants, types, formats and
- * additionalProperties). The shared OpenApiContract helper cannot read
- * additionalProperties, which BatchRun.counts needs.
+ * additionalProperties). The shared OpenApiContract helper cannot read additionalProperties, which
+ * BatchRun.counts needs.
  */
 public final class ContractFile {
 

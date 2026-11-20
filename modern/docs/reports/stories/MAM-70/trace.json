@@ -1,11 +1,44 @@
 {
   "story": "MAM-70",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7"],
-  "tests": [
-    "modern/web-ui/tests/portal/notices.test.tsx",
-    "modern/web-ui/tests/support/notices.ts",
-    "modern/web-ui/e2e/portal-notices.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
   ],
+  "tests": [
+    "modern/web-ui/e2e/portal-notices.spec.ts",
+    "modern/web-ui/tests/portal/notices.test.tsx",
+    "modern/web-ui/tests/support/notices.ts"
+  ],
+  "testIds": {
+    "AC-1": [
+      "notices.test.tsx: PASSED",
+      "portal-notices.spec.ts: PASSED"
+    ],
+    "AC-2": [
+      "notices.test.tsx: PASSED"
+    ],
+    "AC-3": [
+      "notices.test.tsx: PASSED"
+    ],
+    "AC-4": [
+      "notices.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "notices.test.tsx: PASSED"
+    ],
+    "AC-6": [
+      "notices.test.tsx: PASSED",
+      "portal-notices.spec.ts: PASSED"
+    ],
+    "AC-7": [
+      "portal-notices.spec.ts: PASSED"
+    ]
+  },
   "codeUnits": [
     "modern/web-ui/src/app/screens.tsx",
     "modern/web-ui/src/features/portal/notices/NoticesPage.tsx",

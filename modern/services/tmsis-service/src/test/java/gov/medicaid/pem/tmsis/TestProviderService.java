@@ -166,8 +166,8 @@ public final class TestProviderService {
   }
 
   /**
-   * Every search is answered normally but only after this many milliseconds (a slow provider-service
-   * that still answers within the client's timeout).
+   * Every search is answered normally but only after this many milliseconds (a slow
+   * provider-service that still answers within the client's timeout).
    */
   public static void answerSlowlyBy(int millis) {
     answerDelayMillis = millis;
@@ -265,7 +265,9 @@ public final class TestProviderService {
     }
   }
 
-  /** Applies the fault; true when the request is answered (or cut) and must not be answered again. */
+  /**
+   * Applies the fault; true when the request is answered (or cut) and must not be answered again.
+   */
   private static boolean fault(HttpExchange x, Fault fault) throws IOException {
     switch (fault) {
       case SERVER_ERROR -> {

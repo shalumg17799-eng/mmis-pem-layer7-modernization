@@ -14,8 +14,8 @@ decisions: [D-012, D-024, D-026]
 dependsOn: [MAM-31, MAM-24]
 mainJourney: true
 labels: [svc-notification-service, kag-L-S043, agentic, decision-D-012, decision-D-024, decision-D-026, slice-main-journey]
-builtCommit:
-testsSha256: 9044ccf84146b7a21c24f6545ffba9af498d34ad0e508cb695876dff0955647a
+builtCommit: pending-user-commit
+testsSha256: f9bdd07c2795867c8bff96c7d62473abaebd5cfbf8cf0b04e74f26ae07f47f13
 ---
 ## Business requirement
 When a sanction is recorded against a provider (termination, suspension or reinstatement), the provider must be told by email with the matching notice. This replaces the legacy notice programs that were never delivered. A sanction with an action that is not recognised is refused and reported instead of being sent as a general notice. A notice that cannot be sent, or a missing template, must never stop the processing and never undo the status change; it is recorded as failed and made visible. Each notice is sent once even if the triggering event arrives twice, and every sent notice is announced so that it appears in the provider's history.

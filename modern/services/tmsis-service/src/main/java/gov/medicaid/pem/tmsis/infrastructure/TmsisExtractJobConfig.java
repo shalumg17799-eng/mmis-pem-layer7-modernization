@@ -4,6 +4,7 @@ import gov.medicaid.pem.tmsis.application.ActiveProviders;
 import gov.medicaid.pem.tmsis.application.ArchiveExtract;
 import gov.medicaid.pem.tmsis.application.ExtractItem;
 import gov.medicaid.pem.tmsis.application.ExtractRuns;
+import gov.medicaid.pem.tmsis.application.FailureReason;
 import gov.medicaid.pem.tmsis.application.ProviderRow;
 import gov.medicaid.pem.tmsis.domain.ReportingPeriod;
 import java.time.Clock;
@@ -11,7 +12,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -55,7 +55,11 @@ public class TmsisExtractJobConfig {
 
   @Bean
   Job tmsisExtractJob(
-      JobRepository repo, Step tmsisExtractStep, Step tmsisArchiveStep, ExtractRuns runs, Clock clock) {
+      JobRepository repo,
+      Step tmsisExtractStep,
+      Step tmsisArchiveStep,
+      ExtractRuns runs,
+      Clock clock) {
     return new JobBuilder(JOB, repo)
         .listener(failedRunListener(runs, clock))
         .start(tmsisExtractStep)
@@ -130,23 +134,12 @@ public class TmsisExtractJobConfig {
           return;
         }
         String runId = job.getJobParameters().getString("runId");
-        String reason =
-            job.getAllFailureExceptions().stream()
-                .map(TmsisExtractJobConfig::reason)
-                .distinct()
-                .collect(Collectors.joining("; "));
-        LOG.error("PRVTMS01 run {} FAILED: {}", runId, reason);
-        runs.fail(UUID.fromString(runId), reason.isBlank() ? job.getStatus().name() : reason, clock.instant());
+        List<Throwable> failures = job.getAllFailureExceptions();
+        Throwable first = failures.isEmpty() ? null : failures.get(0);
+        String reason = first == null ? job.getStatus().name() : FailureReason.of(first);
+        LOG.error("PRVTMS01 run {} FAILED: {}", runId, reason, first);
+        runs.fail(UUID.fromString(runId), reason, clock.instant());
       }
     };
-  }
-
-  private static String reason(Throwable t) {
-    Throwable root = t;
-    while (root.getCause() != null && root.getCause() != root) {
-      root = root.getCause();
-    }
-    String own = t.getMessage() == null ? t.getClass().getSimpleName() : t.getMessage();
-    return root == t || root.getMessage() == null ? own : own + " (" + root.getMessage() + ")";
   }
 }

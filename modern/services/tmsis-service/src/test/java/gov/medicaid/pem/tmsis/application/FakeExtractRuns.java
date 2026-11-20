@@ -13,8 +13,8 @@ import java.util.UUID;
 /**
  * An in-memory {@link ExtractRuns} for the unit tests of the application classes: it keeps the runs
  * and their rows, hands the rows back in ascending NPI order (as the real table does), gives each
- * archived file the next generation, and notes every call in {@link #calls} so a test can check
- * the order of the steps.
+ * archived file the next generation, and notes every call in {@link #calls} so a test can check the
+ * order of the steps.
  */
 class FakeExtractRuns implements ExtractRuns {
 

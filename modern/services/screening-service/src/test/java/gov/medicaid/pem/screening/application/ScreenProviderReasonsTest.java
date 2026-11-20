@@ -20,9 +20,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * MAM-20, MAM-22, MAM-28: what screening one provider does with the reason (INITIAL,
- * REVALIDATION, MANUAL), the given id, a source that gave no answer, and a failure on the way (the
- * screening is stored and announced together or not at all).
+ * MAM-20, MAM-22, MAM-28: what screening one provider does with the reason (INITIAL, REVALIDATION,
+ * MANUAL), the given id, a source that gave no answer, and a failure on the way (the screening is
+ * stored and announced together or not at all).
  */
 class ScreenProviderReasonsTest {
 
@@ -129,7 +129,8 @@ class ScreenProviderReasonsTest {
   }
 
   @Test
-  @DisplayName("[MAM-25 AC-1] the screening starts when the provider is read and ends after the sources answered")
+  @DisplayName(
+      "[MAM-25 AC-1] the screening starts when the provider is read and ends after the sources answered")
   void startAndCompletionTimes() {
     Screening s = screen.screen("1003000111", "INITIAL");
     assertThat(s.startedAt()).isEqualTo(Instant.parse("2026-01-15T10:00:00Z"));
@@ -138,16 +139,19 @@ class ScreenProviderReasonsTest {
   }
 
   @Test
-  @DisplayName("[MAM-18 AC-1] the provider is read first, then the sources are asked, then it is stored, then announced")
+  @DisplayName(
+      "[MAM-18 AC-1] the provider is read first, then the sources are asked, then it is stored, then announced")
   void order() {
     screen.screen("1003000111", "INITIAL");
     assertThat(order).containsExactly("provider", "sources", "save", "outbox");
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-5] a provider that cannot be read: no source is asked, nothing stored or announced")
+  @DisplayName(
+      "[MAM-20 AC-5] a provider that cannot be read: no source is asked, nothing stored or announced")
   void providerUnreadable() {
-    providerFailure = new ProviderFactsSource.Unavailable("1003000777", new RuntimeException("5xx"));
+    providerFailure =
+        new ProviderFactsSource.Unavailable("1003000777", new RuntimeException("5xx"));
     assertThatThrownBy(() -> screen.screen("1003000777", "INITIAL"))
         .isInstanceOf(ProviderFactsSource.Unavailable.class);
     assertThat(order).containsExactly("provider");
@@ -156,10 +160,12 @@ class ScreenProviderReasonsTest {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-2] a provider that provider-service does not know: failure passed on, nothing stored")
+  @DisplayName(
+      "[MAM-28 AC-2] a provider that provider-service does not know: failure passed on, nothing stored")
   void providerUnknown() {
     providerFailure = ApiException.notFound("no such provider");
-    assertThatThrownBy(() -> screen.screen("1003000999", "MANUAL")).isInstanceOf(ApiException.class);
+    assertThatThrownBy(() -> screen.screen("1003000999", "MANUAL"))
+        .isInstanceOf(ApiException.class);
     assertThat(store.saved).isEmpty();
     assertThat(outbox.sent).isEmpty();
   }
@@ -175,7 +181,8 @@ class ScreenProviderReasonsTest {
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-1] a source without an answer (C) still gives a stored FAIL screening and an announced FAIL")
+  @DisplayName(
+      "[MAM-20 AC-1] a source without an answer (C) still gives a stored FAIL screening and an announced FAIL")
   void notAnsweredIsFailAndAnnounced() {
     answers =
         List.of(
@@ -192,7 +199,8 @@ class ScreenProviderReasonsTest {
   }
 
   @Test
-  @DisplayName("[MAM-22 AC-1] the event is keyed by the NPI and carries the taxonomy of the provider")
+  @DisplayName(
+      "[MAM-22 AC-1] the event is keyed by the NPI and carries the taxonomy of the provider")
   void eventKeyAndTaxonomy() {
     screen.screen("1003000444", "INITIAL");
     assertThat(outbox.sent.get(0).subject()).isEqualTo("1003000444");

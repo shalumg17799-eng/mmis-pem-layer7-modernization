@@ -14,8 +14,8 @@ decisions: [D-022, D-006, D-007, D-023, D-024]
 dependsOn: [MAM-77]
 mainJourney: false
 labels: [svc-web-ui, kag-L-S060, agentic, decision-D-022, decision-D-006, decision-D-007, decision-D-023, decision-D-024]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 75e413717035f125f97172c7ef176362ac796a926cc74d18e17c1a9ae2545a1a
 ---
 ## Business requirement
 When an analyst opens a provider, the page shows everything the provider record holds, each field with its meaning, and states the enrolment status in words and as the stored code. The old inquiry screen looked the provider up but never actually showed the status message; the new page always does. Active, terminated, pending, denied and suspended each have their own wording, an unrecognised status is not hidden, and an unknown provider is reported plainly.

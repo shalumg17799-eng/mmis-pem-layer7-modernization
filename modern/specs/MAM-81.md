@@ -14,8 +14,8 @@ decisions: [D-003, D-029, D-020, D-024]
 dependsOn: [MAM-48, MAM-45, MAM-28, MAM-93, MAM-85, MAM-50, MAM-51]
 mainJourney: false
 labels: [svc-e2e, kag-L-S072, agentic, decision-D-003, decision-D-029, decision-D-020, decision-D-024]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: b8965f5cad20014c69e20fd17fe4a72057d4c59eba0ac03f6b0da6832e7a7114
 ---
 ## Business requirement
 Every month the administrator must be able to find the providers whose revalidation is due, see each of them once as a case, have them checked again automatically, and receive the legacy queue file. This story proves that monthly cycle works for real in the running system.

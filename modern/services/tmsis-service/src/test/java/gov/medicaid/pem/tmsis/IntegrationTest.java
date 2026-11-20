@@ -20,9 +20,9 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * Base for integration tests: the real application with Postgres and Kafka from Testcontainers,
- * the fake provider-service of {@link TestProviderService} and the test Clock (2026-01-15, 10:00
- * UTC). Before each test the fake and the clock are reset and the extract tables are emptied (so an
+ * Base for integration tests: the real application with Postgres and Kafka from Testcontainers, the
+ * fake provider-service of {@link TestProviderService} and the test Clock (2026-01-15, 10:00 UTC).
+ * Before each test the fake and the clock are reset and the extract tables are emptied (so an
  * archive starts empty); after each test every run has ended (a run is asynchronous, ADR-004), the
  * triggers a test made are lifted, and the clock is reset.
  *

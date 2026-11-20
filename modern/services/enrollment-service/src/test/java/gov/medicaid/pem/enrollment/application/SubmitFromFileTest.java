@@ -73,7 +73,8 @@ class SubmitFromFileTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-4] a valid record is announced once as ApplicationValidated with its NPI as subject")
+  @DisplayName(
+      "[MAM-56 AC-4] a valid record is announced once as ApplicationValidated with its NPI as subject")
   void validAnnounced() {
     StoredApplication a =
         submit.fromFile(application("1003000111", "IN", "207Q00000X"), "admin1", id -> {});
@@ -93,9 +94,11 @@ class SubmitFromFileTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-4] a blank NPI is REJECTED with exactly E101 and no event (no subject for it)")
+  @DisplayName(
+      "[MAM-56 AC-4] a blank NPI is REJECTED with exactly E101 and no event (no subject for it)")
   void blankNpi() {
-    StoredApplication a = submit.fromFile(application(null, "IN", "207Q00000X"), "admin1", id -> {});
+    StoredApplication a =
+        submit.fromFile(application(null, "IN", "207Q00000X"), "admin1", id -> {});
     assertThat(a.status()).isEqualTo("REJECTED");
     assertThat(codes(a.errors())).containsExactly("E101/npi");
     assertThat(outbox.sent).isEmpty();
@@ -135,7 +138,8 @@ class SubmitFromFileTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-8] the run key is written for the stored application: attach gets its id once")
+  @DisplayName(
+      "[MAM-57 AC-8] the run key is written for the stored application: attach gets its id once")
   void attachGetsTheApplicationId() {
     List<UUID> attached = new ArrayList<>();
     StoredApplication a =
@@ -156,7 +160,8 @@ class SubmitFromFileTest {
   @DisplayName(
       "[MAM-57 AC-8] the order is: save, tie to the run, announce, so all three belong to one unit of work")
   void orderOfTheWrites() {
-    submit.fromFile(application("1003000111", "IN", "207Q00000X"), "admin1", id -> order.add("attach"));
+    submit.fromFile(
+        application("1003000111", "IN", "207Q00000X"), "admin1", id -> order.add("attach"));
     assertThat(order).containsExactly("save", "attach", "enqueue ApplicationValidated");
   }
 

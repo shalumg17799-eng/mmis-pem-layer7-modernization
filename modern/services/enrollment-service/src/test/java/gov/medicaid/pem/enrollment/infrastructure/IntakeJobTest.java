@@ -27,8 +27,7 @@ class IntakeJobTest extends IntakeIntegrationTest {
 
   byte[] cutShort() {
     return AppInputFile.lines(
-        AppInputFile.valid("1003000111"),
-        AppInputFile.cut(AppInputFile.valid("1003000222"), 150));
+        AppInputFile.valid("1003000111"), AppInputFile.cut(AppInputFile.valid("1003000222"), 150));
   }
 
   /** The job executions of the run: job name, status of the execution. */
@@ -49,7 +48,8 @@ class IntakeJobTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-1] a completed run is one execution of the Spring Batch job PRVENR01, COMPLETED")
+  @DisplayName(
+      "[MAM-56 AC-1] a completed run is one execution of the Spring Batch job PRVENR01, COMPLETED")
   void completedRunIsAJobExecution() throws Exception {
     String id = run(valid(), DATE);
     assertThat(executionsOf(id))
@@ -58,7 +58,8 @@ class IntakeJobTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-1] the job parameters are runId, businessDate and submittedBy; the run id identifies the job instance")
+  @DisplayName(
+      "[MAM-56 AC-1] the job parameters are runId, businessDate and submittedBy; the run id identifies the job instance")
   void jobParameters() throws Exception {
     String id = run(valid(), DATE);
     List<Map<String, Object>> params =
@@ -73,7 +74,9 @@ class IntakeJobTest extends IntakeIntegrationTest {
             row -> row.get("parameter_value"),
             row -> row.get("identifying"))
         .containsExactly(
-            tuple("businessDate", DATE, "Y"), tuple("runId", id, "Y"), tuple("submittedBy", "admin1", "N"));
+            tuple("businessDate", DATE, "Y"),
+            tuple("runId", id, "Y"),
+            tuple("submittedBy", "admin1", "N"));
   }
 
   @Test
@@ -115,7 +118,8 @@ class IntakeJobTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-1] the run result is the intake_run row, the job repository holds no counts of its own")
+  @DisplayName(
+      "[MAM-57 AC-1] the run result is the intake_run row, the job repository holds no counts of its own")
   void countsAreInTheRunRow() throws Exception {
     String id = run(valid(), DATE);
     JsonNode read = IntakeApi.run(mvc, json, id);

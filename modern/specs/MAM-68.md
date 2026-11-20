@@ -14,8 +14,8 @@ decisions: [D-006, D-007, D-002, D-003, D-004, D-023]
 dependsOn: [MAM-62, MAM-37]
 mainJourney: true
 labels: [svc-web-ui, kag-L-S056, agentic, decision-D-006, decision-D-007, decision-D-002, decision-D-003, decision-D-004, decision-D-023, slice-main-journey]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 196d7989315c8dc0537a3d2fe5d0fb77568de32b8d34ba93caa9e3d9e222cd81
 ---
 ## Business requirement
 A provider can see their own provider record: their identifiers, type, specialty, enrolment status (including pending, active, terminated, denied and suspended), screening result, risk level, effective date and next revalidation date, plus either their personal details and licence or their organisation's details. Every code is shown with its meaning, dates are shown with four-digit years, and a provider can never see someone else's record.

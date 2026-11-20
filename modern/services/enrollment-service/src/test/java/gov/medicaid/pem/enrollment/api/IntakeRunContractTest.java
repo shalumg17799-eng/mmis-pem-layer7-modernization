@@ -51,12 +51,14 @@ class IntakeRunContractTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-1] the 200 answer of getIntakeRun for a COMPLETED run is a BatchRun with the four counts")
+  @DisplayName(
+      "[MAM-57 AC-1] the 200 answer of getIntakeRun for a COMPLETED run is a BatchRun with the four counts")
   void completedRunIsABatchRun() throws Exception {
     JsonNode run = IntakeApi.runToEnd(mvc, json, valid(), DATE);
     assertThat(run.path("status").asText()).isEqualTo("COMPLETED");
     assertThat(ContractFile.violations("BatchRun", run)).isEmpty();
-    assertThat(run.path("counts").fieldNames()).toIterable()
+    assertThat(run.path("counts").fieldNames())
+        .toIterable()
         .containsExactly("read", "written", "errored", "skipped");
   }
 
@@ -72,14 +74,16 @@ class IntakeRunContractTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-1] a COMPLETED run has no error member or a null one, never an empty text")
+  @DisplayName(
+      "[MAM-57 AC-1] a COMPLETED run has no error member or a null one, never an empty text")
   void completedRunHasNoError() throws Exception {
     JsonNode run = IntakeApi.runToEnd(mvc, json, valid(), DATE);
     assertThat(run.path("error").isMissingNode() || run.path("error").isNull()).isTrue();
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-1] the status of a run is one of the contract's RUNNING, COMPLETED, FAILED")
+  @DisplayName(
+      "[MAM-57 AC-1] the status of a run is one of the contract's RUNNING, COMPLETED, FAILED")
   void statusIsInTheEnum() throws Exception {
     JsonNode completed = IntakeApi.runToEnd(mvc, json, valid(), DATE);
     JsonNode failed = IntakeApi.runToEnd(mvc, json, cutShort(), "2026-04-01");
@@ -138,7 +142,8 @@ class IntakeRunContractTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-7] the contract documents 200, 401, 403, 404 for getIntakeRun and getIntakeErrorFile")
+  @DisplayName(
+      "[MAM-57 AC-7] the contract documents 200, 401, 403, 404 for getIntakeRun and getIntakeErrorFile")
   void readStatuses() {
     assertThat(ContractFile.statuses("getIntakeRun")).contains("200", "401", "403", "404");
     assertThat(ContractFile.statuses("getIntakeErrorFile")).contains("200", "401", "403", "404");
@@ -155,9 +160,11 @@ class IntakeRunContractTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-1] the request of startIntakeRun is multipart/form-data with file and businessDate required")
+  @DisplayName(
+      "[MAM-56 AC-1] the request of startIntakeRun is multipart/form-data with file and businessDate required")
   void requestSchema() {
-    assertThat(ContractFile.requestMediaTypes("startIntakeRun")).containsExactly("multipart/form-data");
+    assertThat(ContractFile.requestMediaTypes("startIntakeRun"))
+        .containsExactly("multipart/form-data");
     assertThat(ContractFile.required("FileRunRequest")).contains("file", "businessDate");
     assertThat(ContractFile.required("FileRunRequest")).doesNotContain("batchId");
   }

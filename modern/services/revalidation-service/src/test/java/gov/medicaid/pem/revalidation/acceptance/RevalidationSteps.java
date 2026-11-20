@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.medicaid.pem.testsupport.OpenApiContract;
+import gov.medicaid.pem.revalidation.ContractFile;
 import gov.medicaid.pem.testsupport.PemContainers;
 import gov.medicaid.pem.testsupport.PemJwt;
 import io.cucumber.datatable.DataTable;
@@ -100,6 +100,13 @@ public class RevalidationSteps {
     JsonNode p = body();
     assertThat(p.path("title").asText()).isNotBlank();
     assertThat(p.path("status").asInt()).isEqualTo(expected);
+  }
+
+  /** The last answer conforms to the schema the contract documents for this operation and status. */
+  private void contract(String operation, int status) throws Exception {
+    assertThat(ContractFile.responseViolations(operation, status, body()))
+        .as("%s %s: %s", operation, status, result.getResponse().getContentAsString())
+        .isEmpty();
   }
 
   private UUID lastRun() {
@@ -342,8 +349,7 @@ public class RevalidationSteps {
       "the sweep start answer is {int} with a BatchRun for business date {string}, job {string} and status {string}")
   public void batchRun(int status, String date, String job, String runStatus) throws Exception {
     status(status);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse("startRevalidationSweep", 202, result.getResponse().getContentAsString());
+    contract("startRevalidationSweep", 202);
     JsonNode run = body();
     assertThat(UUID.fromString(run.path("runId").asText())).isEqualTo(lastRun());
     assertThat(run.path("job").asText()).isEqualTo(job);
@@ -355,8 +361,7 @@ public class RevalidationSteps {
   @Then("the sweep start answer is {int} with a problem")
   public void startProblem(int status) throws Exception {
     problem(status);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse("startRevalidationSweep", status, result.getResponse().getContentAsString());
+    contract("startRevalidationSweep", status);
   }
 
   @Then("the sweep start answer is {int}")
@@ -396,9 +401,7 @@ public class RevalidationSteps {
       throws Exception {
     readRun(role, lastRun());
     status(200);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse(
-            "getRevalidationSweep", 200, result.getResponse().getContentAsString());
+    contract("getRevalidationSweep", 200);
     JsonNode run = body();
     assertThat(UUID.fromString(run.path("runId").asText())).isEqualTo(lastRun());
     assertThat(run.path("job").asText()).isEqualTo("revalidation-sweep");
@@ -416,9 +419,7 @@ public class RevalidationSteps {
   public void failedRun(String role, String status, String reason) throws Exception {
     readRun(role, lastRun());
     status(200);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse(
-            "getRevalidationSweep", 200, result.getResponse().getContentAsString());
+    contract("getRevalidationSweep", 200);
     JsonNode run = body();
     assertThat(run.path("status").asText()).isEqualTo(status);
     assertThat(run.path("error").asText()).contains(reason);
@@ -676,9 +677,7 @@ public class RevalidationSteps {
   @Then("the list answer is {int} with a problem")
   public void listProblem(int status) throws Exception {
     problem(status);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse(
-            "listRevalidationCases", status, result.getResponse().getContentAsString());
+    contract("listRevalidationCases", status);
   }
 
   @Then("the list answer is {int}")
@@ -690,9 +689,7 @@ public class RevalidationSteps {
       "the list answer is {int} with total {int}, page {int} and size {int} and exactly the cases of NPI {string}")
   public void listOf(int status, int total, int page, int size, String npis) throws Exception {
     status(status);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse(
-            "listRevalidationCases", 200, result.getResponse().getContentAsString());
+    contract("listRevalidationCases", 200);
     JsonNode p = body();
     assertThat(p.path("total").asInt()).isEqualTo(total);
     assertThat(p.path("page").asInt()).isEqualTo(page);
@@ -841,9 +838,7 @@ public class RevalidationSteps {
   public void completionProblem(int status) throws Exception {
     problem(status);
     if (status == 404 || status == 409) {
-      OpenApiContract.of(CONTRACT)
-          .assertResponse(
-              "completeRevalidation", status, result.getResponse().getContentAsString());
+      contract("completeRevalidation", status);
     }
   }
 
@@ -851,9 +846,7 @@ public class RevalidationSteps {
       "the completion answer is {int} with the case of NPI {string} in status {string}, its due date {string} and a closedAt")
   public void completed(int status, String npi, String caseStatus, String due) throws Exception {
     status(status);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse(
-            "completeRevalidation", 200, result.getResponse().getContentAsString());
+    contract("completeRevalidation", 200);
     JsonNode c = body();
     assertThat(c.path("caseId").asText()).isEqualTo(caseIdOf(npi).toString());
     assertThat(c.path("npi").asText()).isEqualTo(npi);

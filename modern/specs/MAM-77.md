@@ -14,8 +14,8 @@ decisions: [D-022, D-023, D-024]
 dependsOn: [MAM-62, MAM-37]
 mainJourney: false
 labels: [svc-web-ui, kag-L-S059, agentic, decision-D-022, decision-D-023, decision-D-024]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 346ccf2bbe28503c36dc72b3b29fc435c9056140dfd56c78ed5fe37802cc8a62
 ---
 ## Business requirement
 A state analyst can look up a provider by identification number, Medicaid ID or name. The number the analyst types is the one searched, a blank or malformed entry is sent back for correction, an unknown provider is reported plainly as 'No provider found', and the last number used is remembered so the analyst can continue without retyping. This replaces the old inquiry transaction, whose typed number was never used and whose messages never reached the screen. Only staff roles can use it.

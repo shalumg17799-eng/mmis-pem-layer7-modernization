@@ -19,7 +19,7 @@ sample from `aws-transform/test-data/` or a fabricated NPI with a valid check di
 | leie (OIG LEIE exclusions) | `GET /leie/exclusions?npi={10 digits}` | `excluded: false` | NPI 1990000111 excluded, type 1128(a)(1) PROGRAM-RELATED FRAUD, 2023-01-15 (the owner of applicant 1003000444) |
 | sam (SAM.gov debarments) | `GET /sam/debarments?npi={10 digits}` | `debarred: false` (SAM is empty by design) | NPI 1005999010, the fabricated entity SAMPLE DEBARRED SUPPLY 01, debarred from 2025-06-01 |
 | nppes (national registry) | `GET /nppes/providers?npi={10 digits}` | `found: true, active: true` | NPI 1005999036, fabricated, deactivated 2024-06-30 |
-| license-board (state licences) | `GET /license-board/licenses?licenseNo={no}&state={st}` | the six ACTIVE sample licences of `license_board.txt` with their expiry, and the seeded licences SD10001-SD10007 / TX (ACTIVE, expiry 2030-12) | PT99900 / TX EXPIRED, expiry 2024-01. Any other licence or state answers `found: false` |
+| license-board (state licences) | `GET /license-board/licenses?licenseNo={no}&state={st}` | the six ACTIVE sample licences of `license_board.txt` with their expiry, and the seeded licences SD10001-SD10007 / TX and SD20001 / TX, the licence of the valid intake individual 1006133288 of `testdata/fixed-width/appinput-baseline.dat` (all ACTIVE, expiry 2030-12) | PT99900 / TX EXPIRED, expiry 2024-01. Any other licence or state answers `found: false` |
 | ssa-dmf (death master file) | `GET /ssa-dmf/deaths?npi={10 digits}` | `deceased: false` | NPI 1005999028, fabricated, died 2025-08-01 |
 
 ## Selecting the error and slow answers

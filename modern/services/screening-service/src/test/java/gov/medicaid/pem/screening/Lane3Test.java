@@ -6,14 +6,10 @@ import static org.assertj.core.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.medicaid.pem.testsupport.EventProbe;
-import gov.medicaid.pem.testsupport.PemContainers;
 import gov.medicaid.pem.testsupport.PemJwt;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import org.awaitility.Awaitility;
@@ -55,8 +51,8 @@ public abstract class Lane3Test extends IntegrationTest {
   }
 
   /**
-   * Lifts every write rejection the test made, waits until no run is going on any more (a run
-   * must not write into the next test's world) and restores the clean stubs.
+   * Lifts every write rejection the test made, waits until no run is going on any more (a run must
+   * not write into the next test's world) and restores the clean stubs.
    */
   @AfterEach
   protected void liftRejections() {
@@ -190,7 +186,9 @@ public abstract class Lane3Test extends IntegrationTest {
             org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
             org.apache.kafka.common.serialization.StringDeserializer.class,
             org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-            org.apache.kafka.common.serialization.StringDeserializer.class);
+            org.apache.kafka.common.serialization.StringDeserializer.class,
+            org.apache.kafka.clients.consumer.ConsumerConfig.METADATA_MAX_AGE_CONFIG,
+            1000);
     List<String> seen = new ArrayList<>();
     try (var consumer = new org.apache.kafka.clients.consumer.KafkaConsumer<String, String>(cfg)) {
       consumer.subscribe(List.of(topic));
@@ -222,7 +220,9 @@ public abstract class Lane3Test extends IntegrationTest {
             org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
             org.apache.kafka.common.serialization.StringDeserializer.class,
             org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-            org.apache.kafka.common.serialization.StringDeserializer.class);
+            org.apache.kafka.common.serialization.StringDeserializer.class,
+            org.apache.kafka.clients.consumer.ConsumerConfig.METADATA_MAX_AGE_CONFIG,
+            1000);
     try (var consumer = new org.apache.kafka.clients.consumer.KafkaConsumer<String, String>(cfg)) {
       consumer.subscribe(List.of(topic));
       long end = System.nanoTime() + howLong.toNanos();
@@ -268,8 +268,10 @@ public abstract class Lane3Test extends IntegrationTest {
   }
 
   /** The answer is this status with an application/problem+json body. */
-  protected void assertProblem(MvcResult r, int status) {
-    assertThat(r.getResponse().getStatus()).as(r.getResponse().getContentAsString()).isEqualTo(status);
+  protected void assertProblem(MvcResult r, int status) throws Exception {
+    assertThat(r.getResponse().getStatus())
+        .as(r.getResponse().getContentAsString())
+        .isEqualTo(status);
     assertThat(r.getResponse().getContentType()).startsWith("application/problem+json");
   }
 

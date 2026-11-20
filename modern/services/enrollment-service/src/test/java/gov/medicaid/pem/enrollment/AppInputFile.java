@@ -70,17 +70,20 @@ public final class AppInputFile {
 
   /** A valid individual application for the NPI: type IN, taxonomy 207Q00000X, RIVERA MARIA. */
   public static String valid(String npi) {
-    return individual(npi, "M00000" + npi.substring(7), "IN", "207Q00000X", "RIVERA", "MARIA", "MD12345", "TX");
+    return individual(
+        npi, "M00000" + npi.substring(7), "IN", "207Q00000X", "RIVERA", "MARIA", "MD12345", "TX");
   }
 
   /** A valid individual application whose taxonomy is empty (E104). */
   public static String noTaxonomy(String npi) {
-    return individual(npi, "M00000" + npi.substring(7), "IN", "", "RIVERA", "MARIA", "MD12345", "TX");
+    return individual(
+        npi, "M00000" + npi.substring(7), "IN", "", "RIVERA", "MARIA", "MD12345", "TX");
   }
 
   /** A valid individual application with another type code (E102 when the code is unknown). */
   public static String ofType(String npi, String type) {
-    return individual(npi, "M00000" + npi.substring(7), type, "207Q00000X", "RIVERA", "MARIA", "MD12345", "TX");
+    return individual(
+        npi, "M00000" + npi.substring(7), type, "207Q00000X", "RIVERA", "MARIA", "MD12345", "TX");
   }
 
   /** A valid individual application with an empty NPI (E101). */
@@ -138,7 +141,9 @@ public final class AppInputFile {
     return rows;
   }
 
-  /** A synthetic dataset of modern/testdata, for example {@code fixed-width/appinput-baseline.dat}. */
+  /**
+   * A synthetic dataset of modern/testdata, for example {@code fixed-width/appinput-baseline.dat}.
+   */
   public static byte[] dataset(String name) throws IOException {
     Path rel = Path.of("testdata", name);
     Path dir = Path.of("").toAbsolutePath();

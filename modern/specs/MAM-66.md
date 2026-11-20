@@ -14,8 +14,8 @@ decisions: [D-001, D-016, D-023, D-024, D-004]
 dependsOn: [MAM-64, MAM-54]
 mainJourney: true
 labels: [svc-web-ui, kag-L-S055, agentic, decision-D-001, decision-D-016, decision-D-023, decision-D-024, decision-D-004, slice-main-journey]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 55345fb4a12dae83af3a73dfa7fe27155b2e8aae6626ad0d2d83b5f3266d3402
 ---
 ## Business requirement
 A provider can open any of their applications to see what happened to it: when it was sent, whether it was accepted or rejected and, for a rejected one, every reason it was rejected, each with its error code. A provider never sees another provider's application.

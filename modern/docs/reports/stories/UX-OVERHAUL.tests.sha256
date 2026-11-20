@@ -1,1 +1,16 @@
+6004eaa83b616339d62c7a1591c5e6f88173ea7532a6b2cd6d761f9c8b3a7b6f  modern/web-ui/e2e/ux-overhaul.spec.ts
+3199ecc5d60bb747fecce8a8075ed9277982468aefa7f17822f39eee2de210e8  modern/web-ui/tests/support/uxWorld.tsx
+4a89211419dd80d720fc80a70d1768b7ea5644f36d4aa2ad0109177e915efe07  modern/web-ui/tests/ux/application-status.test.tsx
+d8964a6f0665f66f51d9939378fe73573527c46a7e1d3249323f916942573d6b  modern/web-ui/tests/ux/approval-brief.test.tsx
+aaf55eee0ddbc49bf16b7c2a61ba47d16e5ba88440332a3184b9a9238661a3a7  modern/web-ui/tests/ux/breadcrumb.test.tsx
+69ebb03bef3499f30a562b58c3280e57a8f5cf50d03a1bb23bbd59b6e1b6583e  modern/web-ui/tests/ux/empty-state.test.tsx
+421cbce56333a285f6ee5655e1ec41632f4d824f409de5e2fde872272cb51b94  modern/web-ui/tests/ux/landing-and-errors.test.tsx
+d041bf75a4a675778697d46ffa0f20942449a5ee3c6e64a39cc8bf9a2e0f1551  modern/web-ui/tests/ux/plain-dates.test.tsx
+b786f0e7262524b9e901d5426275c73a50c536e2ed3e9df0aa0c1090aad60aca  modern/web-ui/tests/ux/plain-labels.test.tsx
+4a8cc058e9f27d6d2ee486d67bd215a00585457cbb08f25e0fa244f0e971bb92  modern/web-ui/tests/ux/plain-words.test.ts
 d0aed5191f93861676d4bde126d250ba80d1899e4ec208e9e42212d42645da6a  modern/web-ui/tests/ux/portal-home.test.tsx
+4eda354b6637ff817ccc7035c7b76b9befae01be8f428413cd584d1263876cb7  modern/web-ui/tests/ux/review-and-tiles.test.tsx
+df4e36f4e76faca9b8cc73e1575a6a8f4db54d8f530aeec9a706e6ab7dea5a6b  modern/web-ui/tests/ux/sorting.test.tsx
+3e277ef0485c97b0d2e5d0121d6d3d7c19ad26d077a1c5b1ed8b6a3480357c3d  modern/web-ui/tests/ux/step-indicator.test.tsx
+785f17dab532e03165b03f4ef88f98db4fc2e36547bf7f721d8abf0d32d3ed73  modern/web-ui/tests/ux/summary-lists.test.tsx
+b282f4e0cffa9e8163d7342cf98fc6269e4be91e27a7a8a9dbe9538985291dc2  modern/web-ui/tests/ux/tools-panel.test.tsx

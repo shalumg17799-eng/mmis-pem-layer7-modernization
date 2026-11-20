@@ -26,7 +26,10 @@ class ExtractItemTest {
 
   static ProviderRow provider(String npi, String status, String effective) {
     return new ProviderRow(
-        npi, "M00000" + npi.substring(7), status, effective == null ? null : LocalDate.parse(effective));
+        npi,
+        "M00000" + npi.substring(7),
+        status,
+        effective == null ? null : LocalDate.parse(effective));
   }
 
   /** The items of the provider and the warning lines logged while it was evaluated. */
@@ -74,14 +77,14 @@ class ExtractItemTest {
     ExtractItem flagged = evaluate(provider("1003000777", "A", "2027-01-15")).item().orElseThrow();
     ExtractItem normal = evaluate(provider("1003000777", "A", "2026-01-15")).item().orElseThrow();
     assertThat(flagged.record()).isEqualTo(normal.record());
-    assertThat(flagged.record())
-        .isEqualTo(new TmsisRecord("M00000777", "1003000777", "A", PERIOD));
+    assertThat(flagged.record()).isEqualTo(new TmsisRecord("M00000777", "1003000777", "A", PERIOD));
   }
 
   // ---- AC-3 to AC-5: which years are flagged ----------------------------------------------------
 
   @ParameterizedTest(
-      name = "[MAM-78 AC-3] effective {0} against the business date 2026-03-31 is not flagged and not logged")
+      name =
+          "[MAM-78 AC-3] effective {0} against the business date 2026-03-31 is not flagged and not logged")
   @ValueSource(strings = {"2026-03-31", "2026-12-31", "2026-01-01", "2025-12-31"})
   void notLaterYearIsNotFlagged(String effective) {
     Result r = evaluate(provider("1003000333", "A", effective));
@@ -122,9 +125,15 @@ class ExtractItemTest {
   void referenceYearIsTheBusinessYear() {
     ProviderRow p = provider("1003000777", "A", "2027-02-01");
     try (LogCapture log = LogCapture.open()) {
-      assertThat(ExtractItem.of(p, LocalDate.parse("2026-12-31"), "26365").orElseThrow().futureEnrolment())
+      assertThat(
+              ExtractItem.of(p, LocalDate.parse("2026-12-31"), "26365")
+                  .orElseThrow()
+                  .futureEnrolment())
           .isTrue();
-      assertThat(ExtractItem.of(p, LocalDate.parse("2027-01-01"), "27001").orElseThrow().futureEnrolment())
+      assertThat(
+              ExtractItem.of(p, LocalDate.parse("2027-01-01"), "27001")
+                  .orElseThrow()
+                  .futureEnrolment())
           .isFalse();
       assertThat(log.messages(Level.WARN)).hasSize(1);
     }
@@ -142,7 +151,8 @@ class ExtractItemTest {
   // ---- AC-6: only ACTIVE providers are checked --------------------------------------------------
 
   @ParameterizedTest(
-      name = "[MAM-78 AC-6] a provider in status {0} with enrolment 2027-01-01 has no item, no warning line and no count")
+      name =
+          "[MAM-78 AC-6] a provider in status {0} with enrolment 2027-01-01 has no item, no warning line and no count")
   @ValueSource(strings = {"P", "T", "D", "S"})
   void nonActiveIsNotChecked(String status) {
     Result r = evaluate(provider("1003000555", status, "2027-01-01"));
@@ -151,8 +161,7 @@ class ExtractItemTest {
   }
 
   @Test
-  @DisplayName(
-      "[MAM-71 AC-1] an ACTIVE provider's item holds the record the file is written from")
+  @DisplayName("[MAM-71 AC-1] an ACTIVE provider's item holds the record the file is written from")
   void activeItemRecord() {
     ExtractItem item = evaluate(provider("1003000111", "A", "2026-03-31")).item().orElseThrow();
     assertThat(item.record().npi()).isEqualTo("1003000111");

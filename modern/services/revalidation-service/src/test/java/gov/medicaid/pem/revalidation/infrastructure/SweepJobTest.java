@@ -217,4 +217,63 @@ class SweepJobTest extends IntegrationTest {
                 .getStatus())
         .isEqualTo(200);
   }
+
+  @Test
+  @DisplayName(
+      "[MAM-45 AC-7] a run over 250 due providers opens 250 cases and writes 250 records of 80 bytes in ascending NPI order")
+  void largeRun() throws Exception {
+    jdbc.update(
+        "INSERT INTO tracked_provider (npi, enroll_status, reval_due_date)"
+            + " SELECT (1003001000 + g)::text, 'A', DATE '2026-02-28' FROM generate_series(1, 250) g");
+
+    UUID run = RevalidationFixtures.sweep(mvc, "2026-03-31");
+
+    byte[] file =
+        mvc.perform(
+                MockMvcRequestBuilders.get(
+                        RevalidationFixtures.SWEEPS + "/{runId}/queue-file", run)
+                    .with(PemJwt.admin()))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    assertThat(file).hasSize(250 * 80);
+    for (int i = 0; i < 250; i++) {
+      String record = new String(file, i * 80, 80, java.nio.charset.StandardCharsets.ISO_8859_1);
+      assertThat(record)
+          .isEqualTo(
+              (1003001000 + i + 1)
+                  + "20260228"
+                  + "RESCREEN-REQUIRED   "
+                  + " ".repeat(42));
+    }
+    assertThat(RevalidationFixtures.count(jdbc, "SELECT count(*) FROM revalidation_case"))
+        .isEqualTo(250);
+    assertThat(RevalidationFixtures.outbox(jdbc, "RevalidationDue")).hasSize(250);
+    assertThat(((Number) step(run).get("read_count")).intValue()).isEqualTo(250);
+    assertThat(((Number) step(run).get("write_count")).intValue()).isEqualTo(250);
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-45 AC-8] Flyway V2 and V3 created the noDueDate count of a run and the Spring Batch job repository tables")
+  void schemaOfTheSweep() {
+    assertThat(
+            jdbc.queryForList(
+                "SELECT column_name FROM information_schema.columns"
+                    + " WHERE table_name = 'sweep_run' ORDER BY 1",
+                String.class))
+        .contains("no_due_date_count", "queued_count", "queue_file", "failure_reason");
+    assertThat(
+            jdbc.queryForList(
+                "SELECT table_name FROM information_schema.tables"
+                    + " WHERE table_schema = 'public' AND table_name LIKE 'batch_%' ORDER BY 1",
+                String.class))
+        .contains(
+            "batch_job_instance",
+            "batch_job_execution",
+            "batch_job_execution_params",
+            "batch_step_execution",
+            "batch_job_execution_context",
+            "batch_step_execution_context");
+  }
 }

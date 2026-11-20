@@ -19,6 +19,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -36,8 +38,7 @@ class ExtractProducedEventTest extends IntegrationTest {
   static final String DATE = "2026-03-31";
   static final Duration FIND = Duration.ofSeconds(40);
   static final Duration SETTLE = Duration.ofSeconds(3);
-  static final String UUID_FORMAT =
-      "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+  static final String UUID_FORMAT = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 
   static void twoActive() {
     TestProviderService.holds(
@@ -55,7 +56,8 @@ class ExtractProducedEventTest extends IntegrationTest {
     return json.readTree(rows.get(0));
   }
 
-  // ---- the event ---------------------------------------------------------------------------------
+  // ---- the event
+  // ---------------------------------------------------------------------------------
 
   @Test
   @DisplayName(
@@ -116,8 +118,7 @@ class ExtractProducedEventTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName(
-      "[MAM-75 AC-5] a run that wrote no rows is announced too, with rowCount 0")
+  @DisplayName("[MAM-75 AC-5] a run that wrote no rows is announced too, with rowCount 0")
   void emptyRunIsAnnounced() throws Exception {
     TestProviderService.holds();
     String runId = api.runToEnd(DATE).path("runId").asText();
@@ -198,18 +199,15 @@ class ExtractProducedEventTest extends IntegrationTest {
         .andReturn();
   }
 
-  @Test
-  @DisplayName(
-      "[MAM-75 AC-5] a correlation id with a line break and other unsafe characters is replaced: it is not echoed, not logged and not in the event (code review 2026-11-19, lesson g)")
-  void unsafeCorrelationIdNeverReachesLogOrEvent() throws Exception {
+  /** Starts a run with this X-Correlation-Id and checks that the unsafe text went nowhere. */
+  void assertUnsafeIdIsReplaced(String evil) throws Exception {
     twoActive();
-    String evil = "abc\r\nFORGED-LOG-LINE level=ERROR <script>";
     String runId;
     try (LogCapture log = LogCapture.open()) {
       MvcResult r = startWithCorrelationId(evil);
       assertThat(r.getResponse().getStatus()).isEqualTo(202);
       String echoed = r.getResponse().getHeader("X-Correlation-Id");
-      assertThat(echoed).isNotNull().doesNotContain("FORGED").doesNotContain("\n");
+      assertThat(echoed).isNotNull().doesNotContain("FORGED");
       assertThat(echoed).matches(UUID_FORMAT);
       runId = api.read(r).path("runId").asText();
       api.await(runId);
@@ -218,10 +216,51 @@ class ExtractProducedEventTest extends IntegrationTest {
           .noneMatch(m -> m.contains("FORGED"));
       assertThat(log.lines())
           .extracting(l -> String.valueOf(l.correlationId()))
-          .noneMatch(c -> c.contains("FORGED") || c.contains("\n"));
+          .noneMatch(c -> c.contains("FORGED"));
     }
     JsonNode event = envelopeOf(runId);
     assertThat(event.path("correlationId").asText()).doesNotContain("FORGED").matches(UUID_FORMAT);
+  }
+
+  @ParameterizedTest(
+      name =
+          "[MAM-75 AC-5] the unsafe correlation id <{0}> is replaced: it is not echoed, not logged and not in the event (code review 2026-11-19, lesson g)")
+  @ValueSource(
+      strings = {
+        "abc FORGED-LOG-LINE level=ERROR <script>",
+        "FORGED/../../etc/passwd",
+        "FORGED;DROP-TABLE",
+        "{\"FORGED\":1}",
+        "FORGED%0d%0aINJECTED"
+      })
+  void unsafeCorrelationIdNeverReachesLogOrEvent(String evil) throws Exception {
+    assertUnsafeIdIsReplaced(evil);
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-75 AC-5] a correlation id longer than 64 characters is replaced: it is not echoed, not logged and not in the event (lesson g)")
+  void tooLongCorrelationIdIsReplaced() throws Exception {
+    assertUnsafeIdIsReplaced("FORGED" + "x".repeat(60));
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-75 AC-5] a correlation id with a line break is refused before it reaches a log line, a run or an event: 400 and no run (lesson g)")
+  void lineBreakInTheCorrelationIdIsRefused() throws Exception {
+    twoActive();
+    int runs = jdbc.queryForObject("SELECT count(*) FROM extract_run", Integer.class);
+    try (LogCapture log = LogCapture.open()) {
+      MvcResult r = startWithCorrelationId("abc\r\nFORGED-LOG-LINE level=ERROR");
+      assertThat(r.getResponse().getStatus()).isEqualTo(400);
+      assertThat(String.valueOf(r.getResponse().getHeader("X-Correlation-Id")))
+          .doesNotContain("FORGED");
+      assertThat(log.lines())
+          .extracting(LogCapture.Line::message)
+          .noneMatch(m -> m.contains("FORGED"));
+    }
+    assertThat(jdbc.queryForObject("SELECT count(*) FROM extract_run", Integer.class))
+        .isEqualTo(runs);
   }
 
   @Test

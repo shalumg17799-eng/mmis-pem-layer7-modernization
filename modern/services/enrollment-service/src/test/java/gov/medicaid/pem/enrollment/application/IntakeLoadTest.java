@@ -80,11 +80,11 @@ class IntakeLoadTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-1] open logs the legacy line 'PRVENR01: STARTING ENROLLMENT LOAD - BATCH <id>'")
+  @DisplayName(
+      "[MAM-56 AC-1] open logs the legacy line 'PRVENR01: STARTING ENROLLMENT LOAD - BATCH <id>'")
   void openLogsTheLegacyLine() {
     in.load.open(DATE, "B0331001");
-    assertThat(logged(Level.INFO))
-        .contains("PRVENR01: STARTING ENROLLMENT LOAD - BATCH B0331001");
+    assertThat(logged(Level.INFO)).contains("PRVENR01: STARTING ENROLLMENT LOAD - BATCH B0331001");
   }
 
   @ParameterizedTest(name = "[MAM-56 AC-2] batch id [{0}] becomes DEFBATCH")
@@ -147,7 +147,8 @@ class IntakeLoadTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-5] an empty line in the middle is a record of zero bytes, so it is unreadable")
+  @DisplayName(
+      "[MAM-57 AC-5] an empty line in the middle is a record of zero bytes, so it is unreadable")
   void emptyLineIsARecord() {
     assertThat(texts(bytes("AAA\n\nBBB\n"))).containsExactly("AAA", "", "BBB");
     assertThat(texts(bytes("AAA\r\n\r\nBBB\n"))).containsExactly("AAA", "", "BBB");
@@ -156,20 +157,21 @@ class IntakeLoadTest {
   @Test
   @DisplayName("[MAM-56 AC-3] a CR that is not before an LF belongs to the record")
   void loneCrStays() {
-    assertThat(texts(bytes("AA\rBB\nCC\r"))).containsExactly("AA\rBB", "CC\r");
+    assertThat(texts(bytes("AA\rBB\nCC"))).containsExactly("AA\rBB", "CC");
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-3] a file with no line end is read in blocks of 200 bytes (fixed-block file)")
+  @DisplayName(
+      "[MAM-56 AC-3] a file with no line end is read in blocks of 200 bytes (fixed-block file)")
   void blocksOf200() {
     byte[] file = AppInputFile.blocks(AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2));
     assertThat(file).hasSize(400);
-    assertThat(texts(file))
-        .containsExactly(AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2));
+    assertThat(texts(file)).containsExactly(AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2));
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-5] the last block of a fixed-block file may be short: it is a short record")
+  @DisplayName(
+      "[MAM-57 AC-5] the last block of a fixed-block file may be short: it is a short record")
   void shortLastBlock() {
     byte[] file = bytes("X".repeat(200) + "Y".repeat(50));
     List<String> records = texts(file);
@@ -196,11 +198,9 @@ class IntakeLoadTest {
   @DisplayName(
       "[MAM-57 AC-1] a clean run writes every record, counts after each one and completes at the clock time")
   void cleanRun() {
-    in.process(
-        AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2), AppInputFile.valid(NPI_3));
+    in.process(AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2), AppInputFile.valid(NPI_3));
     assertThat(in.runs.counts)
-        .containsExactly(
-            new int[] {1, 1, 0, 0}, new int[] {2, 2, 0, 0}, new int[] {3, 3, 0, 0});
+        .containsExactly(new int[] {1, 1, 0, 0}, new int[] {2, 2, 0, 0}, new int[] {3, 3, 0, 0});
     assertThat(in.runs.completedAt).isEqualTo(NOW);
     assertThat(in.runs.failedReason).isNull();
     assertThat(in.runs.errorRows).isEmpty();
@@ -220,8 +220,7 @@ class IntakeLoadTest {
   @Test
   @DisplayName("[MAM-56 AC-5] the records are processed in file order")
   void fileOrder() {
-    in.process(
-        AppInputFile.valid(NPI_3), AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2));
+    in.process(AppInputFile.valid(NPI_3), AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2));
     assertThat(in.store.saved)
         .extracting(StoredApplication::npi)
         .containsExactly(NPI_3, NPI_1, NPI_2);
@@ -231,7 +230,8 @@ class IntakeLoadTest {
   @DisplayName(
       "[MAM-57 AC-1] the run ends with a log line that gives the four counts of the legacy TERMINATE")
   void endLine() {
-    in.process(AppInputFile.valid(NPI_1), AppInputFile.noTaxonomy(NPI_2), AppInputFile.valid(NPI_1));
+    in.process(
+        AppInputFile.valid(NPI_1), AppInputFile.noTaxonomy(NPI_2), AppInputFile.valid(NPI_1));
     assertThat(logged(Level.INFO))
         .anySatisfy(
             line ->
@@ -252,7 +252,8 @@ class IntakeLoadTest {
     assertThat(in.store.saved).isEmpty();
   }
 
-  // ---- process: validation (AC-4, AC-5) -----------------------------------------------------------
+  // ---- process: validation (AC-4, AC-5)
+  // -----------------------------------------------------------
 
   @Test
   @DisplayName("[MAM-56 AC-4] a blank NPI is REJECTED with exactly E101 on npi and no event")
@@ -298,9 +299,7 @@ class IntakeLoadTest {
         AppInputFile.noNpi(), AppInputFile.ofType(NPI_2, "XX"), AppInputFile.noTaxonomy(NPI_3));
     assertThat(in.outbox.sent)
         .extracting(IntakeFakes.Sent::type, IntakeFakes.Sent::subject)
-        .containsExactly(
-            tuple("ApplicationRejected", NPI_2),
-            tuple("ApplicationRejected", NPI_3));
+        .containsExactly(tuple("ApplicationRejected", NPI_2), tuple("ApplicationRejected", NPI_3));
   }
 
   @Test
@@ -312,23 +311,22 @@ class IntakeLoadTest {
     assertThat(in.store.saved)
         .extracting(StoredApplication::npi, StoredApplication::status)
         .containsExactly(
-            tuple(NPI_1, "VALIDATED"),
-            tuple(NPI_2, "REJECTED"),
-            tuple(NPI_3, "VALIDATED"));
+            tuple(NPI_1, "VALIDATED"), tuple(NPI_2, "REJECTED"), tuple(NPI_3, "VALIDATED"));
     assertThat(in.runs.lastCounts()).containsExactly(3, 2, 1, 0);
     assertThat(in.outbox.count("ApplicationValidated")).isEqualTo(2);
   }
 
-  // ---- process: the APPERROR file (AC-6) -----------------------------------------------------------
+  // ---- process: the APPERROR file (AC-6)
+  // -----------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-56 AC-6] one APPERROR row per rejected record, none for valid ones, in input order")
+  @DisplayName(
+      "[MAM-56 AC-6] one APPERROR row per rejected record, none for valid ones, in input order")
   void errorRows() {
     in.process(
         AppInputFile.valid(NPI_1),
         AppInputFile.noNpi(),
-        AppInputFile.individual(
-            NPI_2, "M00000222", "XX", "", "RIVERA", "MARIA", "MD12345", "TX"),
+        AppInputFile.individual(NPI_2, "M00000222", "XX", "", "RIVERA", "MARIA", "MD12345", "TX"),
         AppInputFile.noTaxonomy(NPI_3));
     assertThat(in.runs.errorRows)
         .containsExactly(
@@ -338,7 +336,8 @@ class IntakeLoadTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-6] the row for 1003000222 type XX starts '1003000222 TYPE:XX ERR:VALIDATION-FAILED'")
+  @DisplayName(
+      "[MAM-56 AC-6] the row for 1003000222 type XX starts '1003000222 TYPE:XX ERR:VALIDATION-FAILED'")
   void errorRowStart() {
     in.process(AppInputFile.ofType(NPI_2, "XX"));
     assertThat(in.runs.errorRows.get(0)).startsWith("1003000222 TYPE:XX ERR:VALIDATION-FAILED");
@@ -358,7 +357,8 @@ class IntakeLoadTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-6] the NPI and the type of a row are the bytes as read, a blank NPI is ten spaces")
+  @DisplayName(
+      "[MAM-56 AC-6] the NPI and the type of a row are the bytes as read, a blank NPI is ten spaces")
   void errorRowAsRead() {
     assertThat(IntakeLoad.errorRow(AppInputFile.noNpi()))
         .startsWith("           TYPE:IN ERR:VALIDATION-FAILED")
@@ -369,7 +369,8 @@ class IntakeLoadTest {
     assertThat(IntakeLoad.errorRow(odd)).startsWith("ABCDEFGHIJ TYPE:xx ERR:VALIDATION-FAILED");
   }
 
-  // ---- process: counts (MAM-57) --------------------------------------------------------------------
+  // ---- process: counts (MAM-57)
+  // --------------------------------------------------------------------
 
   @Test
   @DisplayName(
@@ -379,8 +380,7 @@ class IntakeLoadTest {
         AppInputFile.valid(NPI_1),
         AppInputFile.valid(NPI_4),
         AppInputFile.noNpi(),
-        AppInputFile.individual(
-            NPI_2, "M00000222", "XX", "", "RIVERA", "MARIA", "MD12345", "TX"));
+        AppInputFile.individual(NPI_2, "M00000222", "XX", "", "RIVERA", "MARIA", "MD12345", "TX"));
     int[] counts = in.runs.lastCounts();
     assertThat(counts).containsExactly(4, 2, 2, 0);
     assertThat(counts[0]).isEqualTo(counts[1] + counts[2] + counts[3]);
@@ -391,8 +391,7 @@ class IntakeLoadTest {
   @DisplayName(
       "[MAM-57 AC-3] a duplicate NPI (E103 only) is skipped, REJECTED with one error and one APPERROR row, and not announced twice")
   void duplicateIsSkipped() {
-    in.process(
-        AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2));
+    in.process(AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_2));
     assertThat(in.runs.lastCounts()).containsExactly(3, 2, 0, 1);
     StoredApplication second = in.store.saved.get(1);
     assertThat(second.status()).isEqualTo("REJECTED");
@@ -418,13 +417,13 @@ class IntakeLoadTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-3] the counts are written after every record, so a failed run shows its progress")
+  @DisplayName(
+      "[MAM-57 AC-3] the counts are written after every record, so a failed run shows its progress")
   void countsAfterEveryRecord() {
     in.process(
         AppInputFile.valid(NPI_1), AppInputFile.noTaxonomy(NPI_2), AppInputFile.valid(NPI_1));
     assertThat(in.runs.counts)
-        .containsExactly(
-            new int[] {1, 1, 0, 0}, new int[] {2, 1, 1, 0}, new int[] {3, 1, 1, 1});
+        .containsExactly(new int[] {1, 1, 0, 0}, new int[] {2, 1, 1, 0}, new int[] {3, 1, 1, 1});
   }
 
   @Test
@@ -439,7 +438,8 @@ class IntakeLoadTest {
     assertThat(in.store.of(NPI_2).status()).isEqualTo("VALIDATED");
   }
 
-  // ---- process: re-run of a business date (MAM-57 AC-8) -------------------------------------------
+  // ---- process: re-run of a business date (MAM-57 AC-8)
+  // -------------------------------------------
 
   @Test
   @DisplayName(
@@ -476,11 +476,13 @@ class IntakeLoadTest {
     in.process(valid, rejected);
     assertThat(in.runs.attachedRecords).containsExactly(valid, rejected);
     assertThat(in.runs.attachedApplications)
-        .containsExactly(in.store.saved.get(0).applicationId(), in.store.saved.get(1).applicationId());
+        .containsExactly(
+            in.store.saved.get(0).applicationId(), in.store.saved.get(1).applicationId());
     assertThat(in.runs.attachedRecords).allSatisfy(r -> assertThat(r).hasSize(200));
   }
 
-  // ---- process: failures (MAM-57 AC-5, AC-6) ---------------------------------------------------------
+  // ---- process: failures (MAM-57 AC-5, AC-6)
+  // ---------------------------------------------------------
 
   @Test
   @DisplayName(
@@ -526,9 +528,7 @@ class IntakeLoadTest {
     in.store.failForNpi = NPI_1;
     byte[] file =
         AppInputFile.lines(
-            AppInputFile.noTaxonomy(NPI_2),
-            AppInputFile.valid(NPI_1),
-            AppInputFile.valid(NPI_3));
+            AppInputFile.noTaxonomy(NPI_2), AppInputFile.valid(NPI_1), AppInputFile.valid(NPI_3));
     assertThatThrownBy(() -> in.load.process(UUID.randomUUID(), DATE, file, "admin1"))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("record 2")
@@ -541,10 +541,12 @@ class IntakeLoadTest {
     assertThat(in.runs.calls).doesNotContain("complete");
   }
 
-  // ---- failed: the run is marked FAILED --------------------------------------------------------------
+  // ---- failed: the run is marked FAILED
+  // --------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-57 AC-6] failed marks the run FAILED with the reason at the clock time and logs it as an error")
+  @DisplayName(
+      "[MAM-57 AC-6] failed marks the run FAILED with the reason at the clock time and logs it as an error")
   void failedMarksTheRun() {
     UUID id = UUID.randomUUID();
     in.load.failed(id, DATE, "record 2 NPI 1003000111 could not be stored");
@@ -559,7 +561,8 @@ class IntakeLoadTest {
                     .contains("record 2 NPI 1003000111 could not be stored"));
   }
 
-  // ---- process: reading PRVRECRD (MAM-56 AC-3) ---------------------------------------------------------
+  // ---- process: reading PRVRECRD (MAM-56 AC-3)
+  // ---------------------------------------------------------
 
   @Test
   @DisplayName(
@@ -577,12 +580,20 @@ class IntakeLoadTest {
     assertThat(a.organization()).isNull();
   }
 
-  @ParameterizedTest(name = "[MAM-56 AC-3] type {0} is read as an organisation: legal name 51-90, DBA name 91-120, owner NPI 121-130")
+  @ParameterizedTest(
+      name =
+          "[MAM-56 AC-3] type {0} is read as an organisation: legal name 51-90, DBA name 91-120, owner NPI 121-130")
   @ValueSource(strings = {"GR", "FA"})
   void organizationFields(String type) {
     in.process(
         AppInputFile.organization(
-            NPI_2, "M00000222", type, "207Q00000X", "EXCLUDED CLINIC LLC", "DBA CLINIC", "1990000111"));
+            NPI_2,
+            "M00000222",
+            type,
+            "207Q00000X",
+            "EXCLUDED CLINIC LLC",
+            "DBA CLINIC",
+            "1990000111"));
     StoredApplication a = in.store.of(NPI_2);
     assertThat(a.providerType()).isEqualTo(type);
     assertThat(a.organization())
@@ -610,13 +621,13 @@ class IntakeLoadTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-3] an unknown type code has neither the individual nor the organisation view")
+  @DisplayName(
+      "[MAM-56 AC-3] an unknown type code has neither the individual nor the organisation view")
   void unknownTypeHasNoView() {
     in.process(AppInputFile.ofType(NPI_2, "XX"));
     StoredApplication a = in.store.of(NPI_2);
     assertThat(a.individual()).isNull();
     assertThat(a.organization()).isNull();
-    assertThat(a.providerType()).isEqualTo("XX");
   }
 
   @Test

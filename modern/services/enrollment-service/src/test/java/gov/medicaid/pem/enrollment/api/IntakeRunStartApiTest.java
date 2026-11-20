@@ -82,10 +82,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
   @DisplayName(
       "[MAM-56 AC-1] the service log contains the line 'PRVENR01: STARTING ENROLLMENT LOAD - BATCH B0331001'")
   void logLine() throws Exception {
-    IntakeApi.await(
-        mvc, json, IntakeApi.startAsAdmin(mvc, json, threeValid(), DATE, "B0331001"));
-    assertThat(log().messages())
-        .contains("PRVENR01: STARTING ENROLLMENT LOAD - BATCH B0331001");
+    IntakeApi.await(mvc, json, IntakeApi.startAsAdmin(mvc, json, threeValid(), DATE, "B0331001"));
+    assertThat(log().messages()).contains("PRVENR01: STARTING ENROLLMENT LOAD - BATCH B0331001");
   }
 
   @Test
@@ -95,7 +93,12 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
     IntakeApi.await(
         mvc,
         json,
-        IntakeApi.startAsAdmin(mvc, json, AppInputFile.lines(AppInputFile.valid("1003000777")), "2026-04-01", "B0401001"));
+        IntakeApi.startAsAdmin(
+            mvc,
+            json,
+            AppInputFile.lines(AppInputFile.valid("1003000777")),
+            "2026-04-01",
+            "B0401001"));
     assertThat(log().messages())
         .contains(
             "PRVENR01: STARTING ENROLLMENT LOAD - BATCH B0331001",
@@ -115,7 +118,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
 
   // ---- AC-2 -------------------------------------------------------------------------------------
 
-  @ParameterizedTest(name = "[MAM-56 AC-2] a batch id of [{0}] defaults to DEFBATCH: log line and intake_run")
+  @ParameterizedTest(
+      name = "[MAM-56 AC-2] a batch id of [{0}] defaults to DEFBATCH: log line and intake_run")
   @NullSource
   @ValueSource(strings = {"", " ", "      ", "        "})
   void missingBatchIdIsDefbatch(String batchId) throws Exception {
@@ -140,7 +144,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-2] a batch id of exactly 8 characters (the contract's maxLength) is accepted")
+  @DisplayName(
+      "[MAM-56 AC-2] a batch id of exactly 8 characters (the contract's maxLength) is accepted")
   void eightCharactersAreAccepted() throws Exception {
     String id = IntakeApi.startAsAdmin(mvc, json, threeValid(), DATE, "ABCDEFGH");
     IntakeApi.await(mvc, json, id);
@@ -148,8 +153,7 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName(
-      "[MAM-56 AC-2] a batch id of 9 characters is 400 problem+json and no run is created")
+  @DisplayName("[MAM-56 AC-2] a batch id of 9 characters is 400 problem+json and no run is created")
   void nineCharactersAreRefused() throws Exception {
     MvcResult r = IntakeApi.start(mvc, PemJwt.admin(), threeValid(), DATE, "ABCDEFGHI");
     assertThat(r.getResponse().getStatus()).isEqualTo(400);
@@ -160,7 +164,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
   // ---- AC-7: the run parameters ---------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-56 AC-7] a start without businessDate is 400 problem+json that names it, and no run is created")
+  @DisplayName(
+      "[MAM-56 AC-7] a start without businessDate is 400 problem+json that names it, and no run is created")
   void withoutBusinessDate() throws Exception {
     MvcResult r = IntakeApi.start(mvc, PemJwt.admin(), threeValid(), null, null);
     assertThat(r.getResponse().getStatus()).isEqualTo(400);
@@ -170,7 +175,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-7] a start without a file is 400 problem+json that names it, and no run is created")
+  @DisplayName(
+      "[MAM-56 AC-7] a start without a file is 400 problem+json that names it, and no run is created")
   void withoutFile() throws Exception {
     MvcResult r = IntakeApi.start(mvc, PemJwt.admin(), null, DATE, null);
     assertThat(r.getResponse().getStatus()).isEqualTo(400);
@@ -180,7 +186,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-7] a start with neither a file nor a business date is 400 and no run is created")
+  @DisplayName(
+      "[MAM-56 AC-7] a start with neither a file nor a business date is 400 and no run is created")
   void withNeither() throws Exception {
     MvcResult r = IntakeApi.start(mvc, PemJwt.admin(), null, null, null);
     assertThat(r.getResponse().getStatus()).isEqualTo(400);
@@ -188,7 +195,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-56 AC-7] businessDate [{0}] is not an ISO date: 400 problem+json and no run is created")
+      name =
+          "[MAM-56 AC-7] businessDate [{0}] is not an ISO date: 400 problem+json and no run is created")
   @ValueSource(
       strings = {
         "",
@@ -207,9 +215,7 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
       })
   void businessDateMustBeAnIsoDate(String businessDate) throws Exception {
     MvcResult r = IntakeApi.start(mvc, PemJwt.admin(), threeValid(), businessDate, "B0331001");
-    assertThat(r.getResponse().getStatus())
-        .as(r.getResponse().getContentAsString())
-        .isEqualTo(400);
+    assertThat(r.getResponse().getStatus()).as(r.getResponse().getContentAsString()).isEqualTo(400);
     assertThat(r.getResponse().getContentType()).startsWith("application/problem+json");
     assertThat(runCount()).isZero();
   }
@@ -218,7 +224,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
   @DisplayName("[MAM-56 AC-7] a leap day is a valid business date")
   void leapDay() throws Exception {
     String id = IntakeApi.startAsAdmin(mvc, json, threeValid(), "2028-02-29", "B0229001");
-    assertThat(IntakeApi.await(mvc, json, id).path("businessDate").asText()).isEqualTo("2028-02-29");
+    assertThat(IntakeApi.await(mvc, json, id).path("businessDate").asText())
+        .isEqualTo("2028-02-29");
   }
 
   @Test
@@ -230,7 +237,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
     assertThat(run.path("counts").path("read").asInt()).isEqualTo(3);
   }
 
-  // ---- the correlation id (code review lesson) ----------------------------------------------------
+  // ---- the correlation id (code review lesson)
+  // ----------------------------------------------------
 
   @Test
   @DisplayName(
@@ -254,7 +262,8 @@ class IntakeRunStartApiTest extends IntakeIntegrationTest {
               }
               assertThat(line.message()).doesNotContain("FORGED");
             });
-    List<String> payloads = jdbc.queryForList("SELECT payload::text FROM outbox_event", String.class);
+    List<String> payloads =
+        jdbc.queryForList("SELECT payload::text FROM outbox_event", String.class);
     assertThat(payloads).hasSize(3);
     for (String payload : payloads) {
       JsonNode event = json.readTree(payload);

@@ -24,8 +24,8 @@ import org.springframework.test.web.servlet.MvcResult;
 /**
  * The events provider-service writes to its outbox keep to modern/contracts/asyncapi/events.yaml:
  * every required field, no undeclared field, and no null where the contract says string (lesson of
- * the reviews of the first three services; D-024, ADR-003). The events are read from outbox_event as
- * the relay would publish them.
+ * the reviews of the first three services; D-024, ADR-003). The events are read from outbox_event
+ * as the relay would publish them.
  */
 class ProviderOutboxContractTest extends IntegrationTest {
 
@@ -85,7 +85,13 @@ class ProviderOutboxContractTest extends IntegrationTest {
     group.put("taxonomy", "261QM0801X");
     group.put(
         "organization",
-        Map.of("legalName", "EXCLUDED CLINIC LLC", "dbaName", "EXCLUDED CLINIC", "ownerNpi", "1990000111"));
+        Map.of(
+            "legalName",
+            "EXCLUDED CLINIC LLC",
+            "dbaName",
+            "EXCLUDED CLINIC",
+            "ownerNpi",
+            "1990000111"));
     jdbc.update("DELETE FROM outbox_event WHERE subject = '1003000444'");
 
     enrollment.onEvent(
@@ -197,7 +203,9 @@ class ProviderOutboxContractTest extends IntegrationTest {
 
     send(
         "/api/v1/providers/{npi}/status-changes",
-        "{\"action\":\"" + action + "\",\"reason\":\"LEIE exclusion\",\"effectiveDate\":\"2026-03-31\"}",
+        "{\"action\":\""
+            + action
+            + "\",\"reason\":\"LEIE exclusion\",\"effectiveDate\":\"2026-03-31\"}",
         CORRELATION);
 
     assertThat(CONTRACT.violations("ProviderStatusChangedEnvelope", the("ProviderStatusChanged")))

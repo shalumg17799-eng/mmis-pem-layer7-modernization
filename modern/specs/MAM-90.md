@@ -14,8 +14,8 @@ decisions: [D-006, D-018, D-026, D-027, D-023, D-024, D-004]
 dependsOn: [MAM-80, MAM-52]
 mainJourney: false
 labels: [svc-web-ui, kag-L-S064, agentic, decision-D-006, decision-D-018, decision-D-026, decision-D-027, decision-D-023, decision-D-024, decision-D-004]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 8f4f115aa7042021199c72b49d86d72f609491c9d91b2e49d249859f72666ee0
 ---
 ## Business requirement
 A supervisor can terminate, suspend or reinstate a provider by choosing the action, giving a reason and an effective date. The provider's status changes at once, the history keeps every action, and a suspension is a status of its own, no longer confused with a denial. The form never invents rules about which status may be sanctioned, and an unknown action is refused with a message at the field.

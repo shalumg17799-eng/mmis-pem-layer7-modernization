@@ -11,9 +11,9 @@ typed by hand. Stack: Docker Compose project `pem` on this machine, synthetic da
 | AC-2 | Contracts and the role table do not drift | PASS (after the table in `docs/architecture/nfr.md` got the 3 run-status calls of Q-105) |
 | AC-3 | A provider only sees their own data | PASS |
 | AC-4 | Forged and expired tokens are refused | PASS: 6 of 6 |
-| AC-5 | No high or critical vulnerable dependency | OPEN until the library upgrade is deployed: 17 fixable findings, 2 justified (Q-122) |
+| AC-5 | No high or critical vulnerable dependency | PASS after deploy 2 (2026-11-20 18:46): the scan of the deployed jar shows 2 findings, both spring-webmvc with a written justification (Q-122); 0 HIGH or CRITICAL findings without a justification (before the upgrade: 33 findings, 19 HIGH or CRITICAL) |
 | AC-6 | No secret in any file | PASS: clean |
-| AC-7 | Only health is open on the actuator | DEFECT FOUND on the gateway, fix made, PASS expected after the next deploy (Q-121); the nine services PASS |
+| AC-7 | Only health is open on the actuator | PASS after deploy 1 (2026-11-20 17:07): the defect found on the gateway (`/actuator/info` and `/actuator/metrics` open without a token) is fixed, the gateway and the nine services expose only health (Q-121, default A) |
 | AC-8 | Optional ZAP baseline scan | NOT RUN: the user has not agreed to the optional scan |
 
 ## AC-1, AC-2, AC-3, AC-7: live checks through the gateway
@@ -84,6 +84,23 @@ Java libraries (web UI: none): 8 CRITICAL, 11 HIGH, 13 MODERATE, 1 LOW.
 The upgrade is a build change with a regression run before it is deployed; the scan is repeated on the new deployable
 (see "Runs").
 
+### Library upgrade of 2026-11-20 (Q-122)
+
+Default A of Q-122 applied in the build (Spring Boot 3.5.16 and Spring Cloud 2025.0.3 unchanged, no new major version): the versions are keys in `gradle/libs.versions.toml`, applied to every module as constraints in `buildSrc/.../pem.java-conventions.gradle.kts` (ADR-010). Resolved on the run-time class path of `:infra:local-runtime` (all ten services):
+
+| Library | Before | After |
+|---|---|---|
+| tomcat-embed-core, -el, -websocket | 10.1.55 | 10.1.59 |
+| jackson-core, jackson-databind and the other Jackson modules (jackson-annotations stays 2.21: it has no patch version) | 2.21.4 | 2.21.7 |
+| postgresql (JDBC driver) | 42.7.11 | 42.7.12 |
+| snappy-java | 1.1.10.5 | 1.1.10.9 |
+| lz4-java | 1.10.1 | 1.11.4 |
+| bcprov-jdk18on (brought by spring-cloud-starter, compile scope; not a test library) | 1.80.2 | 1.85 |
+| log4j-api, log4j-to-slf4j | 2.24.3 | 2.25.5 |
+
+Regression of the modules that are already closed, run on the new versions (`gradlew :libs:fixed-width:test :libs:service-kit:check :services:api-gateway:check :services:risk-service:test :services:sanctions-service:test :services:directory-service:test`, 2026-11-20 17:24 to 17:51, BUILD SUCCESSFUL): fixed-width 257, service-kit 110 (check: JaCoCo, Spotless, versionCheck), api-gateway 48 (check), risk 351, sanctions 326, directory 433 tests; 0 failed, 0 skipped. `help` and `versionCheck` pass.
+The 33 advisories are closed in the scan only when the deployable is rebuilt and the scan is repeated; that is the lead's step with the deploy.
+
 ## AC-6: secrets
 
 Command: `kag/.venv/Scripts/python.exe tools/checks/scan_secrets.py`. Run of 2026-11-20 16:01: CLEAN.
@@ -105,3 +122,7 @@ and no scanner image was pulled.
 | 2026-11-20 16:00-16:16 | test_security_tokens.py | 6 passed |
 | 2026-11-20 16:01 | scan_secrets.py | CLEAN |
 | 2026-11-20 16:03 | scan_dependencies.py | 33 advisories, 19 HIGH or CRITICAL, 2 justified |
+| 2026-11-20 17:06 | test_security.py against deploy 1 (the gated risk, sanctions and directory code plus the gateway actuator fix) | **278 passed**, 0 failed (78 s); J1 and J2 passed before it |
+| 2026-11-20 17:27 | secrets scan of the content staged for the checkpoint commit 2e20ead (1,716 files; same patterns and the 16 values of `.env.local`) | CLEAN |
+| 2026-11-20 18:42 | scan_dependencies.py on the jar built 18:36 with the upgraded libraries (107 Java libraries, 314 npm packages) | 2 findings (CRITICAL 2, both spring-webmvc 6.2.19, justified); HIGH or CRITICAL without justification: **0**; exit code 0 |
+| 2026-11-20 18:45 | test_security.py against deploy 2 (the upgraded libraries; J1 and J2 passed before it) | **278 passed**, 0 failed (42 s) |

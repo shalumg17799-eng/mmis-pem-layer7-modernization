@@ -81,7 +81,8 @@ class SourceRulesOwnerTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-22 AC-3] a blank owner NPI <{0}> is no owner: a listing of the owner is not used")
+      name =
+          "[MAM-22 AC-3] a blank owner NPI <{0}> is no owner: a listing of the owner is not used")
   @NullAndEmptySource
   @ValueSource(strings = {" ", "   ", "\t"})
   void blankOwnerIsIgnored(String blank) {

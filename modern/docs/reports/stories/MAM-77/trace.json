@@ -1,13 +1,75 @@
 {
   "story": "MAM-77",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
-  "tests": [
-    "modern/web-ui/tests/console/provider-search.test.tsx",
-    "modern/web-ui/tests/support/search.ts",
-    "modern/web-ui/e2e/console-search.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
   ],
+  "tests": [
+    "modern/web-ui/e2e/console-search.spec.ts",
+    "modern/web-ui/tests/console/provider-search.test.tsx",
+    "modern/web-ui/tests/support/search.ts"
+  ],
+  "testIds": {
+    "AC-1": [
+      "console-search.spec.ts: PASSED",
+      "provider-search.test.tsx: PASSED"
+    ],
+    "AC-2": [
+      "console-search.spec.ts: PASSED",
+      "provider-search.test.tsx: PASSED"
+    ],
+    "AC-3": [
+      "console-search.spec.ts: PASSED",
+      "provider-search.test.tsx: PASSED"
+    ],
+    "AC-4": [
+      "console-search.spec.ts: PASSED",
+      "provider-search.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "console-search.spec.ts: PASSED",
+      "provider-search.test.tsx: PASSED"
+    ],
+    "AC-6": [
+      "provider-search.test.tsx: PASSED"
+    ],
+    "AC-7": [
+      "console-search.spec.ts: PASSED",
+      "provider-search.test.tsx: PASSED"
+    ],
+    "AC-8": [
+      "console-search.spec.ts: PASSED",
+      "provider-search.test.tsx: PASSED"
+    ]
+  },
   "codeUnits": [
     "modern/web-ui/src/features/console/providers/ProviderSearch.tsx"
   ],
-  "rules": []
+  "rules": [
+    "R-PRVCICS1-ADD-02",
+    "R-PRVCICS1-ADD-03",
+    "R-PRVCICS1-cbl-00001",
+    "R-PRVCICS1-cbl-00002",
+    "R-PRVCICS1-cbl-00004",
+    "R-PRVCICS1-cbl-00011",
+    "R-PRVCICS1-cbl-00012",
+    "R-PRVCICS1-cbl-00013",
+    "R-PRVCICS1-cbl-00014",
+    "R-PRVCICS1-cbl-00016",
+    "R-PRVCICS1-cbl-00017",
+    "R-PRVCICS1-cbl-00018",
+    "R-PRVCICS1-cbl-00020",
+    "R-PRVCICS1-cbl-00024",
+    "R-PRVCICS1-cbl-00025",
+    "R-PRVCICS1-cbl-00042",
+    "R-PRVCICS1-cbl-00043",
+    "R-PRVCICS1-cbl-00044",
+    "R-PRVCICS1-cbl-00045"
+  ]
 }

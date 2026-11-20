@@ -14,7 +14,7 @@ decisions: [D-001, D-016, D-012]
 dependsOn: [MAM-64, MAM-66, MAM-70, MAM-46, MAM-54, MAM-58, MAM-50]
 mainJourney: false
 labels: [svc-e2e, kag-L-S068, agentic, decision-D-001, decision-D-016, decision-D-012]
-builtCommit:
+builtCommit: pending-user-commit
 testsSha256: 0fe218ad62aee5682207818ff25e47fdfb51c5881991ead7cbb734904b682f3a
 ---
 ## Business requirement

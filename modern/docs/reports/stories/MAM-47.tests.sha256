@@ -1,1 +1,2 @@
+6c975f3935e9095faac5d2c00fb235266700cd7dc8d25b31b6fafe7fc1da3174  modern/tools/checks/tests/test_intake_licences_known_to_stub.py
 e86ac00e9320be7901cea2ab6169ad059b12ac6fcbfbc745c2cb9ae3eeeeb92a  modern/tools/checks/tests/test_wiremock_stubs.py

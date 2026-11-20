@@ -17,9 +17,9 @@ import org.junit.jupiter.api.Test;
 
 /**
  * MAM-75 AC-2, AC-4, AC-5 and AC-6: the last step of a run (PRVMTH01 STEP030) writes the run's
- * records in ascending NPI order as the TMSISOUT file, archives it as the next generation, completes
- * the run with its row count and puts ExtractProduced in the outbox, in that order and only when
- * every step before worked.
+ * records in ascending NPI order as the TMSISOUT file, archives it as the next generation,
+ * completes the run with its row count and puts ExtractProduced in the outbox, in that order and
+ * only when every step before worked.
  */
 class ArchiveExtractTest {
 
@@ -150,7 +150,8 @@ class ArchiveExtractTest {
     assertThat(((ExtractProducedData) events.get(0).data()).rowCount()).isZero();
   }
 
-  // ---- AC-5: ExtractProduced ---------------------------------------------------------------------
+  // ---- AC-5: ExtractProduced
+  // ---------------------------------------------------------------------
 
   @Test
   @DisplayName("[MAM-75 AC-5] exactly one event is put in the outbox, of the type ExtractProduced")
@@ -185,7 +186,9 @@ class ArchiveExtractTest {
   void eventUsesTheRunsDate() {
     archive.archive(runWithRows("1003000111"));
     ExtractProducedData data = (ExtractProducedData) events.get(0).data();
-    assertThat(data.businessDate()).isEqualTo(BUSINESS_DATE).isNotEqualTo(LocalDate.of(2026, 1, 15));
+    assertThat(data.businessDate())
+        .isEqualTo(BUSINESS_DATE)
+        .isNotEqualTo(LocalDate.of(2026, 1, 15));
     assertThat(data.periodYyddd()).isEqualTo("26090").isNotEqualTo("26015");
   }
 

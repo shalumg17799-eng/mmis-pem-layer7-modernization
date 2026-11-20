@@ -41,7 +41,8 @@ public class SpringBatchExtractLauncher implements ExtractJobLauncher {
     try {
       launcher.run(job, parameters);
     } catch (Exception e) {
-      throw new IllegalStateException("job " + job.getName() + " not started: " + e.getMessage(), e);
+      throw new IllegalStateException(
+          "job " + job.getName() + " not started: " + e.getMessage(), e);
     }
   }
 }

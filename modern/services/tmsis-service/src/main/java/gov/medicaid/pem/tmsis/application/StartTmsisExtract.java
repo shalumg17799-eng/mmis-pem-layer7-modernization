@@ -45,8 +45,9 @@ public class StartTmsisExtract {
     try {
       launcher.launch(run.runId(), businessDate);
     } catch (RuntimeException e) {
-      LOG.error("PRVTMS01 run {} for {} could not be started: {}", run.runId(), businessDate, e.toString());
-      runs.fail(run.runId(), "could not be started: " + e.getMessage(), clock.instant());
+      String reason = FailureReason.of("could not be started: ", e);
+      LOG.error("PRVTMS01 run {} for {}: {}", run.runId(), businessDate, reason, e);
+      runs.fail(run.runId(), reason, clock.instant());
     }
     return runs.find(run.runId()).orElse(run);
   }

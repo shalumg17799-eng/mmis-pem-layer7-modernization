@@ -14,8 +14,8 @@ decisions: [D-002, D-023, D-024]
 dependsOn: [MAM-62, MAM-38]
 mainJourney: false
 labels: [svc-web-ui, kag-L-S065, agentic, decision-D-002, decision-D-023, decision-D-024]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: c2578837aa237411e35ac6d7f98f8940c24ed6f119333068b8768babef1e6135
 ---
 ## Business requirement
 The table that turns a provider's specialty prefix into a risk level (limited, moderate or high) is kept as business data, not buried in a program. An administrator can see the current table with its version, add, change or remove rows, and save the result as a new version. The screen starts with the legacy values and refuses entries that are not valid. Nobody else can change the table.

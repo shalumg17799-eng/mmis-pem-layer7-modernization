@@ -14,8 +14,8 @@ decisions: [D-015, D-028, D-020]
 dependsOn: [MAM-75, MAM-71, MAM-67, MAM-63, MAM-93, MAM-73, MAM-50, MAM-51]
 mainJourney: false
 labels: [svc-e2e, kag-L-S073, agentic, decision-D-015, decision-D-028, decision-D-020]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 772dfe529540fc201d4d61994c64b54bda49db726962f53fcd5963a176c8b8d4
 ---
 ## Business requirement
 At month end the administrator must be able to produce the federal reporting file and the managed-care directory file in their legacy formats, with the reporting file archived, and anyone must be able to find active providers in the public directory with properly written names. This story proves that works for real in the running system.

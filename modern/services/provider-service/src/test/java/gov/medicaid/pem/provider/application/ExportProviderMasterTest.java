@@ -12,7 +12,9 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-/** MAM-43 (D-007, ADR-005): the export asks the store for every provider and writes them as given. */
+/**
+ * MAM-43 (D-007, ADR-005): the export asks the store for every provider and writes them as given.
+ */
 class ExportProviderMasterTest {
 
   static Provider provider(String npi) {

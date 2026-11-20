@@ -14,8 +14,8 @@ decisions: [D-024, D-012]
 dependsOn: [MAM-16, MAM-24]
 mainJourney: true
 labels: [svc-platform, kag-L-S006, agentic, decision-D-024, decision-D-012, slice-main-journey]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 5af3536ddd3ad62e64e903722fbdeddd473f9df2e1930f38c3763a3791d25093
 ---
 ## Business requirement
 Services must tell each other about business changes reliably, so that an approved provider reaches the directory and triggers a notice even if a service restarts or the same message arrives twice. This story gives every service the same, tested way to publish and to receive such messages.

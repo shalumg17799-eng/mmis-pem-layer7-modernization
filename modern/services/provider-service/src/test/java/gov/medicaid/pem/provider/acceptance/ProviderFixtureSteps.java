@@ -17,9 +17,9 @@ public class ProviderFixtureSteps {
   @Autowired private JdbcTemplate jdbc;
 
   /**
-   * Replaces the whole provider table (and the history) with the rows of the table. Columns:
-   * npi, medicaidId, providerType, taxonomy, riskTier, enrollStatus, screenFlag, effectiveDate,
-   * endDate, revalidationDueDate, lastName, firstName, licenseNo, licenseState, legalName, dbaName,
+   * Replaces the whole provider table (and the history) with the rows of the table. Columns: npi,
+   * medicaidId, providerType, taxonomy, riskTier, enrollStatus, screenFlag, effectiveDate, endDate,
+   * revalidationDueDate, lastName, firstName, licenseNo, licenseState, legalName, dbaName,
    * ownerNpi. A column that is not in the table keeps the default of {@link ProviderRows}; an empty
    * cell is no value.
    */

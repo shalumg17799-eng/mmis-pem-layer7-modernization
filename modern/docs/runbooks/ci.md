@@ -1,8 +1,9 @@
 # CI runbook (MAM-39)
 
-The CI workflow is `modern/.github/workflows/ci.yml`. It is **inert where it is**: GitHub only runs workflows from the
-repository root. To switch it on, copy it to `.github/workflows/ci.yml` at the repository root and push (a user decision;
-nothing has been pushed). Every action and tool in it has an exact version; change a version only on purpose.
+The CI workflow is `.github/workflows/ci.yml` at the repository root. It was kept inert under `modern/.github/workflows/`
+until the user decided to switch it on (2026-11-20 19:32); it now runs on every push and pull request. Its run results
+are recorded in `modern/docs/reports/stories/MAM-39.md`. Every action and tool in it has an exact version; change a
+version only on purpose.
 
 Anyone without the workflow runs the same four steps by hand from `modern/` (Git Bash on Windows, any shell elsewhere):
 

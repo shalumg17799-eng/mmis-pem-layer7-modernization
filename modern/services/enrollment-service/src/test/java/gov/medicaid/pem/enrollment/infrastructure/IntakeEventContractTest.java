@@ -29,13 +29,15 @@ class IntakeEventContractTest extends IntakeIntegrationTest {
   List<String> violations(String schema, String type) throws Exception {
     List<String> all = new java.util.ArrayList<>();
     for (JsonNode event : events(type)) {
-      EventsContractFile.violations(schema, event).forEach(v -> all.add(event.path("subject").asText() + " " + v));
+      EventsContractFile.violations(schema, event)
+          .forEach(v -> all.add(event.path("subject").asText() + " " + v));
     }
     return all;
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-4] the baseline file: its three ApplicationValidated events are valid ApplicationValidatedEnvelopes")
+  @DisplayName(
+      "[MAM-56 AC-4] the baseline file: its three ApplicationValidated events are valid ApplicationValidatedEnvelopes")
   void baselineValidatedEvents() throws Exception {
     IntakeApi.runToEnd(mvc, json, AppInputFile.dataset(BASELINE), "2026-01-15");
     assertThat(events("ApplicationValidated")).hasSize(3);
@@ -43,7 +45,8 @@ class IntakeEventContractTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-4] the baseline file: its four ApplicationRejected events are valid ApplicationRejectedEnvelopes")
+  @DisplayName(
+      "[MAM-56 AC-4] the baseline file: its four ApplicationRejected events are valid ApplicationRejectedEnvelopes")
   void baselineRejectedEvents() throws Exception {
     IntakeApi.runToEnd(mvc, json, AppInputFile.dataset(BASELINE), "2026-01-15");
     assertThat(events("ApplicationRejected")).hasSize(4);
@@ -51,7 +54,8 @@ class IntakeEventContractTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-3] the scenarios file: its eight ApplicationValidated events are valid ApplicationValidatedEnvelopes")
+  @DisplayName(
+      "[MAM-56 AC-3] the scenarios file: its eight ApplicationValidated events are valid ApplicationValidatedEnvelopes")
   void scenariosEvents() throws Exception {
     IntakeApi.runToEnd(mvc, json, AppInputFile.dataset(SCENARIOS), "2026-01-15");
     assertThat(events("ApplicationValidated")).hasSize(8);
@@ -76,7 +80,8 @@ class IntakeEventContractTest extends IntakeIntegrationTest {
       "[MAM-56 AC-3] an organisation with no DBA name and no owner gives an event whose organization has only the legal name")
   void organizationMembersAreOmitted() throws Exception {
     String record =
-        AppInputFile.organization("1003000333", "M00000333", "FA", "251G00000X", "SUNSET HOSPICE INC", "", "");
+        AppInputFile.organization(
+            "1003000333", "M00000333", "FA", "251G00000X", "SUNSET HOSPICE INC", "", "");
     IntakeApi.runToEnd(mvc, json, AppInputFile.lines(record), DATE);
     JsonNode organization = events("ApplicationValidated").get(0).path("data").path("organization");
     assertThat(organization.fieldNames()).toIterable().containsExactly("legalName");
@@ -91,7 +96,8 @@ class IntakeEventContractTest extends IntakeIntegrationTest {
         AppInputFile.individual("1003000444", "M00000444", "IN", "207Q00000X", "", "", "", "");
     IntakeApi.runToEnd(mvc, json, AppInputFile.lines(record), DATE);
     assertThat(violations("ApplicationValidatedEnvelope", "ApplicationValidated")).isEmpty();
-    assertThat(events("ApplicationValidated").get(0).path("data").toString()).doesNotContain("null");
+    assertThat(events("ApplicationValidated").get(0).path("data").toString())
+        .doesNotContain("null");
   }
 
   @Test
@@ -103,11 +109,20 @@ class IntakeEventContractTest extends IntakeIntegrationTest {
         json,
         AppInputFile.lines(AppInputFile.valid("1003000111"), AppInputFile.noTaxonomy("1003000222")),
         DATE);
-    assertThat(events("ApplicationValidated").get(0).path("subject").asText()).isEqualTo("1003000111");
-    assertThat(events("ApplicationRejected").get(0).path("subject").asText()).isEqualTo("1003000222");
+    assertThat(events("ApplicationValidated").get(0).path("subject").asText())
+        .isEqualTo("1003000111");
+    assertThat(events("ApplicationRejected").get(0).path("subject").asText())
+        .isEqualTo("1003000222");
     assertThat(events("ApplicationValidated").get(0).path("source").asText())
         .isEqualTo("enrollment-service");
-    assertThat(events("ApplicationRejected").get(0).path("data").path("errors").get(0).path("code").asText())
+    assertThat(
+            events("ApplicationRejected")
+                .get(0)
+                .path("data")
+                .path("errors")
+                .get(0)
+                .path("code")
+                .asText())
         .isEqualTo("E104");
   }
 

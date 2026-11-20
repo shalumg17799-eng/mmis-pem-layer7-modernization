@@ -129,7 +129,8 @@ class AuditHistoryUseCasesTest {
   }
 
   @Test
-  @DisplayName("[MAM-40 AC-3] the actor of a registration is the producing service named by the event")
+  @DisplayName(
+      "[MAM-40 AC-3] the actor of a registration is the producing service named by the event")
   void registrationActorIsTheSource() {
     registration().register(application("1003000111"), "enrollment-service-2");
 
@@ -157,7 +158,8 @@ class AuditHistoryUseCasesTest {
             if (p == null) {
               return false;
             }
-            db.put(npi, provider(npi, p.enrollStatus(), flag, p.riskTier(), p.revalidationDueDate()));
+            db.put(
+                npi, provider(npi, p.enrollStatus(), flag, p.riskTier(), p.revalidationDueDate()));
             return true;
           }
 
@@ -168,7 +170,8 @@ class AuditHistoryUseCasesTest {
               return false;
             }
             db.put(
-                npi, provider(npi, p.enrollStatus(), p.screenFlag(), tier, p.revalidationDueDate()));
+                npi,
+                provider(npi, p.enrollStatus(), p.screenFlag(), tier, p.revalidationDueDate()));
             return true;
           }
         };
@@ -209,7 +212,9 @@ class AuditHistoryUseCasesTest {
     v.screeningCompleted("1003000111", "FAIL");
     v.riskTierAssigned("1003000111", "M");
 
-    assertThat(entries).extracting(AuditEntry::actor).containsExactly("screening-service", "risk-service");
+    assertThat(entries)
+        .extracting(AuditEntry::actor)
+        .containsExactly("screening-service", "risk-service");
     assertThat(entries.get(0).after()).containsEntry("screenFlag", "F");
   }
 
@@ -217,8 +222,7 @@ class AuditHistoryUseCasesTest {
   @DisplayName(
       "[MAM-40 AC-1] a risk tier appends one RISK_TIER_ASSIGNED entry: before no tier, after the tier and the tier received")
   void tierEntry() {
-    db.put(
-        "1003000111", provider("1003000111", EnrollStatus.PENDING, ScreenFlag.PASS, null, null));
+    db.put("1003000111", provider("1003000111", EnrollStatus.PENDING, ScreenFlag.PASS, null, null));
 
     verdicts().riskTierAssigned("1003000111", "L", "risk-service");
 
@@ -263,7 +267,9 @@ class AuditHistoryUseCasesTest {
     AuditEntry e = entries.get(0);
     assertThat(e.actor()).isEqualTo("analyst1");
     assertThat(e.action()).isEqualTo("APPROVED");
-    assertThat(e.before()).containsEntry("enrollStatus", "P").containsEntry("revalidationDueDate", null);
+    assertThat(e.before())
+        .containsEntry("enrollStatus", "P")
+        .containsEntry("revalidationDueDate", null);
     assertThat(e.after())
         .containsEntry("enrollStatus", "A")
         .containsEntry("revalidationDueDate", LocalDate.of(2031, 11, 18));
@@ -287,10 +293,11 @@ class AuditHistoryUseCasesTest {
     AuditEntry e = entries.get(0);
     assertThat(e.action()).isEqualTo("DENIED");
     assertThat(e.before()).containsEntry("enrollStatus", "P");
-    assertThat(e.after()).containsEntry("enrollStatus", "D").containsEntry("revalidationDueDate", null);
+    assertThat(e.after())
+        .containsEntry("enrollStatus", "D")
+        .containsEntry("revalidationDueDate", null);
     assertThat(e.after().get("decision"))
-        .isEqualTo(
-            Map.of("decision", "DENY", "reason", "Owner is on the LEIE list"));
+        .isEqualTo(Map.of("decision", "DENY", "reason", "Owner is on the LEIE list"));
   }
 
   @Test
@@ -339,7 +346,8 @@ class AuditHistoryUseCasesTest {
     statusChange()
         .change(
             "1003000111",
-            new StatusChangeCommand(action, "LEIE exclusion", LocalDate.of(2026, 3, 31), sanctionId),
+            new StatusChangeCommand(
+                action, "LEIE exclusion", LocalDate.of(2026, 3, 31), sanctionId),
             SYSTEM);
 
     assertThat(entries).hasSize(1);
@@ -372,7 +380,8 @@ class AuditHistoryUseCasesTest {
     assertThatThrownBy(
             () ->
                 statusChange()
-                    .change("1003000111", new StatusChangeCommand("PURGE", null, day, null), SYSTEM))
+                    .change(
+                        "1003000111", new StatusChangeCommand("PURGE", null, day, null), SYSTEM))
         .isInstanceOf(ApiException.class);
     assertThatThrownBy(
             () ->

@@ -14,8 +14,8 @@ decisions: [D-005, D-016, D-018, D-029, D-012, D-023, D-024]
 dependsOn: [MAM-80, MAM-25, MAM-52, MAM-48, MAM-60, MAM-40]
 mainJourney: false
 labels: [svc-web-ui, kag-L-S061, agentic, decision-D-005, decision-D-016, decision-D-018, decision-D-029, decision-D-012, decision-D-023, decision-D-024]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 789cdfbb99f8549c847c1aef8fd8b178c3173d79009589db7d4788ee12ae1b08
 ---
 ## Business requirement
 Below the provider record, an analyst, supervisor or administrator sees what has happened to the provider: the screening results source by source, the sanctions history, the revalidation cases, the notices sent, and the audit trail of changes. Each person sees the panels their role is allowed to read, and one panel failing to load never hides the others.

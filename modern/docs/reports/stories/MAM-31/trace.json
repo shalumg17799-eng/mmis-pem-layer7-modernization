@@ -1,0 +1,57 @@
+{
+  "story": "MAM-31",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/HelpersTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/config/PemKafkaAutoConfigurationTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/config/PemKitAutoConfigurationTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/EventEnvelopeTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxRelayTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxWriterTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/ProcessedEventsTest.java",
+    "modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/EventProbe.java",
+    "modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/PemContainers.java"
+  ],
+  "testIds": {
+    "AC-1": [
+      "EventEnvelopeTest: PASSED",
+      "OutboxRelayTest: PASSED",
+      "ProcessedEventsTest: PASSED"
+    ],
+    "AC-2": [
+      "OutboxWriterTest: PASSED"
+    ],
+    "AC-3": [
+      "HelpersTest: PASSED",
+      "OutboxRelayTest: PASSED"
+    ],
+    "AC-4": [
+      "ProcessedEventsTest: PASSED"
+    ],
+    "AC-5": [
+      "HelpersTest: PASSED",
+      "OutboxWriterTest: PASSED"
+    ],
+    "AC-6": [
+      "PemKafkaAutoConfigurationTest: PASSED"
+    ],
+    "AC-7": [
+      "HelpersTest: PASSED",
+      "PemKafkaAutoConfigurationTest: PASSED"
+    ],
+    "AC-8": [
+      "PemKitAutoConfigurationTest: PASSED"
+    ]
+  },
+  "codeUnits": [],
+  "rules": []
+}

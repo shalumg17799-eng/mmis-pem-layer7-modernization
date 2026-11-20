@@ -1,0 +1,114 @@
+{
+  "story": "MAM-58",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/EventsContractFile.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/LogCapture.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeFixtures.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/SanctionNoticeEventsTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/SanctionNoticeFailureTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/SanctionNoticeSteps.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/SendSanctionNoticeFailureTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/SendSanctionNoticeTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/domain/NoticeRulesMatrixTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/domain/SanctionNoticeRulesTest.java",
+    "modern/services/notification-service/src/test/resources/features/MAM-58.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-58.feature 'A termination sends the TRM notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "SanctionNoticeEventsTest: PASSED",
+      "SanctionNoticeRulesTest: PASSED",
+      "SendSanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-58.feature 'A suspension sends the SUS notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "SanctionNoticeEventsTest: PASSED",
+      "SanctionNoticeRulesTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-58.feature 'A reinstatement sends the RST notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "SanctionNoticeEventsTest: PASSED",
+      "SanctionNoticeRulesTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-58.feature 'An action outside T, S and R is refused, not sent as a general notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "SanctionNoticeEventsTest: PASSED",
+      "SanctionNoticeRulesTest: PASSED",
+      "SendSanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
+    ],
+    "AC-5": [
+      "MAM-58.feature 'Every sent notice is announced': PASSED",
+      "SanctionNoticeEventsTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
+    ],
+    "AC-6": [
+      "MAM-58.feature 'A failed send is logged, surfaced and does not stop the processing': PASSED",
+      "SanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
+    ],
+    "AC-7": [
+      "MAM-58.feature 'A missing template is a named failure, not a crash': PASSED",
+      "SendSanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
+    ],
+    "AC-8": [
+      "MAM-58.feature 'A redelivered event sends one notice': PASSED",
+      "SanctionNoticeEventsTest: PASSED",
+      "SanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeFailureTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/NotificationServiceApplication.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/ListNotices.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/Notice.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticePage.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticePorts.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeSentData.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeView.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/SendNotice.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/SendSanctionNotice.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/domain/NoticeRules.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/infrastructure/JdbcNoticeLog.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/infrastructure/NoticeAdapters.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/infrastructure/NoticeEventsListener.java"
+  ],
+  "rules": [
+    "R-PRVSAN01-cbl-00008",
+    "R-PRVSAN01-cbl-00009",
+    "R-PRVSAN01-cbl-00032",
+    "R-PRVSAN01-cbl-00036",
+    "R-PRVSAN01-cbl-00037",
+    "R-PRVSAN01-cbl-00038",
+    "R-PRVSAN01-cbl-00039",
+    "R-PRVSAN01-cbl-00044",
+    "R-PRVSAN01-cbl-00045",
+    "R-PRVSAN01-cbl-00046",
+    "R-PRVSAN01-cbl-00047",
+    "R-PRVSAN01-cbl-00048",
+    "R-PRVSAN01-cbl-00049",
+    "R-PRVSAN01-cbl-00050",
+    "R-PRVSAN01-cbl-00051",
+    "R-PRVSAN01-cbl-00052",
+    "R-PRVSAN01-cbl-00053"
+  ]
+}

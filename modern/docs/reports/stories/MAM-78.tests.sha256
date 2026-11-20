@@ -1,0 +1,9 @@
+9c243bcc77014132757dd3f794918ae599378710b152f6f1b10e27ab995fa344  modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/PlatformChecksTest.java
+0c0d72414c8c5aae5dd5c6767f336064ee065a70229429a07c3944053ee14689  modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/acceptance/ExtractSteps.java
+2a402aa4de8224dfedf37648c1de3e367024d6b41049be4b38c2335a7a5179d3  modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/FutureEnrolmentApiTest.java
+5dbd627bcfe76f782214f1e134c120b2a5c31ce2bdb7a9233df29c0cb7d1df92  modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/application/ContractConstantsTest.java
+14e9ae76294604222b7008742e5d0557b2b3d11e6c98bce97730cc06cae4e12c  modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/application/ExtractItemTest.java
+0c66d79abcfe1d1be4cd373daf576e77de6a4930951bfaf6b8295a9de08a1de0  modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/domain/FutureEnrolmentTest.java
+54256d99f9a2afedf4417591c9a9c8a0dcae13f4018c3a6bbd42085eaef7c0e9  modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/infrastructure/JdbcExtractRunsTest.java
+e7bd2528f05200319a47ebda55827a958ee586e6121cd2017205dba5b79a1420  modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/infrastructure/ProviderServiceClientTest.java
+b0d02d2fe5f9cdcb6098aa614bf4c7c9bafe2bc5f30923dc8cee4021ebca5a52  modern/services/tmsis-service/src/test/resources/features/MAM-78.feature

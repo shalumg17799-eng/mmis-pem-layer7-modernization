@@ -76,7 +76,12 @@ async function runJob(page: Page, option: string, startPath: string): Promise<{ 
 /** Clicks the Download button of the newest completed run of a job and returns the bytes the browser saved. */
 async function downloadFile(page: Page, label: string): Promise<Buffer> {
   const runs = page.getByRole('table', { name: /Recent runs/ });
-  const button = runs.getByRole('button', { name: new RegExp(`^Download ${label}`) }).first();
+  // Corrected 2026-11-20 (Q-097 C): the newest run of this job is the first row that names the job, and its Download
+  // button only appears once that row shows Completed. The old selector took the first Download button of the whole table,
+  // which belongs to an OLDER run while the new row still shows Running (seen in the final run of 2026-11-20).
+  const newest = runs.getByRole('row').filter({ hasText: label }).first();
+  await expect(newest, `the newest ${label} run shows Completed`).toContainText('Completed', { timeout: 120_000 });
+  const button = newest.getByRole('button', { name: new RegExp(`^Download ${label}`) });
   await expect(button).toBeVisible({ timeout: 120_000 });
   const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
   return readFileSync(await download.path());
@@ -117,6 +122,11 @@ test.describe('MAM-83 journey J7: month-end extracts and the public directory', 
         (r) => r.runId === tmsisRun.runId,
       );
     await expect.poll(async () => (await listed())?.status, { message: 'T-MSIS run COMPLETED', ...POLL }).toBe('COMPLETED');
+    // Corrected 2026-11-20 (Q-097 C): the T-MSIS job has no run-status call, so the page keeps the row of the run it just
+    // started at "Running" until the list is read again. The admin reloads the page (what a user has to do today; listed
+    // as an open UI finding in docs/reports/final-report.md), then downloads the file of THIS run from the first row.
+    await admin.reload();
+    await expect(admin.getByRole('heading', { level: 1, name: 'Batch jobs' })).toBeVisible();
     const tmsisOut = await downloadFile(admin, 'T-MSIS extract');
     const tmsisApi = await request.get(`${GATEWAY}/api/v1/batch/tmsis-extracts/${tmsisRun.runId}/file`, {
       headers: { Authorization: `Bearer ${adminToken}` },

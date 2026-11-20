@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Provider rows for the integration tests of the search, history and export stories (synthetic
- * data only), written straight into provider_db with the column values of the acceptance criteria.
+ * Provider rows for the integration tests of the search, history and export stories (synthetic data
+ * only), written straight into provider_db with the column values of the acceptance criteria.
  */
 public final class ProviderRows {
 
@@ -137,7 +137,9 @@ public final class ProviderRows {
       return this;
     }
 
-    /** Only the view of the type is stored: names and licence for IN, the organisation for GR/FA. */
+    /**
+     * Only the view of the type is stored: names and licence for IN, the organisation for GR/FA.
+     */
     public Builder insert(JdbcTemplate jdbc) {
       boolean in = "IN".equals(type);
       jdbc.update(

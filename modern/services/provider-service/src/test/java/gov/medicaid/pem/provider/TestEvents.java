@@ -15,9 +15,9 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Events as the other services publish them (the envelope of events.yaml), sent to the real Kafka of
- * the test and awaited through the processed_event table. Every wait carries its own time limit, so
- * a defect makes the test fail and never hang.
+ * Events as the other services publish them (the envelope of events.yaml), sent to the real Kafka
+ * of the test and awaited through the processed_event table. Every wait carries its own time limit,
+ * so a defect makes the test fail and never hang.
  */
 public final class TestEvents {
 
@@ -58,10 +58,14 @@ public final class TestEvents {
   public static void send(String topic, String key, String message) {
     Map<String, Object> cfg =
         Map.of(
-            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, PemContainers.KAFKA.getBootstrapServers(),
-            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
-            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
-            ProducerConfig.MAX_BLOCK_MS_CONFIG, 30000);
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            PemContainers.KAFKA.getBootstrapServers(),
+            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+            StringSerializer.class,
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+            StringSerializer.class,
+            ProducerConfig.MAX_BLOCK_MS_CONFIG,
+            30000);
     try (var producer = new KafkaProducer<String, String>(cfg)) {
       producer.send(new ProducerRecord<>(topic, key, message)).get();
     } catch (Exception e) {
@@ -110,8 +114,7 @@ public final class TestEvents {
     d.put("taxonomy", "207Q00000X");
     d.put(
         "individual",
-        Map.of(
-            "lastName", last, "firstName", first, "licenseNo", "MD12345", "licenseState", "TX"));
+        Map.of("lastName", last, "firstName", first, "licenseNo", "MD12345", "licenseState", "TX"));
     return d;
   }
 
@@ -124,12 +127,18 @@ public final class TestEvents {
             Map.of("source", "SAMGOV", "result", "P", "detail", "X"),
             Map.of("source", "SSADMF", "result", "P", "detail", "X"));
     return Map.of(
-        "screeningId", UUID.randomUUID().toString(),
-        "npi", npi,
-        "reason", "ENROLLMENT",
-        "result", result,
-        "taxonomy", "207Q00000X",
-        "sources", sources);
+        "screeningId",
+        UUID.randomUUID().toString(),
+        "npi",
+        npi,
+        "reason",
+        "ENROLLMENT",
+        "result",
+        result,
+        "taxonomy",
+        "207Q00000X",
+        "sources",
+        sources);
   }
 
   /** RiskTierAssigned data. */

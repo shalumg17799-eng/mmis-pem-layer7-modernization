@@ -16,10 +16,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 /**
- * MAM-56 AC-7 and MAM-57 AC-7: only ADMIN and SYSTEM may start a run, only ADMIN may read its result
- * and its error file (D-023, ADR-007). The other roles get 403, no token 401, an unknown run 404 for
- * ADMIN, all as application/problem+json. The roles of each operation are also compared with the
- * x-roles of the contract, so the code and the contract cannot drift apart.
+ * MAM-56 AC-7 and MAM-57 AC-7: only ADMIN and SYSTEM may start a run, only ADMIN may read its
+ * result and its error file (D-023, ADR-007). The other roles get 403, no token 401, an unknown run
+ * 404 for ADMIN, all as application/problem+json. The roles of each operation are also compared
+ * with the x-roles of the contract, so the code and the contract cannot drift apart.
  */
 class IntakeRunRolesTest extends IntakeIntegrationTest {
 
@@ -67,7 +67,8 @@ class IntakeRunRolesTest extends IntakeIntegrationTest {
   void adminStarts() throws Exception {
     MvcResult r = IntakeApi.start(mvc, PemJwt.admin(), file(), DATE);
     assertThat(status(r)).isEqualTo(202);
-    IntakeApi.await(mvc, json, json.readTree(r.getResponse().getContentAsString()).path("runId").asText());
+    IntakeApi.await(
+        mvc, json, json.readTree(r.getResponse().getContentAsString()).path("runId").asText());
   }
 
   @Test
@@ -75,10 +76,12 @@ class IntakeRunRolesTest extends IntakeIntegrationTest {
   void systemStarts() throws Exception {
     MvcResult r = IntakeApi.start(mvc, PemJwt.system(), file(), DATE);
     assertThat(status(r)).isEqualTo(202);
-    IntakeApi.await(mvc, json, json.readTree(r.getResponse().getContentAsString()).path("runId").asText());
+    IntakeApi.await(
+        mvc, json, json.readTree(r.getResponse().getContentAsString()).path("runId").asText());
   }
 
-  @ParameterizedTest(name = "[MAM-56 AC-7] {0} gets 403 problem+json on the start and no run is created")
+  @ParameterizedTest(
+      name = "[MAM-56 AC-7] {0} gets 403 problem+json on the start and no run is created")
   @ValueSource(strings = {"PROVIDER", "ANALYST", "SUPERVISOR"})
   void otherRolesRefusedOnStart(String role) throws Exception {
     MvcResult r = IntakeApi.start(mvc, as(role), file(), DATE);
@@ -101,7 +104,8 @@ class IntakeRunRolesTest extends IntakeIntegrationTest {
   @DisplayName(
       "[MAM-56 AC-7] the role is checked before the parameters: a PROVIDER without a file gets 403, not 400")
   void roleBeforeParameters() throws Exception {
-    assertThat(status(IntakeApi.start(mvc, PemJwt.provider("1003000111"), null, null))).isEqualTo(403);
+    assertThat(status(IntakeApi.start(mvc, PemJwt.provider("1003000111"), null, null)))
+        .isEqualTo(403);
     assertThat(status(IntakeApi.start(mvc, null, null, null))).isEqualTo(401);
   }
 
@@ -132,7 +136,8 @@ class IntakeRunRolesTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-7] an unknown run id has no error file: 404 problem+json that names the id")
+  @DisplayName(
+      "[MAM-56 AC-7] an unknown run id has no error file: 404 problem+json that names the id")
   void unknownRunHasNoErrorFile() throws Exception {
     MvcResult r = IntakeApi.errorFile(mvc, UNKNOWN, PemJwt.admin());
     assertThat(status(r)).isEqualTo(404);
@@ -194,7 +199,8 @@ class IntakeRunRolesTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-7] a run id that is no UUID is 400 problem+json for ADMIN, on both reads")
+  @DisplayName(
+      "[MAM-57 AC-7] a run id that is no UUID is 400 problem+json for ADMIN, on both reads")
   void malformedRunId() throws Exception {
     MvcResult run = IntakeApi.read(mvc, "not-a-uuid", PemJwt.admin());
     MvcResult file = IntakeApi.errorFile(mvc, "not-a-uuid", PemJwt.admin());
@@ -206,7 +212,8 @@ class IntakeRunRolesTest extends IntakeIntegrationTest {
 
   // ---- the code against the contract's x-roles --------------------------------------------------
 
-  @ParameterizedTest(name = "[MAM-56 AC-7] startIntakeRun: {0} is allowed exactly as the contract's x-roles say")
+  @ParameterizedTest(
+      name = "[MAM-56 AC-7] startIntakeRun: {0} is allowed exactly as the contract's x-roles say")
   @ValueSource(strings = {"ADMIN", "SYSTEM", "ANALYST", "SUPERVISOR", "PROVIDER"})
   void startMatchesContract(String role) throws Exception {
     boolean allowed = ContractFile.roles("startIntakeRun").contains(role);
@@ -218,7 +225,8 @@ class IntakeRunRolesTest extends IntakeIntegrationTest {
     }
   }
 
-  @ParameterizedTest(name = "[MAM-57 AC-7] getIntakeRun: {0} is allowed exactly as the contract's x-roles say")
+  @ParameterizedTest(
+      name = "[MAM-57 AC-7] getIntakeRun: {0} is allowed exactly as the contract's x-roles say")
   @ValueSource(strings = {"ADMIN", "SYSTEM", "ANALYST", "SUPERVISOR", "PROVIDER"})
   void readMatchesContract(String role) throws Exception {
     boolean allowed = ContractFile.roles("getIntakeRun").contains(role);
@@ -226,7 +234,8 @@ class IntakeRunRolesTest extends IntakeIntegrationTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-56 AC-7] getIntakeErrorFile: {0} is allowed exactly as the contract's x-roles say")
+      name =
+          "[MAM-56 AC-7] getIntakeErrorFile: {0} is allowed exactly as the contract's x-roles say")
   @ValueSource(strings = {"ADMIN", "SYSTEM", "ANALYST", "SUPERVISOR", "PROVIDER"})
   void errorFileMatchesContract(String role) throws Exception {
     boolean allowed = ContractFile.roles("getIntakeErrorFile").contains(role);

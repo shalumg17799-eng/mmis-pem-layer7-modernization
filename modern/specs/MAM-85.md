@@ -14,8 +14,8 @@ decisions: [D-019, D-029, D-005, D-016, D-001, D-023, D-024]
 dependsOn: [MAM-62, MAM-37, MAM-54, MAM-25, MAM-48]
 mainJourney: true
 labels: [svc-web-ui, kag-L-S062, agentic, decision-D-019, decision-D-029, decision-D-005, decision-D-016, decision-D-001, decision-D-023, decision-D-024, slice-main-journey]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 9ff7b9fb85ce4a0a357c1a5241fc0a14e83c32029a632139302709910e180298
 ---
 ## Business requirement
 Analysts and supervisors work from four lists: providers waiting for approval after a passed screening, providers whose screening failed, providers whose revalidation is due, and applications that were rejected. Each list names the provider, why it is there and how to open it, so nothing waits unseen. After a decision or a new screening the lists change accordingly.

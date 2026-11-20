@@ -1,0 +1,102 @@
+{
+  "story": "MAM-65",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/ContractFile.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/DirectoryFixtures.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/Fhir4Shape.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/Fhir4ShapeTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/acceptance/FhirSteps.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/FhirApiTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/FhirContractTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/FhirFullUrlChecks.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/FhirPublicBaseUrlConfiguredTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/FhirPublicBaseUrlDefaultTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/FhirR4HapiValidatorTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/FhirR4ValidityTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/FhirResourceMappingTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/application/ProjectDirectoryProfileTest.java",
+    "modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/infrastructure/JdbcFhirDirectoryTest.java",
+    "modern/services/directory-service/src/test/resources/features/MAM-65.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "FhirApiTest: PASSED",
+      "FhirContractTest: PASSED",
+      "FhirResourceMappingTest: PASSED",
+      "JdbcFhirDirectoryTest: PASSED",
+      "MAM-65.feature 'Practitioner search by NPI answers a searchset Bundle without a token': PASSED"
+    ],
+    "AC-2": [
+      "FhirApiTest: PASSED",
+      "FhirResourceMappingTest: PASSED",
+      "JdbcFhirDirectoryTest: PASSED",
+      "MAM-65.feature 'The Practitioner carries only facts the legacy record holds': PASSED",
+      "ProjectDirectoryProfileTest: PASSED"
+    ],
+    "AC-3": [
+      "FhirApiTest: PASSED",
+      "FhirResourceMappingTest: PASSED",
+      "JdbcFhirDirectoryTest: PASSED",
+      "MAM-65.feature 'Organization search finds groups and facilities, never individuals': PASSED"
+    ],
+    "AC-4": [
+      "FhirApiTest: PASSED",
+      "FhirResourceMappingTest: PASSED",
+      "JdbcFhirDirectoryTest: PASSED",
+      "MAM-65.feature 'PractitionerRole carries the taxonomy as the specialty': PASSED"
+    ],
+    "AC-5": [
+      "FhirApiTest: PASSED",
+      "FhirResourceMappingTest: PASSED",
+      "JdbcFhirDirectoryTest: PASSED",
+      "MAM-65.feature 'Only ACTIVE providers appear, and a reinstatement brings the provider back': PASSED",
+      "ProjectDirectoryProfileTest: PASSED"
+    ],
+    "AC-6": [
+      "FhirApiTest: PASSED",
+      "FhirContractTest: PASSED",
+      "MAM-65.feature 'The FHIR API is read-only': PASSED"
+    ],
+    "AC-7": [
+      "Fhir4ShapeTest: PASSED",
+      "FhirPublicBaseUrlConfiguredTest: PASSED",
+      "FhirPublicBaseUrlDefaultTest: PASSED",
+      "FhirR4HapiValidatorTest: PASSED",
+      "FhirR4ValidityTest: PASSED",
+      "MAM-65.feature 'The resources are valid FHIR R4 (structural check here; the HAPI validator checks the same Bundles in FhirR4HapiValidatorTest)': PASSED"
+    ],
+    "AC-8": [
+      "FhirApiTest: PASSED",
+      "FhirContractTest: PASSED",
+      "FhirResourceMappingTest: PASSED",
+      "MAM-65.feature 'A malformed identifier search is rejected': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/adapter/legacy/DiroutFile.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/api/FhirController.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/application/FhirDirectory.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/application/ProjectDirectory.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/application/ProviderProfile.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/application/ProviderProfiles.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/domain/DirectoryRules.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/infrastructure/DirectoryExtractJobConfig.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/infrastructure/JdbcFhirDirectory.java",
+    "modern/services/directory-service/src/main/java/gov/medicaid/pem/directory/infrastructure/ProviderServiceClient.java",
+    "modern/testdata/generate_seed.py",
+    "modern/testdata/seed/directory_db/02-directory.sql"
+  ],
+  "rules": [
+    "R-PRVDIR01-ADD-04"
+  ]
+}

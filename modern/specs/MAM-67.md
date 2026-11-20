@@ -14,8 +14,8 @@ decisions: [D-028, D-020, D-024, D-023, D-013]
 dependsOn: [MAM-61, MAM-42]
 mainJourney: false
 labels: [svc-directory-service, kag-L-S049, agentic, decision-D-028, decision-D-020, decision-D-024, decision-D-023, decision-D-013]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 102037edd415eb67c83fb62d42eca8f8ae288115d63ea9d37543abbf6f2fd551
 ---
 ## Business requirement
 Managed care organisations received a directory file listing every active provider, one fixed-width record per provider. The new system must still produce that file in exactly the legacy layout, so it can be compared byte for byte with the old one, but with a properly composed provider name. An administrator can run the job for a chosen business date and download the file. The run reports how many providers it wrote, and a failed run is visible instead of silently producing nothing.

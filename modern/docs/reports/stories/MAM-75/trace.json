@@ -1,0 +1,130 @@
+{
+  "story": "MAM-75",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/PlatformChecksTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/acceptance/ExtractSteps.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/adapter/legacy/TmsisOutFileTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/ArchiveGenerationApiTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/ExtractContractTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/ExtractProducedEventTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/ExtractRolesTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/ExtractRunApiTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/FailedRunApiTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/ScheduledRunTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/StartRequestInputTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/application/ArchiveExtractTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/application/ContractConstantsTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/application/StartTmsisExtractTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/domain/ReportingPeriodTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/infrastructure/ExtractJobTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/infrastructure/JdbcExtractRunsTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/infrastructure/ProviderServiceClientTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/infrastructure/ServiceConfigTest.java",
+    "modern/services/tmsis-service/src/test/resources/features/MAM-75.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ContractConstantsTest: PASSED",
+      "ExtractContractTest: PASSED",
+      "ExtractJobTest: PASSED",
+      "ExtractRunApiTest: PASSED",
+      "JdbcExtractRunsTest: PASSED",
+      "MAM-75.feature 'An administrator starts an extract for a business date': PASSED",
+      "StartTmsisExtractTest: PASSED"
+    ],
+    "AC-2": [
+      "ArchiveExtractTest: PASSED",
+      "ContractConstantsTest: PASSED",
+      "ExtractContractTest: PASSED",
+      "ExtractRunApiTest: PASSED",
+      "MAM-75.feature 'A run over no providers has 0 rows and an empty file': PASSED",
+      "MAM-75.feature 'The run reports its result and row count': PASSED",
+      "TmsisOutFileTest: PASSED"
+    ],
+    "AC-3": [
+      "ExtractJobTest: PASSED",
+      "ExtractRunApiTest: PASSED",
+      "JdbcExtractRunsTest: PASSED",
+      "MAM-75.feature 'The run uses the business date, not the system date': PASSED",
+      "ReportingPeriodTest: PASSED",
+      "StartTmsisExtractTest: PASSED"
+    ],
+    "AC-4": [
+      "ArchiveExtractTest: PASSED",
+      "ArchiveGenerationApiTest: PASSED",
+      "ExtractContractTest: PASSED",
+      "ExtractJobTest: PASSED",
+      "JdbcExtractRunsTest: PASSED",
+      "MAM-75.feature 'Every run's file is archived as a new generation': PASSED"
+    ],
+    "AC-5": [
+      "ArchiveExtractTest: PASSED",
+      "ContractConstantsTest: PASSED",
+      "ExtractProducedEventTest: PASSED",
+      "MAM-75.feature 'ExtractProduced is published when the extract is archived': PASSED"
+    ],
+    "AC-6": [
+      "ArchiveExtractTest: PASSED",
+      "ArchiveGenerationApiTest: PASSED",
+      "ExtractContractTest: PASSED",
+      "ExtractJobTest: PASSED",
+      "ExtractProducedEventTest: PASSED",
+      "FailedRunApiTest: PASSED",
+      "JdbcExtractRunsTest: PASSED",
+      "MAM-75.feature 'A failed run is visible and leaves nothing behind': PASSED",
+      "MAM-75.feature 'A provider-service that does not answer ends the run FAILED within the timeout': PASSED",
+      "ProviderServiceClientTest: PASSED",
+      "StartRequestInputTest: PASSED",
+      "StartTmsisExtractTest: PASSED"
+    ],
+    "AC-7": [
+      "MAM-75.feature 'The monthly schedule uses the Clock's date': PASSED",
+      "ReportingPeriodTest: PASSED",
+      "ScheduledRunTest: PASSED",
+      "ServiceConfigTest: PASSED",
+      "StartTmsisExtractTest: PASSED"
+    ],
+    "AC-8": [
+      "ExtractContractTest: PASSED",
+      "ExtractRolesTest: PASSED",
+      "MAM-75.feature 'A business date with a time part is not a date and is rejected': PASSED",
+      "MAM-75.feature 'A start without a business date is rejected': PASSED",
+      "MAM-75.feature 'Access and input checks by role': PASSED",
+      "PlatformChecksTest: PASSED",
+      "StartRequestInputTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/application/ArchiveExtract.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/application/EventOutbox.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/application/ExtractProducedData.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/infrastructure/TmsisAdapters.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/infrastructure/TmsisSchedule.java",
+    "modern/services/tmsis-service/src/main/resources/db/migration/tmsis/V3__outbox_subject_run_id.sql"
+  ],
+  "rules": [
+    "R-PRVTMS01-ADD-06",
+    "R-PRVTMS01-cbl-00001",
+    "R-PRVTMS01-cbl-00013",
+    "R-PRVTMS01-cbl-00014",
+    "R-PRVTMS01-cbl-00015",
+    "R-PRVTMS01-cbl-00016",
+    "R-PRVTMS01-cbl-00017",
+    "R-PRVTMS01-cbl-00018",
+    "R-PRVTMS01-cbl-00019",
+    "R-PRVTMS01-cbl-00052",
+    "R-PRVTMS01-cbl-00053",
+    "R-PRVTMS01-cbl-00054",
+    "R-PRVTMS01-cbl-00055"
+  ]
+}

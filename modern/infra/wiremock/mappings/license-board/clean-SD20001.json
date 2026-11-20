@@ -1,0 +1,34 @@
+{
+  "name": "license-board clean: SD20001 / TX ACTIVE (valid intake individual 1006133288, testdata/fixed-width/appinput-baseline.dat)",
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/license-board/licenses",
+    "queryParameters": {
+      "licenseNo": {
+        "equalTo": "SD20001"
+      },
+      "state": {
+        "equalTo": "TX"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "LICBOARD",
+      "licenseNo": "{{request.query.licenseNo}}",
+      "state": "TX",
+      "found": true,
+      "status": "ACTIVE",
+      "expiry": "2030-12"
+    }
+  },
+  "metadata": {
+    "source": "license-board",
+    "answer": "clean"
+  }
+}

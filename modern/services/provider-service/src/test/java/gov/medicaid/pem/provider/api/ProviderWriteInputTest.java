@@ -21,8 +21,8 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 /**
  * How the two write endpoints answer a bad request (lessons of the earlier reviews): a date must be
- * an ISO date, an unreadable body is a 400 problem, a missing token a 401 problem and a missing role
- * a 403 problem, and nothing is changed by a refused request.
+ * an ISO date, an unreadable body is a 400 problem, a missing token a 401 problem and a missing
+ * role a 403 problem, and nothing is changed by a refused request.
  */
 class ProviderWriteInputTest extends IntegrationTest {
 
@@ -46,17 +46,26 @@ class ProviderWriteInputTest extends IntegrationTest {
   }
 
   private Map<String, Object> record() {
-    return jdbc.queryForMap("SELECT enroll_status, version, end_date FROM provider WHERE npi = ?", NPI);
+    return jdbc.queryForMap(
+        "SELECT enroll_status, version, end_date FROM provider WHERE npi = ?", NPI);
   }
 
-  private static void assertProblem(MvcResult r, int status) {
-    assertThat(r.getResponse().getStatus()).as(r.getResponse().getContentAsString()).isEqualTo(status);
+  private static void assertProblem(MvcResult r, int status) throws Exception {
+    assertThat(r.getResponse().getStatus())
+        .as(r.getResponse().getContentAsString())
+        .isEqualTo(status);
     assertThat(r.getResponse().getContentType()).startsWith("application/problem+json");
   }
 
   @ParameterizedTest(name = "effectiveDate {0} is refused")
   @ValueSource(
-      strings = {"2026-03-31T00:00:00", "2026-03-31T00:00:00Z", "2026-03-31 00:00:00", "31/03/2026", "2026-02-30"})
+      strings = {
+        "2026-03-31T00:00:00",
+        "2026-03-31T00:00:00Z",
+        "2026-03-31 00:00:00",
+        "31/03/2026",
+        "2026-02-30"
+      })
   @DisplayName(
       "[MAM-33 AC-6] an effective date that is not an ISO date (a time part, another format, an impossible day) is a 400 problem and changes nothing")
   void onlyAnIsoDateIsAccepted(String date) throws Exception {
@@ -73,7 +82,8 @@ class ProviderWriteInputTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-33 AC-6] a status change whose body is not JSON is a 400 problem and changes nothing")
+  @DisplayName(
+      "[MAM-33 AC-6] a status change whose body is not JSON is a 400 problem and changes nothing")
   void unreadableStatusChange() throws Exception {
     Map<String, Object> before = record();
 
@@ -83,7 +93,8 @@ class ProviderWriteInputTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-33 AC-8] a status change with no token is a 401 problem, with a role that may not is a 403 problem")
+  @DisplayName(
+      "[MAM-33 AC-8] a status change with no token is a 401 problem, with a role that may not is a 403 problem")
   void statusChangeNeedsToken() throws Exception {
     String body = "{\"action\":\"SUSPEND\",\"effectiveDate\":\"2026-03-31\"}";
 
@@ -92,7 +103,8 @@ class ProviderWriteInputTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-27 AC-7] a decision with no token is a 401 problem, with a role that may not is a 403 problem")
+  @DisplayName(
+      "[MAM-27 AC-7] a decision with no token is a 401 problem, with a role that may not is a 403 problem")
   void decisionNeedsToken() throws Exception {
     String body = "{\"decision\":\"APPROVE\"}";
 
@@ -102,7 +114,8 @@ class ProviderWriteInputTest extends IntegrationTest {
 
   @ParameterizedTest(name = "decision body {0} is refused")
   @ValueSource(strings = {"not json", "", "{\"decision\":\"MAYBE\"}", "{\"decision\":42}", "{}"})
-  @DisplayName("[MAM-27 AC-4] a decision whose body is not JSON or names no valid decision is a 400 problem and changes nothing")
+  @DisplayName(
+      "[MAM-27 AC-4] a decision whose body is not JSON or names no valid decision is a 400 problem and changes nothing")
   void unreadableDecision(String body) throws Exception {
     Map<String, Object> before = record();
 

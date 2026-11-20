@@ -37,7 +37,8 @@ class StartTmsisExtractTest {
     return start(launcher, CLOCK);
   }
 
-  // ---- AC-1: the run is recorded and its job started ---------------------------------------------
+  // ---- AC-1: the run is recorded and its job started
+  // ---------------------------------------------
 
   @Test
   @DisplayName(
@@ -101,7 +102,8 @@ class StartTmsisExtractTest {
   }
 
   @Test
-  @DisplayName("[MAM-75 AC-1] if the stored run cannot be read back, the run that was opened is answered")
+  @DisplayName(
+      "[MAM-75 AC-1] if the stored run cannot be read back, the run that was opened is answered")
   void storedRunMissing() {
     runs.findReturnsNothing = true;
     ExtractRun run = start((id, date) -> {}).start(BUSINESS_DATE);
@@ -109,7 +111,8 @@ class StartTmsisExtractTest {
     assertThat(run.businessDate()).isEqualTo(BUSINESS_DATE);
   }
 
-  // ---- AC-6: a job that cannot be started ---------------------------------------------------------
+  // ---- AC-6: a job that cannot be started
+  // ---------------------------------------------------------
 
   @Test
   @DisplayName(
@@ -129,7 +132,8 @@ class StartTmsisExtractTest {
   }
 
   @Test
-  @DisplayName("[MAM-75 AC-6] a failed start is answered, not thrown: the caller sees the FAILED run")
+  @DisplayName(
+      "[MAM-75 AC-6] a failed start is answered, not thrown: the caller sees the FAILED run")
   void launchFailureIsNotThrown() {
     ExtractRun run =
         start(
@@ -160,7 +164,8 @@ class StartTmsisExtractTest {
     assertThat(run.error().toLowerCase()).doesNotContain("select", "insert", "update", "sql");
   }
 
-  // ---- AC-7: the schedule uses the Clock's date ---------------------------------------------------
+  // ---- AC-7: the schedule uses the Clock's date
+  // ---------------------------------------------------
 
   @Test
   @DisplayName(

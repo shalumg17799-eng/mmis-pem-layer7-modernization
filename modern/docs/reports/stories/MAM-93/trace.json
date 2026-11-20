@@ -1,18 +1,60 @@
 {
   "story": "MAM-93",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
-  "tests": [
-    "modern/web-ui/tests/admin/batch-jobs.test.tsx",
-    "modern/web-ui/tests/support/batch.ts",
-    "modern/web-ui/e2e/admin-jobs.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
   ],
+  "tests": [
+    "modern/web-ui/e2e/admin-jobs.spec.ts",
+    "modern/web-ui/tests/admin/batch-jobs.test.tsx",
+    "modern/web-ui/tests/support/batch.ts"
+  ],
+  "testIds": {
+    "AC-1": [
+      "admin-jobs.spec.ts: PASSED",
+      "batch-jobs.test.tsx: PASSED"
+    ],
+    "AC-2": [
+      "admin-jobs.spec.ts: PASSED",
+      "batch-jobs.test.tsx: PASSED"
+    ],
+    "AC-3": [
+      "admin-jobs.spec.ts: PASSED",
+      "batch-jobs.test.tsx: PASSED"
+    ],
+    "AC-4": [
+      "admin-jobs.spec.ts: PASSED",
+      "batch-jobs.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "admin-jobs.spec.ts: PASSED",
+      "batch-jobs.test.tsx: PASSED"
+    ],
+    "AC-6": [
+      "admin-jobs.spec.ts: PASSED",
+      "batch-jobs.test.tsx: PASSED"
+    ],
+    "AC-7": [
+      "batch-jobs.test.tsx: PASSED"
+    ],
+    "AC-8": [
+      "admin-jobs.spec.ts: PASSED",
+      "batch-jobs.test.tsx: PASSED"
+    ]
+  },
   "codeUnits": [
     "modern/web-ui/src/app/screens.tsx",
     "modern/web-ui/src/features/console/admin/jobs/JobsPage.tsx",
     "modern/web-ui/src/features/console/admin/jobs/jobs.ts",
+    "modern/web-ui/src/features/console/sanction/sanctionForm.ts",
     "modern/web-ui/src/shared/api/client.ts",
-    "modern/web-ui/src/shared/format/dates.ts",
-    "modern/web-ui/src/features/console/sanction/sanctionForm.ts"
+    "modern/web-ui/src/shared/format/dates.ts"
   ],
   "rules": []
 }

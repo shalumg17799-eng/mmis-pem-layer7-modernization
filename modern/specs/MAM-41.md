@@ -14,8 +14,8 @@ decisions: [Q-005, D-002]
 dependsOn: [MAM-35, MAM-38]
 mainJourney: false
 labels: [svc-risk-service, kag-L-S037, agentic, decision-Q-005, decision-D-002]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 8ec462629094dbc22b647dbe8e3168dbb13ec67fbfda002c7b936f016594ee2d
 ---
 ## Business requirement
 Analysts and other services sometimes need to know which risk level a specialty code would get without changing anything, for example to explain a level to a provider or to check a code. This story provides that question-and-answer service. It uses the same table as the real assignment, looks only at the first three characters of the code, and never records or announces anything.

@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
  * codec. The type code selects the REDEFINES view: IN writes the individual fields, GR and FA the
  * organisation fields (legal name, DBA name, owner NPI in bytes 121-130). Alphanumeric values are
  * right-padded with spaces and cut on the right when longer (an alphanumeric MOVE, only in this
- * legacy-format writer); an unset date is zeros and an unset risk tier a space. One record per line,
- * no header or trailer.
+ * legacy-format writer); an unset date is zeros and an unset risk tier a space. One record per
+ * line, no header or trailer.
  */
 @Component
 public class PrvrecrdFile implements ExportProviderMaster.MasterFile {

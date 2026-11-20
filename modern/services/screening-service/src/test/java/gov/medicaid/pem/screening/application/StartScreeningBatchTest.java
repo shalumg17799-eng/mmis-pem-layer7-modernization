@@ -75,7 +75,8 @@ class StartScreeningBatchTest {
   }
 
   @Test
-  @DisplayName("[MAM-32 AC-6] a launch failure without a message is recorded with the exception text")
+  @DisplayName(
+      "[MAM-32 AC-6] a launch failure without a message is recorded with the exception text")
   void launchFailsWithoutMessage() {
     launchFailure = new IllegalStateException();
     ScreeningRuns.Run run = start.start(DATE);

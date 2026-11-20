@@ -1,0 +1,77 @@
+{
+  "story": "MAM-41",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/RiskFixtures.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/AssessmentSteps.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/RuleTableSteps.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/api/RiskAssessmentsApiTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/application/AssessOnRequestTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/domain/RuleSetPrefixTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/infrastructure/JdbcRiskStoreTest.java",
+    "modern/services/risk-service/src/test/resources/features/MAM-41.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "AssessOnRequestTest: PASSED",
+      "JdbcRiskStoreTest: PASSED",
+      "MAM-41.feature 'Prefixes in the table are assessed with their tier': PASSED",
+      "RiskAssessmentsApiTest: PASSED",
+      "RuleSetPrefixTest: PASSED"
+    ],
+    "AC-2": [
+      "AssessOnRequestTest: PASSED",
+      "MAM-41.feature 'Only the first three characters count': PASSED",
+      "RiskAssessmentsApiTest: PASSED",
+      "RuleSetPrefixTest: PASSED"
+    ],
+    "AC-3": [
+      "AssessOnRequestTest: PASSED",
+      "MAM-41.feature 'A blank or too-short taxonomy gets the default tier, as in the legacy': PASSED",
+      "RiskAssessmentsApiTest: PASSED",
+      "RuleSetPrefixTest: PASSED"
+    ],
+    "AC-4": [
+      "AssessOnRequestTest: PASSED",
+      "MAM-41.feature 'A missing or too-long taxonomy is a bad request': PASSED",
+      "RiskAssessmentsApiTest: PASSED"
+    ],
+    "AC-5": [
+      "AssessOnRequestTest: PASSED",
+      "MAM-41.feature 'The assessment has no side effect': PASSED",
+      "RiskAssessmentsApiTest: PASSED"
+    ],
+    "AC-6": [
+      "AssessOnRequestTest: PASSED",
+      "JdbcRiskStoreTest: PASSED",
+      "MAM-41.feature 'The answer uses the table in force': PASSED",
+      "RiskAssessmentsApiTest: PASSED",
+      "RuleSetPrefixTest: PASSED"
+    ],
+    "AC-7": [
+      "MAM-41.feature 'Only analysts, supervisors and the system can ask': PASSED",
+      "RiskAssessmentsApiTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/api/RiskController.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/AssessOnRequest.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/RuleSets.java"
+  ],
+  "rules": [
+    "R-PRVRSK01-ADD-03",
+    "R-PRVRSK01-cbl-00003",
+    "R-PRVRSK01-cbl-00018",
+    "R-PRVRSK01-cbl-00019",
+    "R-PRVRSK01-cbl-00020",
+    "R-PRVRSK01-cbl-00021"
+  ]
+}

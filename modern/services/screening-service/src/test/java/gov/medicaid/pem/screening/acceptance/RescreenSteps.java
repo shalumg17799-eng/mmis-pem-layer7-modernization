@@ -101,7 +101,7 @@ public class RescreenSteps {
   }
 
   @Then("the request answers {int} problem+json")
-  public void problem(int status) {
+  public void problem(int status) throws Exception {
     assertThat(result.getResponse().getStatus())
         .as(result.getResponse().getContentAsString())
         .isEqualTo(status);
@@ -109,7 +109,7 @@ public class RescreenSteps {
   }
 
   @Then("the request answers {int}")
-  public void status(int status) {
+  public void status(int status) throws Exception {
     assertThat(result.getResponse().getStatus())
         .as(result.getResponse().getContentAsString())
         .isEqualTo(status);
@@ -215,12 +215,10 @@ public class RescreenSteps {
     awaitProcessed(marker); // same topic and key: the redelivery was handled before the marker
   }
 
-  @Then(
-      "exactly {int} screening with reason {string} exists for NPI {string} and it is COMPLETED")
+  @Then("exactly {int} screening with reason {string} exists for NPI {string} and it is COMPLETED")
   public void screeningsWithReason(int count, String reason, String npi) {
     List<Map<String, Object>> rows =
-        jdbc.queryForList(
-            "SELECT status FROM screening WHERE npi = ? AND reason = ?", npi, reason);
+        jdbc.queryForList("SELECT status FROM screening WHERE npi = ? AND reason = ?", npi, reason);
     assertThat(rows).hasSize(count);
     assertThat(rows).allSatisfy(r -> assertThat(r.get("status")).isEqualTo("COMPLETED"));
   }

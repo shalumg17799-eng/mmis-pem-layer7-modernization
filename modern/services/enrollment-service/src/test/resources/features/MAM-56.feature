@@ -102,7 +102,7 @@ Feature: Run the legacy APPINPUT intake as a batch job with one error row per re
     When "<role>" starts an intake run for business date "2026-03-31"
     Then the intake answer is <status>
     And the intake answer is problem+json when it is not 202
-    And <runs> intake run(s) exist after the call
+    And the number of intake runs is <runs>
 
     Examples:
       | role       | status | runs |
@@ -142,11 +142,11 @@ Feature: Run the legacy APPINPUT intake as a batch job with one error row per re
     When an ADMIN starts an intake run without a business date
     Then the intake answer is 400
     And the intake answer is problem+json when it is not 202
-    And 0 intake run(s) exist after the call
+    And the number of intake runs is 0
 
   @AC-7
   Scenario: A run without a file is refused and no run is created
     When an ADMIN starts an intake run without a file
     Then the intake answer is 400
     And the intake answer is problem+json when it is not 202
-    And 0 intake run(s) exist after the call
+    And the number of intake runs is 0

@@ -18,9 +18,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * MAM-32 AC-3 and AC-4, byte by byte: the SCRNOUT file of the legacy layout SCRNREC (67 bytes:
- * NPI 1-10, SOURCE 11-18, RESULT 19, VERDICT-DATE 20-27, DETAIL 28-67; ADR-005, question C-7 A),
- * four rows per screened provider in ascending NPI order and the order LICBOARD, OIGLEIE, SAMGOV,
+ * MAM-32 AC-3 and AC-4, byte by byte: the SCRNOUT file of the legacy layout SCRNREC (67 bytes: NPI
+ * 1-10, SOURCE 11-18, RESULT 19, VERDICT-DATE 20-27, DETAIL 28-67; ADR-005, question C-7 A), four
+ * rows per screened provider in ascending NPI order and the order LICBOARD, OIGLEIE, SAMGOV,
  * SSADMF. The file is read by byte position, never with the codec that wrote it.
  */
 class ScrnoutWriterTest {
@@ -47,16 +47,33 @@ class ScrnoutWriterTest {
   }
 
   @Test
-  @DisplayName("[MAM-32 AC-3] one provider gives four records of 67 bytes, as the legacy layout has them")
+  @DisplayName(
+      "[MAM-32 AC-3] one provider gives four records of 67 bytes, as the legacy layout has them")
   void oneProviderExactBytes() {
     byte[] file = writer.write(List.of(new Screened("1003000111", allPass())), DATE);
     assertThat(file).hasSize(4 * 67);
     assertThat(text(file))
         .isEqualTo(
-            "1003000111" + "LICBOARD" + "P" + "20260331" + pad("LICENCE MD12345 TX ACTIVE UNTIL 2028-09")
-                + "1003000111" + "OIGLEIE " + "P" + "20260331" + pad("NOT EXCLUDED")
-                + "1003000111" + "SAMGOV  " + "P" + "20260331" + pad("NOT DEBARRED")
-                + "1003000111" + "SSADMF  " + "P" + "20260331" + pad("NOT DECEASED"));
+            "1003000111"
+                + "LICBOARD"
+                + "P"
+                + "20260331"
+                + pad("LICENCE MD12345 TX ACTIVE UNTIL 2028-09")
+                + "1003000111"
+                + "OIGLEIE "
+                + "P"
+                + "20260331"
+                + pad("NOT EXCLUDED")
+                + "1003000111"
+                + "SAMGOV  "
+                + "P"
+                + "20260331"
+                + pad("NOT DEBARRED")
+                + "1003000111"
+                + "SSADMF  "
+                + "P"
+                + "20260331"
+                + pad("NOT DECEASED"));
   }
 
   /** A detail as the legacy field holds it: left-justified, padded with spaces to 40 bytes. */
@@ -80,16 +97,27 @@ class ScrnoutWriterTest {
             new Screened("1003000555", allPass()),
             new Screened("1003000111", allPass()),
             new Screened("1003000333", allPass()));
-    List<String> npis = Scrnout.rows(writer.write(given, DATE)).stream().map(Scrnout.Row::npi).toList();
+    List<String> npis =
+        Scrnout.rows(writer.write(given, DATE)).stream().map(Scrnout.Row::npi).toList();
     assertThat(npis)
         .containsExactly(
-            "1003000111", "1003000111", "1003000111", "1003000111",
-            "1003000333", "1003000333", "1003000333", "1003000333",
-            "1003000555", "1003000555", "1003000555", "1003000555");
+            "1003000111",
+            "1003000111",
+            "1003000111",
+            "1003000111",
+            "1003000333",
+            "1003000333",
+            "1003000333",
+            "1003000333",
+            "1003000555",
+            "1003000555",
+            "1003000555",
+            "1003000555");
   }
 
   @Test
-  @DisplayName("[MAM-32 AC-3] the four rows of a provider are LICBOARD, OIGLEIE, SAMGOV, SSADMF whatever the order given")
+  @DisplayName(
+      "[MAM-32 AC-3] the four rows of a provider are LICBOARD, OIGLEIE, SAMGOV, SSADMF whatever the order given")
   void sourcesInLegacyOrder() {
     List<SourceResult> shuffled = new ArrayList<>(allPass());
     Collections.reverse(shuffled);
@@ -101,7 +129,12 @@ class ScrnoutWriterTest {
   }
 
   @ParameterizedTest(name = "[MAM-32 AC-3] source {0} is written left-justified in 8 bytes: <{1}>")
-  @CsvSource({"LICBOARD,'LICBOARD'", "OIGLEIE,'OIGLEIE '", "SAMGOV,'SAMGOV  '", "SSADMF,'SSADMF  '"})
+  @CsvSource({
+    "LICBOARD,'LICBOARD'",
+    "OIGLEIE,'OIGLEIE '",
+    "SAMGOV,'SAMGOV  '",
+    "SSADMF,'SSADMF  '"
+  })
   void sourceLeftJustified(String source, String expected) {
     byte[] file = writer.write(List.of(new Screened("1003000111", allPass())), DATE);
     String record =
@@ -113,8 +146,14 @@ class ScrnoutWriterTest {
     assertThat(record.substring(10, 18)).isEqualTo(expected);
   }
 
-  @ParameterizedTest(name = "[MAM-32 AC-3] the business date {0} is the verdict date {1} in bytes 20-27")
-  @CsvSource({"2026-03-31,20260331", "2026-01-05,20260105", "2024-02-29,20240229", "2099-12-31,20991231"})
+  @ParameterizedTest(
+      name = "[MAM-32 AC-3] the business date {0} is the verdict date {1} in bytes 20-27")
+  @CsvSource({
+    "2026-03-31,20260331",
+    "2026-01-05,20260105",
+    "2024-02-29,20240229",
+    "2099-12-31,20991231"
+  })
   void verdictDateIsTheBusinessDate(LocalDate date, String expected) {
     List<Scrnout.Row> rows =
         Scrnout.rows(writer.write(List.of(new Screened("1003000111", allPass())), date));
@@ -138,7 +177,8 @@ class ScrnoutWriterTest {
   }
 
   @Test
-  @DisplayName("[MAM-32 AC-4] the error code of a result is not written: the legacy record has no field for it")
+  @DisplayName(
+      "[MAM-32 AC-4] the error code of a result is not written: the legacy record has no field for it")
   void errorCodeNotWritten() {
     SourceResult expired =
         new SourceResult(Source.LICBOARD, "F", AT, "LICENCE PT99900 TX EXPIRED 2024-01", "E202");
@@ -148,7 +188,11 @@ class ScrnoutWriterTest {
     assertThat(file).doesNotContain("E202");
     assertThat(file)
         .startsWith(
-            "1003000555" + "LICBOARD" + "F" + "20260331" + pad("LICENCE PT99900 TX EXPIRED 2024-01"));
+            "1003000555"
+                + "LICBOARD"
+                + "F"
+                + "20260331"
+                + pad("LICENCE PT99900 TX EXPIRED 2024-01"));
   }
 
   @Test
@@ -191,12 +235,12 @@ class ScrnoutWriterTest {
   }
 
   @Test
-  @DisplayName("[MAM-32 AC-3] two providers give eight records: the second follows the first without a gap")
+  @DisplayName(
+      "[MAM-32 AC-3] two providers give eight records: the second follows the first without a gap")
   void twoProviders() {
     byte[] file =
         writer.write(
-            List.of(
-                new Screened("1003000555", allPass()), new Screened("1003000111", allPass())),
+            List.of(new Screened("1003000555", allPass()), new Screened("1003000111", allPass())),
             DATE);
     assertThat(file).hasSize(8 * 67);
     assertThat(Scrnout.records(file).get(0)).startsWith("1003000111LICBOARDP");

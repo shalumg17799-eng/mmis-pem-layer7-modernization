@@ -101,7 +101,8 @@ class JdbcIntakeRunsTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-56 AC-6] error rows are kept one after the other, in the order they were added")
+  @DisplayName(
+      "[MAM-56 AC-6] error rows are kept one after the other, in the order they were added")
   void errorRowsInOrder() {
     UUID id = newRun(D1);
     String first = "1003000222 TYPE:XX ERR:VALIDATION-FAILED".concat(" ".repeat(210));
@@ -146,7 +147,8 @@ class JdbcIntakeRunsTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-6] a run that is already COMPLETED is never turned into FAILED afterwards")
+  @DisplayName(
+      "[MAM-57 AC-6] a run that is already COMPLETED is never turned into FAILED afterwards")
   void completedRunStaysCompleted() {
     UUID id = newRun(D1);
     runs.complete(id, END);
@@ -158,7 +160,8 @@ class JdbcIntakeRunsTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-6] a failure with no reason is stored with the reason 'failed', never null")
+  @DisplayName(
+      "[MAM-57 AC-6] a failure with no reason is stored with the reason 'failed', never null")
   void failWithoutReason() {
     UUID first = newRun(D1);
     UUID second = newRun(D1);
@@ -168,10 +171,12 @@ class JdbcIntakeRunsTest extends IntakeIntegrationTest {
     assertThat(runs.find(second).orElseThrow().error()).isEqualTo("failed");
   }
 
-  // ---- the run key and the re-run check (AC-8) -----------------------------------------------------
+  // ---- the run key and the re-run check (AC-8)
+  // -----------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-57 AC-8] a record that another run of the same business date stored is already processed")
+  @DisplayName(
+      "[MAM-57 AC-8] a record that another run of the same business date stored is already processed")
   void processedByAnotherRunOfTheSameDate() {
     UUID earlier = newRun(D1);
     UUID now = newRun(D1);
@@ -180,7 +185,8 @@ class JdbcIntakeRunsTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-8] a record the same run stored is not 'already processed' by that run (duplicates in one file)")
+  @DisplayName(
+      "[MAM-57 AC-8] a record the same run stored is not 'already processed' by that run (duplicates in one file)")
   void notProcessedBySameRun() {
     UUID run = newRun(D1);
     application(run, raw("RECORD A"));
@@ -188,7 +194,8 @@ class JdbcIntakeRunsTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-8] a record stored under another business date is not 'already processed'")
+  @DisplayName(
+      "[MAM-57 AC-8] a record stored under another business date is not 'already processed'")
   void otherBusinessDate() {
     UUID earlier = newRun(D1);
     UUID now = newRun(D2);
@@ -213,7 +220,8 @@ class JdbcIntakeRunsTest extends IntakeIntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-57 AC-8] attach ties the application to the run and keeps its raw 200-byte record")
+  @DisplayName(
+      "[MAM-57 AC-8] attach ties the application to the run and keeps its raw 200-byte record")
   void attach() {
     UUID run = newRun(D1);
     application(run, raw("RECORD A"));

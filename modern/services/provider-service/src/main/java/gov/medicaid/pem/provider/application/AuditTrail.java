@@ -21,9 +21,12 @@ public interface AuditTrail {
 
   /** Appends one entry for {@code npi}; the correlation id is taken from the log context. */
   default void record(
-      String npi, String actor, String action, Map<String, Object> before, Map<String, Object> after) {
-    append(
-        new AuditEntry(npi, null, actor, action, before, after, MDC.get(CorrelationId.MDC_KEY)));
+      String npi,
+      String actor,
+      String action,
+      Map<String, Object> before,
+      Map<String, Object> after) {
+    append(new AuditEntry(npi, null, actor, action, before, after, MDC.get(CorrelationId.MDC_KEY)));
   }
 
   /** The provider fields that a change can touch, as shown in before and after. */

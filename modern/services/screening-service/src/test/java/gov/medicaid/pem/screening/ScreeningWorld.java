@@ -54,7 +54,9 @@ public final class ScreeningWorld {
     return "LICBOARD".equals(source) ? "licenseNo" : "npi";
   }
 
-  /** Every source answers "clean" for anyone and the licence board knows no licence (priority 10). */
+  /**
+   * Every source answers "clean" for anyone and the licence board knows no licence (priority 10).
+   */
   public static void cleanSources() {
     MOCK.stubFor(
         get(urlPathEqualTo(LEIE))
@@ -285,8 +287,8 @@ public final class ScreeningWorld {
   }
 
   /**
-   * provider-service answers the list GET /api/v1/providers?page=n&size=200 page by page with
-   * these providers, and each of them also by NPI.
+   * provider-service answers the list GET /api/v1/providers?page=n&size=200 page by page with these
+   * providers, and each of them also by NPI.
    */
   public static void lists(List<ObjectNode> providers) {
     int size = 200;
@@ -296,7 +298,8 @@ public final class ScreeningWorld {
     }
     for (int page = 0; page < pages; page++) {
       ArrayNode items = JSON.createArrayNode();
-      providers.subList(page * size, Math.min(providers.size(), (page + 1) * size))
+      providers
+          .subList(page * size, Math.min(providers.size(), (page + 1) * size))
           .forEach(p -> items.add(p));
       ObjectNode body = JSON.createObjectNode();
       body.set("items", items);
@@ -310,6 +313,36 @@ public final class ScreeningWorld {
               .withQueryParam("size", equalTo(String.valueOf(size)))
               .willReturn(okJson(body.toString())));
     }
+  }
+
+  /** provider-service ends every call of the list without an answer. */
+  public static void listFault(Fault fault) {
+    MOCK.stubFor(
+        get(urlPathEqualTo(PROVIDERS)).atPriority(1).willReturn(aResponse().withFault(fault)));
+  }
+
+  /** provider-service answers every call of the list with this JSON body (HTTP 200). */
+  public static void listBody(String jsonBody) {
+    MOCK.stubFor(get(urlPathEqualTo(PROVIDERS)).atPriority(1).willReturn(okJson(jsonBody)));
+  }
+
+  /** provider-service answers the list only after {@code millis} milliseconds. */
+  public static void listSlow(int millis) {
+    MOCK.stubFor(
+        get(urlPathEqualTo(PROVIDERS))
+            .atPriority(1)
+            .willReturn(
+                okJson("{\"items\":[],\"page\":0,\"size\":200,\"total\":0}")
+                    .withFixedDelay(millis)));
+  }
+
+  /** provider-service answers one page of the list with this status. */
+  public static void listPageAnswers(int page, int status) {
+    MOCK.stubFor(
+        get(urlPathEqualTo(PROVIDERS))
+            .atPriority(1)
+            .withQueryParam("page", equalTo(String.valueOf(page)))
+            .willReturn(aResponse().withStatus(status)));
   }
 
   /** The pages of the list the mock was asked for, in the order of the requests. */

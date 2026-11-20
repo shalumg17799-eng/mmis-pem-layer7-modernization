@@ -1,5 +1,7 @@
 package gov.medicaid.pem.provider.api;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.OptBoolean;
 import gov.medicaid.pem.kit.security.CurrentUser;
 import gov.medicaid.pem.kit.web.ApiException;
 import gov.medicaid.pem.provider.application.AuditEntry;
@@ -57,10 +59,15 @@ public class ProviderController {
 
   /**
    * Contract StatusChangeRequest. The action is taken as text so that an unknown one is refused
-   * with 422 by the use case (D-026), not as an unreadable body.
+   * with 422 by the use case (D-026), not as an unreadable body. The effective date is strictly
+   * yyyy-MM-dd (contract format date): a date-time such as 2026-03-31T00:00:00Z is a 400, where
+   * Jackson's default LocalDate reading would drop the time.
    */
   public record StatusChangeRequest(
-      String action, String reason, LocalDate effectiveDate, UUID sanctionId) {}
+      String action,
+      String reason,
+      @JsonFormat(pattern = "uuuu-MM-dd", lenient = OptBoolean.FALSE) LocalDate effectiveDate,
+      UUID sanctionId) {}
 
   /**
    * changeProviderStatus (MAM-33): x-roles SYSTEM, SUPERVISOR (D-013, D-023). The actor is the

@@ -154,13 +154,13 @@ class ReportedProvidersApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-71 AC-2] the file has no line ends and is text/plain (contract: 120-byte records)")
+  @DisplayName(
+      "[MAM-71 AC-2] the file has no line ends and is text/plain (contract: 120-byte records)")
   void noLineEnds() throws Exception {
     sixProviders();
     JsonNode run = api.runToEnd(DATE);
     MvcResult result =
-        api.getPath(
-            PemJwt.admin(), TmsisApi.BASE + "/" + run.path("runId").asText() + "/file");
+        api.getPath(PemJwt.admin(), TmsisApi.BASE + "/" + run.path("runId").asText() + "/file");
     assertThat(result.getResponse().getContentType()).startsWith("text/plain");
     assertThat(result.getResponse().getContentAsString()).doesNotContain("\n").doesNotContain("\r");
   }
@@ -278,8 +278,7 @@ class ReportedProvidersApiTest extends IntegrationTest {
               assertThat(r.method()).isEqualTo("GET");
               assertThat(r.path()).isEqualTo("/api/v1/providers");
               assertThat(r.query()).containsEntry("status", "A");
-              assertThat(r.authorization())
-                  .isEqualTo("Bearer " + TestProviderService.SYSTEM_TOKEN);
+              assertThat(r.authorization()).isEqualTo("Bearer " + TestProviderService.SYSTEM_TOKEN);
             });
   }
 

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import gov.medicaid.pem.revalidation.IntegrationTest;
 import gov.medicaid.pem.revalidation.RevalidationFixtures;
-import gov.medicaid.pem.testsupport.OpenApiContract;
+import gov.medicaid.pem.revalidation.ContractFile;
 import gov.medicaid.pem.testsupport.PemJwt;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -214,7 +214,7 @@ class RevalidationContractTest extends IntegrationTest {
     JsonNode p = RevalidationFixtures.read(r.getResponse().getContentAsString());
     assertThat(p.path("title").asText()).isNotBlank();
     assertThat(p.path("status").asInt()).isEqualTo(401);
-    OpenApiContract.of(CONTRACT).assertResponse(op.id(), 401, r.getResponse().getContentAsString());
+    conforms(op.id(), 401, r);
   }
 
   @ParameterizedTest(name = "[MAM-48 AC-8] the 403 of {0} is a problem+json that conforms to the contract")
@@ -230,10 +230,17 @@ class RevalidationContractTest extends IntegrationTest {
     JsonNode p = RevalidationFixtures.read(r.getResponse().getContentAsString());
     assertThat(p.path("title").asText()).isNotBlank();
     assertThat(p.path("status").asInt()).isEqualTo(403);
-    OpenApiContract.of(CONTRACT).assertResponse(op.id(), 403, r.getResponse().getContentAsString());
+    conforms(op.id(), 403, r);
   }
 
   // ---- the documented answers have the documented shape ----------------------------------------
+
+  private static void conforms(String operation, int status, MvcResult r) throws Exception {
+    String text = r.getResponse().getContentAsString();
+    assertThat(ContractFile.responseViolations(operation, status, RevalidationFixtures.read(text)))
+        .as("%s %s: %s", operation, status, text)
+        .isEmpty();
+  }
 
   private MvcResult as(MockHttpServletRequestBuilder request, String role) throws Exception {
     return mvc.perform(request.with(token(role))).andReturn();
@@ -249,11 +256,9 @@ class RevalidationContractTest extends IntegrationTest {
     MvcResult bad = as(MockMvcRequestBuilders.get("/api/v1/revalidations?status=OPEN"), "ANALYST");
 
     assertThat(ok.getResponse().getStatus()).isEqualTo(200);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse("listRevalidationCases", 200, ok.getResponse().getContentAsString());
+    conforms("listRevalidationCases", 200, ok);
     assertThat(bad.getResponse().getStatus()).isEqualTo(400);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse("listRevalidationCases", 400, bad.getResponse().getContentAsString());
+    conforms("listRevalidationCases", 400, bad);
   }
 
   @Test
@@ -282,22 +287,18 @@ class RevalidationContractTest extends IntegrationTest {
                 .content(body),
             "ANALYST");
 
-    OpenApiContract contract = OpenApiContract.of(CONTRACT);
     assertThat(ok.getResponse().getStatus()).isEqualTo(200);
-    contract.assertResponse("completeRevalidation", 200, ok.getResponse().getContentAsString());
+    conforms("completeRevalidation", 200, ok);
     assertThat(conflict.getResponse().getStatus()).isEqualTo(409);
-    contract.assertResponse(
-        "completeRevalidation", 409, conflict.getResponse().getContentAsString());
+    conforms("completeRevalidation", 409, conflict);
     assertThat(missing.getResponse().getStatus()).isEqualTo(404);
-    contract.assertResponse(
-        "completeRevalidation", 404, missing.getResponse().getContentAsString());
+    conforms("completeRevalidation", 404, missing);
   }
 
   @Test
   @DisplayName(
       "[MAM-45 AC-1] startRevalidationSweep: 202 is a BatchRun, 400 a Problem; getRevalidationSweep: 200 and 404")
   void sweepContract() throws Exception {
-    OpenApiContract contract = OpenApiContract.of(CONTRACT);
 
     MvcResult started =
         RevalidationFixtures.startSweep(mvc, PemJwt.admin(), "{\"businessDate\":\"2026-03-31\"}");
@@ -312,15 +313,13 @@ class RevalidationContractTest extends IntegrationTest {
             "ADMIN");
 
     assertThat(started.getResponse().getStatus()).isEqualTo(202);
-    contract.assertResponse(
-        "startRevalidationSweep", 202, started.getResponse().getContentAsString());
+    conforms("startRevalidationSweep", 202, started);
     assertThat(refused.getResponse().getStatus()).isEqualTo(400);
-    contract.assertResponse(
-        "startRevalidationSweep", 400, refused.getResponse().getContentAsString());
+    conforms("startRevalidationSweep", 400, refused);
     assertThat(read.getResponse().getStatus()).isEqualTo(200);
-    contract.assertResponse("getRevalidationSweep", 200, read.getResponse().getContentAsString());
+    conforms("getRevalidationSweep", 200, read);
     assertThat(unknown.getResponse().getStatus()).isEqualTo(404);
-    contract.assertResponse("getRevalidationSweep", 404, unknown.getResponse().getContentAsString());
+    conforms("getRevalidationSweep", 404, unknown);
   }
 
   @Test
@@ -342,8 +341,7 @@ class RevalidationContractTest extends IntegrationTest {
     assertThat(ok.getResponse().getStatus()).isEqualTo(200);
     assertThat(ok.getResponse().getContentType()).startsWith("text/plain");
     assertThat(unknown.getResponse().getStatus()).isEqualTo(404);
-    OpenApiContract.of(CONTRACT)
-        .assertResponse("getRevalidationQueueFile", 404, unknown.getResponse().getContentAsString());
+    conforms("getRevalidationQueueFile", 404, unknown);
   }
 
   /** Documented here, not changed: the request bodies the contract does not list a 400 for. */

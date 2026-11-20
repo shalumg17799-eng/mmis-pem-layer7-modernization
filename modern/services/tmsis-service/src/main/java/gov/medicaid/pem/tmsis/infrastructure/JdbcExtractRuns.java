@@ -98,7 +98,8 @@ public class JdbcExtractRuns implements ExtractRuns {
   @Transactional
   public int complete(UUID runId, int rows, byte[] file, Instant at) {
     jdbc.execute("LOCK TABLE extract_archive IN EXCLUSIVE MODE");
-    Integer last = jdbc.queryForObject("SELECT max(generation) FROM extract_archive", Integer.class);
+    Integer last =
+        jdbc.queryForObject("SELECT max(generation) FROM extract_archive", Integer.class);
     int generation = last == null ? 1 : last + 1;
     jdbc.update(
         "INSERT INTO extract_archive (extract_run_id, generation, content, archived_at)"

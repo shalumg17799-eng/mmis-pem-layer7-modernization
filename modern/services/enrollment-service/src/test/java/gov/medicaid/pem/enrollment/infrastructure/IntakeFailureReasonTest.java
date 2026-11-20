@@ -1,23 +1,18 @@
 package gov.medicaid.pem.enrollment.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doThrow;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import gov.medicaid.pem.enrollment.AppInputFile;
 import gov.medicaid.pem.enrollment.IntakeApi;
 import gov.medicaid.pem.enrollment.IntakeIntegrationTest;
 import gov.medicaid.pem.testsupport.PemJwt;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
@@ -27,11 +22,12 @@ import org.springframework.test.web.servlet.MvcResult;
  * It holds none of "select", "insert", "update" or "sql" (any case), is at most 200 characters, and
  * keeps the "record n NPI x" prefix where the record is known; the full exception is logged.
  *
- * <p>Seven failures of the real database are made, each at the second record of the usual file: the
- * insert of the application, the write of its run key, the write of the APPERROR row, the check
- * whether the record was already processed (a SELECT, which no trigger can reject: the run table is
- * a spy that throws Spring's own exception, with the statement text), the write of the counts and
- * of the completion, and the start of the job (a trigger on the job repository's instance table).
+ * <p>Seven failures of the real database are made: the insert of the application, the write of its
+ * run key and the write of the APPERROR row (triggers that reject that write), the check whether
+ * the record was already processed (a SELECT, which no trigger can reject: the column it reads is
+ * renamed for the test), the write of the counts and of the completion, and the start of the job (a
+ * trigger on the job repository's instance table). All but the check fail at the second record of
+ * the usual file; the check fails at the first.
  */
 class IntakeFailureReasonTest extends IntakeIntegrationTest {
 
@@ -43,7 +39,7 @@ class IntakeFailureReasonTest extends IntakeIntegrationTest {
     RUN_KEY,
     /** the write of the APPERROR row of the rejected record 2 */
     ERROR_ROW,
-    /** runs.alreadyProcessed for record 2 */
+    /** the check whether record 1 was already processed (its column is missing) */
     ALREADY_PROCESSED_CHECK,
     /** runs.counts after record 2 */
     RUN_COUNTS,
@@ -93,15 +89,13 @@ class IntakeFailureReasonTest extends IntakeIntegrationTest {
               "application",
               "NEW.intake_run_id IS NOT NULL AND NEW.npi = '" + NPI_2 + "'");
       case ERROR_ROW -> reject("reject_row", "UPDATE", "intake_run", "NEW.error_file IS NOT NULL");
-      case ALREADY_PROCESSED_CHECK ->
-          doThrow(
-                  new UncategorizedSQLException(
-                      "PreparedStatementCallback",
-                      "SELECT count(*) FROM application a JOIN intake_run r ON r.id = a.intake_run_id"
-                          + " WHERE r.business_date = ? AND r.public_id <> ? AND a.raw_record = ?",
-                      new SQLException("the test database lost the connection", "08006")))
-              .when(runs)
-              .alreadyProcessed(any(), any(), argThat(raw -> raw != null && raw.startsWith(NPI_2)));
+      case ALREADY_PROCESSED_CHECK -> {
+        // a SELECT cannot be rejected by a trigger: the column it reads is renamed for the test
+        jdbc.execute("ALTER TABLE application RENAME COLUMN raw_record TO raw_record_off");
+        afterTest(
+            () ->
+                jdbc.execute("ALTER TABLE application RENAME COLUMN raw_record_off TO raw_record"));
+      }
       case RUN_COUNTS ->
           reject(
               "reject_counts",
@@ -117,7 +111,7 @@ class IntakeFailureReasonTest extends IntakeIntegrationTest {
   /** What the injected failure says in the database or driver: the full exception holds this. */
   static String causeOf(Failure failure) {
     return failure == Failure.ALREADY_PROCESSED_CHECK
-        ? "the test database lost the connection"
+        ? "does not exist"
         : "the test database rejected this write";
   }
 
@@ -188,10 +182,10 @@ class IntakeFailureReasonTest extends IntakeIntegrationTest {
 
   @Test
   @DisplayName(
-      "[MAM-57 AC-6] a failure of the check whether record 2 was processed names record 2 (the NPI is not read yet)")
+      "[MAM-57 AC-6] a failure of the check whether record 1 was processed names record 1 (the NPI is not read yet)")
   void checkFailureNamesTheRecord() throws Exception {
     Seen seen = failedRun(Failure.ALREADY_PROCESSED_CHECK);
-    assertThat(seen.read().path("error").asText()).startsWith("record 2");
+    assertThat(seen.read().path("error").asText()).startsWith("record 1");
   }
 
   @Test
@@ -211,5 +205,53 @@ class IntakeFailureReasonTest extends IntakeIntegrationTest {
     Seen seen = failedRun(Failure.JOB_LAUNCH);
     assertThat(seen.answer().path("status").asText()).isEqualTo("FAILED");
     assertThat(seen.answer().path("error").asText()).isNotBlank();
+  }
+
+  // ---- a failure nobody injected: a record that is not text
+  // ----------------------------------------------
+
+  /**
+   * Record 2 has a NUL byte in its taxonomy: PostgreSQL cannot store it, whatever the service does.
+   */
+  static byte[] fileWithANulByte() {
+    String nul = AppInputFile.with(AppInputFile.valid(NPI_2), 22, "207Q" + (char) 0 + "0000X");
+    return AppInputFile.lines(AppInputFile.valid(NPI_1), nul, AppInputFile.valid(NPI_3));
+  }
+
+  JsonNode runWithANulByte() throws Exception {
+    JsonNode run = IntakeApi.runToEnd(mvc, json, fileWithANulByte(), DATE);
+    assertThat(run.path("status").asText()).as("the run: " + run).isEqualTo("FAILED");
+    return run;
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-57 AC-6] a record that the database cannot store (a NUL byte) ends the run FAILED, never COMPLETED, naming record 2 and its NPI")
+  void nulByteEndsTheRunFailed() throws Exception {
+    JsonNode run = runWithANulByte();
+    assertThat(run.path("error").asText()).startsWith("record 2 NPI " + NPI_2);
+    assertThat(run.path("endedAt").asText()).isNotBlank();
+    assertThat(run.path("counts").path("read").asInt()).isEqualTo(2);
+    assertThat(run.path("counts").path("errored").asInt()).isEqualTo(1);
+    assertThat(statusOf(NPI_1)).isEqualTo("VALIDATED");
+    assertThat(applications(NPI_3)).isZero();
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-57 AC-6] the reason of a run that failed on a NUL byte is short and has no SQL statement text (D-024)")
+  void nulByteReasonIsClean() throws Exception {
+    JsonNode run = runWithANulByte();
+    String stored =
+        jdbc.queryForObject(
+            "SELECT failure_reason FROM intake_run WHERE public_id = ?::uuid",
+            String.class,
+            run.path("runId").asText());
+    assertThat(List.of(run.path("error").asText(), stored))
+        .allSatisfy(
+            text ->
+                assertThat(text)
+                    .hasSizeLessThanOrEqualTo(SHORT)
+                    .satisfies(t -> assertThat(t.toLowerCase()).doesNotContain(SQL_WORDS)));
   }
 }

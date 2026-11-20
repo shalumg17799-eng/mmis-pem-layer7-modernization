@@ -31,7 +31,9 @@ class ApplicationRecordsTest {
   @ParameterizedTest(name = "[MAM-20 AC-4] provider type {0} is an individual: {1}")
   @CsvSource({"IN,true", "GR,false", "FA,false", "in,false", "INDIVIDUAL,false"})
   void individual(String type, boolean expected) {
-    assertThat(new ProviderFacts("1003000111", type, "207Q00000X", null, null, null, null).individual())
+    assertThat(
+            new ProviderFacts("1003000111", type, "207Q00000X", null, null, null, null)
+                .individual())
         .isEqualTo(expected);
   }
 
@@ -60,7 +62,8 @@ class ApplicationRecordsTest {
     assertThat(ProviderFactsSource.Unavailable.in(unavailable)).isTrue();
     assertThat(
             ProviderFactsSource.Unavailable.in(
-                new RuntimeException("listener failed", new IllegalStateException("wrapped", unavailable))))
+                new RuntimeException(
+                    "listener failed", new IllegalStateException("wrapped", unavailable))))
         .isTrue();
   }
 
@@ -79,15 +82,7 @@ class ApplicationRecordsTest {
 
   private static ScreeningRuns.Run run(int read, int screened) {
     return new ScreeningRuns.Run(
-        UUID.randomUUID(),
-        LocalDate.of(2026, 3, 31),
-        "COMPLETED",
-        read,
-        screened,
-        0,
-        null,
-        AT,
-        AT);
+        UUID.randomUUID(), LocalDate.of(2026, 3, 31), "COMPLETED", read, screened, 0, null, AT, AT);
   }
 
   @ParameterizedTest(name = "[MAM-32 AC-5] read {0} and screened {1} give skipped {2}")
@@ -123,7 +118,8 @@ class ApplicationRecordsTest {
   void screeningCopiesResults() {
     List<SourceResult> results = new ArrayList<>(Fakes.results("P", "P", "P", "P"));
     Screening s =
-        new Screening(UUID.randomUUID(), "1003000111", "INITIAL", "COMPLETED", "PASS", results, AT, AT);
+        new Screening(
+            UUID.randomUUID(), "1003000111", "INITIAL", "COMPLETED", "PASS", results, AT, AT);
     results.clear();
     assertThat(s.results()).hasSize(4);
     assertThatThrownBy(() -> s.results().add(Fakes.results("P", "P", "P", "P").get(0)))

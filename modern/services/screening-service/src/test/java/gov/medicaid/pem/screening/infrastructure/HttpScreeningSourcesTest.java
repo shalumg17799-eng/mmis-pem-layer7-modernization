@@ -63,13 +63,15 @@ class HttpScreeningSourcesTest {
   }
 
   static ProviderFacts organisation(String type, String owner) {
-    return new ProviderFacts("1003000444", type, "251G00000X", null, null, "EXCLUDED CLINIC LLC", owner);
+    return new ProviderFacts(
+        "1003000444", type, "251G00000X", null, null, "EXCLUDED CLINIC LLC", owner);
   }
 
   // ---- the usual answers ------------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-18 AC-2] the four sources answer clean: four P results in the order of SCRNOUT, one lookup each")
+  @DisplayName(
+      "[MAM-18 AC-2] the four sources answer clean: four P results in the order of SCRNOUT, one lookup each")
   void clean() {
     List<SourceResult> r = sources(Duration.ofSeconds(2), 1).check(RIVERA);
     assertThat(r.stream().map(SourceResult::source))
@@ -98,8 +100,7 @@ class HttpScreeningSourcesTest {
         new ProviderFacts("1003000111", "IN", "207Q00000X", "MD12345", "TX", null, null);
     sources(Duration.ofSeconds(2), 1).check(noName);
     assertThat(
-            MOCK.findAll(
-                getRequestedFor(urlPathEqualTo(SAM)).withQueryParam("name", equalTo(""))))
+            MOCK.findAll(getRequestedFor(urlPathEqualTo(SAM)).withQueryParam("name", equalTo(""))))
         .hasSize(1);
   }
 
@@ -117,7 +118,8 @@ class HttpScreeningSourcesTest {
             .atPriority(1)
             .withQueryParam("npi", equalTo("1003000111"))
             .willReturn(
-                okJson("{\"source\":\"SSADMF\",\"deceased\":true,\"dateOfDeath\":\"2025-08-01\"}")));
+                okJson(
+                    "{\"source\":\"SSADMF\",\"deceased\":true,\"dateOfDeath\":\"2025-08-01\"}")));
     List<SourceResult> r = sources(Duration.ofSeconds(2), 1).check(RIVERA);
     assertThat(of(r, Source.OIGLEIE).errorCode()).isEqualTo("E201");
     assertThat(of(r, Source.OIGLEIE).detail()).isEqualTo("EXCLUDED 1128(a)(1) SINCE 2023-01-15");
@@ -152,7 +154,8 @@ class HttpScreeningSourcesTest {
     assertThat(ScreeningWorld.lookups("SAMGOV", "1003000111")).isEqualTo(asked);
   }
 
-  @ParameterizedTest(name = "[MAM-20 AC-1] HTTP {0} from the source is no answer: C after the retry")
+  @ParameterizedTest(
+      name = "[MAM-20 AC-1] HTTP {0} from the source is no answer: C after the retry")
   @CsvSource({"400", "401", "403", "404", "429", "500", "502", "503", "504"})
   void anyErrorStatusIsNoAnswer(int status) {
     ScreeningWorld.sourceError("SSADMF", "1003000111", status);
@@ -163,7 +166,8 @@ class HttpScreeningSourcesTest {
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-1] a source that fails once and then answers is judged on its answer: P, two lookups")
+  @DisplayName(
+      "[MAM-20 AC-1] a source that fails once and then answers is judged on its answer: P, two lookups")
   void retrySucceeds() {
     MOCK.stubFor(
         get(urlPathEqualTo(LEIE))
@@ -183,7 +187,8 @@ class HttpScreeningSourcesTest {
     assertThat(ScreeningWorld.lookups("OIGLEIE", "1003000111")).isEqualTo(2);
   }
 
-  @ParameterizedTest(name = "[MAM-20 AC-1] a {0} of the connection is no answer: C, COULD NOT BE REACHED")
+  @ParameterizedTest(
+      name = "[MAM-20 AC-1] a {0} of the connection is no answer: C, COULD NOT BE REACHED")
   @EnumSource(
       value = Fault.class,
       names = {"CONNECTION_RESET_BY_PEER", "EMPTY_RESPONSE", "MALFORMED_RESPONSE_CHUNK"})
@@ -202,7 +207,11 @@ class HttpScreeningSourcesTest {
         get(urlPathEqualTo(DMF))
             .atPriority(1)
             .withQueryParam("npi", equalTo("1003000111"))
-            .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody("<html>oops</html>")));
+            .willReturn(
+                aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "application/json")
+                    .withBody("<html>oops</html>")));
     SourceResult dmf = of(sources(Duration.ofSeconds(2), 1).check(RIVERA), Source.SSADMF);
     assertThat(dmf.result()).isEqualTo("C");
     assertThat(dmf.detail()).isEqualTo("COULD NOT BE REACHED");
@@ -233,7 +242,8 @@ class HttpScreeningSourcesTest {
   // ---- MAM-20 AC-2: slow ------------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-20 AC-2] a source slower than its limit gives C, DID NOT ANSWER IN TIME, after two attempts")
+  @DisplayName(
+      "[MAM-20 AC-2] a source slower than its limit gives C, DID NOT ANSWER IN TIME, after two attempts")
   void slowIsTimedOut() {
     ScreeningWorld.sourceSlow("SAMGOV", "1003000111", 1500);
     long start = System.nanoTime();
@@ -256,7 +266,8 @@ class HttpScreeningSourcesTest {
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-2] slow on the first attempt and quick on the retry: judged on the answer, P")
+  @DisplayName(
+      "[MAM-20 AC-2] slow on the first attempt and quick on the retry: judged on the answer, P")
   void slowThenQuick() {
     MOCK.stubFor(
         get(urlPathEqualTo(SAM))
@@ -277,7 +288,8 @@ class HttpScreeningSourcesTest {
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-2] the last attempt decides the detail: timed out, then an error is COULD NOT BE REACHED")
+  @DisplayName(
+      "[MAM-20 AC-2] the last attempt decides the detail: timed out, then an error is COULD NOT BE REACHED")
   void timeoutThenErrorIsUnreachable() {
     MOCK.stubFor(
         get(urlPathEqualTo(SAM))
@@ -298,7 +310,8 @@ class HttpScreeningSourcesTest {
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-2] the last attempt decides the detail: an error, then a timeout is DID NOT ANSWER IN TIME")
+  @DisplayName(
+      "[MAM-20 AC-2] the last attempt decides the detail: an error, then a timeout is DID NOT ANSWER IN TIME")
   void errorThenTimeoutIsTimedOut() {
     MOCK.stubFor(
         get(urlPathEqualTo(SAM))
@@ -319,7 +332,8 @@ class HttpScreeningSourcesTest {
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-2] the four sources are asked in parallel: four slow answers cost one wait, not four")
+  @DisplayName(
+      "[MAM-20 AC-2] the four sources are asked in parallel: four slow answers cost one wait, not four")
   void parallel() {
     for (String s : ScreeningWorld.SOURCES) {
       ScreeningWorld.sourceSlow(s, "LICBOARD".equals(s) ? "MD12345" : "1003000111", 800);
@@ -334,10 +348,12 @@ class HttpScreeningSourcesTest {
   // ---- MAM-20 AC-3 and AC-4: the licence --------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-20 AC-3] a licence the board does not know: F without a code, LICENCE NOT FOUND")
+  @DisplayName(
+      "[MAM-20 AC-3] a licence the board does not know: F without a code, LICENCE NOT FOUND")
   void licenceUnknown() {
     ProviderFacts unknown =
-        new ProviderFacts("1003000666", "IN", "207Q00000X", "XX00000", "TX", "TESTPROV FOXTROT", null);
+        new ProviderFacts(
+            "1003000666", "IN", "207Q00000X", "XX00000", "TX", "TESTPROV FOXTROT", null);
     SourceResult lic = of(sources(Duration.ofSeconds(2), 1).check(unknown), Source.LICBOARD);
     assertThat(lic.result()).isEqualTo("F");
     assertThat(lic.errorCode()).isNull();
@@ -345,11 +361,15 @@ class HttpScreeningSourcesTest {
     assertThat(ScreeningWorld.lookups("LICBOARD", "XX00000")).isEqualTo(1);
   }
 
-  @ParameterizedTest(name = "[MAM-20 AC-3] an individual with licence number <{0}> fails without asking the board")
-  @CsvSource(value = {"NIL", "''", "'   '"}, nullValues = "NIL")
+  @ParameterizedTest(
+      name = "[MAM-20 AC-3] an individual with licence number <{0}> fails without asking the board")
+  @CsvSource(
+      value = {"NIL", "''", "'   '"},
+      nullValues = "NIL")
   void noLicenceNumber(String licence) {
     ProviderFacts none =
-        new ProviderFacts("1003000666", "IN", "207Q00000X", licence, "TX", "TESTPROV FOXTROT", null);
+        new ProviderFacts(
+            "1003000666", "IN", "207Q00000X", licence, "TX", "TESTPROV FOXTROT", null);
     SourceResult lic = of(sources(Duration.ofSeconds(2), 1).check(none), Source.LICBOARD);
     assertThat(lic.result()).isEqualTo("F");
     assertThat(lic.errorCode()).isNull();
@@ -357,11 +377,13 @@ class HttpScreeningSourcesTest {
     assertThat(ScreeningWorld.lookups("LICBOARD")).isZero();
   }
 
-  @ParameterizedTest(name = "[MAM-20 AC-4] a {0} is not checked against a licence, whatever its record holds")
+  @ParameterizedTest(
+      name = "[MAM-20 AC-4] a {0} is not checked against a licence, whatever its record holds")
   @CsvSource({"GR", "FA"})
   void organisationHasNoLicenceCheck(String type) {
     ProviderFacts org =
-        new ProviderFacts("1003000333", type, "251G00000X", "GR11100", "TX", "SUNSET HOSPICE INC", null);
+        new ProviderFacts(
+            "1003000333", type, "251G00000X", "GR11100", "TX", "SUNSET HOSPICE INC", null);
     List<SourceResult> r = sources(Duration.ofSeconds(2), 1).check(org);
     SourceResult lic = of(r, Source.LICBOARD);
     assertThat(lic.result()).isEqualTo("P");
@@ -374,7 +396,8 @@ class HttpScreeningSourcesTest {
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-3] a licence with a status other than ACTIVE and EXPIRED fails without a code")
+  @DisplayName(
+      "[MAM-20 AC-3] a licence with a status other than ACTIVE and EXPIRED fails without a code")
   void suspendedLicence() {
     ScreeningWorld.licence("MD12345", "TX", "SUSPENDED", "2028-09");
     SourceResult lic = of(sources(Duration.ofSeconds(2), 1).check(RIVERA), Source.LICBOARD);
@@ -400,7 +423,8 @@ class HttpScreeningSourcesTest {
   // ---- MAM-22: the owner ------------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-22 AC-2] an organisation with an owner: the LEIE is asked for the provider and for the owner, once each")
+  @DisplayName(
+      "[MAM-22 AC-2] an organisation with an owner: the LEIE is asked for the provider and for the owner, once each")
   void bothAreAsked() {
     sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000999"));
     assertThat(ScreeningWorld.lookups("OIGLEIE", "1003000444")).isEqualTo(1);
@@ -408,8 +432,11 @@ class HttpScreeningSourcesTest {
     assertThat(ScreeningWorld.lookups("OIGLEIE")).isEqualTo(2);
   }
 
-  @ParameterizedTest(name = "[MAM-22 AC-3] an owner NPI <{0}> is no owner: one lookup, the provider's own NPI")
-  @CsvSource(value = {"NIL", "''", "'  '"}, nullValues = "NIL")
+  @ParameterizedTest(
+      name = "[MAM-22 AC-3] an owner NPI <{0}> is no owner: one lookup, the provider's own NPI")
+  @CsvSource(
+      value = {"NIL", "''", "'  '"},
+      nullValues = "NIL")
   void noOwnerNoSecondLookup(String owner) {
     SourceResult leie =
         of(sources(Duration.ofSeconds(2), 1).check(organisation("FA", owner)), Source.OIGLEIE);
@@ -423,14 +450,17 @@ class HttpScreeningSourcesTest {
   void ownerExcluded() {
     ScreeningWorld.leieListed("1990000111");
     SourceResult leie =
-        of(sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000111")), Source.OIGLEIE);
+        of(
+            sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000111")),
+            Source.OIGLEIE);
     assertThat(leie.result()).isEqualTo("F");
     assertThat(leie.errorCode()).isEqualTo("E203");
     assertThat(leie.detail()).isEqualTo("OWNER 1990000111 EXCLUDED 1128(a)(1) SINCE 2023-01-15");
   }
 
   @Test
-  @DisplayName("[MAM-22 AC-4] the provider and its owner are on the LEIE: one result, E201, both named")
+  @DisplayName(
+      "[MAM-22 AC-4] the provider and its owner are on the LEIE: one result, E201, both named")
   void bothExcluded() {
     ScreeningWorld.leieListed("1990000111");
     ScreeningWorld.leieListed("1003000444");
@@ -443,11 +473,14 @@ class HttpScreeningSourcesTest {
   }
 
   @Test
-  @DisplayName("[MAM-22 AC-5] the owner lookup fails: two lookups of the owner, one of the provider, C without a code")
+  @DisplayName(
+      "[MAM-22 AC-5] the owner lookup fails: two lookups of the owner, one of the provider, C without a code")
   void ownerLookupFails() {
     ScreeningWorld.sourceError("OIGLEIE", "1990000999", 500);
     SourceResult leie =
-        of(sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000999")), Source.OIGLEIE);
+        of(
+            sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000999")),
+            Source.OIGLEIE);
     assertThat(leie.result()).isEqualTo("C");
     assertThat(leie.errorCode()).isNull();
     assertThat(leie.detail()).isEqualTo("COULD NOT BE REACHED");
@@ -456,33 +489,42 @@ class HttpScreeningSourcesTest {
   }
 
   @Test
-  @DisplayName("[MAM-22 AC-5] the provider lookup fails and the owner is clean: C, the owner is still asked once")
+  @DisplayName(
+      "[MAM-22 AC-5] the provider lookup fails and the owner is clean: C, the owner is still asked once")
   void ownLookupFails() {
     ScreeningWorld.sourceError("OIGLEIE", "1003000444", 500);
     SourceResult leie =
-        of(sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000999")), Source.OIGLEIE);
+        of(
+            sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000999")),
+            Source.OIGLEIE);
     assertThat(leie.result()).isEqualTo("C");
     assertThat(ScreeningWorld.lookups("OIGLEIE", "1003000444")).isEqualTo(2);
     assertThat(ScreeningWorld.lookups("OIGLEIE", "1990000999")).isEqualTo(1);
   }
 
   @Test
-  @DisplayName("[MAM-22 AC-5] the provider is on the LEIE but the owner lookup fails: C (question C-5 default), the exclusion is not hidden by a P")
+  @DisplayName(
+      "[MAM-22 AC-5] the provider is on the LEIE but the owner lookup fails: C (question C-5 default), the exclusion is not hidden by a P")
   void listedProviderAndFailingOwner() {
     ScreeningWorld.leieListed("1003000444");
     ScreeningWorld.sourceError("OIGLEIE", "1990000999", 500);
     SourceResult leie =
-        of(sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000999")), Source.OIGLEIE);
+        of(
+            sources(Duration.ofSeconds(2), 1).check(organisation("GR", "1990000999")),
+            Source.OIGLEIE);
     assertThat(leie.result()).isNotEqualTo("P");
     assertThat(leie.result()).isEqualTo("C");
   }
 
   @Test
-  @DisplayName("[MAM-22 AC-5] an owner lookup that does not answer in time is DID NOT ANSWER IN TIME")
+  @DisplayName(
+      "[MAM-22 AC-5] an owner lookup that does not answer in time is DID NOT ANSWER IN TIME")
   void ownerLookupSlow() {
     ScreeningWorld.sourceSlow("OIGLEIE", "1990000999", 1200);
     SourceResult leie =
-        of(sources(Duration.ofMillis(300), 1).check(organisation("GR", "1990000999")), Source.OIGLEIE);
+        of(
+            sources(Duration.ofMillis(300), 1).check(organisation("GR", "1990000999")),
+            Source.OIGLEIE);
     assertThat(leie.result()).isEqualTo("C");
     assertThat(leie.detail()).isEqualTo("DID NOT ANSWER IN TIME");
   }
@@ -490,13 +532,15 @@ class HttpScreeningSourcesTest {
   @Test
   @DisplayName("[MAM-22 AC-2] the owner lookup runs beside the provider lookup, not after it")
   void ownerInParallel() {
-    ScreeningWorld.sourceSlow("OIGLEIE", "1003000444", 1000);
-    ScreeningWorld.sourceSlow("OIGLEIE", "1990000999", 1000);
+    ScreeningWorld.sourceSlow("OIGLEIE", "1003000444", 1500);
+    ScreeningWorld.sourceSlow("OIGLEIE", "1990000999", 1500);
     long start = System.nanoTime();
     SourceResult leie =
-        of(sources(Duration.ofSeconds(3), 1).check(organisation("GR", "1990000999")), Source.OIGLEIE);
+        of(
+            sources(Duration.ofSeconds(4), 1).check(organisation("GR", "1990000999")),
+            Source.OIGLEIE);
     Duration took = Duration.ofNanos(System.nanoTime() - start);
     assertThat(leie.result()).isEqualTo("P");
-    assertThat(took).isLessThan(Duration.ofMillis(1750));
+    assertThat(took).isLessThan(Duration.ofMillis(2600));
   }
 }

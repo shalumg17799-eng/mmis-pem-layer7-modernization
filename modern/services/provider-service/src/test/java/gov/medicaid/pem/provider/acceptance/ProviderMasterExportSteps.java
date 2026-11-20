@@ -40,7 +40,8 @@ public class ProviderMasterExportSteps {
       req = req.with(token);
     }
     export = mvc.perform(req).andReturn();
-    String body = new String(export.getResponse().getContentAsByteArray(), StandardCharsets.US_ASCII);
+    String body =
+        new String(export.getResponse().getContentAsByteArray(), StandardCharsets.US_ASCII);
     lines = body.isEmpty() ? List.of() : Arrays.asList(body.split("\n", -1));
   }
 
@@ -81,12 +82,14 @@ public class ProviderMasterExportSteps {
   @Then("the export lines are for the NPIs {string} in that order")
   public void order(String npis) {
     List<String> want = Arrays.asList(npis.split(","));
-    assertThat(lines.stream().map(l -> l.substring(0, 10)).toList()).containsExactlyElementsOf(want);
+    assertThat(lines.stream().map(l -> l.substring(0, 10)).toList())
+        .containsExactlyElementsOf(want);
   }
 
   @Then("the export does not end with a line break")
   public void noTrailingBreak() {
-    String body = new String(export.getResponse().getContentAsByteArray(), StandardCharsets.US_ASCII);
+    String body =
+        new String(export.getResponse().getContentAsByteArray(), StandardCharsets.US_ASCII);
     assertThat(body).doesNotEndWith("\n").doesNotEndWith("\r");
   }
 
@@ -108,7 +111,8 @@ public class ProviderMasterExportSteps {
     assertThat(bytes(npi, from, to)).isEqualTo(" ".repeat(to - from + 1));
   }
 
-  @Then("every export line decodes with the PRVRECRD codec to the fields the API returns for that NPI")
+  @Then(
+      "every export line decodes with the PRVRECRD codec to the fields the API returns for that NPI")
   public void decodes() throws Exception {
     FixedWidthCodec codec = FixedWidthCodec.forLayout("PRVRECRD");
     assertThat(lines).isNotEmpty();
@@ -121,11 +125,15 @@ public class ProviderMasterExportSteps {
           mvc.perform(get("/api/v1/providers/{npi}", npi).with(PemJwt.admin())).andReturn();
       assertThat(api.getResponse().getStatus()).isEqualTo(200);
       JsonNode p = json.readTree(api.getResponse().getContentAsString());
-      assertThat(r.get("PRV-MEDICAID-ID")).as("medicaidId").isEqualTo(p.path("medicaidId").asText());
+      assertThat(r.get("PRV-MEDICAID-ID"))
+          .as("medicaidId")
+          .isEqualTo(p.path("medicaidId").asText());
       assertThat(r.get("PRV-TYPE-CODE")).as("type").isEqualTo(p.path("providerType").asText());
       assertThat(r.get("PRV-TAXONOMY")).as("taxonomy").isEqualTo(p.path("taxonomy").asText());
       assertThat(r.get("PRV-RISK-TIER")).as("tier").isEqualTo(p.path("riskTier").asText(""));
-      assertThat(r.get("PRV-ENROLL-STATUS")).as("status").isEqualTo(p.path("enrollStatus").asText());
+      assertThat(r.get("PRV-ENROLL-STATUS"))
+          .as("status")
+          .isEqualTo(p.path("enrollStatus").asText());
       assertThat(r.get("PRV-SCREEN-FLAG")).as("flag").isEqualTo(p.path("screenFlag").asText());
       assertThat(r.getDate("PRV-EFFECTIVE-DATE"))
           .as("effective date")

@@ -18,8 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 /**
- * MAM-43: the 130-byte PRVRECRD record written from a provider, byte by byte (data-layouts.md:
- * NPI 1-10, Medicaid ID 11-19, type 20-21, taxonomy 22-31, tier 32, status 33, screen flag 34,
+ * MAM-43: the 130-byte PRVRECRD record written from a provider, byte by byte (data-layouts.md: NPI
+ * 1-10, Medicaid ID 11-19, type 20-21, taxonomy 22-31, tier 32, status 33, screen flag 34,
  * effective date 35-42, due date 43-50, then the variant 51-130: IN last name 51-80, first name
  * 81-100, licence 101-115, state 116-117, filler 118-130; GR/FA legal name 51-90, DBA name 91-120,
  * owner NPI 121-130).
@@ -108,7 +108,8 @@ class PrvrecrdFileTest {
   }
 
   @Test
-  @DisplayName("[MAM-43 AC-4] a group record has the legal name, the DBA name and the owner NPI in 121-130")
+  @DisplayName(
+      "[MAM-43 AC-4] a group record has the legal name, the DBA name and the owner NPI in 121-130")
   void groupRecord() {
     String written =
         file.write(
@@ -203,7 +204,8 @@ class PrvrecrdFileTest {
   @DisplayName(
       "[MAM-43 AC-4] the view of the type decides: a group never shows individual names, an individual never shows an organisation")
   void onlyTheViewOfTheTypeIsWritten() {
-    Provider g = organisation(ProviderType.GROUP, "SAMPLE CLINIC GROUP", "SAMPLE CLINIC", "1990000111");
+    Provider g =
+        organisation(ProviderType.GROUP, "SAMPLE CLINIC GROUP", "SAMPLE CLINIC", "1990000111");
     Provider groupWithNames =
         new Provider(
             g.npi(),
@@ -257,7 +259,8 @@ class PrvrecrdFileTest {
 
   @ParameterizedTest(name = "status {0} is written as byte 33 {1}")
   @EnumSource(EnrollStatus.class)
-  @DisplayName("[MAM-43 AC-5] every enrolment status is written as its code, S for a suspended provider")
+  @DisplayName(
+      "[MAM-43 AC-5] every enrolment status is written as its code, S for a suspended provider")
   void everyStatus(EnrollStatus status) {
     Provider p = individual().withEnrollStatus(status);
 
@@ -369,8 +372,7 @@ class PrvrecrdFileTest {
   }
 
   @Test
-  @DisplayName(
-      "[MAM-43 AC-3] dates are CCYYMMDD with a 4-digit year and zero-filled month and day")
+  @DisplayName("[MAM-43 AC-3] dates are CCYYMMDD with a 4-digit year and zero-filled month and day")
   void datesHaveFourDigitYears() {
     Provider i = individual();
     Provider p =
@@ -401,7 +403,8 @@ class PrvrecrdFileTest {
   }
 
   @Test
-  @DisplayName("[MAM-43 AC-1] a Medicaid ID shorter than 9 is space-padded and the record stays 130 bytes")
+  @DisplayName(
+      "[MAM-43 AC-1] a Medicaid ID shorter than 9 is space-padded and the record stays 130 bytes")
   void shortMedicaidIdIsPadded() {
     Provider i = individual();
     Provider p =
@@ -437,7 +440,8 @@ class PrvrecrdFileTest {
       "[MAM-43 AC-2] records are joined by one line feed, in the order given, with no header and no trailer")
   void recordsJoinedByLineFeed() {
     Provider a = individual();
-    Provider b = organisation(ProviderType.GROUP, "EXCLUDED CLINIC LLC", "EXCLUDED CLINIC", "1990000111");
+    Provider b =
+        organisation(ProviderType.GROUP, "EXCLUDED CLINIC LLC", "EXCLUDED CLINIC", "1990000111");
 
     String written = file.write(List.of(a, b));
 

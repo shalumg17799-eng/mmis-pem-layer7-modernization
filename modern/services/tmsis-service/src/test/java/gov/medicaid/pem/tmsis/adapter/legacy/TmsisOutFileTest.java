@@ -40,7 +40,8 @@ class TmsisOutFileTest {
   void wholeRecord() {
     byte[] file = writer.write(List.of(ONE));
     assertThat(file).hasSize(120);
-    assertThat(text(file)).isEqualTo("PRV01" + "M00000111" + "1003000111" + "A" + "26090" + " ".repeat(90));
+    assertThat(text(file))
+        .isEqualTo("PRV01" + "M00000111" + "1003000111" + "A" + "26090" + " ".repeat(90));
   }
 
   static Stream<Arguments> fields() {
@@ -102,7 +103,8 @@ class TmsisOutFileTest {
   }
 
   @Test
-  @DisplayName("[MAM-71 AC-2] a Medicaid ID shorter than 9 characters is padded with spaces on the right")
+  @DisplayName(
+      "[MAM-71 AC-2] a Medicaid ID shorter than 9 characters is padded with spaces on the right")
   void shortMedicaidIdPadded() {
     TmsisRecord r = new TmsisRecord("M123", "1003000111", "A", "26090");
     String record = Tmsisout.records(writer.write(List.of(r))).get(0);

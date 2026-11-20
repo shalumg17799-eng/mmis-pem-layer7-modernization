@@ -164,6 +164,7 @@ Feature: Monthly revalidation sweep: open one case for every ACTIVE provider tha
       | ADMIN    | 200    |
       | SYSTEM   | 403    |
       | ANALYST  | 403    |
+      | SUPERVISOR | 403  |
       | PROVIDER | 403    |
       | NONE     | 401    |
 
@@ -193,6 +194,7 @@ Feature: Monthly revalidation sweep: open one case for every ACTIVE provider tha
       | ADMIN    | 200    |
       | SYSTEM   | 403    |
       | ANALYST  | 403    |
+      | SUPERVISOR | 403  |
       | PROVIDER | 403    |
       | NONE     | 401    |
 

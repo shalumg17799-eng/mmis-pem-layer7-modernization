@@ -1,6 +1,6 @@
 # Requirement checklist (FINAL PLAN Part C)
 
-Generated 2026-11-19 20:40 by `modern/tools/trace/build_checklist.py` from the repo; do not edit by hand.
+Generated 2026-11-20 19:27 by `modern/tools/trace/build_checklist.py` from the repo; do not edit by hand.
 
 ## 1. Business stories: 59 of 64 built
 
@@ -73,7 +73,7 @@ Generated 2026-11-19 20:40 by `modern/tools/trace/build_checklist.py` from the r
 | MAM-92 | web-ui | Console: view and change the risk rules (admin) | yes | DONE (fast-mode, gates postponed); AC-1..AC-7 built, recorded tests green |
 | MAM-93 | web-ui | Console: run the batch jobs and download their legacy files (admin) | yes | DONE (fast-mode, gates postponed); AC-1..AC-8 built, tests 57/57 green |
 
-Tasks (not business stories): MAM-16 (open), MAM-19 (open), MAM-24 (open), MAM-26 (open), MAM-29 (open), MAM-31 (open), MAM-34 (built), MAM-39 (built), MAM-42 (built), MAM-44 (built), MAM-47 (built), MAM-50 (built), MAM-51 (built), MAM-53 (built)
+Tasks (not business stories): MAM-16 (open), MAM-19 (built), MAM-24 (built), MAM-26 (built), MAM-29 (built), MAM-31 (built), MAM-34 (built), MAM-39 (built), MAM-42 (built), MAM-44 (built), MAM-47 (built), MAM-50 (built), MAM-51 (built), MAM-53 (built)
 
 ## 2. Legacy rules: 433 of 433 non-dropped rules reach built code; 0 gaps
 
@@ -81,15 +81,15 @@ Tasks (not business stories): MAM-16 (open), MAM-19 (open), MAM-24 (open), MAM-2
 
 | Service | Main classes | Stories built / total |
 |---|---|---|
-| provider-service | 54 | 9 / 9 |
+| provider-service | 55 | 9 / 9 |
 | enrollment-service | 33 | 4 / 4 |
 | screening-service | 35 | 6 / 6 |
 | risk-service | 16 | 3 / 3 |
 | revalidation-service | 33 | 3 / 3 |
 | sanctions-service | 22 | 2 / 2 |
 | notification-service | 15 | 3 / 3 |
-| directory-service | 27 | 4 / 4 |
-| tmsis-service | 25 | 3 / 3 |
+| directory-service | 28 | 4 / 4 |
+| tmsis-service | 26 | 3 / 3 |
 
 ## 4. Screens: 13 of 13 built
 
@@ -123,11 +123,13 @@ UX overhaul status per screen: see the UI agent's group reports and `modern/docs
 | J6 | MAM-81 | j6-revalidation.spec.ts | yes | modern/docs/ux/journeys.md#J6 |
 | J7 | MAM-83 | j7-extracts.spec.ts | yes | modern/docs/ux/journeys.md#J7 |
 
-## 6. Open questions (3) and BLOCKED items
+## 6. Open questions (1) and BLOCKED items
 
-- Q-106: (MAM-44, 2026-11-19 20:30) How a provider with no revalidation due date is written in a fixed-width file ( (OPEN, default applied)
-- Q-107: (MAM-44 AC-6, 2026-11-19 20:30) Does a run-level fixture row count as rule coverage? ( (OPEN, default applied)
-- Q-108: (UI polish, 2026-11-19 20:10) Provider detail shows NPI, name, status, screening result and revalidation due twice ( (OPEN, default applied)
+- Q-131: (provider-service, MAM-40, 2026-11-20 18:55) The audit history answer and its contract disagree ( (OPEN, needs the user)
+- PROGRESS: | 2026-11-20 18:12 | HARD DEADLINE 20:00: PIT and reviews cut, deferred work stopped, deploy 2 started (Jira Done 42 of 93) | User message 18:02 (recorded above). **Done since 17:36**: MAM-29 (gateway
+- PROGRESS: | 2026-11-20 17:36 | Deploy 1 DEPLOYED; checkpoint commit 2e20ead pushed; 6 stories + 3 epics Done (Jira Done 40 of 93) | **Deploy 1**: `RESULT DEPLOYED` at 17:07 (pem-apps healthy 16:59:59; J1 passed
+- PROGRESS: | 2026-11-20 16:18 | Parity: legacy run captured; MAM-84 scans | **Parity stage 1 (legacy run on Hercules) PARTIAL but with real golden files**: MVS jobs 193-197 ran with the lab's load modules (code 
+- PROGRESS: | 2026-11-19 21:04 | Platform tasks + MAM-89 groundwork | Done in Jira with comment (AC checks): MAM-34 (smoke-walking-skeleton.sh: AC-1 200, AC-2 401/403), MAM-50 (AC-1: after make seed 16/16 provide
 - PROGRESS: | 2026-11-19 16:41 | Part C tooling | New `modern/tools/trace/build_checklist.py` writes `docs/reports/requirement-checklist.md` (64 business stories = the 64 items of type Story; rules -> built code;
 - PROGRESS: | 2026-11-19 16:10 | J1 x2 BLOCKED (env) | `./pem.sh j1 2` attempt 1: run 1 PASSED end to end (24.6 s, all AC-1..AC-8 incl. notices and provider record), run 2 failed `page.goto: net::ERR_CONNECTION_R
 - PROGRESS: | 2026-11-19 14:20 | MAM-64 | Portal apply: 101 Vitest + 25 Playwright green (lead re-ran both), hashes OK; live J1 AC-1 passes through it. Jira comment + in-review. MAM-87: 73/74 Vitest, 27/28 Playwr

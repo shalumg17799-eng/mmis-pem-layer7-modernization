@@ -92,7 +92,8 @@ class ProviderSearchApiTest extends IntegrationTest {
   // ---- AC-5: NPI and Medicaid ID are exact ------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-37 AC-5] the Medicaid ID is matched exactly: a prefix or another case finds nothing")
+  @DisplayName(
+      "[MAM-37 AC-5] the Medicaid ID is matched exactly: a prefix or another case finds nothing")
   void medicaidIdIsExact() throws Exception {
     assertThat(npis(ok(search("medicaidId", "MCD000111")))).containsExactly("1003000111");
     assertThat(npis(ok(search("medicaidId", "MCD00011")))).isEmpty();
@@ -109,7 +110,8 @@ class ProviderSearchApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-5] the NPI is matched exactly and an NPI that is not on file gives an empty page")
+  @DisplayName(
+      "[MAM-37 AC-5] the NPI is matched exactly and an NPI that is not on file gives an empty page")
   void npiExact() throws Exception {
     JsonNode found = ok(search("npi", "1003000444"));
     JsonNode none = ok(search("npi", "1003000999"));
@@ -141,7 +143,8 @@ class ProviderSearchApiTest extends IntegrationTest {
 
   @ParameterizedTest(name = "medicaidId=[{0}] is refused")
   @ValueSource(strings = {"", " ", "ABCDEFGHIJ"})
-  @DisplayName("[MAM-37 AC-5] a Medicaid ID that is empty or longer than 9 characters is a 400 problem")
+  @DisplayName(
+      "[MAM-37 AC-5] a Medicaid ID that is empty or longer than 9 characters is a 400 problem")
   void malformedMedicaidId(String id) throws Exception {
     mvc.perform(get("/api/v1/providers").param("medicaidId", id).with(PemJwt.analyst()))
         .andExpect(status().isBadRequest())
@@ -154,7 +157,8 @@ class ProviderSearchApiTest extends IntegrationTest {
     assertThat(npis(ok(search("medicaidId", "MCD000999")))).isEmpty();
   }
 
-  // ---- AC-6: name, status, screen flag, paging ----------------------------------------------------
+  // ---- AC-6: name, status, screen flag, paging
+  // ----------------------------------------------------
 
   @Test
   @DisplayName("[MAM-37 AC-6] status and screen flag are exact filters that combine with AND")
@@ -169,7 +173,8 @@ class ProviderSearchApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-6] a name matches any part of the last, first, legal or DBA name, ignoring case")
+  @DisplayName(
+      "[MAM-37 AC-6] a name matches any part of the last, first, legal or DBA name, ignoring case")
   void nameContains() throws Exception {
     assertThat(npis(ok(search("name", "RIVERA")))).containsExactly("1003000111");
     assertThat(npis(ok(search("name", "river")))).containsExactly("1003000111");
@@ -212,7 +217,8 @@ class ProviderSearchApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-6] a backslash in a name is a plain character, and cannot be used to escape a wildcard")
+  @DisplayName(
+      "[MAM-37 AC-6] a backslash in a name is a plain character, and cannot be used to escape a wildcard")
   void backslashIsLiteral() throws Exception {
     ProviderRows.group("1003000544").legalName("C\\D CLINIC").dbaName("CD").insert(jdbc);
     ProviderRows.group("1003000555").legalName("100% FREE").dbaName("FREE").insert(jdbc);
@@ -226,7 +232,8 @@ class ProviderSearchApiTest extends IntegrationTest {
 
   @ParameterizedTest(name = "status={0} screenFlag={1} is refused")
   @CsvSource({"X,", "p,", "'',", ",Z", ",u", "PP,"})
-  @DisplayName("[MAM-37 AC-6] a status or screen flag that is not one of the contract codes is a 400 problem")
+  @DisplayName(
+      "[MAM-37 AC-6] a status or screen flag that is not one of the contract codes is a 400 problem")
   void unknownCodes(String statusCode, String flagCode) throws Exception {
     MockHttpServletRequestBuilder req = get("/api/v1/providers").with(PemJwt.analyst());
     if (statusCode != null) {
@@ -239,15 +246,15 @@ class ProviderSearchApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-6] with no filter and no paging the answer is page 0 of size 20, in ascending NPI order")
+  @DisplayName(
+      "[MAM-37 AC-6] with no filter and no paging the answer is page 0 of size 20, in ascending NPI order")
   void defaultsAndOrder() throws Exception {
     JsonNode page = ok(search());
 
     assertThat(page.path("page").asInt()).isZero();
     assertThat(page.path("size").asInt()).isEqualTo(20);
     assertThat(page.path("total").asInt()).isEqualTo(4);
-    assertThat(npis(page))
-        .containsExactly("1003000111", "1003000222", "1003000444", "1003000777");
+    assertThat(npis(page)).containsExactly("1003000111", "1003000222", "1003000444", "1003000777");
   }
 
   @Test
@@ -267,13 +274,19 @@ class ProviderSearchApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-6] the largest page size is 200; 0, 201, a negative page or text is a 400 problem")
+  @DisplayName(
+      "[MAM-37 AC-6] the largest page size is 200; 0, 201, a negative page or text is a 400 problem")
   void pagingLimits() throws Exception {
     assertThat(ok(search("size", "200")).path("size").asInt()).isEqualTo(200);
     assertThat(ok(search("size", "1")).path("items").size()).isEqualTo(1);
     for (String[] bad :
         new String[][] {
-          {"size", "0"}, {"size", "201"}, {"size", "-1"}, {"page", "-1"}, {"size", "abc"}, {"page", "x"}
+          {"size", "0"},
+          {"size", "201"},
+          {"size", "-1"},
+          {"page", "-1"},
+          {"size", "abc"},
+          {"page", "x"}
         }) {
       MvcResult r = search(bad);
       assertThat(r.getResponse().getStatus()).as(bad[0] + "=" + bad[1]).isEqualTo(400);
@@ -281,7 +294,8 @@ class ProviderSearchApiTest extends IntegrationTest {
     }
   }
 
-  // ---- AC-1, AC-4: what a record shows ------------------------------------------------------------
+  // ---- AC-1, AC-4: what a record shows
+  // ------------------------------------------------------------
 
   @Test
   @DisplayName(
@@ -297,7 +311,8 @@ class ProviderSearchApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-1] the end date of a terminated provider is returned, and no end date is not shown")
+  @DisplayName(
+      "[MAM-37 AC-1] the end date of a terminated provider is returned, and no end date is not shown")
   void endDate() throws Exception {
     mvc.perform(get("/api/v1/providers/1003000222").with(PemJwt.analyst()))
         .andExpect(jsonPath("$.endDate").value("2026-03-31"))
@@ -317,26 +332,32 @@ class ProviderSearchApiTest extends IntegrationTest {
     }
   }
 
-  // ---- AC-3: nothing is carried between requests ----------------------------------------------------
+  // ---- AC-3: nothing is carried between requests
+  // ----------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-37 AC-3] a lookup creates no session and sets no cookie: nothing is carried to the next request")
+  @DisplayName(
+      "[MAM-37 AC-3] a lookup creates no session and sets no cookie: nothing is carried to the next request")
   void noSessionIsCreated() throws Exception {
-    MvcResult r = mvc.perform(get("/api/v1/providers/1003000111").with(PemJwt.analyst())).andReturn();
+    MvcResult r =
+        mvc.perform(get("/api/v1/providers/1003000111").with(PemJwt.analyst())).andReturn();
 
     assertThat(r.getRequest().getSession(false)).isNull();
     assertThat(r.getResponse().getHeaders("Set-Cookie")).isEmpty();
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-3] the same caller reading A, then B, then an unknown NPI gets A, B and 404, in any order")
+  @DisplayName(
+      "[MAM-37 AC-3] the same caller reading A, then B, then an unknown NPI gets A, B and 404, in any order")
   void noCarryOver() throws Exception {
     String[] order = {"1003000444", "1003000999", "1003000111", "1003000999", "1003000444"};
     for (String npi : order) {
       MvcResult r = mvc.perform(get("/api/v1/providers/" + npi).with(PemJwt.analyst())).andReturn();
       if (npi.equals("1003000999")) {
         assertThat(r.getResponse().getStatus()).isEqualTo(404);
-        assertThat(r.getResponse().getContentAsString()).doesNotContain("1003000444").doesNotContain("1003000111");
+        assertThat(r.getResponse().getContentAsString())
+            .doesNotContain("1003000444")
+            .doesNotContain("1003000111");
       } else {
         assertThat(json.readTree(r.getResponse().getContentAsString()).path("npi").asText())
             .isEqualTo(npi);
@@ -344,7 +365,8 @@ class ProviderSearchApiTest extends IntegrationTest {
     }
   }
 
-  // ---- AC-7: roles ------------------------------------------------------------------------------------
+  // ---- AC-7: roles
+  // ------------------------------------------------------------------------------------
 
   @ParameterizedTest(name = "{0} may search")
   @ValueSource(strings = {"ANALYST", "SUPERVISOR", "ADMIN", "SYSTEM"})
@@ -356,9 +378,11 @@ class ProviderSearchApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-7] a PROVIDER cannot search, even with a token that carries their own NPI")
+  @DisplayName(
+      "[MAM-37 AC-7] a PROVIDER cannot search, even with a token that carries their own NPI")
   void providerCannotSearch() throws Exception {
-    mvc.perform(get("/api/v1/providers").param("npi", "1003000111").with(PemJwt.provider("1003000111")))
+    mvc.perform(
+            get("/api/v1/providers").param("npi", "1003000111").with(PemJwt.provider("1003000111")))
         .andExpect(status().isForbidden())
         .andExpect(jsonPath("$.status").value(403));
   }
@@ -406,7 +430,8 @@ class ProviderSearchApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-37 AC-2] an unknown NPI is a 404 problem+json that names only the NPI asked for")
+  @DisplayName(
+      "[MAM-37 AC-2] an unknown NPI is a 404 problem+json that names only the NPI asked for")
   void unknownNpiProblem() throws Exception {
     MvcResult r =
         mvc.perform(get("/api/v1/providers/1003000999").with(PemJwt.analyst())).andReturn();
@@ -417,6 +442,8 @@ class ProviderSearchApiTest extends IntegrationTest {
     assertThat(problem.path("status").asInt()).isEqualTo(404);
     assertThat(problem.path("detail").asText()).contains("1003000999");
     assertThat(problem.has("npi")).isFalse();
-    assertThat(r.getResponse().getContentAsString()).doesNotContain("RIVERA").doesNotContain("OKAFOR");
+    assertThat(r.getResponse().getContentAsString())
+        .doesNotContain("RIVERA")
+        .doesNotContain("OKAFOR");
   }
 }

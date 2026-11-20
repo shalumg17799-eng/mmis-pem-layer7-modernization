@@ -120,7 +120,8 @@ public final class EventContract {
       }
       return;
     }
-    if (schema.containsKey("const") && !String.valueOf(schema.get("const")).equals(value.asText())) {
+    if (schema.containsKey("const")
+        && !String.valueOf(schema.get("const")).equals(value.asText())) {
       errors.add(path + " = " + value + " but the schema says const " + schema.get("const"));
     }
     if (schema.get("enum") instanceof List<?> e && value.isValueNode()) {
@@ -148,7 +149,8 @@ public final class EventContract {
         return;
       }
       for (int i = 0; i < value.size(); i++) {
-        check((Map<String, Object>) schema.get("items"), value.get(i), path + "[" + i + "]", errors);
+        check(
+            (Map<String, Object>) schema.get("items"), value.get(i), path + "[" + i + "]", errors);
       }
     } else if (types.contains("string") || (types.isEmpty() && value.isTextual())) {
       checkString(schema, value, path, errors);

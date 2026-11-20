@@ -120,16 +120,7 @@ final class Fakes {
       Run r = runs.get(runId);
       runs.put(
           runId,
-          new Run(
-              runId,
-              r.businessDate(),
-              "FAILED",
-              read,
-              0,
-              0,
-              error,
-              r.startedAt(),
-              endedAt));
+          new Run(runId, r.businessDate(), "FAILED", read, 0, 0, error, r.startedAt(), endedAt));
     }
 
     @Override

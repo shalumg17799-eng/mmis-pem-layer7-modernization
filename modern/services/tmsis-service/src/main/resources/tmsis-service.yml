@@ -9,6 +9,12 @@ spring:
     password: ${PG_TMSIS_PASSWORD:}
   flyway:
     locations: classpath:db/migration/tmsis
+  batch:
+    jdbc:
+      # Spring Batch creates a job execution SERIALIZABLE by default; on PostgreSQL several runs
+      # started at the same time then fail with "could not serialize access" (MAM-75 AC-4). Every run
+      # is a job instance of its own (runId), so READ COMMITTED loses nothing.
+      isolation-level-for-create: read_committed
 server:
   port: ${PEM_TMSIS_PORT:8089}
 pem:

@@ -35,7 +35,8 @@ class ContractConstantsTest {
   @Test
   @DisplayName("[MAM-71 AC-5] a page holds its items and the total number of ACTIVE providers")
   void pageHoldsItemsAndTotal() {
-    ProviderRow row = new ProviderRow("1003000111", "M00000111", "A", LocalDate.parse("2026-01-15"));
+    ProviderRow row =
+        new ProviderRow("1003000111", "M00000111", "A", LocalDate.parse("2026-01-15"));
     ActiveProviders.Page page = new ActiveProviders.Page(java.util.List.of(row), 450);
     assertThat(page.items()).containsExactly(row);
     assertThat(page.total()).isEqualTo(450);
@@ -45,7 +46,8 @@ class ContractConstantsTest {
   @DisplayName(
       "[MAM-78 AC-1] a provider row carries the NPI, Medicaid ID, enrolment status and enrolment date")
   void providerRowFields() {
-    ProviderRow row = new ProviderRow("1003000111", "M00000111", "A", LocalDate.parse("2026-01-15"));
+    ProviderRow row =
+        new ProviderRow("1003000111", "M00000111", "A", LocalDate.parse("2026-01-15"));
     assertThat(row.npi()).isEqualTo("1003000111");
     assertThat(row.medicaidId()).isEqualTo("M00000111");
     assertThat(row.enrollStatus()).isEqualTo("A");
@@ -57,7 +59,8 @@ class ContractConstantsTest {
       "[MAM-75 AC-5] the event data holds the run id, business date, period and row count of the contract")
   void eventDataFields() {
     UUID id = UUID.randomUUID();
-    ExtractProducedData data = new ExtractProducedData(id, LocalDate.parse("2026-03-31"), "26090", 2);
+    ExtractProducedData data =
+        new ExtractProducedData(id, LocalDate.parse("2026-03-31"), "26090", 2);
     assertThat(data.runId()).isEqualTo(id);
     assertThat(data.businessDate()).isEqualTo(LocalDate.parse("2026-03-31"));
     assertThat(data.periodYyddd()).isEqualTo("26090");
@@ -73,7 +76,16 @@ class ContractConstantsTest {
     Instant end = Instant.parse("2026-01-15T10:00:05Z");
     ExtractRun run =
         new ExtractRun(
-            id, LocalDate.parse("2026-03-31"), "26090", ExtractRun.COMPLETED, 2, 1, 3, null, start, end);
+            id,
+            LocalDate.parse("2026-03-31"),
+            "26090",
+            ExtractRun.COMPLETED,
+            2,
+            1,
+            3,
+            null,
+            start,
+            end);
     assertThat(run.runId()).isEqualTo(id);
     assertThat(run.rows()).isEqualTo(2);
     assertThat(run.futureEnrolments()).isEqualTo(1);

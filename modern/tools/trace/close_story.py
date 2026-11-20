@@ -2,11 +2,11 @@
 
 - writes modern/docs/reports/stories/<KEY>/trace.json (story, ACs, test files, test IDs per AC from the latest results,
   code units, rule IDs); an existing trace.json keeps its codeUnits and gains the missing fields;
-- sets `testsSha256:` (sha256 of modern/docs/reports/stories/<KEY>.tests.sha256) and `builtCommit: pending-user-commit`
-  in modern/specs/<KEY>.md, keeping the file's line endings;
+- sets `testsSha256:` (sha256 of modern/docs/reports/stories/<KEY>.tests.sha256) and `builtCommit:` (the hash given with
+  --commit, else `pending-user-commit`) in modern/specs/<KEY>.md, keeping the file's line endings;
 then run build_rule_trace.py to refresh the rule trace.
 
-Usage: modern/kag/.venv/Scripts/python.exe modern/tools/trace/close_story.py MAM-65 MAM-67 [--code path ...]
+Usage: modern/kag/.venv/Scripts/python.exe modern/tools/trace/close_story.py MAM-65 MAM-67 [--code path ...] [--commit 2e20ead]
 Code units: given with --code, else kept from an existing trace.json, else the main source files named in the story
 report's "Files created/changed" (same matcher as build_checklist.py).
 """
@@ -33,6 +33,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("keys", nargs="+")
     ap.add_argument("--code", nargs="*", default=None)
+    ap.add_argument("--commit", default="pending-user-commit", help="commit that holds the built code (short hash); default: not committed yet")
     a = ap.parse_args()
     brt, chk = _load("build_rule_trace"), _load("build_checklist")
     specs, results = brt.specs(), brt.tests()
@@ -61,12 +62,12 @@ def main() -> None:
         raw = sp.read_bytes().decode("utf-8")
         nl = "\r\n" if "\r\n" in raw else "\n"
         raw = re.sub(r"^testsSha256:.*$", f"testsSha256: {digest}", raw, count=1, flags=re.M)
-        raw = re.sub(r"^builtCommit:.*$", "builtCommit: pending-user-commit", raw, count=1, flags=re.M)
+        raw = re.sub(r"^builtCommit:.*$", f"builtCommit: {a.commit}", raw, count=1, flags=re.M)
         raw = raw.replace("\r\n", "\n").replace("\n", nl)
         sp.write_bytes(raw.encode("utf-8"))
         npass = sum(1 for ids in trace["testIds"].values() for t in ids if t.endswith("PASSED"))
         print(f"{key}: trace.json ({len(test_files)} test files, {npass} passing test results, {len(trace['codeUnits'])} code units, "
-              f"{len(trace['rules'])} rules); spec testsSha256={digest[:12]}..., builtCommit=pending-user-commit")
+              f"{len(trace['rules'])} rules); spec testsSha256={digest[:12]}..., builtCommit={a.commit}")
 
 
 if __name__ == "__main__":

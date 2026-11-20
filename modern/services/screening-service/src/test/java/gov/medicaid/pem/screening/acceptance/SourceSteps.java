@@ -90,8 +90,7 @@ public class SourceSteps {
     ScreeningWorld.licence(licence, state, "ACTIVE", "2029-01", 3);
   }
 
-  @When(
-      "provider-service publishes ProviderRegistered for NPI {string} and does not wait for it")
+  @When("provider-service publishes ProviderRegistered for NPI {string} and does not wait for it")
   public void publishWithoutWaiting(String npi) {
     registration = ScreeningEvents.providerRegistered(npi);
   }
@@ -131,7 +130,8 @@ public class SourceSteps {
 
   @Then("no screening is stored for NPI {string}")
   public void noScreening(String npi) {
-    assertThat(jdbc.queryForObject("SELECT count(*) FROM screening WHERE npi = ?", Integer.class, npi))
+    assertThat(
+            jdbc.queryForObject("SELECT count(*) FROM screening WHERE npi = ?", Integer.class, npi))
         .isZero();
   }
 
@@ -165,7 +165,8 @@ public class SourceSteps {
                 Integer.class,
                 npi))
         .isEqualTo(count);
-    assertThat(jdbc.queryForObject("SELECT count(*) FROM screening WHERE npi = ?", Integer.class, npi))
+    assertThat(
+            jdbc.queryForObject("SELECT count(*) FROM screening WHERE npi = ?", Integer.class, npi))
         .isEqualTo(count);
   }
 

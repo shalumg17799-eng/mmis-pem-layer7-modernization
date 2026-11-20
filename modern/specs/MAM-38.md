@@ -14,8 +14,8 @@ decisions: [Q-005, D-023]
 dependsOn: [MAM-35]
 mainJourney: false
 labels: [svc-risk-service, kag-L-S036, agentic, decision-Q-005, decision-D-023]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 699ac071b66607c2eccb353e493c5d58385ed1aa98f32df766b9a34c4da541ee
 ---
 ## Business requirement
 Which specialty codes are high, moderate or limited risk is business knowledge that will change over time, and the business must be able to see the table and change it without a software release. Staff can read the current table, an administrator can save a changed table as a new version, and each assignment records which version it used. At the start the table holds exactly the values the legacy job used.

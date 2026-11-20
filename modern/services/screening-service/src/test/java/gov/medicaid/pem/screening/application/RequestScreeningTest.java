@@ -116,7 +116,8 @@ class RequestScreeningTest {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-2] an NPI provider-service does not know is a 404 and nothing is started")
+  @DisplayName(
+      "[MAM-28 AC-2] an NPI provider-service does not know is a 404 and nothing is started")
   void unknownProvider() {
     providerFailure =
         HttpClientErrorException.create(
@@ -133,7 +134,8 @@ class RequestScreeningTest {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-2] a provider-service that cannot be read is not a 404: the failure is passed on")
+  @DisplayName(
+      "[MAM-28 AC-2] a provider-service that cannot be read is not a 404: the failure is passed on")
   void unavailableIsNotNotFound() {
     providerFailure = new ProviderFactsSource.Unavailable(NPI, new IllegalStateException("down"));
     assertThatThrownBy(() -> request.request(NPI))
@@ -142,7 +144,8 @@ class RequestScreeningTest {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-2] another client error of provider-service is passed on, not turned into a 404")
+  @DisplayName(
+      "[MAM-28 AC-2] another client error of provider-service is passed on, not turned into a 404")
   void otherClientErrorIsPassedOn() {
     providerFailure =
         HttpClientErrorException.create(
@@ -153,7 +156,8 @@ class RequestScreeningTest {
   }
 
   @Test
-  @DisplayName("[MAM-28 AC-1] a background run that fails does not throw out of the executor and stores nothing")
+  @DisplayName(
+      "[MAM-28 AC-1] a background run that fails does not throw out of the executor and stores nothing")
   void backgroundFailureStaysInTheRunnable() {
     request.request(NPI);
     sourcesFailure = new IllegalStateException("sources are down");

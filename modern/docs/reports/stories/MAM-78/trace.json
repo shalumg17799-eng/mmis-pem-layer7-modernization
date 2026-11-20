@@ -1,0 +1,87 @@
+{
+  "story": "MAM-78",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "tests": [
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/PlatformChecksTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/acceptance/ExtractSteps.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/FutureEnrolmentApiTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/application/ContractConstantsTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/application/ExtractItemTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/domain/FutureEnrolmentTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/infrastructure/JdbcExtractRunsTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/infrastructure/ProviderServiceClientTest.java",
+    "modern/services/tmsis-service/src/test/resources/features/MAM-78.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ContractConstantsTest: PASSED",
+      "ExtractItemTest: PASSED",
+      "FutureEnrolmentApiTest: PASSED",
+      "FutureEnrolmentTest: PASSED",
+      "JdbcExtractRunsTest: PASSED",
+      "MAM-78.feature 'A later enrolment year raises a warning that names the provider': PASSED",
+      "ProviderServiceClientTest: PASSED"
+    ],
+    "AC-2": [
+      "ExtractItemTest: PASSED",
+      "FutureEnrolmentApiTest: PASSED",
+      "MAM-78.feature 'The flagged provider is still reported unchanged': PASSED"
+    ],
+    "AC-3": [
+      "ExtractItemTest: PASSED",
+      "FutureEnrolmentApiTest: PASSED",
+      "FutureEnrolmentTest: PASSED",
+      "JdbcExtractRunsTest: PASSED",
+      "MAM-78.feature 'Only a year strictly later than the business year is flagged': PASSED"
+    ],
+    "AC-4": [
+      "ExtractItemTest: PASSED",
+      "FutureEnrolmentApiTest: PASSED",
+      "FutureEnrolmentTest: PASSED",
+      "JdbcExtractRunsTest: PASSED",
+      "MAM-78.feature 'Enrolments before the year 2000 are not flagged': PASSED"
+    ],
+    "AC-5": [
+      "ExtractItemTest: PASSED",
+      "FutureEnrolmentApiTest: PASSED",
+      "FutureEnrolmentTest: PASSED",
+      "MAM-78.feature 'Years after 2099 are flagged': PASSED"
+    ],
+    "AC-6": [
+      "ExtractItemTest: PASSED",
+      "FutureEnrolmentApiTest: PASSED",
+      "MAM-78.feature 'Only ACTIVE providers are checked': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/api/TmsisExtractController.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/application/ExtractItem.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/application/ExtractRun.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/application/ExtractRuns.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/application/ProviderRow.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/application/StartTmsisExtract.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/domain/FutureEnrolment.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/infrastructure/JdbcExtractRuns.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/infrastructure/ProviderServiceClient.java",
+    "modern/services/tmsis-service/src/main/java/gov/medicaid/pem/tmsis/infrastructure/TmsisExtractJobConfig.java",
+    "modern/services/tmsis-service/src/main/resources/db/migration/tmsis/V4__future_enrolment_count.sql"
+  ],
+  "rules": [
+    "R-PRVTMS01-ADD-02",
+    "R-PRVTMS01-ADD-03",
+    "R-PRVTMS01-cbl-00005",
+    "R-PRVTMS01-cbl-00006",
+    "R-PRVTMS01-cbl-00033",
+    "R-PRVTMS01-cbl-00034",
+    "R-PRVTMS01-cbl-00035",
+    "R-PRVTMS01-cbl-00036",
+    "R-PRVTMS01-cbl-00037"
+  ]
+}

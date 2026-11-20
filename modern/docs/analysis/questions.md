@@ -1019,3 +1019,94 @@ Options: A) leave it for now and list it as an open item of MAM-16 (no correctne
 touches recorded tests that import them); B) move the classes now (a refactoring of two services with re-runs and
 re-deploys). **Default applied: A** (the user's rule of 2026-11-20: fix only correctness or security defects now).
 MAM-16 stays In Progress with AC-2 open for these two services; every other AC of MAM-16 is met.
+
+## Q-124. (MAM-91 parity, group U-1, 2026-11-20 17:55) Two conventions for "no revalidation due date" in the 130-byte master (status: ANSWERED 2026-11-20 19:32 by the user: A)
+
+The test data, and so the legacy run, write 99991231 for a provider with no due date (Q-106 default A). The modern master
+export writes 00000000 (MAM-43 AC-6, basis D-029 "the legacy treats a zero due date as unset"), the SQL seed holds NULL, and
+the codec rejects an all-zero date (MAM-42). Effect: 46 of the 86 UNEXPECTED rows of the parity report (bytes 43-50 of 4
+seeded providers and 3 new ones, in 10 master comparisons), and the export cannot be read back by the codec.
+Options: A) the export writes 99991231 for an unset due date: small, test-first, no legacy re-run, but it changes the
+approved MAM-43 AC-6 and its recorded test; B) keep zeros in the export, change the test data to zeros, let the codec read
+an all-zero due date as "none" (changes the MAM-42 library rule and its tests) and run the legacy jobs again; C) keep both
+and approve a new decision that the two values mean the same, so the comparison treats them as equal.
+**Default applied: nothing is changed** (every option changes an approved criterion, an approved library rule or needs a new
+decision, so it is the user's call); the 46 rows stay UNEXPECTED in docs/reports/parity-report.md. **Recommended: A.**
+
+## Q-125. (MAM-91 parity, group U-2, 2026-11-20 17:55) Effective date of a newly registered provider: parity evidence for Q-015 (Q-A1) (status: DEFAULT APPLIED - revisit)
+
+The legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date
+(20261120), which is the default A of Q-015 (Q-A1), not an approved decision. 9 UNEXPECTED rows (3 new providers in 3 files).
+Options: A) confirm the Q-A1 default as a decision (the rows then become EXPECTED); B) carry the application's effective
+date through ApplicationValidated (a contract change). **Default applied: A** (behaviour unchanged); the rows stay
+UNEXPECTED until the decision is approved.
+
+## Q-126. (MAM-91 parity, groups U-3, U-5, U-6, U-7, 2026-11-20 17:55) The event chain replaces the JCL step sequence (status: DEFAULT APPLIED - revisit)
+
+The modern system registers, screens and tiers a new provider by events within seconds. So: a snapshot "after STEP010"
+already holds the screening result and the tier (U-3, 10 rows); the screening rows of new providers are in
+screening-service, not in the file of the screening run (U-5, 12 rows); the later work is not gated on the return code of
+the intake, while the legacy JCL bypasses STEP015-STEP040 after RC=4 (U-6, 2 files); the lab capture between STEP030 and
+STEP040 has no modern counterpart (U-7, 1 file). No decision D-001 to D-029 states this.
+Options: A) one new decision: compare final states only, new providers are screened at registration, intake errors do not
+block later work; B) decide each of the four separately; C) rebuild the step semantics (not recommended).
+**Default applied: A** (no code change); the rows stay UNEXPECTED until the decision is approved.
+
+## Q-127. (MAM-91 parity, group U-4, 2026-11-20 17:55) A risk tier only after a PASS screening (status: DEFAULT APPLIED - revisit)
+
+The legacy PRVRSK01 sets a tier on every record whatever its status and screen flag; the modern risk-service assigns one
+only after a PASS screening (MAM-35 AC-6, an approved story), so denied and failed providers keep a blank tier (3 rows).
+Options: A) accept and record it as a decision; B) also tier denied and failed providers. **Default applied: A.**
+
+## Q-128. (MAM-91 parity, group U-9, 2026-11-20 17:55) Reinstating a PENDING provider also sends an APPROVED notice (status: DEFAULT APPLIED - revisit)
+
+Sanction action R on a PENDING provider makes it ACTIVE on both sides (D-027). The modern notification-service then sends
+the reinstatement notice and, because the status went from P to A, an APPROVED notice too; the legacy sends only the
+reinstatement notice (1 row, supplementary comparison). Options: A) accept; B) suppress the APPROVED notice when the cause
+is a sanction reinstatement. **Default applied: A** (business to confirm).
+
+## Q-129. (MAM-91 parity, group U-8, 2026-11-20 17:55) The GDG archive generation and the lab account (status: BLOCKED, open)
+
+An anonymous job on the Hercules lab cannot create the permanent generation MMPRV.TMSIS.ARCHIVE(+1) (IEF197I, IEF453I), and
+the lab account HERC01 was refused (IEF722I INVALID PASSWORD GIVEN; no password was guessed). Only a temporary copy was
+captured (byte-identical to TMSISOUT); the content of the modern archive generation was not exported. To close it: the lab
+password in the root .env (never in chat), then one more PRVMTH01 run and an export of the modern archive content.
+
+## Q-130. (MAM-91 parity, group U-10, 2026-11-20 17:55) Licence SD20001 of the valid intake application is unknown to the licence-board stub (status: DEFAULT APPLIED - revisit)
+
+tools/data/generate.py creates application 1006133288 as a valid individual with licence SD20001, but the licence-board
+stub (infra/wiremock/mappings/license-board/clean-seeded.json) knows only SD10001-SD10007 and the six sample licences. The
+modern screening therefore fails it (LICENCE NOT FOUND, Q-041 default A) while the legacy stubs pass everybody (1 row, and
+this provider's rows in U-3 and U-4). Options: A) add SD20001 (TX, ACTIVE) to the stub, test first, and run the modern
+PRVDAY01 scenarios again; B) change the licence in the test data and run the legacy intake again; C) keep the failure as
+a deliberate scenario and record Q-041 default A as a decision. **Default applied: A** (a test-data and mock gap, no
+business rule changes); result recorded in the parity report after the re-run.
+
+## Q-131. (provider-service, MAM-40, 2026-11-20 18:55) The audit history answer and its contract disagree (status: ANSWERED 2026-11-20 19:32 by the user: A)
+
+Two tests written today fail: ProviderAuditApiTest "[MAM-40 AC-2] the history answer keeps to the AuditPage contract, entry by
+entry" and the scenario "Every change writes one history entry, oldest first". The contract
+(modern/contracts/openapi/provider-service.yaml, AuditEntry) declares `before` and `after` only as `type: [object, null]`
+with no members; the story (MAM-40 AC-1, AC-2, AC-4, AC-5) requires members in them (enrollStatus, revalidationDueDate, the
+reason, the effective date, sanctionId), and the code returns them. The test validator (libs/test-support, OpenApiContract)
+reports every member of an object without declared properties as "not in the contract". Code, story and the older tests agree;
+only the contract is too loose for the new check.
+Options: A) declare the members in the contract (a ProviderSnapshot schema): a contract change, which needs the user;
+B) let the validator accept members of an object schema that declares none (the OpenAPI meaning), a change of shared test
+support by the test-writer; C) remove the two new checks. **No default applied** (A changes a contract, B changes shared
+test code under a deadline, C weakens tests). Recommended: A. Until then provider-service has 2 failing tests and its
+stories stay open.
+
+## User answers of 2026-11-20 19:32 (recorded by the lead)
+
+- Q-124: **A**. The master export writes 99991231 for a provider with no revalidation due date; MAM-43 AC-6 and its tests
+  are changed first, then the code. The test data already uses 99991231 (Q-106 A).
+- Q-131: **A**. The provider audit contract declares the members of `before` and `after` (additive version bump).
+- Web UI stories closed without a coverage figure: **confirmed**. Vitest coverage is to be measured (no threshold) and
+  reported.
+- J7 test correction: to be checked by the code-reviewer; the UI gap it exposed (a T-MSIS run stays "Running" until a
+  reload) is to be fixed, failing test first.
+- The GitHub repository stays public for now. The CI workflow is switched on (moved to the repository root).
+- Q-123 (MAM-16 AC-2): the default stands (A: the readers and writers of enrollment and sanctions stay where they are);
+  the lead reads "MAM-16 AC-2 (Q-123 default)" as: accept the layout as it is and close MAM-16 once its build-change fix
+  has been re-reviewed. To be corrected by the user if a move of the classes was meant.

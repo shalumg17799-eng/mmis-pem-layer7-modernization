@@ -5,8 +5,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * The monthly T-MSIS extract (PRVMTH01; MAM-75 AC-7, ADR-004): the cron is in configuration
- * ({@code pem.tmsis.cron}, "-" turns it off) and the business date is the injected Clock's date.
+ * The monthly T-MSIS extract (PRVMTH01; MAM-75 AC-7, ADR-004): the cron is in configuration ({@code
+ * pem.tmsis.cron}, "-" turns it off) and the business date is the injected Clock's date.
  */
 @Component
 public class TmsisSchedule {

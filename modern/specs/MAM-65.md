@@ -14,8 +14,8 @@ decisions: [D-028, D-008, D-006]
 dependsOn: [MAM-61]
 mainJourney: false
 labels: [svc-directory-service, kag-L-S048, agentic, decision-D-028, decision-D-008, decision-D-006]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 23e33a04b5cd4e20b8816e1ba374ee7110920a1b2e4a15647710c71c58997992
 ---
 ## Business requirement
 Besides the simple directory search, the directory offers its active providers in the standard healthcare data format (FHIR) so that other systems can look them up without signing in. Individual providers are offered as practitioners, groups and facilities as organisations, and each individual's specialty (their taxonomy code) is offered as a practitioner role. Only facts the legacy provider record already holds are offered: identifiers, name, provider type, specialty and licence. Addresses, phone numbers and networks are not offered because the business has not provided them. The data can be read but not changed.

@@ -1,0 +1,67 @@
+{
+  "story": "MAM-38",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "tests": [
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/RiskFixtures.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/RuleTableSteps.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/api/RiskRulesApiTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/application/ManageRiskRulesTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/domain/RuleTableTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/infrastructure/JdbcRiskStoreTest.java",
+    "modern/services/risk-service/src/test/resources/features/MAM-38.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "JdbcRiskStoreTest: PASSED",
+      "MAM-38.feature 'Staff can read the current table': PASSED",
+      "ManageRiskRulesTest: PASSED",
+      "RiskRulesApiTest: PASSED",
+      "RuleTableTest: PASSED"
+    ],
+    "AC-2": [
+      "JdbcRiskStoreTest: PASSED",
+      "MAM-38.feature 'An administrator saves a changed table as a new version': PASSED",
+      "ManageRiskRulesTest: PASSED",
+      "RiskRulesApiTest: PASSED"
+    ],
+    "AC-3": [
+      "JdbcRiskStoreTest: PASSED",
+      "MAM-38.feature 'A stale or inconsistent table is refused': PASSED",
+      "ManageRiskRulesTest: PASSED",
+      "RiskRulesApiTest: PASSED",
+      "RuleTableTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-38.feature 'Malformed rules are rejected': PASSED",
+      "ManageRiskRulesTest: PASSED",
+      "RiskRulesApiTest: PASSED",
+      "RuleTableTest: PASSED"
+    ],
+    "AC-5": [
+      "MAM-38.feature 'Saving a new version re-tiers nobody': PASSED",
+      "RiskRulesApiTest: PASSED",
+      "RuleTableTest: PASSED"
+    ],
+    "AC-6": [
+      "MAM-38.feature 'Only an administrator can change the table': PASSED",
+      "RiskRulesApiTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/api/RiskController.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/AssessOnRequest.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/ManageRiskRules.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/RuleTables.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/domain/RuleTable.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/infrastructure/JdbcRiskStore.java",
+    "modern/testdata/seed/risk_db/01-reset.sql"
+  ],
+  "rules": []
+}

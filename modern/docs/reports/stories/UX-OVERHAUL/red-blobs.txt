@@ -1,1 +1,16 @@
+fe22c553ffda7389bd5bf63a12b9df5199f3882d  modern/web-ui/e2e/ux-overhaul.spec.ts
+02ced0fce0cc241e98a7b23606f8f2250e9c1345  modern/web-ui/tests/support/uxWorld.tsx
+8143c2b62367b1b1c09e655fd66397b23c9e0798  modern/web-ui/tests/ux/application-status.test.tsx
+26393679f37b0913c1acecfe484af52edca954e7  modern/web-ui/tests/ux/approval-brief.test.tsx
+de68263060baea56af9eb231857574aa1c29cfef  modern/web-ui/tests/ux/breadcrumb.test.tsx
+871de09a95e1bd79035a25dc85ba9f6e18f63ef0  modern/web-ui/tests/ux/empty-state.test.tsx
+6ff04221e3f9e12c17eb07530dfccf0ffa597f51  modern/web-ui/tests/ux/landing-and-errors.test.tsx
+437b2e1bdc4b3e2ee8881b8b0c09ae9e633e7134  modern/web-ui/tests/ux/plain-dates.test.tsx
+71ed6f1b8d9fafb51b3fc4ba42b95efba7f2a484  modern/web-ui/tests/ux/plain-labels.test.tsx
+e23956be5bcfe8ea719ea5df6b50a6469c483dcb  modern/web-ui/tests/ux/plain-words.test.ts
 563d63a2275b2e606683c8e287725278624af6e5  modern/web-ui/tests/ux/portal-home.test.tsx
+3980c61db56a09a8bc5810af8baf7e6cc5c6622e  modern/web-ui/tests/ux/review-and-tiles.test.tsx
+75a6c4625d17d41a7e0049cd0033b59b8212f04d  modern/web-ui/tests/ux/sorting.test.tsx
+7561ae6f1fe388b1077a137d27bc21aaf178c72b  modern/web-ui/tests/ux/step-indicator.test.tsx
+04e3b6a234250a95a2abe4bd577c6573df7007e7  modern/web-ui/tests/ux/summary-lists.test.tsx
+40179b79dfcebefffd468c05a16a4762d20997b5  modern/web-ui/tests/ux/tools-panel.test.tsx

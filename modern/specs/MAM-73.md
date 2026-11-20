@@ -14,8 +14,8 @@ decisions: [D-028, D-006, D-008, D-024]
 dependsOn: [MAM-63, MAM-34]
 mainJourney: true
 labels: [svc-web-ui, kag-L-S058, agentic, decision-D-028, decision-D-006, decision-D-008, decision-D-024, slice-main-journey]
-builtCommit:
-testsSha256:
+builtCommit: 2e20ead
+testsSha256: 50c8f4f6396827729d5ca39ed9ebcfa90c58d9cf1c82c1913ef1f58594fd6599
 ---
 ## Business requirement
 Anyone, without signing in, can look up Medicaid providers who are currently enrolled and active. A visitor searches by name and optionally by provider type and sees each provider's name, identification number, type and specialty. Providers who are pending, denied, terminated or suspended never appear, and names are shown as proper display names.

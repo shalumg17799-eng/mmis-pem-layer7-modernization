@@ -14,12 +14,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 /**
- * Code-review lesson (MAM-57 AC-6, AC-8; MAM-56 AC-6): a record is stored once, all or nothing. What
- * marks a record as done for a re-run (its link to the run, intake_run_id with raw_record) is written
- * in the same transaction as the application, the error and the event; so is the APPERROR row of a
- * rejected application. The real database rejects one of these writes for record 2, so the write
- * fails after the others were made: nothing of record 2 may remain, and a re-run of the file for the
- * same business date then stores record 2 exactly once.
+ * Code-review lesson (MAM-57 AC-6, AC-8; MAM-56 AC-6): a record is stored once, all or nothing.
+ * What marks a record as done for a re-run (its link to the run, intake_run_id with raw_record) is
+ * written in the same transaction as the application, the error and the event; so is the APPERROR
+ * row of a rejected application. The real database rejects one of these writes for record 2, so the
+ * write fails after the others were made: nothing of record 2 may remain, and a re-run of the file
+ * for the same business date then stores record 2 exactly once.
  */
 class IntakeAtomicityTest extends IntakeIntegrationTest {
 
@@ -72,26 +72,28 @@ class IntakeAtomicityTest extends IntakeIntegrationTest {
     return again;
   }
 
-  // ---- when the write fails, nothing of the record remains (AC-6) ---------------------------------
+  // ---- when the write fails, nothing of the record remains (AC-6)
+  // ---------------------------------
 
-  @ParameterizedTest(name = "[MAM-57 AC-6] when {0} fails for record 2, no application of record 2 remains")
+  @ParameterizedTest(
+      name = "[MAM-57 AC-6] when {0} fails for record 2, no application of record 2 remains")
   @EnumSource(Break.class)
   void noApplicationRemains(Break what) throws Exception {
     failedRun(what);
     assertThat(applications(NPI_2)).isZero();
   }
 
-  @ParameterizedTest(name = "[MAM-57 AC-6] when {0} fails for record 2, no event of record 2 remains")
+  @ParameterizedTest(
+      name = "[MAM-57 AC-6] when {0} fails for record 2, no event of record 2 remains")
   @EnumSource(Break.class)
   void noEventRemains(Break what) throws Exception {
     failedRun(what);
-    assertThat(
-            count("SELECT count(*) FROM outbox_event WHERE subject = ?", NPI_2))
-        .isZero();
+    assertThat(count("SELECT count(*) FROM outbox_event WHERE subject = ?", NPI_2)).isZero();
   }
 
   @ParameterizedTest(
-      name = "[MAM-57 AC-6] when {0} fails for record 2, the run ends FAILED naming record 2 and its NPI with an end time")
+      name =
+          "[MAM-57 AC-6] when {0} fails for record 2, the run ends FAILED naming record 2 and its NPI with an end time")
   @EnumSource(Break.class)
   void failedRunNamesTheRecord(Break what) throws Exception {
     JsonNode run = failedRun(what);
@@ -100,7 +102,8 @@ class IntakeAtomicityTest extends IntakeIntegrationTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-57 AC-6] when {0} fails for record 2, record 1 keeps its application, its run key and its event")
+      name =
+          "[MAM-57 AC-6] when {0} fails for record 2, record 1 keeps its application, its run key and its event")
   @EnumSource(Break.class)
   void recordOneKeepsItsResult(Break what) throws Exception {
     failedRun(what);
@@ -113,18 +116,19 @@ class IntakeAtomicityTest extends IntakeIntegrationTest {
     assertThat(subjects("ApplicationValidated")).containsExactly(NPI_1);
   }
 
-  @ParameterizedTest(
-      name = "[MAM-57 AC-6] when {0} fails for record 2, record 3 is not processed")
+  @ParameterizedTest(name = "[MAM-57 AC-6] when {0} fails for record 2, record 3 is not processed")
   @EnumSource(Break.class)
   void recordThreeIsNotProcessed(Break what) throws Exception {
     failedRun(what);
     assertThat(applications(NPI_3)).isZero();
   }
 
-  // ---- the re-run stores the record exactly once (AC-8) ---------------------------------------------
+  // ---- the re-run stores the record exactly once (AC-8)
+  // ---------------------------------------------
 
   @ParameterizedTest(
-      name = "[MAM-57 AC-8] after {0} failed, the re-run of the same business date leaves exactly one application per record")
+      name =
+          "[MAM-57 AC-8] after {0} failed, the re-run of the same business date leaves exactly one application per record")
   @EnumSource(Break.class)
   void rerunLeavesOneApplicationPerRecord(Break what) throws Exception {
     rerunAfterTheFailure(what);
@@ -136,7 +140,8 @@ class IntakeAtomicityTest extends IntakeIntegrationTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-57 AC-8] after {0} failed, the re-run of the same business date publishes exactly one ApplicationValidated per record")
+      name =
+          "[MAM-57 AC-8] after {0} failed, the re-run of the same business date publishes exactly one ApplicationValidated per record")
   @EnumSource(Break.class)
   void rerunPublishesOneEventPerRecord(Break what) throws Exception {
     rerunAfterTheFailure(what);
@@ -149,7 +154,8 @@ class IntakeAtomicityTest extends IntakeIntegrationTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-57 AC-8] after {0} failed, the re-run reads 3, writes 2 (records 2 and 3) and skips record 1")
+      name =
+          "[MAM-57 AC-8] after {0} failed, the re-run reads 3, writes 2 (records 2 and 3) and skips record 1")
   @EnumSource(Break.class)
   void rerunCounts(Break what) throws Exception {
     JsonNode counts = rerunAfterTheFailure(what).path("counts");
@@ -159,7 +165,8 @@ class IntakeAtomicityTest extends IntakeIntegrationTest {
     assertThat(counts.path("skipped").asInt()).isEqualTo(1);
   }
 
-  // ---- the APPERROR row of a rejected application is written with it (AC-6) --------------------------
+  // ---- the APPERROR row of a rejected application is written with it (AC-6)
+  // --------------------------
 
   static final String ROW_REJECTION = "reject_row";
 
@@ -183,7 +190,9 @@ class IntakeAtomicityTest extends IntakeIntegrationTest {
     JsonNode run = runThatCannotWriteTheErrorRow();
     int rows = AppInputFile.rows(IntakeApi.errorFileOf(mvc, run.path("runId").asText())).size();
     int stored = applications(NPI_2);
-    assertThat(rows).as("APPERROR rows of the run, applications stored for record 2: %s", stored).isEqualTo(stored);
+    assertThat(rows)
+        .as("APPERROR rows of the run, applications stored for record 2: %s", stored)
+        .isEqualTo(stored);
   }
 
   @Test

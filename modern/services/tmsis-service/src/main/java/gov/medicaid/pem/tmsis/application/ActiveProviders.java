@@ -3,8 +3,8 @@ package gov.medicaid.pem.tmsis.application;
 import java.util.List;
 
 /**
- * Port to provider-service, the one owner of provider data (D-014, ADR-002): one page of the
- * ACTIVE providers in ascending NPI order (GET /api/v1/providers?status=A, SYSTEM token).
+ * Port to provider-service, the one owner of provider data (D-014, ADR-002): one page of the ACTIVE
+ * providers in ascending NPI order (GET /api/v1/providers?status=A, SYSTEM token).
  */
 public interface ActiveProviders {
 

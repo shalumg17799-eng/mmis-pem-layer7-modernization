@@ -1,0 +1,150 @@
+{
+  "story": "MAM-55",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/ContractFile.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/EventsContractFile.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/IntakeApi.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/IntegrationTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/PlatformChecksTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/ReviewFixesTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/SancinFile.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/acceptance/IntakeSteps.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeApiTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeContractTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeControllerTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeDatasetsTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeRolesTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionListApiTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/application/ListSanctionsTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/application/RecordSanctionRulesTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/application/SanctionIntakeRecordsTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/application/SanctionIntakeTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/infrastructure/JdbcSanctionIntakeRunsTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/infrastructure/MultipartSupportTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/infrastructure/ProviderTimeoutIntakeTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/infrastructure/SanctionIntakeAtomicityTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/infrastructure/SanctionIntakeEventContractTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/infrastructure/SanctionIntakeFailureReasonTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/infrastructure/SanctionIntakeJobTest.java",
+    "modern/services/sanctions-service/src/test/resources/features/MAM-55.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "JdbcSanctionIntakeRunsTest: PASSED",
+      "MAM-55.feature 'A run starts with an explicit business date': PASSED",
+      "MAM-55.feature 'A start without a business date is a 400 and creates no run': PASSED",
+      "MAM-55.feature 'A start without the file is a 400 and creates no run': PASSED",
+      "MultipartSupportTest: PASSED",
+      "SanctionIntakeApiTest: PASSED",
+      "SanctionIntakeContractTest: PASSED",
+      "SanctionIntakeControllerTest: PASSED",
+      "SanctionIntakeJobTest: PASSED",
+      "SanctionIntakeTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-55.feature 'Every record is read from its fixed positions until the last one': PASSED",
+      "PlatformChecksTest: PASSED",
+      "SanctionIntakeApiTest: PASSED",
+      "SanctionIntakeControllerTest: PASSED",
+      "SanctionIntakeDatasetsTest: PASSED",
+      "SanctionIntakeRecordsTest: PASSED",
+      "SanctionIntakeTest: PASSED"
+    ],
+    "AC-3": [
+      "JdbcSanctionIntakeRunsTest: PASSED",
+      "MAM-55.feature 'Each record is applied through provider-service and kept in the history': PASSED",
+      "SanctionIntakeApiTest: PASSED",
+      "SanctionIntakeControllerTest: PASSED",
+      "SanctionIntakeDatasetsTest: PASSED",
+      "SanctionIntakeEventContractTest: PASSED",
+      "SanctionIntakeTest: PASSED"
+    ],
+    "AC-4": [
+      "JdbcSanctionIntakeRunsTest: PASSED",
+      "MAM-55.feature 'Records that cannot be applied are counted, the run goes on and completes': PASSED",
+      "SanctionIntakeContractTest: PASSED",
+      "SanctionIntakeControllerTest: PASSED",
+      "SanctionIntakeDatasetsTest: PASSED",
+      "SanctionIntakeTest: PASSED"
+    ],
+    "AC-5": [
+      "JdbcSanctionIntakeRunsTest: PASSED",
+      "MAM-55.feature 'A run without a termination reports the legacy counter as 00000': PASSED",
+      "MAM-55.feature 'Only terminations are counted as terminated': PASSED",
+      "SanctionIntakeTest: PASSED"
+    ],
+    "AC-6": [
+      "JdbcSanctionIntakeRunsTest: PASSED",
+      "MAM-55.feature 'A failure to apply ends the run FAILED and names the record and its NPI': PASSED",
+      "MAM-55.feature 'An unreadable record ends the run FAILED and names the record': PASSED",
+      "ProviderTimeoutIntakeTest: PASSED",
+      "SanctionIntakeAtomicityTest: PASSED",
+      "SanctionIntakeContractTest: PASSED",
+      "SanctionIntakeControllerTest: PASSED",
+      "SanctionIntakeDatasetsTest: PASSED",
+      "SanctionIntakeFailureReasonTest: PASSED",
+      "SanctionIntakeJobTest: PASSED",
+      "SanctionIntakeRecordsTest: PASSED",
+      "SanctionIntakeTest: PASSED"
+    ],
+    "AC-7": [
+      "JdbcSanctionIntakeRunsTest: PASSED",
+      "MAM-55.feature 'Running the same business date again applies nothing twice': PASSED",
+      "SanctionIntakeAtomicityTest: PASSED",
+      "SanctionIntakeDatasetsTest: PASSED",
+      "SanctionIntakeJobTest: PASSED",
+      "SanctionIntakeTest: PASSED"
+    ],
+    "AC-8": [
+      "JdbcSanctionIntakeRunsTest: PASSED",
+      "MAM-55.feature 'A run that does not exist is a 404': PASSED",
+      "MAM-55.feature 'A start without a token is 401 and no run is created': PASSED",
+      "MAM-55.feature 'ADMIN and SYSTEM may start a run': PASSED",
+      "MAM-55.feature 'Every other role is refused a start and no run is created': PASSED",
+      "MAM-55.feature 'Only ADMIN reads a run': PASSED",
+      "SanctionIntakeContractTest: PASSED",
+      "SanctionIntakeControllerTest: PASSED",
+      "SanctionIntakeRolesTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/SanctionsServiceApplication.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/api/SanctionController.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/api/SanctionIntakeController.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/ListSanctions.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/RecordSanction.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/SanctionIntake.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/SanctionIntakeLauncher.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/SanctionIntakeRuns.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/infrastructure/JdbcSanctionHistory.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/infrastructure/JdbcSanctionIntakeRuns.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/infrastructure/MultipartSupport.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/infrastructure/SanctionIntakeJobConfig.java",
+    "modern/services/sanctions-service/src/main/resources/db/migration/sanctions/V2__spring_batch.sql"
+  ],
+  "rules": [
+    "R-PRVSAN01-ADD-06",
+    "R-PRVSAN01-cbl-00001",
+    "R-PRVSAN01-cbl-00010",
+    "R-PRVSAN01-cbl-00011",
+    "R-PRVSAN01-cbl-00012",
+    "R-PRVSAN01-cbl-00013",
+    "R-PRVSAN01-cbl-00017",
+    "R-PRVSAN01-cbl-00027",
+    "R-PRVSAN01-cbl-00054",
+    "R-PRVSAN01-cbl-00055",
+    "R-PRVSAN01-cbl-00056",
+    "R-PRVSAN01-cbl-00057",
+    "R-PRVSAN01-cbl-00058"
+  ]
+}

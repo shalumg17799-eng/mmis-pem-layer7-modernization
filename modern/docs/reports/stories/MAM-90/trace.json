@@ -1,18 +1,59 @@
 {
   "story": "MAM-90",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
-  "tests": [
-    "modern/web-ui/tests/console/sanction.test.tsx",
-    "modern/web-ui/tests/support/sanction.ts",
-    "modern/web-ui/e2e/console-sanction.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
   ],
+  "tests": [
+    "modern/web-ui/e2e/console-sanction.spec.ts",
+    "modern/web-ui/tests/console/sanction.test.tsx",
+    "modern/web-ui/tests/support/sanction.ts"
+  ],
+  "testIds": {
+    "AC-1": [
+      "console-sanction.spec.ts: PASSED",
+      "sanction.test.tsx: PASSED"
+    ],
+    "AC-2": [
+      "console-sanction.spec.ts: PASSED",
+      "sanction.test.tsx: PASSED"
+    ],
+    "AC-3": [
+      "console-sanction.spec.ts: PASSED",
+      "sanction.test.tsx: PASSED"
+    ],
+    "AC-4": [
+      "console-sanction.spec.ts: PASSED",
+      "sanction.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "console-sanction.spec.ts: PASSED",
+      "sanction.test.tsx: PASSED"
+    ],
+    "AC-6": [
+      "sanction.test.tsx: PASSED"
+    ],
+    "AC-7": [
+      "console-sanction.spec.ts: PASSED",
+      "sanction.test.tsx: PASSED"
+    ],
+    "AC-8": [
+      "console-sanction.spec.ts: PASSED"
+    ]
+  },
   "codeUnits": [
     "modern/web-ui/src/app/screens.tsx",
-    "modern/web-ui/src/features/console/sanction/SanctionPage.tsx",
-    "modern/web-ui/src/features/console/sanction/sanctionForm.ts",
     "modern/web-ui/src/features/console/providers/ProviderDetail.tsx",
+    "modern/web-ui/src/features/console/providers/panels/DetailPanels.tsx",
     "modern/web-ui/src/features/console/providers/panels/SanctionTable.tsx",
-    "modern/web-ui/src/features/console/providers/panels/DetailPanels.tsx"
+    "modern/web-ui/src/features/console/sanction/SanctionPage.tsx",
+    "modern/web-ui/src/features/console/sanction/sanctionForm.ts"
   ],
   "rules": []
 }

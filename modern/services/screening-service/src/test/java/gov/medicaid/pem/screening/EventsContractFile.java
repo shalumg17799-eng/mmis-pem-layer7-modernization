@@ -17,9 +17,9 @@ import org.yaml.snakeyaml.Yaml;
 
 /**
  * modern/contracts/asyncapi/events.yaml (1.1.0) for the event contract tests: a published event
- * envelope checked against a component schema such as ScreeningCompletedEnvelope. It reads $ref, allOf
- * (the envelope and the data of the event are merged, the later definition of a property wins),
- * anyOf, const, enum, type (a null is only allowed where the schema says null), required,
+ * envelope checked against a component schema such as ScreeningCompletedEnvelope. It reads $ref,
+ * allOf (the envelope and the data of the event are merged, the later definition of a property
+ * wins), anyOf, const, enum, type (a null is only allowed where the schema says null), required,
  * properties (an object that lists properties is closed: a member outside them is a violation),
  * items, format (uuid, date, date-time), pattern and maxLength. Each violation names its path, for
  * example {@code $.data.reason is null}.

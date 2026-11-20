@@ -19,17 +19,17 @@ import org.junit.jupiter.api.Timeout;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Base of the integration tests of the APPINPUT intake (MAM-56, MAM-57, Lane 3 tests): the real
- * application with Postgres and Kafka from Testcontainers. The run table is a spy that stays real
- * unless a test makes one operation fail; failures of the real database are made with triggers
- * that reject one kind of write (the way the sanctions and directory tests do it), lifted after
- * every test. A run goes on in a background thread of the service: no test leaves one running into
- * the clean-up of the next, and none can wait for ever (every wait is bounded, and the class has a
- * time limit of three minutes per test).
+ * application with Postgres and Kafka from Testcontainers, in the same Spring context as the other
+ * tests of the service (no extra context: the test JVM has a small heap). Failures of the real
+ * database are made with triggers that reject one kind of write (the way the sanctions and
+ * directory tests do it) or by renaming a column, and put right after every test. A run goes on in
+ * a background thread of the service: no test leaves one running into the clean-up of the next, and
+ * none can wait for ever (every wait is bounded, and the class has a time limit of three minutes
+ * per test).
  */
 @Timeout(value = 3, unit = TimeUnit.MINUTES)
 public abstract class IntakeIntegrationTest extends IntegrationTest {
@@ -37,13 +37,14 @@ public abstract class IntakeIntegrationTest extends IntegrationTest {
   /** The business date of the usual runs of the MAM-56 and MAM-57 acceptance criteria. */
   protected static final String DATE = "2026-03-31";
 
-  @MockitoSpyBean protected IntakeRuns runs;
+  @Autowired protected IntakeRuns runs;
   @Autowired protected MockMvc mvc;
   @Autowired protected JdbcTemplate jdbc;
   @Autowired protected ObjectMapper json;
 
   private DbRejections rejections;
   private Captured captured;
+  private final List<Runnable> cleanups = new ArrayList<>();
 
   /** Keeps level, logger, message, the MDC id and the exception chain of every line. */
   public static final class Captured extends AppenderBase<ILoggingEvent> {
@@ -100,6 +101,10 @@ public abstract class IntakeIntegrationTest extends IntegrationTest {
     ((Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).detachAppender(captured);
     captured.stop();
     backgroundJobsHaveEnded();
+    for (Runnable undo : cleanups) {
+      undo.run();
+    }
+    cleanups.clear();
     rejections.liftAll();
     wipe();
   }
@@ -131,7 +136,10 @@ public abstract class IntakeIntegrationTest extends IntegrationTest {
                     == 0);
   }
 
-  /** Makes the database reject the writes of {@code events} on {@code table} that match {@code when}. */
+  /**
+   * Makes the database reject the writes of {@code events} on {@code table} that match {@code
+   * when}.
+   */
   protected void reject(String name, String events, String table, String when) {
     rejections.reject(name, events, table, when);
   }
@@ -139,6 +147,11 @@ public abstract class IntakeIntegrationTest extends IntegrationTest {
   /** Lets the writes through again. */
   protected void lift(String name) {
     rejections.lift(name);
+  }
+
+  /** Registers what puts the database right again after this test, whatever the test did. */
+  protected void afterTest(Runnable undo) {
+    cleanups.add(undo);
   }
 
   // ---- reading the results --------------------------------------------------------------------

@@ -43,7 +43,10 @@ class RecordNoticeSentTest {
 
     boolean recorded =
         record.noticeSent(
-            "1003000111", "a1a1a1a1-0000-4000-8000-0000000000a1", "APPROVED", "notification-service");
+            "1003000111",
+            "a1a1a1a1-0000-4000-8000-0000000000a1",
+            "APPROVED",
+            "notification-service");
 
     assertThat(recorded).isTrue();
     assertThat(entries).hasSize(1);
@@ -56,7 +59,8 @@ class RecordNoticeSentTest {
         .containsExactly(
             Map.entry(
                 "notice",
-                Map.of("noticeId", "a1a1a1a1-0000-4000-8000-0000000000a1", "template", "APPROVED")));
+                Map.of(
+                    "noticeId", "a1a1a1a1-0000-4000-8000-0000000000a1", "template", "APPROVED")));
   }
 
   @Test

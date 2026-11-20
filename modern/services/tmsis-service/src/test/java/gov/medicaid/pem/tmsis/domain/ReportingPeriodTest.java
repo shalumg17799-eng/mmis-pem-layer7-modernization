@@ -86,8 +86,7 @@ class ReportingPeriodTest {
   }
 
   @Test
-  @DisplayName(
-      "[MAM-71 AC-3] the period depends on the given date only, never on the system date")
+  @DisplayName("[MAM-71 AC-3] the period depends on the given date only, never on the system date")
   void sameDateSamePeriod() {
     LocalDate date = LocalDate.of(2026, 3, 31);
     assertThat(ReportingPeriod.yyddd(date)).isEqualTo(ReportingPeriod.yyddd(date));

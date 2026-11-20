@@ -1,10 +1,42 @@
 {
   "story": "MAM-66",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6"],
-  "tests": [
-    "modern/web-ui/tests/portal/application-status.test.tsx",
-    "modern/web-ui/e2e/portal-status.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
   ],
+  "tests": [
+    "modern/web-ui/e2e/portal-status.spec.ts",
+    "modern/web-ui/tests/portal/application-status.test.tsx"
+  ],
+  "testIds": {
+    "AC-1": [
+      "application-status.test.tsx: PASSED",
+      "portal-status.spec.ts: PASSED"
+    ],
+    "AC-2": [
+      "application-status.test.tsx: PASSED",
+      "portal-status.spec.ts: PASSED"
+    ],
+    "AC-3": [
+      "application-status.test.tsx: PASSED",
+      "portal-status.spec.ts: PASSED"
+    ],
+    "AC-4": [
+      "application-status.test.tsx: PASSED",
+      "portal-status.spec.ts: PASSED"
+    ],
+    "AC-5": [
+      "application-status.test.tsx: PASSED",
+      "portal-status.spec.ts: PASSED"
+    ],
+    "AC-6": [
+      "portal-status.spec.ts: PASSED"
+    ]
+  },
   "codeUnits": [
     "modern/web-ui/src/features/portal/applications/ApplicationStatus.tsx",
     "modern/web-ui/src/shared/api/types.ts"

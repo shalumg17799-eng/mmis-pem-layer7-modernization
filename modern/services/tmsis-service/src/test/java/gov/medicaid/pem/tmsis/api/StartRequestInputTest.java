@@ -22,10 +22,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
  * MAM-75 AC-8 (D-020): the business date is an explicit, required parameter. A start without a
- * businessDate, with a body that cannot be read, or with anything but an ISO date (yyyy-mm-dd) is
- * a 400 application/problem+json and starts no run. A value with a time part such as
- * 2026-03-31T00:00:00 is not a date (contract: format date; code review 2026-11-19, lesson b).
- * The list and the file download check their own parameters the same way.
+ * businessDate, with a body that cannot be read, or with anything but an ISO date (yyyy-mm-dd) is a
+ * 400 application/problem+json and starts no run. A value with a time part such as
+ * 2026-03-31T00:00:00 is not a date (contract: format date; code review 2026-11-19, lesson b). The
+ * list and the file download check their own parameters the same way.
  */
 @Timeout(120)
 class StartRequestInputTest extends IntegrationTest {
@@ -38,7 +38,7 @@ class StartRequestInputTest extends IntegrationTest {
     return jdbc.queryForObject("SELECT count(*) FROM batch_job_instance", Integer.class);
   }
 
-  void assertRejectedWithAProblem(MvcResult r) {
+  void assertRejectedWithAProblem(MvcResult r) throws Exception {
     assertThat(r.getResponse().getStatus()).as(r.getResponse().getContentAsString()).isEqualTo(400);
     assertThat(r.getResponse().getContentType()).startsWith("application/problem+json");
   }
@@ -81,7 +81,8 @@ class StartRequestInputTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-75 AC-8] the 400 of a missing business date says that businessDate is the problem")
+  @DisplayName(
+      "[MAM-75 AC-8] the 400 of a missing business date says that businessDate is the problem")
   void problemNamesTheDate() throws Exception {
     MvcResult r = api.postBody(PemJwt.admin(), "{}");
     JsonNode problem = api.read(r);
@@ -113,7 +114,8 @@ class StartRequestInputTest extends IntegrationTest {
   void onlyAnIsoDateIsAccepted(String value) throws Exception {
     int runs = runCount();
     int jobs = jobCount();
-    assertRejectedWithAProblem(api.postBody(PemJwt.admin(), "{\"businessDate\":\"" + value + "\"}"));
+    assertRejectedWithAProblem(
+        api.postBody(PemJwt.admin(), "{\"businessDate\":\"" + value + "\"}"));
     assertThat(runCount()).isEqualTo(runs);
     assertThat(jobCount()).isEqualTo(jobs);
   }
@@ -124,7 +126,8 @@ class StartRequestInputTest extends IntegrationTest {
   @ValueSource(strings = {"20260331", "1774915200", "[2026,3,31]", "true", "{}", "2026.5"})
   void onlyAStringIsAccepted(String jsonValue) throws Exception {
     int runs = runCount();
-    assertRejectedWithAProblem(api.postBody(PemJwt.admin(), "{\"businessDate\":" + jsonValue + "}"));
+    assertRejectedWithAProblem(
+        api.postBody(PemJwt.admin(), "{\"businessDate\":" + jsonValue + "}"));
     assertThat(runCount()).isEqualTo(runs);
   }
 
@@ -138,7 +141,8 @@ class StartRequestInputTest extends IntegrationTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-75 AC-8] the ISO date {0} is accepted: 202 with that business date and period {1}")
+      name =
+          "[MAM-75 AC-8] the ISO date {0} is accepted: 202 with that business date and period {1}")
   @CsvSource({
     "2026-03-31, 26090",
     "2026-01-01, 26001",
@@ -153,14 +157,14 @@ class StartRequestInputTest extends IntegrationTest {
     String runId = run.path("runId").asText();
     api.await(runId);
     byte[] file = api.file(runId);
-    assertThat(new String(file, StandardCharsets.ISO_8859_1).substring(25, 30))
-        .isEqualTo(period);
+    assertThat(new String(file, StandardCharsets.ISO_8859_1).substring(25, 30)).isEqualTo(period);
   }
 
   // ---- the other parameters ---------------------------------------------------------------------
 
   @ParameterizedTest(
-      name = "[MAM-75 AC-8] the list with the query <{0}> is a 400 problem+json (contract: page >= 0, size 1 to 200)")
+      name =
+          "[MAM-75 AC-8] the list with the query <{0}> is a 400 problem+json (contract: page >= 0, size 1 to 200)")
   @ValueSource(
       strings = {
         "page=-1",
@@ -192,8 +196,7 @@ class StartRequestInputTest extends IntegrationTest {
   @Test
   @DisplayName("[MAM-75 AC-6] the file of a run id that does not exist is a 404 problem+json")
   void fileOfAnUnknownRun() throws Exception {
-    MvcResult r =
-        api.getPath(PemJwt.admin(), TmsisApi.BASE + "/" + UUID.randomUUID() + "/file");
+    MvcResult r = api.getPath(PemJwt.admin(), TmsisApi.BASE + "/" + UUID.randomUUID() + "/file");
     assertThat(r.getResponse().getStatus()).isEqualTo(404);
     assertThat(r.getResponse().getContentType()).startsWith("application/problem+json");
     assertThat(api.read(r).path("status").asInt()).isEqualTo(404);

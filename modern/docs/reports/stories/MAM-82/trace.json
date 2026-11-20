@@ -1,11 +1,50 @@
 {
   "story": "MAM-82",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
-  "tests": [
-    "modern/web-ui/tests/console/detail-panels.test.tsx",
-    "modern/web-ui/tests/support/panels.ts",
-    "modern/web-ui/e2e/console-panels.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
   ],
+  "tests": [
+    "modern/web-ui/e2e/console-panels.spec.ts",
+    "modern/web-ui/tests/console/detail-panels.test.tsx",
+    "modern/web-ui/tests/support/panels.ts"
+  ],
+  "testIds": {
+    "AC-1": [
+      "detail-panels.test.tsx: PASSED"
+    ],
+    "AC-2": [
+      "detail-panels.test.tsx: PASSED"
+    ],
+    "AC-3": [
+      "detail-panels.test.tsx: PASSED"
+    ],
+    "AC-4": [
+      "detail-panels.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "console-panels.spec.ts: PASSED",
+      "detail-panels.test.tsx: PASSED"
+    ],
+    "AC-6": [
+      "console-panels.spec.ts: PASSED",
+      "detail-panels.test.tsx: PASSED"
+    ],
+    "AC-7": [
+      "console-panels.spec.ts: PASSED",
+      "detail-panels.test.tsx: PASSED"
+    ],
+    "AC-8": [
+      "console-panels.spec.ts: PASSED",
+      "detail-panels.test.tsx: PASSED"
+    ]
+  },
   "codeUnits": [
     "modern/web-ui/src/features/console/providers/ProviderDetail.tsx",
     "modern/web-ui/src/features/console/providers/panels/DetailPanels.tsx",

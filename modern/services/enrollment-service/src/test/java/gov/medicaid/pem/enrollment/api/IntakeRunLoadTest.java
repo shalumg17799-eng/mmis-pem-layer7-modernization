@@ -1,6 +1,7 @@
 package gov.medicaid.pem.enrollment.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import gov.medicaid.pem.enrollment.AppInputFile;
@@ -16,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * MAM-56 and MAM-57: how the intake reads a file and what it stores, beyond the Cucumber scenarios.
@@ -60,7 +62,8 @@ class IntakeRunLoadTest extends IntakeIntegrationTest {
     assertThat(IntakeApi.errorFileOf(mvc, run.path("runId").asText())).isEmpty();
   }
 
-  @ParameterizedTest(name = "[MAM-57 AC-5] a record of {0} bytes ends the run FAILED naming record 2")
+  @ParameterizedTest(
+      name = "[MAM-57 AC-5] a record of {0} bytes ends the run FAILED naming record 2")
   @ValueSource(ints = {0, 130, 199, 201})
   void wrongLength(int length) throws Exception {
     String bad = (AppInputFile.valid("1003000222") + "x".repeat(60)).substring(0, length);
@@ -68,7 +71,8 @@ class IntakeRunLoadTest extends IntakeIntegrationTest {
         IntakeApi.runToEnd(
             mvc,
             json,
-            AppInputFile.lines(AppInputFile.valid("1003000111"), bad, AppInputFile.valid("1003000333")),
+            AppInputFile.lines(
+                AppInputFile.valid("1003000111"), bad, AppInputFile.valid("1003000333")),
             DATE);
     assertThat(run.path("status").asText()).isEqualTo("FAILED");
     assertThat(run.path("error").asText()).contains("record 2").contains(length + " bytes");
@@ -118,7 +122,8 @@ class IntakeRunLoadTest extends IntakeIntegrationTest {
         .isEqualTo(record);
   }
 
-  @ParameterizedTest(name = "[MAM-56 AC-4] an NPI of [{0}] is E101: REJECTED, one error row with the NPI as read")
+  @ParameterizedTest(
+      name = "[MAM-56 AC-4] an NPI of [{0}] is E101: REJECTED, one error row with the NPI as read")
   @ValueSource(strings = {"ABCDEFGHIJ", "100300011", "100300011A", "1003-00011", " 100300011"})
   void malformedNpiIsE101(String npi) throws Exception {
     String record =
@@ -140,8 +145,7 @@ class IntakeRunLoadTest extends IntakeIntegrationTest {
       "[Q-095] a staff-run intake loads an individual under any NPI: it is not refused for not being the starter's own")
   void staffRunIsNotBoundToAnOwnNpi() throws Exception {
     JsonNode run =
-        IntakeApi.runToEnd(
-            mvc, json, AppInputFile.lines(AppInputFile.valid("1003000555")), DATE);
+        IntakeApi.runToEnd(mvc, json, AppInputFile.lines(AppInputFile.valid("1003000555")), DATE);
     assertThat(run.path("status").asText()).isEqualTo("COMPLETED");
     assertThat(statusOf("1003000555")).isEqualTo("VALIDATED");
   }
@@ -150,8 +154,7 @@ class IntakeRunLoadTest extends IntakeIntegrationTest {
   @DisplayName(
       "[Q-100] an individual record with a blank NPI is REJECTED E101 and counted errored: the run completes, it is not refused")
   void blankNpiIsRejectedNotRefused() throws Exception {
-    JsonNode run =
-        IntakeApi.runToEnd(mvc, json, AppInputFile.lines(AppInputFile.noNpi()), DATE);
+    JsonNode run = IntakeApi.runToEnd(mvc, json, AppInputFile.lines(AppInputFile.noNpi()), DATE);
     assertThat(run.path("status").asText()).isEqualTo("COMPLETED");
     assertThat(run.path("counts").path("errored").asInt()).isEqualTo(1);
     assertThat(count("SELECT count(*) FROM application WHERE status = 'REJECTED' AND npi IS NULL"))
@@ -166,20 +169,22 @@ class IntakeRunLoadTest extends IntakeIntegrationTest {
         IntakeApi.start(
             mvc,
             PemJwt.system(),
-            AppInputFile.lines(AppInputFile.valid("1003000111"), AppInputFile.noTaxonomy("1003000222")),
+            AppInputFile.lines(
+                AppInputFile.valid("1003000111"), AppInputFile.noTaxonomy("1003000222")),
             DATE);
     assertThat(started.getResponse().getStatus()).isEqualTo(202);
     JsonNode run =
         IntakeApi.await(
-            mvc, json, json.readTree(started.getResponse().getContentAsString()).path("runId").asText());
+            mvc,
+            json,
+            json.readTree(started.getResponse().getContentAsString()).path("runId").asText());
     assertThat(run.path("status").asText()).isEqualTo("COMPLETED");
     assertThat(run.path("counts").path("written").asInt()).isEqualTo(1);
     assertThat(run.path("counts").path("errored").asInt()).isEqualTo(1);
   }
 
   @Test
-  @DisplayName(
-      "[MAM-57 AC-1] two runs started one after the other each report their own counts")
+  @DisplayName("[MAM-57 AC-1] two runs started one after the other each report their own counts")
   void twoRunsHaveTheirOwnCounts() throws Exception {
     String first =
         IntakeApi.startAsAdmin(
@@ -208,13 +213,13 @@ class IntakeRunLoadTest extends IntakeIntegrationTest {
       "[MAM-57 AC-3] a duplicate within the file is skipped even when its raw record equals the first one's")
   void identicalRecordsInOneFile() throws Exception {
     String record = AppInputFile.valid("1003000111");
-    JsonNode run =
-        IntakeApi.runToEnd(mvc, json, AppInputFile.lines(record, record), DATE);
+    JsonNode run = IntakeApi.runToEnd(mvc, json, AppInputFile.lines(record, record), DATE);
     assertThat(run.path("counts").path("written").asInt()).isEqualTo(1);
     assertThat(run.path("counts").path("skipped").asInt()).isEqualTo(1);
     assertThat(applications("1003000111")).isEqualTo(2);
     assertThat(
-            count("SELECT count(*) FROM application WHERE npi = '1003000111' AND status = 'VALIDATED'"))
+            count(
+                "SELECT count(*) FROM application WHERE npi = '1003000111' AND status = 'VALIDATED'"))
         .isEqualTo(1);
   }
 
@@ -229,5 +234,50 @@ class IntakeRunLoadTest extends IntakeIntegrationTest {
     assertThat(again.path("counts").path("skipped").asInt()).isZero();
     assertThat(AppInputFile.rows(IntakeApi.errorFileOf(mvc, again.path("runId").asText())))
         .containsExactly(AppInputFile.errorRow("1003000222", "IN"));
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-54 AC-1] an application loaded from a file is visible to the PROVIDER whose token holds its NPI, and to no other PROVIDER (D-023)")
+  void fileApplicationsAreVisibleToTheirProviderOnly() throws Exception {
+    IntakeApi.runToEnd(
+        mvc,
+        json,
+        AppInputFile.lines(AppInputFile.valid("1003000111"), AppInputFile.valid("1003000222")),
+        DATE);
+    MvcResult own =
+        mvc.perform(get("/api/v1/applications").with(PemJwt.provider("1003000111"))).andReturn();
+    JsonNode items = json.readTree(own.getResponse().getContentAsString());
+    assertThat(items.path("total").asInt()).isEqualTo(1);
+    assertThat(items.path("items").get(0).path("npi").asText()).isEqualTo("1003000111");
+    assertThat(items.path("items").get(0).path("source").asText()).isEqualTo("LEGACY_FILE");
+    String othersId =
+        jdbc.queryForObject(
+            "SELECT public_id::text FROM application WHERE npi = '1003000222'", String.class);
+    MvcResult other =
+        mvc.perform(get("/api/v1/applications/" + othersId).with(PemJwt.provider("1003000111")))
+            .andReturn();
+    assertThat(other.getResponse().getStatus()).isEqualTo(403);
+  }
+
+  @Test
+  @DisplayName(
+      "[MAM-56 AC-6] a record with bytes above 127 (not ASCII) is rejected E101 and its APPERROR row is still 250 bytes of printable ASCII")
+  void nonAsciiBytesKeepTheErrorRowLayout() throws Exception {
+    String npi = "\u00C1\u00C2\u00C3\u00C4\u00C5\u00C6\u00C7\u00C8\u00C9\u00CA";
+    String record =
+        AppInputFile.individual(
+            npi, "M00000999", "IN", "207Q00000X", "RIVERA", "MARIA", "MD12345", "TX");
+    JsonNode run = IntakeApi.runToEnd(mvc, json, AppInputFile.lines(record), DATE);
+    assertThat(run.path("status").asText()).as("the run: " + run).isEqualTo("COMPLETED");
+    assertThat(run.path("counts").path("errored").asInt()).isEqualTo(1);
+    byte[] row =
+        IntakeApi.errorFile(mvc, run.path("runId").asText(), PemJwt.admin())
+            .getResponse()
+            .getContentAsByteArray();
+    assertThat(row).hasSize(250);
+    for (byte b : row) {
+      assertThat(b & 0xFF).isBetween(0x20, 0x7E);
+    }
   }
 }

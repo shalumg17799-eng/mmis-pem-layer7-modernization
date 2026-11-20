@@ -92,7 +92,8 @@ class ProviderPagesReaderTest {
   }
 
   @Test
-  @DisplayName("[MAM-71 AC-5] every request asks for the pages in order and for the full size of 200")
+  @DisplayName(
+      "[MAM-71 AC-5] every request asks for the pages in order and for the full size of 200")
   void requestsAreInOrder() {
     Pages pages = new Pages(1000);
     readAll(new ProviderPagesReader(pages));

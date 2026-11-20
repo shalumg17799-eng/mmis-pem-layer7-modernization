@@ -1,0 +1,102 @@
+{
+  "story": "MAM-52",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/EventsContractFile.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/ReviewFixesTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/TestProviderService.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/acceptance/CucumberSpringConfig.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/acceptance/CucumberSuiteTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/acceptance/SanctionSteps.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/ProviderTimeoutOnlineTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionAppliedEventContractTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/application/RecordSanctionTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/domain/SanctionActionTest.java",
+    "modern/services/sanctions-service/src/test/resources/features/MAM-52.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-52.feature 'A termination sets the provider to TERMINATED': PASSED",
+      "RecordSanctionRulesTest: PASSED",
+      "RecordSanctionTest: PASSED",
+      "SanctionActionTest: PASSED",
+      "SanctionAppliedEventContractTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-52.feature 'A suspension sets the provider to SUSPENDED, not DENIED': PASSED",
+      "RecordSanctionTest: PASSED",
+      "SanctionActionTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-52.feature 'A reinstatement sets the provider to ACTIVE': PASSED",
+      "RecordSanctionTest: PASSED",
+      "SanctionActionTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-52.feature 'A sanction is applied whatever the current status': PASSED"
+    ],
+    "AC-5": [
+      "MAM-52.feature 'An unknown action code is rejected': PASSED",
+      "RecordSanctionRulesTest: PASSED",
+      "RecordSanctionTest: PASSED",
+      "SanctionActionTest: PASSED"
+    ],
+    "AC-6": [
+      "MAM-52.feature 'A sanction for an unknown provider is not found': PASSED",
+      "RecordSanctionTest: PASSED"
+    ],
+    "AC-7": [
+      "MAM-52.feature 'A failure to apply is never reported as not found or as applied': PASSED",
+      "ProviderTimeoutOnlineTest: PASSED",
+      "RecordSanctionTest: PASSED"
+    ],
+    "AC-8": [
+      "ListSanctionsTest: PASSED",
+      "MAM-52.feature 'The sanction history is readable, and roles are enforced': PASSED",
+      "SanctionListApiTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/api/SanctionController.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/EventOutbox.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/ListSanctions.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/ProviderStatusPort.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/RecordSanction.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/SanctionAppliedData.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/SanctionCommand.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/SanctionHistory.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/SanctionPage.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/domain/Sanction.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/domain/SanctionAction.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/infrastructure/JdbcSanctionHistory.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/infrastructure/KitEventOutbox.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/infrastructure/ProviderServiceClient.java"
+  ],
+  "rules": [
+    "R-PRVSAN01-ADD-01",
+    "R-PRVSAN01-ADD-02",
+    "R-PRVSAN01-ADD-03",
+    "R-PRVSAN01-ADD-05",
+    "R-PRVSAN01-cbl-00002",
+    "R-PRVSAN01-cbl-00003",
+    "R-PRVSAN01-cbl-00018",
+    "R-PRVSAN01-cbl-00019",
+    "R-PRVSAN01-cbl-00020",
+    "R-PRVSAN01-cbl-00021",
+    "R-PRVSAN01-cbl-00022",
+    "R-PRVSAN01-cbl-00023",
+    "R-PRVSAN01-cbl-00024",
+    "R-PRVSAN01-cbl-00025",
+    "R-PRVSAN01-cbl-00029",
+    "R-PRVSAN01-cbl-00033"
+  ]
+}

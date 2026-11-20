@@ -56,7 +56,9 @@ class ProviderOutageTest extends IntegrationTest {
     ProviderRows.individual("1003000111").insert(jdbc);
   }
 
-  /** Runs the work while the test database is paused; the work gets 90 s, the database comes back. */
+  /**
+   * Runs the work while the test database is paused; the work gets 90 s, the database comes back.
+   */
   private <T> T whileTheDatabaseIsDown(Callable<T> work) throws Exception {
     var docker = DockerClientFactory.instance().client();
     String postgres = PemContainers.POSTGRES.getContainerId();
@@ -142,7 +144,8 @@ class ProviderOutageTest extends IntegrationTest {
 
     awaitHealthUp();
     JsonNode after =
-        json.readTree(mvc.perform(get("/actuator/health")).andReturn().getResponse().getContentAsString());
+        json.readTree(
+            mvc.perform(get("/actuator/health")).andReturn().getResponse().getContentAsString());
     assertThat(after.path("status").asText()).isEqualTo("UP");
   }
 }

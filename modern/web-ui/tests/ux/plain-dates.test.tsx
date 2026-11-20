@@ -100,11 +100,16 @@ const ISO_DATE = /\d{4}-\d{2}-\d{2}/;
 const SLASH_DATE = /(^|\s)\d{1,2}\/\d{1,2}\/\d{2,4}(\s|$|[.,;:])/;
 const PLAIN_DATE = /(^|\s)\d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}(\s|$|[.,;:])/;
 
-/** The text of the main area with a space between the text of every element (table cells would otherwise run together: "10030001119 Mar 2026"). */
+/**
+ * The text of the main area with a space between the text of every element (table cells would otherwise run together:
+ * "10030001119 Mar 2026"). The labels and the hints of the form fields are left out: they describe what a user TYPES, and a typed
+ * date keeps MM/DD/YYYY ("for example 12/31/2026").
+ */
 function spacedText(scope: HTMLElement): string {
   const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
   const parts: string[] = [];
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (node.parentElement?.closest('.usa-hint, label')) continue;
     const value = (node.textContent ?? '').replace(/\s+/g, ' ').trim();
     if (value) parts.push(value);
   }

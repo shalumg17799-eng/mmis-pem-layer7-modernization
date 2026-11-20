@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
 /**
- * MAM-40: the shape of a history entry. before and after hold the provider fields that a change
- * can touch (as the codes of the record), plus one named part for the request details.
+ * MAM-40: the shape of a history entry. before and after hold the provider fields that a change can
+ * touch (as the codes of the record), plus one named part for the request details.
  */
 class AuditTrailTest {
 
@@ -51,7 +51,8 @@ class AuditTrailTest {
   }
 
   @Test
-  @DisplayName("[MAM-40 AC-2] a missing provider has no snapshot: the registration entry has before null")
+  @DisplayName(
+      "[MAM-40 AC-2] a missing provider has no snapshot: the registration entry has before null")
   void noSnapshotWithoutProvider() {
     assertThat(AuditTrail.snapshot(null)).isNull();
   }
@@ -84,18 +85,22 @@ class AuditTrailTest {
   @Test
   @DisplayName("[MAM-40 AC-5] a snapshot with a named part carries the request details last")
   void snapshotWithPart() {
-    Map<String, Object> details = AuditTrail.details("action", "SUSPEND", "reason", "LEIE exclusion");
-    Map<String, Object> after = AuditTrail.snapshot(provider(RiskTier.HIGH), "statusChange", details);
+    Map<String, Object> details =
+        AuditTrail.details("action", "SUSPEND", "reason", "LEIE exclusion");
+    Map<String, Object> after =
+        AuditTrail.snapshot(provider(RiskTier.HIGH), "statusChange", details);
     assertThat(after).containsEntry("riskTier", "H").containsEntry("statusChange", details);
     assertThat(List.copyOf(after.keySet()).get(after.size() - 1)).isEqualTo("statusChange");
     assertThat(after).hasSize(12);
   }
 
   @Test
-  @DisplayName("[MAM-40 AC-5] details keep their order and keep null values (a reason may be absent)")
+  @DisplayName(
+      "[MAM-40 AC-5] details keep their order and keep null values (a reason may be absent)")
   void detailsKeepOrderAndNulls() {
     Map<String, Object> d = AuditTrail.details("action", "REINSTATE", "reason", null, "n", 3);
-    assertThat(d).containsExactly(entry("action", "REINSTATE"), entry("reason", null), entry("n", 3));
+    assertThat(d)
+        .containsExactly(entry("action", "REINSTATE"), entry("reason", null), entry("n", 3));
   }
 
   @Test

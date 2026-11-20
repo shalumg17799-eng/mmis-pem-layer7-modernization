@@ -1,11 +1,23 @@
 # Parity report: legacy PEM jobs on Hercules against the modern system (MAM-91)
 
 Date: 2026-11-20. Author: parity-checker. Business date of both sides: **2026-11-20** (not the frozen 2026-01-15, see section 7).
-Status: **classification PROPOSED**. Every EXPECTED below cites an approved decision D-001 to D-029; nothing was marked EXPECTED without one. Everything else is UNEXPECTED and waits for the user (MAM-91 AC-7). The lead applies these proposals as DEFAULT APPLIED - revisit.
+Status: **FINAL for this run (lead, 2026-11-20 18:20; user deadline 20:00: no further re-run).** Every difference in the captured files is classified below as EXPECTED with its decision number (D-001 to D-029) or as UNEXPECTED. Nothing was marked EXPECTED without an approved decision. The UNEXPECTED groups U-1 to U-10 are recorded as questions Q-124 to Q-130 in `modern/docs/analysis/questions.md` with the default applied for each (section 8); they stay UNEXPECTED here until the user decides. Story MAM-91 therefore stays In Progress (AC-7 open).
 
 **Revision after the independent review (2026-11-20), two corrections.** (1) The screen flag F of application 1006133288 was proposed as EXPECTED under D-005. D-005 only replaces the four stubs and does not say what an unknown licence gives, so it is now UNEXPECTED, group U-10 (test data / mock: SD20001 is not in the licence-board stub; the Q-041 default is not an approved decision). (2) The master input is not shared by the two sides: the legacy run loaded the `.dat`, the modern stack was seeded from SQL and differs in 4 due dates (U-1). The three 'input byte-identical' master checks passed only because `run_modern.py` copies the golden file; they are now information only (213 ok, 5 information only). Units are unchanged (MATCH 128, EXPECTED 41, UNEXPECTED 67); rows are now 63 EXPECTED and 86 UNEXPECTED.
 
 Inputs: `modern/parity/golden/**` (stage 1, legacy run, report `modern/docs/reports/parity-legacy-run.md`), `modern/parity/modern/**` (stage 2, modern run), `modern/docs/analysis/defect-register.md` (D-001 to D-029), `modern/docs/analysis/questions.md`, the layouts exported from the graph (`modern/libs/fixed-width/src/main/resources/layouts/*.json`). Comparison tool: `modern/tools/parity/compare_parity.py` (Python, standard library only); full machine-readable result: `modern/parity/compare-result.json`.
+
+## 0. Result per file (final)
+
+| File | Records legacy / modern | Result |
+|---|---|---|
+| REVALQ (PRVMTH01) | 4 / 4 | **MATCH**, byte-identical |
+| TMSISOUT (PRVMTH01) | 8 / 8 | **MATCH**, byte-identical (period 26324, D-015 preserved). The GDG archive generation could not be captured: BLOCKED (U-8, Q-129) |
+| DIROUT (PRVDIR01) | 8 / 8 | **EXPECTED**: all 8 records differ only in the name area, bytes 23-82 (D-028, section 5.1); every other byte is identical |
+| APPERROR (PRVDAY01) | baseline 2 / 5; valid-only 0 / 0 | **EXPECTED** (D-001: the legacy stops at the first invalid application and writes its error row twice; the modern run writes one row per invalid application); the valid-only run is identical (both empty) |
+| SCRNOUT (PRVDAY01) | valid-only 20 / 8; baseline absent / 8 | 8 rows **EXPECTED** (D-005: the stub rows have no source, date or detail); 12 rows and 1 file **UNEXPECTED** (U-5, U-6: new providers are screened at registration, and the legacy never produced the baseline file; Q-126) |
+| Provider master (13 comparisons in 5 runs) | 205 / 204 | 115 **MATCH**; 20 **EXPECTED** (D-001, D-003, D-006); 53 **UNEXPECTED**: 46 rows are the "no due date" convention (U-1, Q-124), the rest are the effective date (U-2, Q-125), the event chain (U-3, U-6, U-7, Q-126), the tier rule (U-4, Q-127) and the licence stub gap (U-10, Q-130) |
+| Sanction notices (supplementary) | 5 / 5 | 4 MATCH, 1 EXPECTED (D-026), 1 UNEXPECTED (U-9, Q-128) |
 
 ## 1. Result at a glance
 
@@ -97,6 +109,36 @@ Per file type, all runs together (six files; the supplementary notices are left 
 | E-4 | D-006 | PRVSAN01 sancin-baseline: provider master after | 1 row | sanction S gives DENIED in the legacy (PRVSAN01.cbl:109-110) and the new SUSPENDED status in the modern system | `1005992312 PRV-ENROLL-STATUS: D -> S` |
 | E-6 | D-026 | PRVSAN01 sancin-baseline: sanction notices (supplementary) | 1 row | an unknown action code X is rejected by the modern run (no change, no notice); the legacy applies nothing but still queues the general notice PRVNTGEN (D-012: notification-service replaces the CALL) | `1005912765: GEN 1005912765 -> -` |
 
+### 5.1 The DIROUT name area (bytes 23-82), decision D-028
+
+DIROUT is 100 bytes: Medicaid ID 1-9, NPI 10-19, type 20-21, risk tier 22, **name 23-82** (60 bytes), filler 83-100. In all
+8 records every byte outside the name area is identical on both sides; only the name area differs, and it differs in all 8.
+
+Why: the legacy PRVDIR01 does not build a name. It copies the first 60 bytes of the 80-byte variant area of the master
+record (`PRV-VARIANT`, master bytes 51-130), whatever the provider type is. That area is laid out in two ways (REDEFINES):
+
+- individual (IN): last name 30, first name 20, licence number 15, licence state 2, filler 13. The first 60 bytes are
+  therefore the last name, the first name **and the first 10 characters of the licence number**;
+- group or facility (GR, FA): legal name 40, DBA name 30, owner NPI 10. The first 60 bytes are the legal name and the
+  **first 20 characters of the DBA name** (cut in the middle of the field).
+
+Decision D-028 replaces this with a composed name: first name + last name for an individual, the legal name for an
+organisation, left-justified and padded with spaces to 60 bytes. The licence number no longer appears in the public
+directory file, and no half DBA name is published.
+
+Examples from the captured files (`parity/golden/PRVDIR01/20261120-seed/after/dirout.ebcdic.ascii` and
+`parity/modern/PRVDIR01/20261120-seed/after/dirout.ascii`; the brackets mark bytes 23-82):
+
+| NPI, type | Master variant area | Legacy name area | Modern name area |
+|---|---|---|---|
+| 1005940865, IN | last `ALPHA`, first `TESTPROV`, licence `SD10001`, state `TX` | `[ALPHA                         TESTPROV            SD10001   ]` | `[TESTPROV ALPHA                                              ]` |
+| 1005912765, GR | legal `SAMPLE CLINIC 01`, DBA `SAMPLE CLINIC GROUP 01`, owner 1005940865 | `[SAMPLE CLINIC 01                        SAMPLE CLINIC GROUP ]` | `[SAMPLE CLINIC 01                                            ]` |
+| 1005923986, FA | legal `SAMPLE AMBULANCE 01`, DBA `SAMPLE TRANSPORT 01`, owner 1005951276 | `[SAMPLE AMBULANCE 01                     SAMPLE TRANSPORT 01 ]` | `[SAMPLE AMBULANCE 01                                         ]` |
+
+In the first row the legacy file publishes the licence number inside the name; in the second the DBA name is cut after 20
+characters (`SAMPLE CLINIC GROUP ` instead of `SAMPLE CLINIC GROUP 01`). Both are the documented legacy behaviour
+(CLAUDE.md section 4: "name = first 60 bytes of PRV-VARIANT"), so the 8 differences are EXPECTED under D-028.
+
 Matches that confirm decisions (no difference, listed because they were exercised): D-015 (T-MSIS period 26324 identical in all 8 rows); D-027 (R on the pending provider 1005933068 gives A on both sides; R on the suspended 1005919109 gives A on both); T on 1005943141 gives T on both; D-026 and the unknown NPI 1006143592 leave the master unchanged on both sides; D-029 is not observable in these files (REVALQ has the same 4 providers on both sides because the seed has no active provider with an unset due date).
 
 ## 6. UNEXPECTED differences
@@ -169,7 +211,20 @@ No legacy job needed a second attempt (stage 1). On the modern side, earlier att
 
 ## 8. Decisions needed from the user
 
-Each is a proposal; none is applied. Recommended defaults are marked.
+Each is a proposal. The lead recorded them on 2026-11-20 17:55 as questions in `modern/docs/analysis/questions.md` and
+applied the defaults below (the user's standing rule: apply the recommended default, mark it DEFAULT APPLIED - revisit):
+
+| Item | Group | Question | Default applied |
+|---|---|---|---|
+| 1 | U-1 | Q-124 | **Nothing changed.** Every option changes an approved criterion (MAM-43 AC-6), an approved library rule or needs a new decision, so it is left to the user. Recommended: A. |
+| 2 | U-2 | Q-125 | A: behaviour unchanged (registration date); needs the user's confirmation to become a decision. |
+| 3 | U-3, U-5, U-6, U-7 | Q-126 | A: no code change; one new decision proposed (compare final states only). |
+| 4 | U-4 | Q-127 | A: accept (MAM-35 AC-6). |
+| 5 | U-9 | Q-128 | A: accept; business to confirm. |
+| 6 | U-8 | Q-129 | Open, BLOCKED (GDG generation and the lab account; no password was guessed). |
+| 7 | U-10 | Q-130 | A: the stub fix is prepared and tested offline (new mapping `infra/wiremock/mappings/license-board/clean-SD20001.json`, new test `tools/checks/tests/test_intake_licences_known_to_stub.py`, 21 passed). It is **not loaded into the running WireMock and the two PRVDAY01 modern runs were not repeated** (user deadline 20:00: no further re-run), so U-10 stays UNEXPECTED in this report. Expected after a reload and a re-run: flag P and tier L for 1006133288, as in the legacy files (not verified). |
+
+None of these defaults turns an UNEXPECTED row into EXPECTED: that needs an approved decision with a D number.
 
 1. **No due date (U-1, 46 rows).** The test data and the legacy run write 99991231; the modern export writes 00000000 (MAM-43 AC-6, D-029) and the codec rejects zeros (D-024); the SQL seed holds NULL.  
    Options: A) the export writes 99991231 for an unset due date (Q-106 A), MAM-43 AC-6 changed, tests first; B) keep zeros in the export and re-run the legacy with zeros in the four seed records (the lab loader should take them; not tested); C) accept both conventions as a new decision D-030 and compare the two values as equal. **Recommended: A** (it is the default already applied in Q-106, and the codec could then read the export back).
@@ -212,7 +267,7 @@ Observations that are not differences in the six files but matter:
 | AC-4 | met, with the date deviation | The modern system ran the same inputs on 2026-11-20 and produced APPERROR, SCRNOUT, REVALQ, TMSISOUT, DIROUT and the 130-byte master export; both sides parsed with the codec's layout files. The Java codec itself was not called. |
 | AC-5 | met | Every difference is MATCH, EXPECTED (with a D number) or UNEXPECTED; no manifest lists a run-dependent field, so nothing was normalised and no business field was. The report uses EXPECTED/UNEXPECTED for the skill's INTENDED/UNEXPLAINED. |
 | AC-6 | met in substance | One report for all runs (as the lead asked) instead of one file per job and run: summary per file (section 4), table of EXPECTED groups with D numbers including D-006 (section 5), table of UNEXPECTED differences with file, key, field, values and cause (section 6). |
-| AC-7 | not met yet | 67 UNEXPECTED units (86 rows) wait for the user. No difference was marked INTENDED by the checker, no Defect story was created, and the comparison must be re-run (the script is repeatable) until none is left. |
+| AC-7 | not met yet | 67 UNEXPECTED units (86 rows) wait for the user: questions Q-124 to Q-130 with the defaults of section 8. No difference was marked EXPECTED without a decision number, no Defect story was created, and the comparison must be run again (the script is repeatable) once the decisions are made and the stub fix of Q-130 is loaded. |
 | AC-8 | met | PRVTMS01 line 114 (identifier past column 72) runs as the lab port's re-spaced statement, `&DATE` and `&BATCH_DATE` have explicit values (PARM `BATCH_ID=20261120`, temporary dataset names), `source-code/` and `aws-transform/` are unchanged (git status empty), and each patch is recorded in the manifests (`labDifferences`) and in `parity/golden/lab-cobol-diff/`. |
 
 ## 11. Files

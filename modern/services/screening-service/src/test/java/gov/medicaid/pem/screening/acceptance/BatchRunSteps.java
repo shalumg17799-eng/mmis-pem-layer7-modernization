@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import gov.medicaid.pem.screening.Bounded;
-import gov.medicaid.pem.screening.Scrnout;
 import gov.medicaid.pem.screening.ScreeningWorld;
+import gov.medicaid.pem.screening.Scrnout;
 import gov.medicaid.pem.testsupport.PemJwt;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
@@ -175,14 +175,14 @@ public class BatchRunSteps {
   // ---- the start answer -------------------------------------------------------------------
 
   @Then("the start answers {int}")
-  public void startAnswers(int status) {
+  public void startAnswers(int status) throws Exception {
     assertThat(last.getResponse().getStatus())
         .as(last.getResponse().getContentAsString())
         .isEqualTo(status);
   }
 
   @Then("the start answers {int} problem+json")
-  public void startProblem(int status) {
+  public void startProblem(int status) throws Exception {
     assertThat(last.getResponse().getStatus())
         .as(last.getResponse().getContentAsString())
         .isEqualTo(status);
@@ -216,7 +216,8 @@ public class BatchRunSteps {
 
   private List<JsonNode> allScreenings() throws Exception {
     MvcResult r =
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/screenings?size=200").with(PemJwt.analyst()))
+        mvc.perform(
+                MockMvcRequestBuilders.get("/api/v1/screenings?size=200").with(PemJwt.analyst()))
             .andReturn();
     assertThat(r.getResponse().getStatus()).isEqualTo(200);
     List<JsonNode> all = new ArrayList<>();
@@ -251,7 +252,8 @@ public class BatchRunSteps {
 
   @Then("provider-service was asked for the pages {string} of the provider list, each exactly once")
   public void pages(String pages) {
-    assertThat(ScreeningWorld.listedPages()).containsExactlyElementsOf(Arrays.asList(pages.split(",")));
+    assertThat(ScreeningWorld.listedPages())
+        .containsExactlyElementsOf(Arrays.asList(pages.split(",")));
   }
 
   @Then("provider-service was asked for the provider list at most {int} times")
@@ -259,7 +261,8 @@ public class BatchRunSteps {
     assertThat(ScreeningWorld.listedPages()).hasSizeLessThanOrEqualTo(times);
   }
 
-  @Then("the run is {string} with counts read {int}, screened {int}, skipped {int} and failed {int}")
+  @Then(
+      "the run is {string} with counts read {int}, screened {int}, skipped {int} and failed {int}")
   public void counts(String status, int read, int screened, int skipped, int failed)
       throws Exception {
     JsonNode run = run(runId);

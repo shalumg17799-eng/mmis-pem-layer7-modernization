@@ -1,17 +1,56 @@
 {
   "story": "MAM-73",
-  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
-  "tests": [
-    "modern/web-ui/tests/public/directory.test.tsx",
-    "modern/web-ui/tests/support/directory.ts",
-    "modern/web-ui/e2e/public-directory.spec.ts"
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
   ],
+  "tests": [
+    "modern/web-ui/e2e/public-directory.spec.ts",
+    "modern/web-ui/tests/public/directory.test.tsx",
+    "modern/web-ui/tests/support/directory.ts"
+  ],
+  "testIds": {
+    "AC-1": [
+      "directory.test.tsx: PASSED",
+      "public-directory.spec.ts: PASSED"
+    ],
+    "AC-2": [
+      "directory.test.tsx: PASSED",
+      "public-directory.spec.ts: PASSED"
+    ],
+    "AC-3": [
+      "directory.test.tsx: PASSED"
+    ],
+    "AC-4": [
+      "directory.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "directory.test.tsx: PASSED"
+    ],
+    "AC-6": [
+      "directory.test.tsx: PASSED"
+    ],
+    "AC-7": [
+      "directory.test.tsx: PASSED",
+      "public-directory.spec.ts: PASSED"
+    ],
+    "AC-8": [
+      "directory.test.tsx: PASSED",
+      "public-directory.spec.ts: PASSED"
+    ]
+  },
   "codeUnits": [
     "modern/web-ui/src/app/App.tsx",
     "modern/web-ui/src/features/public/directory/PublicDirectory.tsx",
     "modern/web-ui/src/shared/api/client.ts",
-    "modern/web-ui/src/shared/api/useApi.ts",
     "modern/web-ui/src/shared/api/types.ts",
+    "modern/web-ui/src/shared/api/useApi.ts",
     "modern/web-ui/src/shared/ui/Pager.tsx"
   ],
   "rules": []

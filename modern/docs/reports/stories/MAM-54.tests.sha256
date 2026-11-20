@@ -1,3 +1,6 @@
+4c7f56cf8fd5d482b3ea538fa6a00528ff11535f46b2bc9b1d0043ade87df1a8  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/DbRejections.java
+62b033f529361a7773734cd45a3031e8aab074f0056299bd47017f2403acd6a5  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/IntakeIntegrationTest.java
 f518bf7108a6f1a91a7d8eac59a84d2fa7277fbc5f4f54b3a4cfc1be624f9664  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/ReadApplicationsSteps.java
+a8aef21efebf58f75174accbeaee44d866674e0b05784487b241af33259d3407  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/ApplicationLessonsTest.java
 3c57d7977818b8a421d449b878b73b6fc6075be55e508b2a03ebabf65d3bcbfe  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/ReadApplicationTest.java
 0a630416e3c5ccb2d2d71a125ca3c998cf14eab55fb0b88dbe767196095c0b26  modern/services/enrollment-service/src/test/resources/features/MAM-54.feature

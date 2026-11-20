@@ -3,6 +3,8 @@ modern/kag/.venv/
 __pycache__/
 .pytest_cache/
 **/build/
+# a SOURCE package named "build" (the build logic of MAM-16), not a build output: keep it in git
+!modern/buildSrc/src/main/kotlin/pem/build/
 **/.gradle/
 **/node_modules/
 modern/web-ui/dist/

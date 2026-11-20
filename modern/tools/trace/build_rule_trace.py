@@ -16,7 +16,12 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 M = REPO / "modern"
-TAG = re.compile(r"\[(MAM-\d+) (AC-\d+)\]")
+TAG = re.compile(r"\[(MAM-\d+) (AC-\d+(?:\s*[/,]\s*AC-\d+)*)\]")
+
+
+def tags_of(text: str) -> list:
+    """(key, ac) pairs of a test name: "[MAM-n AC-m]" and lists such as "[MAM-n AC-1/AC-2/AC-3]"."""
+    return [(key, ac) for key, acs in TAG.findall(text) for ac in re.findall(r"AC-\d+", acs)]
 RANGE = re.compile(r"\bMAM-(\d+) AC-(\d+)\.\.AC-(\d+)")
 
 
@@ -50,7 +55,7 @@ def tests():
         for tc in ET.parse(xml).getroot().iter("testcase"):
             r = "FAILED" if (tc.find("failure") is not None or tc.find("error") is not None) else "SKIPPED" if tc.find("skipped") is not None else "PASSED"
             name = tc.get("name", "")
-            for key, ac in TAG.findall(name):
+            for key, ac in tags_of(name):
                 res[(key, ac)].append(f"{tc.get('classname', '').rsplit('.', 1)[-1]}: {r}")
             res[("scenario", name)].append(r)
     for f in M.glob("services/*/src/test/resources/features/*.feature"):
@@ -71,7 +76,7 @@ def tests():
     if v.exists():
         for r in json.loads(v.read_text(encoding="utf-8")).get("testResults", []):
             for a in r.get("assertionResults", []):
-                for key, ac in TAG.findall(a.get("fullName", "")):
+                for key, ac in tags_of(a.get("fullName", "")):
                     res[(key, ac)].append(f"{Path(r['name']).name}: {a['status'].upper()}")
     # pytest JUnit XML of the tool tests (pytest --junitxml=modern/tools/checks/test-results/pytest.xml): names test_mamN_acM_...
     for xml in sorted((M / "tools/checks/test-results").glob("*.xml")):
@@ -90,7 +95,7 @@ def tests():
                 full = " ".join(titles + [spec.get("title", "")])
                 last = [r.get("status") for t in spec.get("tests", []) for r in t.get("results", [])[-1:]]
                 status = "PASSED" if last and all(x == "passed" for x in last) else "SKIPPED" if last and all(x == "skipped" for x in last) else "FAILED"
-                tags = set(TAG.findall(full))
+                tags = set(tags_of(full))
                 for key, a, b in RANGE.findall(full):
                     tags |= {(f"MAM-{key}", f"AC-{n}") for n in range(int(a), int(b) + 1)}
                 for key, ac in sorted(tags):

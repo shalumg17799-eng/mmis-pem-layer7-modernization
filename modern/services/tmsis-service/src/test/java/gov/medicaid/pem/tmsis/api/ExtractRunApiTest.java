@@ -171,7 +171,8 @@ class ExtractRunApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-75 AC-2] the counts of a run are integers: rows, futureEnrolments and archiveGeneration")
+  @DisplayName(
+      "[MAM-75 AC-2] the counts of a run are integers: rows, futureEnrolments and archiveGeneration")
   void countsAreIntegers() throws Exception {
     twoActive();
     JsonNode counts = api.runToEnd(DATE).path("counts");

@@ -38,7 +38,8 @@ public class ProviderProblems {
     LOG.error(
         "provider records could not be read or written (correlation id {}): {}",
         MDC.get(CorrelationId.MDC_KEY),
-        ex.toString());
+        ex.getClass().getSimpleName(),
+        ex);
     ProblemDetail p =
         ProblemDetail.forStatusAndDetail(
             HttpStatus.SERVICE_UNAVAILABLE,

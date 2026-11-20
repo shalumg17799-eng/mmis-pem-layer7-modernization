@@ -95,7 +95,8 @@ class SourceRulesNotAnsweredTest {
   }
 
   @Test
-  @DisplayName("[MAM-20 AC-3] the detail of a licence is cut at exactly 60 characters, not 59 or 61")
+  @DisplayName(
+      "[MAM-20 AC-3] the detail of a licence is cut at exactly 60 characters, not 59 or 61")
   void cutBoundary() {
     assertThat(SourceRules.cut("A".repeat(59))).hasSize(59);
     assertThat(SourceRules.cut("A".repeat(60))).hasSize(60);
