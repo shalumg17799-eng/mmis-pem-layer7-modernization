@@ -14,8 +14,8 @@ decisions: [D-001, D-012, D-016, D-019]
 dependsOn: [MAM-58]
 mainJourney: true
 labels: [svc-notification-service, kag-L-S044, agentic, decision-D-001, decision-D-012, decision-D-016, decision-D-019, slice-main-journey]
-builtCommit: pending-user-commit
-testsSha256: 848b4d31ff89799e8055d9b3aa656716ced0da8ff8f573a1a782115de4e963d8
+builtCommit: 20e0270
+testsSha256: bfe855037082730d2a6d7b1a4b84122a423b0a76082773c20996b5a730d02b0f
 ---
 ## Business requirement
 Providers must also be told by email about decisions on their application: approved, denied, or rejected after the checks, and when their revalidation falls due. The emails can be seen by the person demonstrating the system (in Mailpit) and, through the notice list, by the provider. A provider receives one notice per event, and a change caused by a sanction is not announced a second time.

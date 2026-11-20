@@ -14,8 +14,8 @@ decisions: [D-012, D-023, D-024]
 dependsOn: [MAM-58, MAM-59]
 mainJourney: true
 labels: [svc-notification-service, kag-L-S045, agentic, decision-D-012, decision-D-023, decision-D-024, slice-main-journey]
-builtCommit: pending-user-commit
-testsSha256: f945420de833b29e4bf10e9ede1666ea25ecccaf418e132f735ce3b8fa4b18ca
+builtCommit: 20e0270
+testsSha256: c250ccb7093d657845504e3ea560acc9ba9fe71f3dcf1806efdfa0d14f47b498
 ---
 ## Business requirement
 Providers must be able to see the notices that were sent to them, staff must be able to see the notices sent to any provider, and administrators must be able to see the notice templates in use. A provider never sees another provider's notices, and a notice that could not be sent shows as failed.

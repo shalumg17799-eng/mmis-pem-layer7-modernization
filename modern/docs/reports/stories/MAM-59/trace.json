@@ -34,69 +34,69 @@
   ],
   "testIds": {
     "AC-1": [
-      "NoticeRulesMatrixTest: PASSED (4 tests)",
-      "NoticeRulesTest: PASSED (2 tests)",
-      "NoticeSendFailureEventsTest: PASSED (4 tests)",
-      "NoticeSendFailureTest: PASSED (7 tests)",
-      "SendNoticeFailureTest: PASSED (13 tests)",
-      "SendNoticeResultTest: PASSED (5 tests)",
-      "SendNoticeTest: PASSED",
-      "StatusNoticeEventsTest: PASSED (3 tests)",
-      "TemplateTest: PASSED (4 tests)",
       "MAM-59.feature 'An approval sends the 'Enrolment approved' notice': PASSED",
-      "MAM-59.feature 'An approval whose notice template is missing is recorded as FAILED and is not lost': PASSED"
-    ],
-    "AC-2": [
+      "MAM-59.feature 'An approval whose notice template is missing is recorded as FAILED and is not lost': PASSED",
       "NoticeRulesMatrixTest: PASSED",
       "NoticeRulesTest: PASSED",
-      "NoticeSendFailureEventsTest: PASSED (4 tests)",
-      "NoticeSendFailureTest: PASSED (5 tests)",
-      "SendNoticeFailureTest: PASSED (11 tests)",
-      "SendNoticeResultTest: PASSED (4 tests)",
-      "StatusNoticeEventsTest: PASSED (2 tests)",
+      "NoticeSendFailureEventsTest: PASSED",
+      "NoticeSendFailureTest: PASSED",
+      "SendNoticeFailureTest: PASSED",
+      "SendNoticeResultTest: PASSED",
+      "SendNoticeTest: PASSED",
+      "StatusNoticeEventsTest: PASSED",
+      "TemplateTest: PASSED"
+    ],
+    "AC-2": [
       "MAM-59.feature 'A denial sends the DENIED notice': PASSED",
-      "MAM-59.feature 'A denial whose notice template is missing is recorded as FAILED and is not lost': PASSED"
+      "MAM-59.feature 'A denial whose notice template is missing is recorded as FAILED and is not lost': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "NoticeRulesTest: PASSED",
+      "NoticeSendFailureEventsTest: PASSED",
+      "NoticeSendFailureTest: PASSED",
+      "SendNoticeFailureTest: PASSED",
+      "SendNoticeResultTest: PASSED",
+      "StatusNoticeEventsTest: PASSED"
     ],
     "AC-3": [
-      "NoticeRulesMatrixTest: PASSED (13 tests)",
-      "NoticeRulesTest: PASSED (6 tests)",
-      "StatusNoticeEventsTest: PASSED (8 tests)",
-      "MAM-59.feature 'A sanction-driven status change sends no second notice': PASSED"
+      "MAM-59.feature 'A sanction-driven status change sends no second notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "NoticeRulesTest: PASSED",
+      "StatusNoticeEventsTest: PASSED"
     ],
     "AC-4": [
-      "NoticeRulesMatrixTest: PASSED (4 tests)",
-      "NoticeRulesTest: PASSED",
-      "NoticeSendFailureEventsTest: PASSED (4 tests)",
-      "NoticeSendFailureTest: PASSED (5 tests)",
-      "SendNoticeFailureTest: PASSED (11 tests)",
-      "SendNoticeResultTest: PASSED (4 tests)",
-      "StatusNoticeEventsTest: PASSED",
       "MAM-59.feature 'A rejected application sends the 'Application rejected' notice': PASSED",
-      "MAM-59.feature 'A rejection whose notice template is missing is recorded as FAILED and is not lost': PASSED"
+      "MAM-59.feature 'A rejection whose notice template is missing is recorded as FAILED and is not lost': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "NoticeRulesTest: PASSED",
+      "NoticeSendFailureEventsTest: PASSED",
+      "NoticeSendFailureTest: PASSED",
+      "SendNoticeFailureTest: PASSED",
+      "SendNoticeResultTest: PASSED",
+      "StatusNoticeEventsTest: PASSED"
     ],
     "AC-5": [
-      "NoticeRulesMatrixTest: PASSED (11 tests)",
+      "MAM-59.feature 'A rejected application without an NPI gets no notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
       "NoticeRulesTest: PASSED",
-      "StatusNoticeEventsTest: PASSED (4 tests)",
-      "MAM-59.feature 'A rejected application without an NPI gets no notice': PASSED"
+      "StatusNoticeEventsTest: PASSED"
     ],
     "AC-6": [
-      "NoticeSendFailureEventsTest: PASSED (4 tests)",
-      "NoticeSendFailureTest: PASSED (5 tests)",
-      "SendNoticeFailureTest: PASSED (11 tests)",
-      "SendNoticeResultTest: PASSED (5 tests)",
-      "StatusNoticeEventsTest: PASSED",
       "MAM-59.feature 'A revalidation due sends the REVALIDATION_DUE notice': PASSED",
-      "MAM-59.feature 'A revalidation notice whose template is missing is recorded as FAILED and is not lost': PASSED"
+      "MAM-59.feature 'A revalidation notice whose template is missing is recorded as FAILED and is not lost': PASSED",
+      "NoticeSendFailureEventsTest: PASSED",
+      "NoticeSendFailureTest: PASSED",
+      "SendNoticeFailureTest: PASSED",
+      "SendNoticeResultTest: PASSED",
+      "StatusNoticeEventsTest: PASSED"
     ],
     "AC-7": [
-      "StatusNoticeEventsTest: PASSED",
-      "MAM-59.feature 'An extract-produced event is consumed without a notice': PASSED"
+      "MAM-59.feature 'An extract-produced event is consumed without a notice': PASSED",
+      "StatusNoticeEventsTest: PASSED"
     ],
     "AC-8": [
+      "MAM-59.feature 'A redelivered approval event sends one notice': PASSED",
       "SendNoticeResultTest: PASSED",
-      "StatusNoticeEventsTest: PASSED (2 tests)",
-      "MAM-59.feature 'A redelivered approval event sends one notice': PASSED"
+      "StatusNoticeEventsTest: PASSED"
     ]
   },
   "codeUnits": [

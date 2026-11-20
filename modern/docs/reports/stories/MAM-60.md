@@ -105,3 +105,24 @@ Not verified:      the 500 body of a GET that fails on the database (MockMvc sho
                    half (GET /api/v1/providers/1003000111 still S) is another service (J-run); real SMTP other than Mailpit;
                    behaviour after a restart of the consumer (offsets); the notice list in the UI (ui-portal-notices).
 ```
+
+## Review fix (2026-11-21, review-fix step of the lead's plan)
+
+The code review of 2026-11-20 rated one point MUST-FIX: the notices for APPROVED, DENIED, REJECTED and REVALIDATION_DUE did
+not have the failure handling of D-024 that the sanction notices have. A missing template was only logged and nothing was
+stored; a mail failure was thrown out of the listener, retried twice and the event parked on the dead-letter topic, so
+"a notice that could not be sent shows as failed" (MAM-60 AC-5) did not hold for these notices.
+
+- Tests first (test-writer, 03:20 to 04:45): SendNoticeFailureTest, NoticeSendFailureTest, NoticeSendFailureEventsTest and
+  NoticeFailureSteps; 4 new scenarios in MAM-59.feature and 1 in MAM-60.feature; two recorded unit tests corrected under rule
+  Q-097 C (a constructor argument and the expected FAILED notice; no assertion removed; see the red reports). Shown red
+  against the code of that moment: 87 of 139 failing in a copy with only the new constructor.
+- Fix (java-developer, 04:45 to 05:00): one delivery path for all notices (new class NoticeDelivery): a missing template or
+  a mail failure gives one WARN line and a FAILED notice and is never thrown; a failure of the store or of the outbox is
+  still thrown. SendNotice and SendSanctionNotice both use it.
+- Whole check of the module (04:52 to 04:58): 346 tests, 0 failures, 0 skipped, JaCoCo 97.8 % of lines, PIT 94 % (29 of 31;
+  the two survivors are equivalent mutants).
+- Second review (05:08): APPROVE, no MUST-FIX. Its notes are in `modern/docs/reports/review-should-fix.md` (among them: the
+  WARN line carries the message of the mail error, not its stack trace; an email is sent before its row is committed, so a
+  database failure after the send can repeat the email on the retry).
+- Not verified: a failed send on the running stack (the stack's mail catcher was not stopped for it).

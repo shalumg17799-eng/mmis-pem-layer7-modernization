@@ -158,3 +158,24 @@ service whose lane was still in its test step when the commit was taken; failed 
 **New in this run: enrollment-service and screening-service passed their whole check on GitHub, on Linux** (tests, JaCoCo,
 PIT, Spotless, `testSourceCheck`; 467 and 705 tests in the local runs), and every other module passed again. What keeps
 the Gradle job red is now this one module, and with it the compose smoke test from starting.
+
+## Seventh run (2026-11-21 04:43, commit 715a8ad, run 44835139578): revalidation-service green on Linux; one compile error, by design
+
+| Job | Result | Duration |
+|---|---|---|
+| Contract lint | success | 1m08s |
+| Web UI tests | success (fourth green run in a row) | 1m01s |
+| Gradle build and full check | failure, with `--continue` and annotations | 22m22s |
+| Compose smoke test | skipped (it needs the Gradle job) | |
+
+**Failed Gradle tasks: 1**, `:services:notification-service:compileTestJava`; failed tests in the JUnit XML files: 0. The
+commit held the new tests for the open review item of notification-service (they call a constructor of `SendNotice` with a
+sixth argument) and not yet the fix: tests first, so that module could not compile at this commit. The fix followed in the
+next commit (20e0270, 05:05).
+
+**New in this run: revalidation-service passed its whole check on GitHub, on Linux** (529 tests in the local run), with the
+two test files of run 6 corrected and the format violations gone. With that, every module has now passed on Linux at least
+once; what was red in this run was only the half of a tests-first step.
+
+Lesson applied from run 6: since 05:05 a commit leaves out the folders that a test-writer is editing at that moment, so the
+head of the branch always compiles.

@@ -325,3 +325,23 @@ workflow journals; one section per review.
 - Tests and DoD records: FailureReason has no unit test (6 PIT survivors, 5 uncovered); SlowSourceBudgetTest measured 4.4-4.6 s of the 5 s budget (caveat 2) and may flake on a slow CI; specs MAM-20/22/28/32 still have empty builtCommit and testsSha256.
 - Logs: source WARN lines (HttpScreeningSources.java:167) run on virtual threads without the MDC correlation id, and an I/O error's toString carries the SAM URL with the provider's name; ScreeningController.java:60 logs only the message of the 503 cause.
 
+## review3:MAM-86 label rule (verdict MUST-FIX)
+
+- SortHeader (src/shared/ui/sorting.tsx:71-73, used by about 12 tables) puts the whole header text inside a button. visibleText now drops it, so case (b) would report 'has no visible text' (a false message) for any future input under a sortable column. Count button captions as header text in th, add a guard, and name this in the over-report sentence (accessibility-report:129).
+- The over-report sentence also misses a label with display:contents: its rect is 0, so shown() refuses it although its text is drawn.
+- contain: paint, strict or content on a small ancestor clips like overflow hidden, but clippedAway reads only overflow (structure.ts:116-123). Only the catch-all in item 4 covers it. Name it, or treat contain paint as an overflow clip.
+- The red report's list lacks the general catch-all at accessibility-report.md:308 ('any method that the statement does not name is not detected'). Add it to the shared list so both reports keep the same text.
+- HEAD 6e24725 holds mutant M19 in structure.ts, while HEAD's gate.a11y.spec.ts already has the body guard, so the default suite on HEAD (CI) fails that guard. Put the working-tree structure.ts (sha aefdd63e) in the next commit.
+- Pin the probed limits (13 accepted, 4 over-reported) as recorded 'known limit' gate cases so that a later change to them shows up. Today they exist only in scratchpad probe JSON.
+
+## review2:notification-service (verdict APPROVE)
+
+- NoticeDelivery.java:55-56,66-71: the WARN line carries only e.getMessage(), so the stack trace and the nested MailConnectException are lost. Pass e as the last logger argument. Open since round 1, and it now covers all seven notice types.
+- NoticeDelivery.java:53-60: the email goes out before the SENT row and the outbox row commit. A later DB failure rolls back, the kit retries twice, and the provider can get up to 3 identical emails (O-2, round 1). Record a pending row first, or stop retrying once the mail was sent.
+- NoticeEventsListener.java:59-75: the NPI from the ProviderStatusChanged subject and from SanctionApplied/RevalidationDue data is not checked against ^[0-9]{10}$ before the email is addressed. A long value fails the CHAR(10) insert after the send, so it is retried and re-sent (round 1, still open).
+- NoticeSendFailureTest.java:331-333 (same in NoticeApiTest.java:449): '!(has && isNull)' also passes if a FAILED notice wrongly carried a sentAt string. Assert that n.has("sentAt") is false.
+- NoticeSendFailureTest.java:125,243,296 changes the port of the context's shared JavaMailSenderImpl. A late Kafka event consumed by this context's listener in that window would be recorded FAILED (O-4). Give the JUnit context its own consumer group, or no listener.
+- NoticeDelivery.java:54: JavaMailSenderImpl throws MailSendException when only transport.close() fails after a successful send, so an email that went out is recorded FAILED. This is rare. It could be told apart through MailSendException.getFailedMessages() being empty.
+- Bookkeeping: testsSha256 in specs/MAM-59.md:18 (848b4d..) and specs/MAM-60.md:18 (f94542..) does not match the re-recorded hash files (bfe855.., c250cc..). The story reports MAM-59.md and MAM-60.md (2026-11-20 18:25) do not describe this fix round.
+- Other round-1 notes this fix did not touch are still open: lenient page/size binding (NoticeController.java:33-34, best fixed in the kit), Mailpit HTTP calls without a timeout in NoticeSteps/SanctionNoticeSteps, the NoticeView JSON shape in the application layer, no (npi, created_at) index, and action/runId logged raw in the plain log format.
+

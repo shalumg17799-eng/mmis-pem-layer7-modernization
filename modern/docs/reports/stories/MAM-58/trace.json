@@ -25,56 +25,56 @@
   ],
   "testIds": {
     "AC-1": [
-      "NoticeRulesMatrixTest: PASSED (3 tests)",
-      "SanctionNoticeEventsTest: PASSED (3 tests)",
+      "MAM-58.feature 'A termination sends the TRM notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "SanctionNoticeEventsTest: PASSED",
       "SanctionNoticeRulesTest: PASSED",
       "SendSanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeTest: PASSED",
-      "MAM-58.feature 'A termination sends the TRM notice': PASSED"
+      "SendSanctionNoticeTest: PASSED"
     ],
     "AC-2": [
-      "NoticeRulesMatrixTest: PASSED (3 tests)",
-      "SanctionNoticeEventsTest: PASSED (3 tests)",
+      "MAM-58.feature 'A suspension sends the SUS notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "SanctionNoticeEventsTest: PASSED",
       "SanctionNoticeRulesTest: PASSED",
-      "SendSanctionNoticeTest: PASSED",
-      "MAM-58.feature 'A suspension sends the SUS notice': PASSED"
+      "SendSanctionNoticeTest: PASSED"
     ],
     "AC-3": [
-      "NoticeRulesMatrixTest: PASSED (3 tests)",
-      "SanctionNoticeEventsTest: PASSED (3 tests)",
+      "MAM-58.feature 'A reinstatement sends the RST notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "SanctionNoticeEventsTest: PASSED",
       "SanctionNoticeRulesTest: PASSED",
-      "SendSanctionNoticeTest: PASSED",
-      "MAM-58.feature 'A reinstatement sends the RST notice': PASSED"
+      "SendSanctionNoticeTest: PASSED"
     ],
     "AC-4": [
-      "NoticeRulesMatrixTest: PASSED (13 tests)",
-      "SanctionNoticeEventsTest: PASSED (6 tests)",
+      "MAM-58.feature 'An action outside T, S and R is refused, not sent as a general notice': PASSED",
+      "NoticeRulesMatrixTest: PASSED",
+      "SanctionNoticeEventsTest: PASSED",
       "SanctionNoticeRulesTest: PASSED",
       "SendSanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeTest: PASSED",
-      "MAM-58.feature 'An action outside T, S and R is refused, not sent as a general notice': PASSED"
+      "SendSanctionNoticeTest: PASSED"
     ],
     "AC-5": [
-      "SanctionNoticeEventsTest: PASSED (2 tests)",
-      "SendSanctionNoticeTest: PASSED",
-      "MAM-58.feature 'Every sent notice is announced': PASSED"
+      "MAM-58.feature 'Every sent notice is announced': PASSED",
+      "SanctionNoticeEventsTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
     ],
     "AC-6": [
-      "SanctionNoticeFailureTest: PASSED (2 tests)",
-      "SendSanctionNoticeFailureTest: PASSED (5 tests)",
-      "SendSanctionNoticeTest: PASSED",
-      "MAM-58.feature 'A failed send is logged, surfaced and does not stop the processing': PASSED"
+      "MAM-58.feature 'A failed send is logged, surfaced and does not stop the processing': PASSED",
+      "SanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
     ],
     "AC-7": [
-      "SendSanctionNoticeFailureTest: PASSED (3 tests)",
-      "SendSanctionNoticeTest: PASSED",
-      "MAM-58.feature 'A missing template is a named failure, not a crash': PASSED"
+      "MAM-58.feature 'A missing template is a named failure, not a crash': PASSED",
+      "SendSanctionNoticeFailureTest: PASSED",
+      "SendSanctionNoticeTest: PASSED"
     ],
     "AC-8": [
+      "MAM-58.feature 'A redelivered event sends one notice': PASSED",
       "SanctionNoticeEventsTest: PASSED",
       "SanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeFailureTest: PASSED (2 tests)",
-      "MAM-58.feature 'A redelivered event sends one notice': PASSED"
+      "SendSanctionNoticeFailureTest: PASSED"
     ]
   },
   "codeUnits": [

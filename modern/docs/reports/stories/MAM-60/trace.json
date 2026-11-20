@@ -23,42 +23,42 @@
   ],
   "testIds": {
     "AC-1": [
-      "ListNoticesResultTest: PASSED (4 tests)",
-      "NoticeApiTest: PASSED (7 tests)",
-      "MAM-60.feature 'Staff list the notices of a provider': PASSED"
+      "ListNoticesResultTest: PASSED",
+      "MAM-60.feature 'Staff list the notices of a provider': PASSED",
+      "NoticeApiTest: PASSED"
     ],
     "AC-2": [
-      "NoticeApiTest: PASSED (33 tests)",
-      "MAM-60.feature 'Invalid filters are refused': PASSED"
+      "MAM-60.feature 'Invalid filters are refused': PASSED",
+      "NoticeApiTest: PASSED"
     ],
     "AC-3": [
-      "ListNoticesResultTest: PASSED (7 tests)",
-      "NoticeApiTest: PASSED (4 tests)",
-      "MAM-60.feature 'A provider sees only their own notices': PASSED"
+      "ListNoticesResultTest: PASSED",
+      "MAM-60.feature 'A provider sees only their own notices': PASSED",
+      "NoticeApiTest: PASSED"
     ],
     "AC-4": [
       "MAM-60.feature 'The provider sees the approval notice': PASSED"
     ],
     "AC-5": [
-      "NoticeApiTest: PASSED (3 tests)",
-      "NoticeSendFailureTest: PASSED (8 tests)",
       "MAM-60.feature 'A failed notice shows as FAILED': PASSED",
-      "MAM-60.feature 'An approval that could not be sent shows as FAILED to staff and to the provider': PASSED"
+      "MAM-60.feature 'An approval that could not be sent shows as FAILED to staff and to the provider': PASSED",
+      "NoticeApiTest: PASSED",
+      "NoticeSendFailureTest: PASSED"
     ],
     "AC-6": [
-      "ListNoticesResultTest: PASSED (4 tests)",
-      "NoticeApiTest: PASSED (9 tests)",
-      "MAM-60.feature 'Who may list notices': PASSED"
+      "ListNoticesResultTest: PASSED",
+      "MAM-60.feature 'Who may list notices': PASSED",
+      "NoticeApiTest: PASSED"
     ],
     "AC-7": [
       "ListNoticesResultTest: PASSED",
-      "NoticeApiTest: PASSED (2 tests)",
-      "TemplateTest: PASSED",
-      "MAM-60.feature 'An administrator lists the templates': PASSED"
+      "MAM-60.feature 'An administrator lists the templates': PASSED",
+      "NoticeApiTest: PASSED",
+      "TemplateTest: PASSED"
     ],
     "AC-8": [
-      "NoticeApiTest: PASSED (9 tests)",
-      "MAM-60.feature 'Only ADMIN can list templates': PASSED"
+      "MAM-60.feature 'Only ADMIN can list templates': PASSED",
+      "NoticeApiTest: PASSED"
     ]
   },
   "codeUnits": [

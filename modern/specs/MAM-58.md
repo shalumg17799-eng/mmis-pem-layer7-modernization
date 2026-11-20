@@ -14,7 +14,7 @@ decisions: [D-012, D-024, D-026]
 dependsOn: [MAM-31, MAM-24]
 mainJourney: true
 labels: [svc-notification-service, kag-L-S043, agentic, decision-D-012, decision-D-024, decision-D-026, slice-main-journey]
-builtCommit: pending-user-commit
+builtCommit: 20e0270
 testsSha256: f9bdd07c2795867c8bff96c7d62473abaebd5cfbf8cf0b04e74f26ae07f47f13
 ---
 ## Business requirement
