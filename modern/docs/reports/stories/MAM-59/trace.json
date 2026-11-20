@@ -11,48 +11,97 @@
     "AC-8"
   ],
   "tests": [
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/EventsContractFile.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/IntegrationTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/LogCapture.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeFixtures.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeSendFailureEventsTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeSendFailureTest.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/PlatformChecksTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/StatusNoticeEventsTest.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/TestMail.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/CucumberSpringConfig.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/CucumberSuiteTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/NoticeFailureSteps.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/NoticeSteps.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/SendNoticeFailureTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/SendNoticeResultTest.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/SendNoticeTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/TemplateTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/domain/NoticeRulesMatrixTest.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/domain/NoticeRulesTest.java",
     "modern/services/notification-service/src/test/resources/features/MAM-59.feature"
   ],
   "testIds": {
     "AC-1": [
+      "NoticeRulesMatrixTest: PASSED (4 tests)",
+      "NoticeRulesTest: PASSED (2 tests)",
+      "NoticeSendFailureEventsTest: PASSED (4 tests)",
+      "NoticeSendFailureTest: PASSED (7 tests)",
+      "SendNoticeFailureTest: PASSED (13 tests)",
+      "SendNoticeResultTest: PASSED (5 tests)",
+      "SendNoticeTest: PASSED",
+      "StatusNoticeEventsTest: PASSED (3 tests)",
+      "TemplateTest: PASSED (4 tests)",
       "MAM-59.feature 'An approval sends the 'Enrolment approved' notice': PASSED",
-      "NoticeRulesTest: PASSED",
-      "SendNoticeTest: PASSED"
+      "MAM-59.feature 'An approval whose notice template is missing is recorded as FAILED and is not lost': PASSED"
     ],
     "AC-2": [
+      "NoticeRulesMatrixTest: PASSED",
+      "NoticeRulesTest: PASSED",
+      "NoticeSendFailureEventsTest: PASSED (4 tests)",
+      "NoticeSendFailureTest: PASSED (5 tests)",
+      "SendNoticeFailureTest: PASSED (11 tests)",
+      "SendNoticeResultTest: PASSED (4 tests)",
+      "StatusNoticeEventsTest: PASSED (2 tests)",
       "MAM-59.feature 'A denial sends the DENIED notice': PASSED",
-      "NoticeRulesTest: PASSED"
+      "MAM-59.feature 'A denial whose notice template is missing is recorded as FAILED and is not lost': PASSED"
     ],
     "AC-3": [
-      "MAM-59.feature 'A sanction-driven status change sends no second notice': PASSED",
-      "NoticeRulesTest: PASSED"
+      "NoticeRulesMatrixTest: PASSED (13 tests)",
+      "NoticeRulesTest: PASSED (6 tests)",
+      "StatusNoticeEventsTest: PASSED (8 tests)",
+      "MAM-59.feature 'A sanction-driven status change sends no second notice': PASSED"
     ],
     "AC-4": [
-      "MAM-59.feature 'A rejected application sends the 'Application rejected' notice': PASSED"
+      "NoticeRulesMatrixTest: PASSED (4 tests)",
+      "NoticeRulesTest: PASSED",
+      "NoticeSendFailureEventsTest: PASSED (4 tests)",
+      "NoticeSendFailureTest: PASSED (5 tests)",
+      "SendNoticeFailureTest: PASSED (11 tests)",
+      "SendNoticeResultTest: PASSED (4 tests)",
+      "StatusNoticeEventsTest: PASSED",
+      "MAM-59.feature 'A rejected application sends the 'Application rejected' notice': PASSED",
+      "MAM-59.feature 'A rejection whose notice template is missing is recorded as FAILED and is not lost': PASSED"
     ],
     "AC-5": [
+      "NoticeRulesMatrixTest: PASSED (11 tests)",
+      "NoticeRulesTest: PASSED",
+      "StatusNoticeEventsTest: PASSED (4 tests)",
       "MAM-59.feature 'A rejected application without an NPI gets no notice': PASSED"
     ],
     "AC-6": [
-      "MAM-59.feature 'A revalidation due sends the REVALIDATION_DUE notice': PASSED"
+      "NoticeSendFailureEventsTest: PASSED (4 tests)",
+      "NoticeSendFailureTest: PASSED (5 tests)",
+      "SendNoticeFailureTest: PASSED (11 tests)",
+      "SendNoticeResultTest: PASSED (5 tests)",
+      "StatusNoticeEventsTest: PASSED",
+      "MAM-59.feature 'A revalidation due sends the REVALIDATION_DUE notice': PASSED",
+      "MAM-59.feature 'A revalidation notice whose template is missing is recorded as FAILED and is not lost': PASSED"
     ],
     "AC-7": [
+      "StatusNoticeEventsTest: PASSED",
       "MAM-59.feature 'An extract-produced event is consumed without a notice': PASSED"
     ],
     "AC-8": [
+      "SendNoticeResultTest: PASSED",
+      "StatusNoticeEventsTest: PASSED (2 tests)",
       "MAM-59.feature 'A redelivered approval event sends one notice': PASSED"
     ]
   },
   "codeUnits": [
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/Notice.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeDelivery.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticePorts.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeSentData.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/SendNotice.java",

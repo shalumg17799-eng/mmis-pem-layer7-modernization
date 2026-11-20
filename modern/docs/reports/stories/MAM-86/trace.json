@@ -1,0 +1,60 @@
+{
+  "story": "MAM-86",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/web-ui/e2e/a11y/gate.a11y.spec.ts",
+    "modern/web-ui/e2e/a11y/keyboard-journeys.spec.ts",
+    "modern/web-ui/e2e/a11y/pages.a11y.spec.ts",
+    "modern/web-ui/e2e/a11y/policy.a11y.spec.ts",
+    "modern/web-ui/e2e/a11y/support/api.ts",
+    "modern/web-ui/e2e/a11y/support/axe-gate.ts",
+    "modern/web-ui/e2e/a11y/support/focus.ts",
+    "modern/web-ui/e2e/a11y/support/keyboard.ts",
+    "modern/web-ui/e2e/a11y/support/screens.ts",
+    "modern/web-ui/e2e/a11y/support/sessions.ts",
+    "modern/web-ui/e2e/a11y/support/structure.ts",
+    "modern/web-ui/tests/ux/scrollable-table.test.tsx"
+  ],
+  "testIds": {
+    "AC-1": [
+      "pages.a11y.spec.ts: PASSED",
+      "policy.a11y.spec.ts: PASSED"
+    ],
+    "AC-2": [
+      "pages.a11y.spec.ts: PASSED"
+    ],
+    "AC-3": [
+      "gate.a11y.spec.ts: PASSED",
+      "keyboard-journeys.spec.ts: PASSED",
+      "policy.a11y.spec.ts: PASSED"
+    ],
+    "AC-4": [
+      "pages.a11y.spec.ts: PASSED",
+      "scrollable-table.test.tsx: PASSED"
+    ],
+    "AC-5": [
+      "gate.a11y.spec.ts: PASSED",
+      "pages.a11y.spec.ts: PASSED"
+    ],
+    "AC-6": [
+      "gate.a11y.spec.ts: PASSED",
+      "pages.a11y.spec.ts: PASSED"
+    ],
+    "AC-7": [
+      "gate.a11y.spec.ts: PASSED",
+      "policy.a11y.spec.ts: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/web-ui/src/shared/ui/ScrollableTable.tsx"
+  ],
+  "rules": []
+}

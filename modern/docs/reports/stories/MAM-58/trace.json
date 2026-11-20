@@ -25,62 +25,63 @@
   ],
   "testIds": {
     "AC-1": [
-      "MAM-58.feature 'A termination sends the TRM notice': PASSED",
-      "NoticeRulesMatrixTest: PASSED",
-      "SanctionNoticeEventsTest: PASSED",
+      "NoticeRulesMatrixTest: PASSED (3 tests)",
+      "SanctionNoticeEventsTest: PASSED (3 tests)",
       "SanctionNoticeRulesTest: PASSED",
       "SendSanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeTest: PASSED"
+      "SendSanctionNoticeTest: PASSED",
+      "MAM-58.feature 'A termination sends the TRM notice': PASSED"
     ],
     "AC-2": [
-      "MAM-58.feature 'A suspension sends the SUS notice': PASSED",
-      "NoticeRulesMatrixTest: PASSED",
-      "SanctionNoticeEventsTest: PASSED",
+      "NoticeRulesMatrixTest: PASSED (3 tests)",
+      "SanctionNoticeEventsTest: PASSED (3 tests)",
       "SanctionNoticeRulesTest: PASSED",
-      "SendSanctionNoticeTest: PASSED"
+      "SendSanctionNoticeTest: PASSED",
+      "MAM-58.feature 'A suspension sends the SUS notice': PASSED"
     ],
     "AC-3": [
-      "MAM-58.feature 'A reinstatement sends the RST notice': PASSED",
-      "NoticeRulesMatrixTest: PASSED",
-      "SanctionNoticeEventsTest: PASSED",
+      "NoticeRulesMatrixTest: PASSED (3 tests)",
+      "SanctionNoticeEventsTest: PASSED (3 tests)",
       "SanctionNoticeRulesTest: PASSED",
-      "SendSanctionNoticeTest: PASSED"
+      "SendSanctionNoticeTest: PASSED",
+      "MAM-58.feature 'A reinstatement sends the RST notice': PASSED"
     ],
     "AC-4": [
-      "MAM-58.feature 'An action outside T, S and R is refused, not sent as a general notice': PASSED",
-      "NoticeRulesMatrixTest: PASSED",
-      "SanctionNoticeEventsTest: PASSED",
+      "NoticeRulesMatrixTest: PASSED (13 tests)",
+      "SanctionNoticeEventsTest: PASSED (6 tests)",
       "SanctionNoticeRulesTest: PASSED",
       "SendSanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeTest: PASSED"
+      "SendSanctionNoticeTest: PASSED",
+      "MAM-58.feature 'An action outside T, S and R is refused, not sent as a general notice': PASSED"
     ],
     "AC-5": [
-      "MAM-58.feature 'Every sent notice is announced': PASSED",
-      "SanctionNoticeEventsTest: PASSED",
-      "SendSanctionNoticeTest: PASSED"
+      "SanctionNoticeEventsTest: PASSED (2 tests)",
+      "SendSanctionNoticeTest: PASSED",
+      "MAM-58.feature 'Every sent notice is announced': PASSED"
     ],
     "AC-6": [
-      "MAM-58.feature 'A failed send is logged, surfaced and does not stop the processing': PASSED",
-      "SanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeTest: PASSED"
+      "SanctionNoticeFailureTest: PASSED (2 tests)",
+      "SendSanctionNoticeFailureTest: PASSED (5 tests)",
+      "SendSanctionNoticeTest: PASSED",
+      "MAM-58.feature 'A failed send is logged, surfaced and does not stop the processing': PASSED"
     ],
     "AC-7": [
-      "MAM-58.feature 'A missing template is a named failure, not a crash': PASSED",
-      "SendSanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeTest: PASSED"
+      "SendSanctionNoticeFailureTest: PASSED (3 tests)",
+      "SendSanctionNoticeTest: PASSED",
+      "MAM-58.feature 'A missing template is a named failure, not a crash': PASSED"
     ],
     "AC-8": [
-      "MAM-58.feature 'A redelivered event sends one notice': PASSED",
       "SanctionNoticeEventsTest: PASSED",
       "SanctionNoticeFailureTest: PASSED",
-      "SendSanctionNoticeFailureTest: PASSED"
+      "SendSanctionNoticeFailureTest: PASSED (2 tests)",
+      "MAM-58.feature 'A redelivered event sends one notice': PASSED"
     ]
   },
   "codeUnits": [
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/NotificationServiceApplication.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/ListNotices.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/Notice.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeDelivery.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticePage.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticePorts.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeSentData.java",

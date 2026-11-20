@@ -17,7 +17,7 @@ require the FAILED row. The full description, the interface the tests assume and
 
 | File | Previous blob | New blob | Line endings | Lines (added / removed) |
 |---|---|---|---|---|
-| `resources/features/MAM-60.feature` | `b9a4bf1adfdb5ca8cfeb6b4a3dfc4d98b9cf9164` | `NEWBLOB_FEATURE60` | LF | 12 / 0 |
+| `resources/features/MAM-60.feature` | `b9a4bf1adfdb5ca8cfeb6b4a3dfc4d98b9cf9164` | `2e39efc59f7e24a512ce9840e1e099c67c2abb3c` | LF | 12 / 0 |
 
 (Under `modern/services/notification-service/src/test/`.) One scenario appended after the last one, tag `@AC-5`: "An approval that could not be sent
 shows as FAILED to staff and to the provider" (the approval event is consumed while the APPROVED template is missing; an ANALYST lists
@@ -42,4 +42,4 @@ The existing AC-5 scenario (a FAILED row inserted by the step) is untouched.
 
 ### Hashes
 
-Re-recorded with `test_protection.py record MAM-60` (the 7 files of the previous record plus `NoticeSendFailureTest.java` and `NoticeFailureSteps.java`).
+Re-recorded with `test_protection.py record MAM-60` (the 7 files of the previous record plus `NoticeSendFailureTest.java` and `NoticeFailureSteps.java`, 9 in all); `check MAM-60` prints `OK: 9 test files of MAM-60 unchanged; no unrecorded test files`.

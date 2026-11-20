@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  * is refused and logged as an error, never sent as GEN (D-026, Q-A10). A send that fails, or a
  * template that is not found (the legacy 'NOTICE PGM NOT FOUND'), is logged as a warning and stored
  * as a FAILED notice; it is never thrown, so the processing goes on and nothing is undone (D-024).
+ * The delivery itself is shared with the other notices, see {@link NoticeDelivery}.
  */
 @Service
 public class SendSanctionNotice {
@@ -28,12 +29,7 @@ public class SendSanctionNotice {
     REFUSED
   }
 
-  private final NoticePorts.Templates templates;
-  private final NoticePorts.Mailer mailer;
-  private final NoticePorts.NoticeStore store;
-  private final NoticePorts.FailedNotices failedNotices;
-  private final NoticePorts.EventOutbox outbox;
-  private final Clock clock;
+  private final NoticeDelivery delivery;
 
   public SendSanctionNotice(
       NoticePorts.Templates templates,
@@ -42,12 +38,7 @@ public class SendSanctionNotice {
       NoticePorts.FailedNotices failedNotices,
       NoticePorts.EventOutbox outbox,
       Clock clock) {
-    this.templates = templates;
-    this.mailer = mailer;
-    this.store = store;
-    this.failedNotices = failedNotices;
-    this.outbox = outbox;
-    this.clock = clock;
+    this.delivery = new NoticeDelivery(templates, mailer, store, failedNotices, outbox, clock);
   }
 
   @Transactional
@@ -61,28 +52,6 @@ public class SendSanctionNotice {
           action);
       return Outcome.REFUSED;
     }
-    String template = code.get();
-    String to = NoticeRules.recipient(npi);
-    Optional<Template> t = templates.find(template);
-    if (t.isEmpty()) {
-      return failed(npi, template, to, eventId, "NOTICE TEMPLATE NOT FOUND " + template);
-    }
-    try {
-      mailer.send(to, t.get().subject(), t.get().bodyFor(npi));
-    } catch (RuntimeException e) {
-      return failed(
-          npi, template, to, eventId, e.getMessage() == null ? e.toString() : e.getMessage());
-    }
-    Notice n = new Notice(UUID.randomUUID(), npi, template, to, eventId, clock.instant());
-    store.save(n);
-    outbox.enqueue("NoticeSent", npi, new NoticeSentData(n.noticeId(), npi, template));
-    return Outcome.SENT;
-  }
-
-  private Outcome failed(String npi, String template, String to, UUID eventId, String cause) {
-    LOG.warn(
-        "NOTICE {} FOR NPI {} STATUS FAILED (event {}), cause: {}", template, npi, eventId, cause);
-    failedNotices.save(new Notice(UUID.randomUUID(), npi, template, to, eventId, null), cause);
-    return Outcome.FAILED;
+    return delivery.deliver(npi, code.get(), eventId).isPresent() ? Outcome.SENT : Outcome.FAILED;
   }
 }

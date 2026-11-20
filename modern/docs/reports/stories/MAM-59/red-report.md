@@ -21,9 +21,9 @@ The failure words are the ones of `SendSanctionNotice` (`SendSanctionNoticeFailu
 
 | File | Previous blob | New blob | Line endings | Lines (added / removed) |
 |---|---|---|---|---|
-| `application/SendNoticeResultTest.java` | `bfc3ff7868e4784b65fbcff3e51ee8f33b8f73fa` | `NEWBLOB_RESULT` | CRLF | 14 / 4 |
-| `application/SendNoticeTest.java` | `05280ca97cf26cd05c6b5fd14c68e98694cb3948` | `NEWBLOB_NOTICE` | CRLF | 13 / 2 |
-| `resources/features/MAM-59.feature` | `bd057a54ebe119586190a2610f9e551edf228e92` | `NEWBLOB_FEATURE` | LF | 40 / 0 |
+| `application/SendNoticeResultTest.java` | `bfc3ff7868e4784b65fbcff3e51ee8f33b8f73fa` | `661dc4923686bd6b35b9b82242b317a7dc88d917` | CRLF | 14 / 4 |
+| `application/SendNoticeTest.java` | `05280ca97cf26cd05c6b5fd14c68e98694cb3948` | `e9871b36d255a738fe4e509511e8121674285fb1` | CRLF | 13 / 2 |
+| `resources/features/MAM-59.feature` | `bd057a54ebe119586190a2610f9e551edf228e92` | `db307d11bc166399a13fd37e66abdb11f37581f8` | LF | 40 / 0 |
 
 (All under `modern/services/notification-service/src/test/`.)
 
@@ -97,11 +97,11 @@ Templates,Mailer,NoticeStore,EventOutbox,Clock` (3 errors) and the 3 follow-up l
 six-argument constructor and its behaviour was left exactly as it is today. Classes `SendNoticeFailureTest`, `SendNoticeResultTest`,
 `SendNoticeTest`, `NoticeSendFailureTest`, `NoticeSendFailureEventsTest`, `CucumberSuiteTest`: **139 tests, 87 failed, 0 skipped** (10 min 41 s).
 
-| Group | Failed / run | Failure reason |
+| Group | Failed / executed | Failure reason |
 |---|---|---|
-| `SendNoticeFailureTest`, mail failure (fields, cause, WARN words, nothing stored, lookup once, not thrown, next notice) | 24 + 1 + 1 / | the `MailSendException` / `IllegalStateException` of the mail port is thrown out of `send` (no catch) |
-| `SendNoticeFailureTest`, missing template (FAILED notice, WARN words) | 8 / | `Expected size: 1 but was: 0` (no FAILED notice); WARN is `no notice template <code>: nothing sent for NPI ...` |
-| `SendNoticeFailureTest` total | 34 / 46 | |
+| `SendNoticeFailureTest`, mail failure (fields, cause, WARN words, nothing stored, lookup once, not thrown, next notice) | 26 | the `MailSendException` / `IllegalStateException` of the mail port is thrown out of `send` (no catch) |
+| `SendNoticeFailureTest`, missing template (FAILED notice, WARN words) | 8 | `Expected size: 1 but was: 0` (no FAILED notice); WARN is `no notice template <code>: nothing sent for NPI ...` |
+| `SendNoticeFailureTest` total | 34 / 46 | the other 12 are the guard tests below |
 | `SendNoticeResultTest.missingTemplateIsReturnedAndLogged`, `SendNoticeTest.missingTemplate` | 2 / 9 | old WARN words; no FAILED notice |
 | `NoticeSendFailureTest` (direct call, listener bean, list for staff and provider, silent server) | 30 / 30 | `a send to a mail server that is down must not be thrown (D-024)`, `the listener must not throw when the mail server is down`, `MailSendException ... Exception reading response` |
 | `NoticeSendFailureEventsTest`, Mailpit paused (2 x 4) | 8 / 8 | `event <id> to be handled did not happen within 45 s; it was retried and parked on pem.provider.events.DLT (enrollment, revalidation), so the listener threw instead of recording a FAILED notice` |
@@ -124,5 +124,5 @@ classes included); PIT on domain and application 38 mutants, 36 killed (95 %; th
 
 ### 7. Hashes
 
-Re-recorded with `test_protection.py record MAM-59` (the 16 files of the previous record plus the 4 new files); `check MAM-59`: see the result of
-the story report. `.tests.sha256` and `red-blobs.txt` are rewritten by that tool.
+Re-recorded with `test_protection.py record MAM-59` (the 16 files of the previous record plus the 4 new files, 20 in all); `check MAM-59` prints
+`OK: 20 test files of MAM-59 unchanged; no unrecorded test files`. `check MAM-60` and `check MAM-58` print OK as well (MAM-58 files were not changed).

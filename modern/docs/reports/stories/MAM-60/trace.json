@@ -11,40 +11,62 @@
     "AC-8"
   ],
   "tests": [
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeApiTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeFixtures.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeSendFailureTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/NoticeFailureSteps.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/NoticeListSteps.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/ListNoticesResultTest.java",
     "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/ListNoticesTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/TemplateTest.java",
     "modern/services/notification-service/src/test/resources/features/MAM-60.feature"
   ],
   "testIds": {
     "AC-1": [
+      "ListNoticesResultTest: PASSED (4 tests)",
+      "NoticeApiTest: PASSED (7 tests)",
       "MAM-60.feature 'Staff list the notices of a provider': PASSED"
     ],
     "AC-2": [
+      "NoticeApiTest: PASSED (33 tests)",
       "MAM-60.feature 'Invalid filters are refused': PASSED"
     ],
     "AC-3": [
+      "ListNoticesResultTest: PASSED (7 tests)",
+      "NoticeApiTest: PASSED (4 tests)",
       "MAM-60.feature 'A provider sees only their own notices': PASSED"
     ],
     "AC-4": [
       "MAM-60.feature 'The provider sees the approval notice': PASSED"
     ],
     "AC-5": [
-      "MAM-60.feature 'A failed notice shows as FAILED': PASSED"
+      "NoticeApiTest: PASSED (3 tests)",
+      "NoticeSendFailureTest: PASSED (8 tests)",
+      "MAM-60.feature 'A failed notice shows as FAILED': PASSED",
+      "MAM-60.feature 'An approval that could not be sent shows as FAILED to staff and to the provider': PASSED"
     ],
     "AC-6": [
+      "ListNoticesResultTest: PASSED (4 tests)",
+      "NoticeApiTest: PASSED (9 tests)",
       "MAM-60.feature 'Who may list notices': PASSED"
     ],
     "AC-7": [
+      "ListNoticesResultTest: PASSED",
+      "NoticeApiTest: PASSED (2 tests)",
+      "TemplateTest: PASSED",
       "MAM-60.feature 'An administrator lists the templates': PASSED"
     ],
     "AC-8": [
+      "NoticeApiTest: PASSED (9 tests)",
       "MAM-60.feature 'Only ADMIN can list templates': PASSED"
     ]
   },
   "codeUnits": [
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/ListNotices.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeDelivery.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticePage.java",
     "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeView.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/SendNotice.java",
     "modern/services/notification-service/src/main/resources/db/migration/notification/V3__extract_ready_template.sql"
   ],
   "rules": []

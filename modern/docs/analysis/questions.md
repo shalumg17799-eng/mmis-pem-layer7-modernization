@@ -1213,6 +1213,15 @@ round, is brought in line with the wording of its criterion by its author. With 
 a visible label element, or when it sits in a table cell under a visible column header and its accessible name contains
 that header's text (the header is the visible label; WCAG 2.1 "Label in Name" and "Labels or Instructions"). The page
 itself stays as it was (the axe scan passed before and after). **Recommended: A.**
+Note of 2026-11-21 04:47 (final review of the label check): under A the header text that must be part of the input's
+name is the text of the header that a person can read, outside controls. So a header with a control or with unreadable
+text beside its readable text now passes when the name holds the readable part, where the checker of 01:40 refused it.
+This is the one place where the check became more lenient in the correction rounds; no assertion of a test was weakened
+or removed, and no header of the application has readable text beside a control (searched 04:45). Both reports say so.
+The original text of this question does not speak of a header that holds a control: reading A in this way is the lead's
+decision of 04:47, open to the user like the default itself. The other side of the same rule: a header whose only text is
+the caption of a button (the sortable header) has no readable text for the check, so an input in a sortable column would
+need a visible label of its own; no table with a sortable header holds an input today.
 
 ## Parity re-run of 2026-11-20 23:17: what it changes for Q-124 to Q-130 (recorded by the lead, 23:40)
 

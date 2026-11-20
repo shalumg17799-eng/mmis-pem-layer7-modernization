@@ -1,7 +1,9 @@
 310caea812ff3f254da43d28b3367004c88ef59f  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeApiTest.java
 d7dbf67aa8d47efe69a74cb37cb930ae6ba38589  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeFixtures.java
+d4711b60f1fa5e34269271fac50d94d0b0356df7  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/NoticeSendFailureTest.java
+704f2596be5fa55d85fc5daf0b1362a5f87f3146  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/NoticeFailureSteps.java
 e76b318ce4e91b858bd08ab45496c4e88151b44e  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/NoticeListSteps.java
 1e7d5a028e714f101bf768dd39d5b80b00daab24  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/ListNoticesResultTest.java
 690ec0f02cdd9cfd31bf06bee0afb07268c3bfae  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/ListNoticesTest.java
 f615457024837ad0ccf41038ec7733e955518afc  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/TemplateTest.java
-b9a4bf1adfdb5ca8cfeb6b4a3dfc4d98b9cf9164  modern/services/notification-service/src/test/resources/features/MAM-60.feature
+2e39efc59f7e24a512ce9840e1e099c67c2abb3c  modern/services/notification-service/src/test/resources/features/MAM-60.feature

@@ -44,7 +44,7 @@ public class NoticeAdapters {
             Timestamp.from(n.sentAt()));
   }
 
-  /** MAM-58: a notice that could not be sent (no sent_at); the cause is in the warning log. */
+  /** D-024: a notice that could not be sent (no sent_at); the cause is in the warning log. */
   @Bean
   NoticePorts.FailedNotices failedNotices(JdbcTemplate jdbc) {
     return (Notice n, String cause) ->

@@ -14,8 +14,8 @@ decisions: [D-006]
 dependsOn: [MAM-62, MAM-64, MAM-66, MAM-68, MAM-70, MAM-73, MAM-77, MAM-80, MAM-85, MAM-87, MAM-90, MAM-92, MAM-93]
 mainJourney: false
 labels: [svc-e2e, kag-L-S075, agentic, decision-D-006]
-builtCommit:
-testsSha256:
+builtCommit: 715a8ad
+testsSha256: 42b9620a1e1e147504acdb2e06068239161f051415e9d099a841d81c893dcd00
 ---
 ## Business requirement
 Every person must be able to use the portal, the console and the public directory, including people who use only a keyboard or a screen reader. This story proves that every page meets the agreed accessibility standard.
