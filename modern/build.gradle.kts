@@ -43,11 +43,3 @@ tasks.register("checkAll") {
     // so a path such as ":libs:check" does not exist. The collections are live, so they are filled when the graph is built.
     dependsOn(subprojects.map { p -> p.tasks.matching { it.name == "check" } })
 }
-
-// USER DECISION 2026-11-20 18:02 (hard deadline 20:00): mutation testing (PIT) is skipped for the services still being
-// tested. While gradle.properties holds pemSkipPit=true every pitest task is disabled, so "check" runs the tests, JaCoCo
-// (85 %), the skipped-test guard and Spotless only. Do not run pitest by hand; report PIT as "not run, deadline".
-// Remove the property line to restore the PIT gate.
-if (providers.gradleProperty("pemSkipPit").orNull == "true") {
-    allprojects { tasks.matching { it.name == "pitest" }.configureEach { enabled = false } }
-}

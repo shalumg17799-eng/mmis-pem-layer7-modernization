@@ -1,13 +1,91 @@
 # Red report: MAM-86 accessibility (WCAG 2.1 AA, zero axe violations, keyboard-only walk-through)
 
-Written by the test-writer on 2026-11-20; corrected on 2026-11-20 evening / 2026-11-21 after an independent review (see "Correction round"); changed again on 2026-11-21 night (see "Round of 2026-11-21": the AC-6 label check, new gate cases, unit tests of ScrollableTable). This story verifies a UI that was built before it: the 13 screens, the shared shell and the
+Written by the test-writer on 2026-11-20; corrected on 2026-11-20 evening / 2026-11-21 after an independent review (see "Correction round"); changed again on 2026-11-21 night (see "Round of 2026-11-21": the AC-6 label check, new gate cases, unit tests of ScrollableTable) and corrected once more the same night after a review of the label check (see "Correction round of 2026-11-21 night": what the check counts as hidden). This story verifies a UI that was built before it: the 13 screens, the shared shell and the
 seven journeys already exist. So the "red" step looks different from a feature story: a test goes red only where the built UI really
 breaks the acceptance criterion. Tests that go green at once describe behaviour the UI already has; they are still the regression net for
 AC-1 to AC-7 and are protected by the hash file. No production code (`modern/web-ui/src`) was changed.
 
+## Correction round of 2026-11-21 night (about 01:10 to 01:40): what the AC-6 label check counts as hidden (review of the label check, three MUST-FIX items)
+
+This is the newest section. The section after it (round of 00:20 to 00:50) is history, with one correction noted at its top. The test-writer changed no production code (`modern/web-ui/src`), built nothing (no `npm run build`, `dist` untouched) and ran no Gradle and no git command.
+
+### The review and what it found
+
+1. Case (b) of the label rule accepted a header that no sighted user sees, because `shown()` read only the element's own style and size. Both markups passed over `<td><input aria-label="Taxonomy prefix, row 1"></td>`: `<th><span class="usa-sr-only">Taxonomy prefix</span></th>` (the USWDS class of this app: `position:absolute;left:-999em`) and `<thead style="opacity:0">` (opacity is not inherited).
+2. Case (a) had the same gap: `<label for="npi" class="usa-sr-only">NPI</label><input id="npi">`, or a label inside `<div style="opacity:0">`, counted as a visible label. The four (vii) cases tested only hiding set on the label itself.
+3. Both reports said the check refuses a header that is not shown, text hidden inside the cell and a label that is not shown. That was false for the markups above, and no limit was stated.
+
+### The change of a recorded test (user rule Q-097 C, decision Q-137 A of the lead; dated 2026-11-21 night)
+
+What the check accepted before this round (the version of the round of 00:20 to 00:50, sha256 e17fb573...): an input was labelled when (a) it had a label element with text and a box of at least 2 by 2 pixels not hidden by the label's own style, or (b) it sat in a table cell, the header cell over its column passed the same own-style test and had text, and that text was in the input's accessible name. Anything hidden through an ancestor (opacity 0 on a wrapper, a thead or a row) or by moving the box off the page (usa-sr-only, top -999em, a transform) still counted as seen.
+
+What it accepts now (support/structure.ts: a new test `seen`, used for the label element, the header cell and every element between a text and its cell or label): the same two cases, but an element counts as seen only when all of these hold: its own style and size pass as before; no ancestor has opacity 0 and `checkVisibility` (called with the options of both the old and the new spelling) says it is rendered (this catches display none on an ancestor, a closed details element and content-visibility hidden, which keep a box); and its box is not wholly off the page (right edge at or left of the page origin, or bottom edge at or above it, in page coordinates, so a scrolled page is not "off"). The text of a header or of a label is the text of its parts that are seen (a label that is a box with its only text off the page has no visible text). The messages are unchanged ("is not shown" now means "not seen by a person").
+
+Why: Q-137 A makes the visible column header (or label) the thing a sighted user reads, so the check must refuse a header or label that no sighted user can see. WCAG 2.1: 3.3.2 Labels or Instructions, 2.5.3 Label in Name, 1.3.1 Info and Relationships.
+
+What it still refuses, with the new tests: everything of the first version (an input outside a table named only by aria-label; a name that lacks its column's header text, also by case, no name, aria-labelledby elsewhere, no header cell; an empty header; another column's header; a label element that is not shown), and now also a header or label that is hidden through usa-sr-only, an opacity 0 on an ancestor (wrapper, thead, row), a box above the page, a transform out of the page, a closed details element, content-visibility hidden, or a one-pixel clipping wrapper around its text.
+
+What it does NOT detect (checked in the browser with the checker as it is, by a throw-away probe, not by a recorded test; none of the 13 screens does any of these): text made invisible by its own colour (`color: transparent`, the colour of the background); `font-size: 0` on a cell that keeps its box (on a small inline element the box collapses and is caught); `text-indent: -9999px` in a large box with overflow hidden; text covered by another element; `aria-hidden` (not a visual method). A box far to the right or below the page counts as seen (it can be scrolled to). The inputs that are examined at all are still chosen by the old own-style test, so an input in a transparent wrapper is examined (it errs on the side of reporting). Case (b) still matches the header text as a substring of the name, and an input named through a label that is not seen, under a header that this text contains, passes case (b).
+
+What did not change: every other assertion, the titles and groups of the 28 first-version tests, `pages.a11y.spec.ts` (the AC-6 test of every screen calls the same `structureProblems`), `support/screens.ts` and the other files of the story. Only `gate.a11y.spec.ts` (19 new tests, one `<style>` rule in the helper that builds the small pages, and the header comment) and `support/structure.ts` changed. Hashes recorded again (see "Test protection").
+
+### Result of the runs of this round
+
+| File | Level | Tests | Passed | Failed |
+|---|---|---|---|---|
+| e2e/a11y/pages.a11y.spec.ts | Playwright, page scans on the live stack (PEM_JOURNEYS=1), build of 2026-11-21 00:19 | 77 | 77 | 0 |
+| e2e/a11y/gate.a11y.spec.ts | Playwright, gate (4) and the AC-6 label rule (47: 28 first version, 19 new), default suite | 51 | 51 | 0 |
+| e2e/a11y/policy.a11y.spec.ts | Playwright, repository checks, no browser, default suite | 12 | 12 | 0 |
+| tests/ux/scrollable-table.test.tsx | Vitest, component (file unchanged, re-run) | 20 | 20 | 0 |
+| e2e/a11y/keyboard-journeys.spec.ts | Playwright, keyboard-only journeys | 7 | not run | 7 of 7 passed in the correction round of 2026-11-20 (they do not use the structure checker) |
+| Total | | 167 | 160 run, 160 passed | 0 |
+
+Per criterion, by the trace tool's own `tests()` function (imported, run over a scratch copy of the JSON reports; `main()` not run, no file of the tool written), with the 7 journeys added by hand to AC-3: AC-1 19, AC-2 5, AC-3 11, AC-4 34, AC-5 30, AC-6 61 (14 pages and 47 gate), AC-7 7; total 167, all passed in the runs above (160) or in the correction round of 2026-11-20 (the 7 journeys), 0 failed. `npx tsc -b` and `npx eslint . --max-warnings 0` in modern/web-ui: both clean (exit 0). The default suite `npx playwright test e2e/a11y` ran 63 tests (51 gate, 12 repository checks): 63 passed.
+
+### Red evidence: the 19 new tests against the checker of 00:50
+
+The 19 tests were written first and run against the unchanged checker (a copy of it was kept, the checker was changed only afterwards). First run, against the 14 tests written at that point: 9 failed. Of the 5 that passed, 3 are guards (one (i), one (ii), one (v)) and 2 passed by accident because the label had an empty box (an inline label whose only child is positioned absolutely has a size of 0, which the old own-style test already refused); those two were given a box of their own (inline-block, 60 by 20 pixels) so that it is the text that is not seen. Five tests were added later: the scrolled table and the label that sets visibility visible again (guards), and the transform, the closed details element and content-visibility hidden (which needed `checkVisibility`, see the mutants). The checker of 00:50 was then put back for one run (sha256 checked, restored byte for byte afterwards): 14 of the 47 AC-6 cases failed, 33 passed. The 14 are both markups of the review and 12 more hiding cases; the 5 new tests that pass on both versions are guards (listed in the table below). After the change of the checker: 47 of 47 pass. JSON: scratchpad ui-results mam86-gate-old-checker-red2.json (old checker) and mam86-gate-new-green3.json (new).
+
+### The 19 new tests
+
+| Test | Result | Reason |
+|---|---|---|
+| MAM-86 AC-6 (i) a label that also holds a usa-sr-only part is accepted: the part a person reads is enough | PASS | guard: passes against the checker of 00:50 too; it keeps case (a) from becoming too strict |
+| MAM-86 AC-6 (i) a label that sets visibility visible inside a wrapper that is visibility hidden is seen, so it is accepted | PASS | guard: passes against the checker of 00:50 too; it keeps case (a) from becoming too strict |
+| MAM-86 AC-6 (ii) a usa-sr-only suffix of the header is not part of what a person reads, so the name need not contain it | PASS | against the checker of 00:50 it FAILS: it keeps the hidden suffix in the header text ("Tier (required)"), so the name "Tier, row 1" does not contain it and a correct input is refused |
+| MAM-86 AC-6 (ii) header text that starts a little left of the page edge but reaches into the page is still seen | PASS | guard for the new off-page test: passes against the checker of 00:50 (no such test there); fails under the mutants that break the test (see the mutants) |
+| MAM-86 AC-6 (ii) a table scrolled out of the window (above and to the left of it) is still on the page: its header is seen | PASS | guard for the new off-page test: passes against the checker of 00:50 (no such test there); fails under the mutants that break the test (see the mutants) |
+| MAM-86 AC-6 (v) a table input under a header whose only text is in a usa-sr-only element (moved off the page) is refused | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (v) a table input under a header whose only text is moved above the page (top -999em) is refused | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (v) a table input under a header whose text sits in a wrapper that is clipped to one pixel is refused | PASS | guard: passes against the checker of 00:50 too (it already skipped an element that is not shown); keeps the walk of the text honest |
+| MAM-86 AC-6 (v) a table input under a header cell whose opacity 0 sits on the thead (opacity is not inherited, but nobody sees the cell) is refused | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (v) a table input under a header cell inside a table row with opacity 0 is refused | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the usa-sr-only class on the label (moved off the page) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: its only text in a usa-sr-only element inside the label | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label inside a wrapper with opacity 0 (opacity is not inherited, but nobody sees the label) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label inside a wrapper with opacity 0, two levels up | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label moved above the page (top -999em) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label moved out of the page by a transform (translateX -5000px) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label inside a closed details element (an accordion that is not open) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label inside a wrapper with content-visibility hidden | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the text of the label in a wrapper clipped to one pixel | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+
+### Mutants of the new `seen` test (the checker is changed for one run and restored byte for byte, sha256 checked)
+
+Twelve mutants, each run against the AC-6 gate cases, all killed. Counts of failing tests are those of the run (the first eleven ran against 43 tests; the survivor was run again and the twelfth was run against 47, after the closed-details and content-visibility cases were added): no ancestor opacity test (4 fail); no off-page test (6); the off-page test ignores the bottom edge (2); ignores the right edge (4); any part of the box off the page counts as off (1); the window is used, not the page (1, the scrolled table); the text of a header is walked with `shown` instead of `seen` (4); the header cell is judged with `shown` (2); the label is judged with `shown` (4); the text of a label is its textContent (2); an ancestor with visibility hidden is treated as hiding (1, the label that sets visibility visible again); `checkVisibility` not called (first 0 failed: the mutant SURVIVED, because no test had a box that is rendered as nothing; after the closed-details and content-visibility tests were added: 2 fail). Evidence that `checkVisibility` is needed: in Chromium 159 a label in a closed details element or under content-visibility hidden has a box of 26 by 17 pixels and `checkVisibility` is false.
+
+### Test protection
+
+`python modern/tools/checks/test_protection.py record MAM-86 <the 12 files>` was run again for the 12 files of the story (printed: recorded 12 test files). Only two lines of the hash file and of `red-blobs.txt` changed: `e2e/a11y/gate.a11y.spec.ts` and `e2e/a11y/support/structure.ts`; the other 10 files are byte-identical to the round of 00:20 to 00:50. Afterwards `check MAM-86` printed OK (12 test files unchanged, no unrecorded test files), `check MAM-92` OK (3 files) and `check MAM-80` OK (3 files). Line endings kept (the working files are CRLF; the edit tool wrote them back unchanged in kind: all lines of both files end in CRLF).
+
+### Runs of this round
+
+Procedure: new gate cases (no stack) first against the checker of 00:50, then against the new one, then the mutants (no stack); under the stack lock (taken 01:31:32, released 01:35:13; seed before the run and again before the release): the whole pages file (77 passed, 1.6 min) and `npx playwright test e2e/a11y` (63 passed, 40 s); then Vitest (20 passed), tsc and eslint. Free memory: 1724 MB before the first browser run (the red, green and mutant runs followed without a second reading), 1580 MB before taking the lock, 1431 MB before the page scans (the default suite ran right after without a new reading). Live pages: the stricter test reads 32 inputs on 7 screens (portal.apply 8, console.provider-search 3, console.approval 2, console.record-sanction 4, console.risk-rules 11, console.batch-jobs 2, public.directory 2) and reports no problem. Not run: the seven keyboard journeys (they do not use the structure checker).
+
 ## Round of 2026-11-21 (00:20 to 00:50): the AC-6 label check brought in line with its criterion (Q-137 A), 28 new gate cases, 20 unit tests of ScrollableTable
 
-The sections below this one describe the rounds of 2026-11-20 and stay as they were written (history). This section is the current state.
+The sections below this one describe the rounds of 2026-11-20 and stay as they were written (history). This section is the state at 00:50.
+Correction of 2026-11-21 night: two statements of this section, that the check refuses a header cell that is "not shown" and a label element that is "not shown" (with the hiding methods named in brackets), were too broad. The check of this round judged only the element's own style and size, so a header or label hidden through an ancestor or moved off the page was still accepted. The section above fixes the check and states what it detects and what it does not.
 The test-writer changed no production code (`modern/web-ui/src`) and built nothing; the lead deployed the build of 2026-11-21 00:19 (`modern/web-ui/dist`, files dated 00:19:47), which contains the fix of D1 (`src/shared/ui/ScrollableTable.tsx`).
 
 ### Result of the final runs
@@ -291,6 +369,30 @@ All seven re-run in the correction round with the added outcome checks (J1 81 s,
 | MAM-86 AC-6 (vii) an input whose label element is not shown is refused: label with visibility hidden | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
 | MAM-86 AC-6 (vii) an input whose label element is not shown is refused: label with opacity 0 | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
 | MAM-86 AC-6 (vii) an input whose label element is not shown is refused: label with visually hidden (one pixel, clipped) | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+
+#### a11y/gate.a11y.spec.ts, the 19 tests added in the correction round of 2026-11-21 night (what counts as hidden; no stack needed). Result against the checker of 00:50: FAIL for 14, PASS for 5 guards; against the new checker: all PASS
+
+| Test | Result | Reason |
+|---|---|---|
+| MAM-86 AC-6 (i) a label that also holds a usa-sr-only part is accepted: the part a person reads is enough | PASS | guard: passes against the checker of 00:50 too; it keeps case (a) from becoming too strict |
+| MAM-86 AC-6 (i) a label that sets visibility visible inside a wrapper that is visibility hidden is seen, so it is accepted | PASS | guard: passes against the checker of 00:50 too; it keeps case (a) from becoming too strict |
+| MAM-86 AC-6 (ii) a usa-sr-only suffix of the header is not part of what a person reads, so the name need not contain it | PASS | against the checker of 00:50 it FAILS: it keeps the hidden suffix in the header text ("Tier (required)"), so the name "Tier, row 1" does not contain it and a correct input is refused |
+| MAM-86 AC-6 (ii) header text that starts a little left of the page edge but reaches into the page is still seen | PASS | guard for the new off-page test: passes against the checker of 00:50 (no such test there); fails under the mutants that break the test (see the mutants) |
+| MAM-86 AC-6 (ii) a table scrolled out of the window (above and to the left of it) is still on the page: its header is seen | PASS | guard for the new off-page test: passes against the checker of 00:50 (no such test there); fails under the mutants that break the test (see the mutants) |
+| MAM-86 AC-6 (v) a table input under a header whose only text is in a usa-sr-only element (moved off the page) is refused | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (v) a table input under a header whose only text is moved above the page (top -999em) is refused | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (v) a table input under a header whose text sits in a wrapper that is clipped to one pixel is refused | PASS | guard: passes against the checker of 00:50 too (it already skipped an element that is not shown); keeps the walk of the text honest |
+| MAM-86 AC-6 (v) a table input under a header cell whose opacity 0 sits on the thead (opacity is not inherited, but nobody sees the cell) is refused | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (v) a table input under a header cell inside a table row with opacity 0 is refused | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the usa-sr-only class on the label (moved off the page) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: its only text in a usa-sr-only element inside the label | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label inside a wrapper with opacity 0 (opacity is not inherited, but nobody sees the label) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label inside a wrapper with opacity 0, two levels up | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label moved above the page (top -999em) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label moved out of the page by a transform (translateX -5000px) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label inside a closed details element (an accordion that is not open) | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the label inside a wrapper with content-visibility hidden | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
+| MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: the text of the label in a wrapper clipped to one pixel | PASS | against the checker of 00:50 it FAILS: the checker reports no problem, so an input that nobody can label by sight is accepted |
 
 #### tests/ux/scrollable-table.test.tsx (Vitest, 20 tests, written after the component; mutants of the component are all killed, see section 4 of the round)
 

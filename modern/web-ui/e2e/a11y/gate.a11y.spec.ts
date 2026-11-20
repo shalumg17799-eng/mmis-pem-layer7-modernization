@@ -7,6 +7,9 @@
 // checker the page scans use (support/structure.ts: readFacts, then structureProblems). Each side of the rule is proved on its own:
 // what it accepts (a visible label element; a table input whose name contains the visible header text of its own column) and what it
 // still refuses, with a problem that names the input (no table, wrong or empty or hidden header, another column's header, label not shown).
+// "Shown" and "hidden" mean what a sighted user sees (correction of 2026-11-21 night, after a review): the element's own style, the
+// style of its ancestors (opacity 0, display none, a closed details element, content-visibility hidden) and a box that lies wholly off
+// the page (the USWDS class usa-sr-only, top -999em, a transform) are all judged, for the label, the header cell and each part of their text.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -158,10 +161,15 @@ test.describe('[MAM-86 AC-3] the keyboard helper fails, naming the control, when
 // header cell of its column is shown and has text, and that text is contained in the input's accessible name.
 // ---------------------------------------------------------------------------------------------------------------------------------
 
+// The rule of the class that this app uses to hide text from the eye and keep it for screen readers (modern/web-ui/node_modules/
+// @uswds/uswds/dist/css/uswds.css, ".usa-sr-only"): the box is taken out of the flow and moved 999em to the left, off the page.
+// It is not display none, not visibility hidden, not opacity 0 and not one pixel in size, so it needs a test of its own.
+const USWDS_SR_ONLY = '.usa-sr-only{position:absolute;left:-999em;right:auto}';
+
 /** A page with the landmarks and one h1 around `body`, so that the only problems a case can raise are about its own inputs and tables. */
 function pageWith(body: string): string {
   return (
-    '<!doctype html><html lang="en"><head><title>Label rule</title></head><body>' +
+    `<!doctype html><html lang="en"><head><title>Label rule</title><style>${USWDS_SR_ONLY}</style></head><body>` +
     '<header><a href="#main">Skip to main content</a></header><nav aria-label="Primary navigation"><a href="#main">Home</a></nav>' +
     `<main id="main"><h1>Label rule</h1>${body}</main></body></html>`
   );
@@ -193,6 +201,16 @@ test.describe('[MAM-86 AC-6] the label rule accepts a visible label element, or 
   test('MAM-86 AC-6 (i) an input with a visible label element is accepted: no problem at all on the page', async ({ page }) => {
     const problems = await problemsOf(page, '<label for="npi">NPI</label><input id="npi" type="text">');
     expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) a label that also holds a usa-sr-only part is accepted: the part a person reads is enough', async ({ page }) => {
+    const problems = await problemsOf(page, '<label for="npi">NPI <span class="usa-sr-only">(ten digits)</span></label><input id="npi" type="text">');
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) a label that sets visibility visible inside a wrapper that is visibility hidden is seen, so it is accepted', async ({ page }) => {
+    const problems = await problemsOf(page, '<div style="visibility:hidden"><label for="npi" style="visibility:visible">NPI</label></div><input id="npi" type="text">');
+    expect(problems, 'visibility is inherited but can be set again; opacity is not inherited and cannot').toEqual([]);
   });
 
   test('MAM-86 AC-6 (i) a table input with a visible label element is accepted, whatever the header of its column says', async ({ page }) => {
@@ -234,6 +252,26 @@ test.describe('[MAM-86 AC-6] the label rule accepts a visible label element, or 
     expect(problems).toEqual([]);
   });
 
+  test('MAM-86 AC-6 (ii) a usa-sr-only suffix of the header is not part of what a person reads, so the name need not contain it', async ({ page }) => {
+    const head = '<thead><tr><th scope="col">Taxonomy prefix</th><th scope="col">Tier<span class="usa-sr-only"> (required)</span></th></tr></thead>';
+    const problems = await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head));
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (ii) header text that starts a little left of the page edge but reaches into the page is still seen', async ({ page }) => {
+    const head = '<thead><tr><th scope="col"><span style="position:absolute;left:-10px;top:60px">Taxonomy prefix</span></th><th scope="col">Tier</th></tr></thead>';
+    const problems = await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head));
+    expect(problems, 'only a box wholly outside the page (its right or bottom edge at or beyond the origin) is not seen').toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (ii) a table scrolled out of the window (above and to the left of it) is still on the page: its header is seen', async ({ page }) => {
+    const spacer = '<div style="width:6000px;height:6000px"></div>';
+    await page.setContent(pageWith(rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1')) + spacer));
+    await page.evaluate(() => window.scrollTo(2000, 2000));
+    expect(await page.evaluate(() => [window.scrollX, window.scrollY]), 'the page really is scrolled past the table').toEqual([2000, 2000]);
+    expect(structureProblems(await readFacts(page)), 'the position is judged on the page, not in the window').toEqual([]);
+  });
+
   test('MAM-86 AC-6 (ii) a table without a thead has its header in the first row made only of th', async ({ page }) => {
     const table = `<table><caption>Risk rules</caption><tr><th scope="col">Taxonomy prefix</th><th scope="col">Tier</th></tr><tr>${prefixCell('Taxonomy prefix, row 1')}${tierCell('Tier, row 1')}</tr></table>`;
     const problems = await problemsOf(page, table);
@@ -243,6 +281,70 @@ test.describe('[MAM-86 AC-6] the label rule accepts a visible label element, or 
   test('MAM-86 AC-6 (ii) with two header rows the lowest header cell over the column is the one that counts', async ({ page }) => {
     const head = '<thead><tr><th scope="col" colspan="2">Rule</th></tr><tr><th scope="col">Taxonomy prefix</th><th scope="col">Tier</th></tr></thead>';
     const problems = await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head));
+    expect(problems).toEqual([]);
+  });
+
+  // Guards of the second correction round (2026-11-21 night): the stricter `seen` must still accept everything that a person can see.
+  test('MAM-86 AC-6 (i) a label inside a wrapper with overflow hidden that is large enough to show it is accepted', async ({ page }) => {
+    const problems = await problemsOf(page, '<div style="width:200px;height:40px;overflow:hidden"><label for="npi">NPI</label></div><input id="npi" type="text">');
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) a label that its wrapper cuts but whose first letters show is accepted (only a clip to under 2 by 2 pixels hides it)', async ({ page }) => {
+    const problems = await problemsOf(page, '<div style="width:30px;overflow:hidden;white-space:nowrap"><label for="npi">NPI number</label></div><input id="npi" type="text">');
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) a label beyond the edge of a wrapper that scrolls (overflow auto) can be scrolled to, so it is accepted', async ({ page }) => {
+    const wrapper = '<div style="width:80px;height:40px;overflow:auto;white-space:nowrap"><span style="display:inline-block;width:300px">Filler</span><label for="npi">NPI</label></div>';
+    const problems = await problemsOf(page, `${wrapper}<input id="npi" type="text">`);
+    expect(problems, 'a scroll container is judged by its own size, not by the edge that its content passes').toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) overflow hidden on an inline wrapper clips nothing, so the label inside it is accepted', async ({ page }) => {
+    const problems = await problemsOf(page, '<span style="overflow:hidden"><label for="npi">NPI</label></span><input id="npi" type="text">');
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) an absolutely positioned label is not clipped by an overflow hidden wrapper that is not its containing block', async ({ page }) => {
+    const wrapper = '<div style="position:relative"><div style="width:1px;height:1px;overflow:hidden"><label for="npi" style="position:absolute;left:0;top:0">NPI</label></div></div>';
+    const problems = await problemsOf(page, `${wrapper}<input id="npi" type="text">`);
+    expect(problems, 'the label belongs to the relative outer box; the 1 pixel box between them does not clip it').toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) a label that has its own text and also wraps a textarea is accepted: the text a person reads is "Reason"', async ({ page }) => {
+    const problems = await problemsOf(page, '<label for="note">Reason <textarea id="note">Write the reason here</textarea></label>');
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) a label with a partly transparent colour (alpha 0.5) is accepted: only alpha 0 hides the text', async ({ page }) => {
+    const problems = await problemsOf(page, '<label for="npi" style="color:rgba(27,27,27,0.5)">NPI</label><input id="npi" type="text">');
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) a label inside a wrapper with filter opacity(0.5) is accepted: only opacity 0 hides it', async ({ page }) => {
+    const problems = await problemsOf(page, '<div style="filter:opacity(0.5)"><label for="npi">NPI</label></div><input id="npi" type="text">');
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) a label whose text sits in an element with a normal font size inside an element with font-size 0 is accepted: the element that holds the text is judged', async ({ page }) => {
+    const problems = await problemsOf(page, '<label for="npi"><span style="font-size:0"><span style="font-size:16px">NPI</span></span></label><input id="npi" type="text">');
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (ii) a header with a normal colour is accepted', async ({ page }) => {
+    const head = '<thead><tr><th scope="col" style="color:#1b1b1b">Taxonomy prefix</th><th scope="col" style="color:rgba(27,27,27,0.7)">Tier</th></tr></thead>';
+    const problems = await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head));
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (ii) a table inside a wrapper with overflow hidden that is large enough: its header is seen', async ({ page }) => {
+    const problems = await problemsOf(page, `<div style="width:700px;height:200px;overflow:hidden">${rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'))}</div>`);
+    expect(problems).toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (ii) a table wider than its scrolling wrapper (overflow-x auto): the header of the column beyond the edge is seen, as it can be scrolled to', async ({ page }) => {
+    const problems = await problemsOf(page, `<div style="width:150px;overflow-x:auto">${rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'))}</div>`);
     expect(problems).toEqual([]);
   });
 });
@@ -316,6 +418,40 @@ test.describe('[MAM-86 AC-6] the label rule still refuses an input with no visib
     });
   }
 
+  // The hiding methods that the first version of the check did not see, because it read only the style of the element itself:
+  // the USWDS class that moves text off the page, an opacity that sits on an ancestor, a box above the page.
+  test('MAM-86 AC-6 (v) a table input under a header whose only text is in a usa-sr-only element (moved off the page) is refused', async ({ page }) => {
+    const head = '<thead><tr><th scope="col"><span class="usa-sr-only">Taxonomy prefix</span></th><th scope="col">Tier</th></tr></thead>';
+    const message = problemAbout(await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head)), 'prefix-1');
+    expect(message).toContain('the header cell of its column has no visible text');
+  });
+
+  test('MAM-86 AC-6 (v) a table input under a header whose only text is moved above the page (top -999em) is refused', async ({ page }) => {
+    const head = '<thead><tr><th scope="col"><span style="position:absolute;top:-999em;left:20px">Taxonomy prefix</span></th><th scope="col">Tier</th></tr></thead>';
+    const message = problemAbout(await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head)), 'prefix-1');
+    expect(message).toContain('the header cell of its column has no visible text');
+  });
+
+  test('MAM-86 AC-6 (v) a table input under a header whose text sits in a wrapper that is clipped to one pixel is refused', async ({ page }) => {
+    const wrapper = '<span style="position:absolute;width:1px;height:1px;overflow:hidden"><span>Taxonomy prefix</span></span>';
+    const head = `<thead><tr><th scope="col">${wrapper}</th><th scope="col">Tier</th></tr></thead>`;
+    const message = problemAbout(await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head)), 'prefix-1');
+    expect(message).toContain('the header cell of its column has no visible text');
+  });
+
+  test('MAM-86 AC-6 (v) a table input under a header cell whose opacity 0 sits on the thead (opacity is not inherited, but nobody sees the cell) is refused', async ({ page }) => {
+    const head = '<thead style="opacity:0"><tr><th scope="col">Taxonomy prefix</th><th scope="col">Tier</th></tr></thead>';
+    const problems = await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head));
+    expect(problemAbout(problems, 'prefix-1')).toContain('the header cell of its column ("Taxonomy prefix") is not shown');
+    expect(problemAbout(problems, 'tier-1'), 'the other column is under the same thead').toContain('the header cell of its column ("Tier") is not shown');
+  });
+
+  test('MAM-86 AC-6 (v) a table input under a header cell inside a table row with opacity 0 is refused', async ({ page }) => {
+    const head = '<thead><tr style="opacity:0"><th scope="col">Taxonomy prefix</th><th scope="col">Tier</th></tr></thead>';
+    const message = problemAbout(await problemsOf(page, rulesTable(prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1'), head)), 'prefix-1');
+    expect(message).toContain('the header cell of its column ("Taxonomy prefix") is not shown');
+  });
+
   test('MAM-86 AC-6 (vi) a table input whose name holds only the header text of ANOTHER column is refused (the two inputs are swapped here)', async ({ page }) => {
     const problems = await problemsOf(page, rulesTable(prefixCell('Tier, row 1') + tierCell('Taxonomy prefix, row 1')));
     expect(problemAbout(problems, 'prefix-1')).toContain('its accessible name "Tier, row 1" does not contain the visible header text "Taxonomy prefix" of its column');
@@ -337,6 +473,27 @@ test.describe('[MAM-86 AC-6] the label rule still refuses an input with no visib
   ] as const) {
     test(`MAM-86 AC-6 (vii) an input whose label element is not shown is refused: label with ${how}`, async ({ page }) => {
       const body = `<label for="npi" style="${style}">NPI</label><input id="npi" type="text">`;
+      const message = problemAbout(await problemsOf(page, body), 'npi');
+      expect(message).toContain(`${NEITHER_A}its label element "NPI" is not shown)`);
+      expect(message).toContain('it is not in a table cell');
+    });
+  }
+
+  // The label that the first version of the check accepted, because it read only the style of the label element itself.
+  for (const [how, body] of [
+    ['the usa-sr-only class on the label (moved off the page)', '<label for="npi" class="usa-sr-only">NPI</label><input id="npi" type="text">'],
+    // The label keeps a box of its own here (inline-block, 60 by 20 pixels), so that it is the TEXT inside it that is not seen, not an empty box.
+    ['its only text in a usa-sr-only element inside the label', '<label for="npi" style="display:inline-block;width:60px;height:20px"><span class="usa-sr-only">NPI</span></label><input id="npi" type="text">'],
+    ['the label inside a wrapper with opacity 0 (opacity is not inherited, but nobody sees the label)', '<div style="opacity:0"><label for="npi">NPI</label></div><input id="npi" type="text">'],
+    ['the label inside a wrapper with opacity 0, two levels up', '<div style="opacity:0"><p><label for="npi">NPI</label></p></div><input id="npi" type="text">'],
+    ['the label moved above the page (top -999em)', '<label for="npi" style="position:absolute;top:-999em;left:20px">NPI</label><input id="npi" type="text">'],
+    ['the label moved out of the page by a transform (translateX -5000px)', '<label for="npi" style="display:inline-block;transform:translateX(-5000px)">NPI</label><input id="npi" type="text">'],
+    // These two keep a real box (about 26 by 17 pixels, read in Chromium) while the browser does not render their content.
+    ['the label inside a closed details element (an accordion that is not open)', '<details><summary>More</summary><label for="npi">NPI</label></details><input id="npi" type="text">'],
+    ['the label inside a wrapper with content-visibility hidden', '<div style="content-visibility:hidden"><label for="npi">NPI</label></div><input id="npi" type="text">'],
+    ['the text of the label in a wrapper clipped to one pixel', '<label for="npi" style="display:inline-block;width:60px;height:20px"><span style="position:absolute;width:1px;height:1px;overflow:hidden"><span>NPI</span></span></label><input id="npi" type="text">'],
+  ] as const) {
+    test(`MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: ${how}`, async ({ page }) => {
       const message = problemAbout(await problemsOf(page, body), 'npi');
       expect(message).toContain(`${NEITHER_A}its label element "NPI" is not shown)`);
       expect(message).toContain('it is not in a table cell');

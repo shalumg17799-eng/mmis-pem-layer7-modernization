@@ -62,12 +62,33 @@ export async function readFacts(page: Page): Promise<Facts> {
           dataCells: table.querySelectorAll('td').length,
         };
       });
-    // The text of an element that a sighted user can read: text nodes whose own element and every element up to `root` are shown.
+    // Can a sighted user see this element? Stricter than `shown`, which reads only the element's own style and size. On top of it:
+    //  - no ancestor has opacity 0 (opacity is not inherited, so the child of a transparent wrapper has opacity 1 and a box, and is
+    //    still invisible); the ancestors are walked here and `checkVisibility` is asked as well (display none or content-visibility
+    //    on an ancestor, and the visibility of the element itself);
+    //  - the box is not wholly off the page: its right edge at or left of the page origin, or its bottom edge at or above it
+    //    (the USWDS class usa-sr-only moves a box 999em to the left; a box there cannot be scrolled to). A box that merely starts left
+    //    of the edge but reaches into the page is seen.
+    // Not detected (a known limit, stated in the accessibility report): text made invisible by its own colour (color transparent, the
+    // colour of the background), font-size 0, a negative text-indent, text pushed out of a box that clips it, or a box covered by
+    // another one.
+    const seen = (node: Element): boolean => {
+      if (!shown(node)) return false;
+      for (let up = node.parentElement; up !== null; up = up.parentElement) {
+        if (Number(getComputedStyle(up).opacity) === 0) return false;
+      }
+      const options: Record<string, boolean> = { opacityProperty: true, visibilityProperty: true, checkOpacity: true, checkVisibilityCSS: true };
+      const check = (node as HTMLElement).checkVisibility;
+      if (typeof check === 'function' && !check.call(node, options)) return false;
+      const r = node.getBoundingClientRect();
+      return !(r.right + window.scrollX <= 0 || r.bottom + window.scrollY <= 0);
+    };
+    // The text of an element that a sighted user can read: text nodes whose own element and every element up to `root` are seen.
     const visibleText = (root: Element): string => {
       const parts: string[] = [];
       const walk = (node: Node): void => {
         if (node.nodeType === Node.TEXT_NODE) parts.push(node.textContent ?? '');
-        else if (node.nodeType === Node.ELEMENT_NODE && (node === root || shown(node as Element))) node.childNodes.forEach(walk);
+        else if (node.nodeType === Node.ELEMENT_NODE && (node === root || seen(node as Element))) node.childNodes.forEach(walk);
       };
       walk(root);
       return clean(parts.join(''));
@@ -123,8 +144,8 @@ export async function readFacts(page: Page): Promise<Facts> {
         .filter((candidate) => candidate !== cell && startOf(candidate) <= column && column < startOf(candidate) + Math.max(1, candidate.colSpan));
       const header = covering[covering.length - 1];
       if (!header) return null;
-      const isShown = shown(header);
-      return { text: isShown ? visibleText(header) : clean(header.textContent), shown: isShown };
+      const isSeen = seen(header);
+      return { text: isSeen ? visibleText(header) : clean(header.textContent), shown: isSeen };
     };
     const skipped = ['hidden', 'submit', 'button', 'reset', 'image'];
     const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('input, select, textarea'))
@@ -137,7 +158,7 @@ export async function readFacts(page: Page): Promise<Facts> {
           id: node.id || node.name || '(no id)',
           type: node.type || node.tagName.toLowerCase(),
           label: labels.map((label) => clean(label.textContent)).filter(Boolean).join(' / '),
-          labelVisible: labels.some((label) => clean(label.textContent) !== '' && shown(label)),
+          labelVisible: labels.some((label) => seen(label) && visibleText(label) !== ''),
           ariaLabel: node.getAttribute('aria-label') ?? '',
           name: nameOf(node),
           inCell: cell !== null,

@@ -150,7 +150,8 @@ reported, so the lead ran the proofs at 22:09 to 22:16 and wrote this section.
    (exit 1) and names each" (7 tests named) and "AC-7 after the temporary classes are removed :libs:fixed-width:test passes
    again (exit 0; 257 tests, 0 failures, 0 skipped)". Nothing was left behind (MAM-42 hash check OK, no TempSkippedDemo
    class in the tree).
-2. `checkAll` depended on three task paths that do not exist. **Fix:** `build.gradle.kts:25-28` depends on `versionCheck`
+2. `checkAll` depended on three task paths that do not exist. **Fix:** `build.gradle.kts` (the `checkAll` task, lines 37-45
+   since the gate extension) depends on `versionCheck`
    and on the `check` task of every subproject that has one. **Proof:** `./gradlew --no-daemon checkAll --dry-run` at 22:09:
    BUILD SUCCESSFUL in 1m; `:versionCheck` is in the plan once; 14 module `check` tasks are listed (the 14 includes of
    settings.gradle.kts); 9 `pitest` tasks are in the plan. This shows that the task graph resolves. A whole `checkAll` has
@@ -207,10 +208,12 @@ listed under "Known limits".
 
 - The guard does not see a disabled or aborted **class template** (`@ParameterizedClass` or `@ClassTemplate`, new in JUnit
   5.13): Gradle reports such a class as a successful suite with zero tests. No test in the repository uses a class
-  template (search of 2026-11-20). A build check that closes this gap is being added (section "Gate extension" below, when
-  it is done).
+  template (search of 2026-11-20). Closed at source level on 2026-11-21 by the build check `testSourceCheck` (section
+  "Gate extension" below): it rejects the source constructs that cause it. The library behaviour itself was reasoned from
+  the code, not run.
 - A JUnit 4 test (`org.junit.Test`) would never be discovered, because only the JUnit Platform engines for Jupiter and
-  Cucumber are present. No test source uses JUnit 4.
+  Cucumber are present. No test source uses JUnit 4, and `testSourceCheck` now rejects JUnit 3 and 4 names, also as the
+  wildcard import `org.junit.*`.
 - `-PpemVersionCatalog=<path>` points `versionCheck` at another file; it is meant for the demonstration only.
 
 AC-2 stays as question Q-123 says (default A: the legacy readers of enrollment-service and sanctions-service stay in their
@@ -237,8 +240,10 @@ The root task `testSourceCheck` (`buildSrc/.../pem/build/TestSourceCheck.kt`, pl
   named `assume` or `assuming` plus a capital letter (`assumeTrue(`, `assumeFalse(`, `assumeThat(`, `assumingThat(`,
   `assumeThatThrownBy(`, and the like);
 - JUnit 4: any `org.junit.` name that is not `org.junit.jupiter` or `org.junit.platform` (`Test`, `Ignore`, `Before`, `After`,
-  `Assert`, `Rule`, `runner`, ...), as import or fully qualified; added by me: `junit.framework` (JUnit 3 is in the same jar and
-  also has no engine);
+  `Assert`, `Rule`, `runner`, ... and the wildcard import `import org.junit.*;` that an IDE writes when it collapses imports),
+  as import or fully qualified; added by me: `junit.framework` (JUnit 3 is in the same jar and also has no engine), also as
+  `import junit.framework.*;`. The first version of the scanner did not flag the two wildcard forms (its rules needed a word
+  after the last dot): the review found it, and this was corrected in the round described under "Correction round" below;
 - **Cucumber filters: included**, because a filter drops scenarios without a skip ever being reported, so neither the listener
   nor a reader of the test results can see it, and it is the cheapest way to turn a red scenario green: the keys
   `cucumber.filter.tags` and `cucumber.filter.name` (a `.properties` line that is not a comment, or a string literal that is
@@ -259,10 +264,14 @@ pass), and it declares no outputs, so Gradle never treats it as up to date.
 - Task registered in `build.gradle.kts` next to `versionCheck`; `checkAll` depends on it (`dependsOn(testSourceCheck)`).
 - `pem.java-conventions.gradle.kts` (`tasks.check`): `dependsOn(":testSourceCheck")` next to the `versionCheck` line, so every
   module's `check` runs it. It is a repository-wide scan, like `versionCheck`: a finding in one module fails every module's check.
-- `tools/checks/demo-build-gates.sh`: new block "AC-7 (second layer)", 51 steps; `DEMO_ONLY=ac8|ac7-runtime|ac7-source` runs one
-  block; the clean-up check now covers the three folders where temporary files are written.
+- `tools/checks/demo-build-gates.sh`: new block "AC-7 (second layer)", 53 steps (51 in the first version, 2 wildcard cases
+  added in the correction round); `DEMO_ONLY=ac8|ac7-runtime|ac7-source` runs one block; the clean-up check now covers the
+  three folders where temporary files are written.
 
-### Demonstration (run under the shared Gradle lock, `--no-daemon`, free memory checked before every call)
+### Demonstration, first round (run under the shared Gradle lock, `--no-daemon`, free memory checked before every call)
+
+The figures of this subsection (51 new steps, 44 temporary sources, 58 PASS, 357 files) are those of the first version of the
+scanner and of the script; the figures after the correction are under "Correction round".
 
 Red, before the check existed (Gradle: "Task 'testSourceCheck' not found in root project 'pem-modern' and its subprojects"):
 
@@ -307,10 +316,54 @@ verify, so the lock was never free over a build that did not compile (not needed
 Before the Gradle run, the design was tried on the real tree with a throw-away Python port of the scanner (353 files, 0
 findings), and the new block of the script was run offline against a fake `gradlew`; those runs are not the proof.
 
+### Correction round (2026-11-21, 00:30 to 01:22)
+
+Finding of the review of the gate extension (read from the code, not run): the JUnit 4 rule matched `org.junit.` followed by a
+word, and the JUnit 3 rule `junit.framework.` followed by a word, so `import org.junit.*;` and `import junit.framework.*;`
+produced no finding. junit 4.13.2 is on every service's test class path through Testcontainers, so a JUnit 4 class written with
+the collapsed import compiles, is never discovered and left `check` green. The sentence "any `org.junit.` name, as import or
+fully qualified" in the first version of this section, in the KDoc and in the developer guide was therefore not true for the
+wildcard. Order of the work: the demonstration first, then the scanner.
+
+1. Demonstration extended (`tools/checks/demo-build-gates.sh`): two cases in the table of constructs, `Junit4Wildcard`
+   (`import org.junit.*;`, construct `org.junit.*`) and `Junit3Wildcard` (`import junit.framework.*;`, construct
+   `junit.framework.*`), so 46 temporary sources and 53 new steps; two lines in the "no false alarm" file that must stay
+   quiet (`import org.junit.jupiter.api.*;`, `import org.junit.jupiter.params.provider.*;`, `import org.junit.platform.suite.api.*;`).
+2. Red, scanner unchanged, `DEMO_ONLY=ac7-source`, lock held 00:42 to 00:47 (the lock was waited for since 00:33), log
+   `mam16-red-wildcard.log` in the scratchpad: `== waited 0 s for free memory; 4 step(s) failed ==`, 50 PASS. The three expected
+   failures: `FAIL AC-7 source org.junit.*: 'TempSkippedDemoSrcJunit4Wildcard.java:6: org.junit.* (' is not in the message`,
+   `FAIL AC-7 source junit.framework.*: 'TempSkippedDemoSrcJunit3Wildcard.java:6: junit.framework.* (' is not in the message` and
+   `FAIL AC-7 source: 46 temporary sources together (exit 1; expected exit 1 and 'Test source check failed: 46 skip mechanism(s)')`.
+   The fourth failure was not the scanner: `FAIL AC-7 source: no false alarm (exit 0; read '364', expected 363)`. Another lane
+   created `TimeoutDetailRepeatedTest.java` in screening-service at 00:44:59, between the script's `find` and the scan, so the
+   real tree went from 360 to 361 files during the step. The script now counts before and after the scan and requires the
+   number read to lie between the two (exact when the tree is stable); the same change was made in the real-tree step. The
+   scanner returned exit 0 on the quiet file, as it should.
+3. Scanner corrected (`TestSourceCheck.kt`, the two rules end in `(\w+|\*)`; the KDoc names the wildcard), edit made inside one
+   lock hold from 01:05:49 and `./gradlew --no-daemon -q help` passed at 01:07 (buildSrc compiles) before anything else ran.
+4. Green, whole script in the same hold, 01:07 to 01:22, log `mam16-green-wildcard.log`: `== waited 240 s for free memory;
+   0 step(s) failed ==`, 60 PASS (7 old + 53 new), exit 0; no `TempSkippedDemo` file left (`test_protection.py check MAM-42` ->
+   `OK: 10 test files of MAM-42 unchanged; no unrecorded test files`). Lines of the new steps:
+   `PASS AC-7 source org.junit.*: TempSkippedDemoSrcJunit4Wildcard.java:6: org.junit.* (JUnit 4: no engine for it is on the class
+   path, so the test is never discovered or run): import org.junit.*;`,
+   `PASS AC-7 source junit.framework.*: TempSkippedDemoSrcJunit3Wildcard.java:6: junit.framework.* (JUnit 3: ...): import
+   junit.framework.*;`, `PASS AC-7 source: 46 temporary sources together make testSourceCheck fail (exit 1) and the count is
+   46, one finding per source`, and `PASS AC-7 source: the same words in comments, in string literals (...) do not fail (exit 0;
+   read 364 files = 361 of the real tree + 3 temporary)`, which includes the three allowed wildcard imports (jupiter, params,
+   platform) staying quiet.
+5. The real tree: `testSourceCheck: read 361 test source files (360 Java, 0 Kotlin, 1 properties) in 13 modules: no @Disabled, @Ignore,
+   conditional execution, assumption, JUnit 3 or 4 class, or Cucumber tag filter.` (exit 0; find counts 361; no exception was
+   added). The plans are unchanged: `:libs:fixed-width:check --dry-run` has `:testSourceCheck` once and `:versionCheck` once;
+   `checkAll --dry-run` has `:testSourceCheck` once, `:versionCheck` once and 14 module checks.
+
+The tree has grown from 357 to 361 test sources since the first round because other lanes add test files (no test file of any
+story was touched by this correction).
+
 ### Result on the real tree
 
 No finding: nothing was changed and nothing was excepted to get to green. The lead's search of 22:40 (no file with a skip
-construct) is confirmed by the check itself and by the independent Python port.
+construct) is confirmed by the check itself and by the independent Python port (first round, 357 files) and again by the
+corrected scanner in the correction round (361 files).
 
 ### Still not verified
 
@@ -327,4 +380,24 @@ construct) is confirmed by the check itself and by the independent Python port.
 - The web UI tests (Vitest, Playwright: `skip`, `only`, `fixme`) are outside this task and unchecked.
 - The scanner has no unit test of its own (`buildSrc` has no test dependency; adding one is a new dependency): the
   demonstration is its test. A Kotlin string template that contains a quote can confuse the lexer for the rest of that line.
+- The demonstration shows 46 constructs, not every spelling of them. For JUnit 4 and 3 it shows a class, a package and the
+  wildcard. Not shown by a run: `import static org.junit.Assert.*;` (by the rule it matches `org.junit.Assert`; the `Junit4Assert`
+  and `Junit4Qualified` cases show that name in two other forms). Not flagged by design of the rule: the JUnit 3 helper packages
+  `junit.extensions`, `junit.runner` and `junit.textui` (a JUnit 3 test is a `junit.framework.TestCase`, which is flagged; this
+  was not run). A name split over two lines or by a comment is not matched (the rules read one line).
 - Linux (the CI run): the scanner uses `java.io.File` and forward slashes; only a Windows run with Git Bash was made.
+
+## Closing note (lead, 2026-11-21 01:50)
+
+- Last review of the gate extension (code-reviewer, 01:37): **APPROVE**, no MUST-FIX. Its SHOULD-FIX notes are listed in
+  `modern/docs/reports/review-should-fix.md` (for example: AssertJ `BDDAssumptions` is not flagged; a `.properties` file
+  under libs/test-support/src/main/resources would not be read).
+- Figures after the correction round: demonstration 60 of 60 steps PASS (7 old, 53 new); the real tree passes with 361
+  test source files and no exception list.
+- The switch `pemSkipPit` (a block at the end of `build.gradle.kts`, added for the 20:00 deadline of 2026-11-20) is
+  removed: the property had been taken out of gradle.properties at 19:29 and nothing set it any more; with the block gone
+  no invocation can switch the PIT gate (AC-4) off.
+- First runs on Linux: GitHub run 2 (commit 14e0707) built and tested for 45 minutes with the skipped-test guard and
+  `versionCheck`; run 3's compose smoke job built the jar with the build logic of this story, `testSourceCheck` included
+  in the configuration. A whole `build checkAll` on GitHub with a real exit code is run 4 (see `stories/MAM-39.md`).
+- AC-2: accepted with question Q-123, default A (the user's plan names this default for closing the story).

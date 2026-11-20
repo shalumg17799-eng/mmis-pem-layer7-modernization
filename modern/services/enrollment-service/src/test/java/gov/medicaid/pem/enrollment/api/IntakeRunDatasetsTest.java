@@ -181,8 +181,10 @@ class IntakeRunDatasetsTest extends IntakeIntegrationTest {
     run(SCENARIOS, "2026-01-15");
     assertThat(
             jdbc.queryForList(
-                "SELECT trim(last_name), trim(first_name), trim(license_no), trim(license_state),"
-                    + " trim(provider_type), trim(taxonomy), trim(medicaid_id), source"
+                "SELECT trim(last_name) AS last_name, trim(first_name) AS first_name,"
+                    + " trim(license_no) AS license_no, trim(license_state) AS license_state,"
+                    + " trim(provider_type) AS provider_type, trim(taxonomy) AS taxonomy,"
+                    + " trim(medicaid_id) AS medicaid_id, source"
                     + " FROM application WHERE npi = '1003000111'"))
         .singleElement()
         .satisfies(

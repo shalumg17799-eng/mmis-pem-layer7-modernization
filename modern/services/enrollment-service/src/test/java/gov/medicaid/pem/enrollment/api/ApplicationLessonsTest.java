@@ -11,9 +11,12 @@ import gov.medicaid.pem.testsupport.PemJwt;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -119,11 +122,28 @@ class ApplicationLessonsTest extends IntakeIntegrationTest {
   // ---- the correlation id (MAM-46)
   // ------------------------------------------------------------------
 
-  @Test
-  @DisplayName(
-      "[MAM-46 AC-1] an X-Correlation-Id with a line break never reaches the log line or the ApplicationValidated event")
-  void unsafeCorrelationIdIsReplaced() throws Exception {
-    String evil = "abc\nFORGED LOG LINE level=ERROR";
+  /**
+   * Correlation ids that are not safe to log or forward and can still travel in an HTTP header. A
+   * header value cannot hold a line break (the server ends the header line there), and Spring
+   * Security's firewall refuses any control character, so those never reach the application.
+   */
+  static Stream<Arguments> unsafeIds() {
+    return Stream.of(
+        Arguments.of("a forged log line after a space", "abc FORGED LOG LINE level=ERROR"),
+        Arguments.of(
+            "a forged JSON log line",
+            "{\"@timestamp\":\"2026-01-15T00:00:00Z\",\"log.level\":\"ERROR\",\"message\":\"FORGED\"}"),
+        Arguments.of("65 characters (one over the limit)", "FORGED" + "a".repeat(59)),
+        Arguments.of("a path and a quote", "../../FORGED/x\"y"),
+        Arguments.of("markup", "<script>FORGED</script>"),
+        Arguments.of("an empty string", ""));
+  }
+
+  @ParameterizedTest(
+      name =
+          "[MAM-46 AC-1] an X-Correlation-Id with {0} never reaches the log line or the ApplicationValidated event")
+  @MethodSource("unsafeIds")
+  void unsafeCorrelationIdIsReplaced(String what, String evil) throws Exception {
     MvcResult r =
         mvc.perform(
                 submit(PemJwt.provider("1003000111"), individual("1003000111", "IN", "207Q00000X"))

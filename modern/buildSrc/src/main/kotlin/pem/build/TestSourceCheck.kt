@@ -37,7 +37,8 @@ import java.io.File
  *  - disabledWithoutDocker (Testcontainers) and the type ExecutionCondition,
  *  - the types Assumptions (JUnit and AssertJ), TestAbortedException and AssumptionViolatedException, and a call of a method
  *    whose name is assume or assuming followed by a capital letter (assumeTrue, assumeThat, assumingThat, and the like),
- *  - JUnit 4 and 3: any org.junit name that is not org.junit.jupiter or org.junit.platform, and junit.framework,
+ *  - JUnit 4 and 3: any org.junit name that is not org.junit.jupiter or org.junit.platform, and junit.framework; a class,
+ *    a package or the wildcard import of an IDE (import org.junit.*, import junit.framework.*) all count,
  *  - Cucumber and suite filters that drop tests without a skip being reported: the keys cucumber.filter.tags and
  *    cucumber.filter.name, the constants FILTER_TAGS_PROPERTY_NAME and FILTER_NAME_PROPERTY_NAME, @IncludeTags and @ExcludeTags.
  *    The tags that feature files carry (for example the story and AC tags) are not filters and are not read.
@@ -198,10 +199,10 @@ internal object TestSourceScan {
             val type = m.groups[1]?.value
             Hit(type ?: (m.groups[2]!!.value + "("), "an assumption or an abort reports the test as skipped")
         },
-        Rule("""(?<![\w.])org\.junit\.(?!jupiter\b|platform\b)(\w+)""") { m ->
+        Rule("""(?<![\w.])org\.junit\.(?!jupiter\b|platform\b)(\w+|\*)""") { m ->
             Hit("org.junit." + m.groupValues[1], "JUnit 4: no engine for it is on the class path, so the test is never discovered or run")
         },
-        Rule("""(?<![\w.])junit\.framework\.(\w+)""") { m ->
+        Rule("""(?<![\w.])junit\.framework\.(\w+|\*)""") { m ->
             Hit("junit.framework." + m.groupValues[1], "JUnit 3: no engine for it is on the class path, so the test is never discovered or run")
         },
         Rule("""(@?)\b(FILTER_TAGS_PROPERTY_NAME|FILTER_NAME_PROPERTY_NAME|IncludeTags|ExcludeTags)\b""") { m ->

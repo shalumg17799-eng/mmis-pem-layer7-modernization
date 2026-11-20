@@ -201,3 +201,91 @@ workflow journals; one section per review.
 - The medicaidId filter applies cb.trim to the column (JpaProviderChanges.java:152), which stops index use on provider_medicaid_id and accepts padded input. Compare on the CHAR value directly.
 - ExportProviderMaster loads every provider into memory (JpaProviderStore.allByNpi) and builds one String. Stream it for a large master before Phase 9 volumes.
 
+## verify:numbers (verdict MUST-FIX)
+
+- parity-report.md:73 and :320, and the result's changedFiles/notes, call the run_modern.py change 'strings only'. git diff shows a new 28-line method check_seed() (reads the golden .dat, compares by NPI) with 4 call sites and SEED_NOTE_UNCHECKED. Describe it as a new read-only check plus strings; the scenarios' HTTP calls are unchanged.
+- parity-report.md:313 (AC-7) and acStatus AC-7 say '27 UNEXPECTED units (40 rows)' wait for Q-125 to Q-129. The 27 units exclude the U-9 notice unit; the 40 rows include it, so 28 units are waiting. Line 48 mixes the same way (41 units vs 63 rows incl. the E-6 notice row). Label the scopes.
+- The golden logs/ files (5 per run, 25 total) are not in the manifests' files[] (only the submitted JCL has a labJcl sha256). Precondition (c) and AC-2 ('sha256 of each file') cover them only through git status, which is clean. Say so in AC-2.
+- As already disclosed in report section 9: stale rule texts in compare-result.json (U-NO-DATE, U-LICENCE-MOCK, 'generation (16)', 'see master-before and U-1'). No count is affected; refresh when the tool may next be changed.
+
+## verify:classification (verdict MUST-FIX)
+
+- Section 6.4 (parity-report.md:230-241) lists only 4 rows that the first run did not have. The 7 E-2 rows that kept their keys but changed value (00000000 -> 99991231) are new too. The totals only add up as new 103 = 92 unchanged + 4 + 7 (old 149 = 92 + 57). List the 7 (still E-2, D-003) so the before/after counts close.
+- Sections 2 (:73) and 11 (:320) call the run_modern.py change 'strings only'. git diff shows a new read-only method check_seed (about 35 lines), called in all four scenarios, plus SEED_NOTE replaced by a computed note. No scenario API call changed, but the text should say 'a read-only premise check and three texts'.
+- Section 5 lists EXPECTED differences per group with one example each; skill section 5 asks for every INTENDED difference. Either list the keys per group (E-1 5 NPIs; E-3 1005925213 and 1005933068, 4 rows each; E-5 all 8 NPIs; E-2 PRVMTH01: 1005923986, 1005947811, 1005951276, 1005989276), or state that compare-result.json is the full table.
+- For the lead (outside the checker's write scope): questions.md is stale. Q-124's body still says 'nothing is changed ... 46 rows stay UNEXPECTED'. Q-126 says U-3 has 10 rows (now 12). Q-127 says 3 rows of 'denied and failed' providers (now 2, both status D, flag F). Q-130 has no result. modern/docs/reports/stories/MAM-91.md does not exist; append section 12 there.
+- Next re-run: capture provider-service's 'Provider {} revalidated: next due date {}' lines into the PRVMTH01 logs, so the 4 E-2 completions are observed rather than inferred. modern-job-lines.txt currently holds only the 3 PRVTMS01 lines.
+- Section 7 (:247) quotes 'IEF453I PARDG1 - JOB FAILED - JCL ERROR' for jobs 187, 189, 190 and 191. Per the PRVMTH01 manifest, those jobs were PARDG1, PARDG3, PARDG4 and PARDG5. Quote the job name per job, or drop it.
+- Several texts in compare_parity.py are stale: the rule texts for U-NO-DATE and U-LICENCE-MOCK, U-ARCHIVE-COPY ('generation (16)'), and the premise line ending 'see master-before and U-1'. Section 9 discloses this. Refresh them in a separate change; no count is affected.
+
+## verify:parity report final (verdict MUST-FIX)
+
+- questions.md:1218-1219 says 'both dates are 2026-11-20, so the 4 rows of PRVMTH01 are explained by D-003'. The 'so' ties D-003 to the dates being equal. The report says D-003 explains the change and the value 20311120 rests on Q-A4 default A either way. Suggest: 'D-003 explains that the date changes; the value is the Q-A4 default (processing date), equal to business date + 5 only because both are 2026-11-20.'
+- The questions.md re-run block flags the stale '10 rows' in Q-126 but not the stale '(3 rows)' in Q-127 (questions.md:1058). The block's own count (2) is right. Add the same note for Q-127.
+- Report section 0, SCRNOUT cell (line 46): '8 rows EXPECTED' and '12 rows and 1 file UNEXPECTED' mean records (units), but section 5 counts E-3 as 24 rows. Write '8 records (24 field rows) EXPECTED', so 'rows' has one meaning in the report.
+- Report section 11 (line 337) lists questions.md as 'Not changed'. That is true only for the parity-checker; the lead appended the re-run block at 23:40. MAM-91.md:26 copies 'no file other than this report was changed', which is unclear inside the story file. Name parity-report.md there.
+- Report line 20: 'the newest golden file is dated 2026-11-20 16:05'. modern/parity/golden/README-hercules-lab.md is dated 16:07. The conclusion still holds (before 18:20). Say 'newest manifest-listed golden file' or 16:07.
+
+## review:MAM-86 (verdict MUST-FIX)
+
+- D1 basis: AC-4 and frontend-stack section 5 ask for a visible focus indicator and a tab order that follows the visual order. Neither says 'every focused element is interactive'. The defect table in accessibility-report.md:173 and the structured result present that phrase as the AC-4 rule. Say that it is the test's reading of 'tab order is logical', and raise it as a decision with options (remove tabindex or add role=region with a name in the UI, or accept named scroll regions) and a recommended default, as was done for D2. Do not weaken the test.
+- policy.a11y.spec.ts:108 scans only keyboard-journeys.spec.ts and support/keyboard.ts. Add api.ts and axe-gate.ts. Also flag page-changing calls the list does not cover (evaluate that writes, goto past the first page, setContent, waitForTimeout), and flag filtering of results.violations, so that 'no violation filtered' is enforced, not only checked by hand.
+- support/structure.ts:32 counts only visible h1 elements (the shown() filter), so a visually hidden second h1 would pass 'exactly one h1'. Count headings of level 1 from the accessibility tree. Today src has a single PageHeading h1, so this has no effect yet.
+- A Playwright run at 23:01 used the default outputDir: test-results/.last-run.json and the web-ui folder are both dated 23:01. That run cleaned modern/web-ui/test-results and is not in the run history in red-report.md. Any vitest.json or other stories' playwright*.json that the trace tool reads would have been deleted. The lead should regenerate them before running build_rule_trace.py, and every later run should pass --output.
+- AC-7 is reported as PASS, but the make e2e path with the page scans has not run. Label it 'PASS (gate); make e2e wiring not run' in acStatus.
+- Proposed pem.sh lines: the page scans fail today (7 red), so '|| exit 1' means the keyboard journeys never run in make e2e and the trailing seed is skipped. Consider a separate a11y target, or putting the journeys before the page scans, and say clearly that make e2e will stay red until D1 and D2 are decided.
+- The ratios measured for 'pseudoContent' elements (menu marker, step indicator) ignore the pseudo-element that made axe undecided. The report says this, but the result line 'no text below 4.5:1' should keep that caveat next to it.
+
+## review:MAM-86 fix:1 (verdict APPROVE)
+
+- web-ui/src/shared/ui/ScrollableTable.tsx: no test covers the overflow branch. The AC-4 scans at 1280 px only exercise a fitting table. The test-writer should add a Vitest test (stub ResizeObserver, define scrollWidth/clientWidth: tabindex 0, region and name appear, then disappear when the table fits again) and an AC-4 or axe scan at a narrow viewport that expects one scroll-region stop.
+- ScrollableTable.tsx:48: if the container has focus and stops overflowing (window widened or zoomed out), tabindex is removed and focus falls to the body. Keep tabindex 0 while document.activeElement is the box and drop it on blur. The ui-developer knows about this and left it.
+- ScrollableTable.tsx:14: a 1 px rounding difference (scrollWidth = clientWidth + 1) makes a stop that scrolls almost nothing, the D1 pattern in small. A margin of 1 to 2 px would still agree with focus.ts (no stop) and with axe (13 px buffer).
+- ScrollableTable.tsx:40: getSnapshot reads scrollWidth/clientWidth on every render of every table, which forces a synchronous reflow. It is fine at today's page sizes. If it shows up in MAM-88, cache the value in the ResizeObserver callback.
+- ProviderSearch.tsx:177 and RiskRulesPage.tsx:183 (plain Table, no scroll container) are unchanged by this work and predate it. At 320 CSS px (WCAG 1.4.10) a wide table may make the whole page scroll sideways. Worth one narrow-viewport check. The RiskRules DOM must stay as it is under Q-137 A.
+
+## review:MAM-16 extension (verdict MUST-FIX)
+
+- TestSourceCheck.kt:197: `\bAssumptions\b` misses AssertJ BDDAssumptions (given(x)...) and WithAssumptions; use `\b\w*Assumptions\b`. Outside a class template the run-time guard still sees the abort, so this is defence in depth only.
+- Some never-run Jupiter forms are caught by neither layer and are not listed in the report: an inner class without @Nested; @ParameterizedTest or @ParameterizedClass(allowZeroInvocations = true) with an empty source; an empty @TestFactory. Consider systemProperty junit.platform.discovery.issue.severity.critical=WARNING on tasks.test, and list these under 'Still not verified'.
+- MAM-16.md:153 cites 'build.gradle.kts:25-28'; that is now :37-44. Known limits (:208-213) still say the check 'is being added ... when it is done' and do not say that testSourceCheck now rejects JUnit 4 sources and class-template skip sources. Update the Review round pointers.
+- pem.java-conventions.gradle.kts:77-79 still says the guard names skipped tests '(JUnit and Cucumber alike)'. That is the unproven Cucumber claim that was removed from the SkippedTestGuard KDoc; align the comment.
+- TestSourceCheck.kt:27-28 and MAM-16.md:249-251 say a lexer mistake 'hides at most one line'. That holds only for one-line string and char literals. A mis-detected text block or raw string (e.g. a Kotlin raw string ending in four quotes) runs to the next triple quote. Reword.
+- The reason text of the org.junit rule (TestSourceCheck.kt:202) says the test 'is never discovered or run', even for `import static org.junit.Assert.*` inside a Jupiter test, which does run. Keep the rejection but say 'the JUnit 4 API is not allowed (a JUnit 4 test never runs)'.
+- Optional extra rules: @ArchIgnore (the archunit-junit5 engine is on every service's test classpath; the guard should report it as skipped, but this was not run); cucumber.features or a narrower @SelectClasspathResource (silently runs a subset); PostDiscoveryFilter or InvocationInterceptor.skip() in test sources.
+- The Gate extension cites no log paths. Name scratchpad/devops-mam16/mam16-red-run.log, mam16-red-run2.log, mam16-green-run.log, stage.log and s2-dry.log, and note that the scratchpad is not durable.
+
+## review2:MAM-16 extension (verdict APPROVE)
+
+- MAM-16.md:327 says 'two lines in the "no false alarm" file' but lists three (jupiter.api.*, jupiter.params.provider.*, platform.suite.api.*), and :349 says three; demo-build-gates.sh:336 also names only two. Change to 'three'. Not MUST-FIX: the right list is in the same sentence and nothing about the gate is overstated.
+- Review round 'Known limits' MAM-16.md:208-211 still says the build check 'is being added ... when it is done': say it is closed at source level by testSourceCheck (Gate extension) and the library behaviour itself was not run. MAM-16.md:153 'build.gradle.kts:25-28' is now :37-44 (lines moved by the gate extension).
+- AssertJ BDDAssumptions.given(...) is not flagged (\bAssumptions\b does not match inside BDDAssumptions; given( is no assume*( call); AssertJ is used in 297 test files. It matters only in a class template's @BeforeAll or arguments source, where the run-time guard is blind. Add BDDAssumptions to the type rule and one demo case.
+- Not caught by either layer and not in the limits list: @ParameterizedTest/@ParameterizedClass(allowZeroInvocations = true) with an empty source; a custom InvocationInterceptor calling invocation.skip(); an inner class without @Nested; a Kotlin import alias of Disabled. Name them; try junit.platform.discovery.issue.severity.critical=WARNING in a shared junit-platform.properties.
+- Scope: libs/test-support/src/main is read for .java/.kt only. A junit-platform.properties or cucumber.properties in libs/test-support/src/main/resources would be on every service's test class path but unscanned (none exists today). Add .properties of that folder to testSources.
+- KDoc TestSourceCheck.kt:28 and report :252 'a lexer mistake can hide at most one line' holds for string and char literals only: a wrongly opened block comment or raw string spans lines (e.g. Kotlin "${"""x"""}"). Kotlin only, 0 Kotlin test files. Reword to 'a mistaken string or char literal hides at most one line'.
+- SkippedTestGuard.kt KDoc (about :27-28) says the source check fails 'on every other skip mechanism': overstated (build-file filters, -D options, and the cases above). Say 'on the skip mechanisms listed in TestSourceCheck.kt'.
+- build.gradle.kts:51-53: -PpemSkipPit=true still lets any invocation switch off AC-4's PIT gate (like -PpemVersionCatalog for AC-8). gradle.properties no longer sets it and ci.yml does not pass it. Remove the block now that the deadline is gone, or state it under the AC-4 limits.
+- docs/PROGRESS.md (lead's log, the 00:25 entry) still carries the first-round figures (357 files); the MAM-16 close note should give 60/53/361 or point to the report's Correction round.
+
+## review:MAM-86 label rule (verdict MUST-FIX)
+
+- structure.ts:169 matches a substring, so 'Frontier' satisfies 'Tier' (this limit is disclosed). That is within Q-137's word 'contains', but a word-boundary match would be closer to Label in Name.
+- Gate (ii) colspan case: one spanning header 'Contact' is accepted as the label of two inputs (phone, email) that a sighted user cannot tell apart. Q-137 does not address spans. Ask the lead, or require the lowest header to cover only the input's column.
+- structure.ts:119: when there is no thead, the header row is the first all-th row anywhere in the table (a mid-table section row or a tfoot row counts), not the first row. Restrict it to the leading row(s).
+- structure.ts:93-108: gridOf treats rowspan=0 as 1 and lets a rowspan cross from thead into tbody, where browsers stop it at the row group. The column can then be wrong: with `<td rowspan="0">G1</td>` in row 1, a row-2 select under 'Tier' named 'Group, row 2' is accepted (a (vi) case). Clip spans to the row group.
+- Other ways of hiding header text still pass case (b): color:transparent, font-size:0, text-indent:-9999px. The risk is lower (axe contrast may flag some), but list them as known limits.
+- gate.a11y.spec.ts:231: the title says 'visually hidden suffix' but the test uses display:none, which hides it from everyone. A usa-sr-only suffix is counted as visible text today and would wrongly refuse 'Tier, row 1'. Add that case with the fix of MUST-FIX 1.
+- tests/ux/scrollable-table.test.tsx:230-232 asserts the order of the observe() calls (container first, table second). Compare them as a set, so that a change of order with no change of behaviour does not fail.
+- Commit the deletion of tests/ux/zz-mutant-component.tsx and zz-mutant.test.tsx before any push: commit c606832 captured them and they now show ' D'; otherwise CI Vitest fails. Make future mutants in the scratchpad, not in the repo.
+- accessibility-report.md:225: the D2 row still says 'Decision for the lead: ... reword AC-6, or add visible per-row labels' and calls D2 CLOSED, while Q-137 is 'DEFAULT APPLIED - revisit'. Say it is closed under the lead's default and open for the user's revisit.
+- The JSON reports exist only in the scratchpad. build_rule_trace.py reads web-ui/test-results/playwright*.json and vitest.json, so the trace will not show this round until the lead re-runs the tests or copies the reports.
+
+## review2:MAM-86 label rule (verdict MUST-FIX)
+
+- The stated limits color:transparent and font-size:0 are cheap to detect: check the computed colour alpha and the font-size of each text's parent element. Close them in the reopened round rather than keeping them as limits.
+- Substring matching lets a one-character header ('x', '#') label any name that contains that letter. Propose a whole-word match to the lead as an amendment of Q-137, which says 'contains'.
+- structure.ts:9-12 and :23: the InputFact comments and the field header.shown still say 'shown'. Reword or rename them to 'seen' to match the new test.
+- scrollable-table.test.tsx:229-232 asserts the order of the observe() calls (watched[0], watched[1]). Compare them as a set.
+- green3 (47/47) started 01:28:40, before the last write of structure.ts (01:30:28, after the mutants). Only the default suite (01:33:50, 51/51) covers the final bytes; red-report should say so.
+- questions.md:1188 still reads 'DEFAULT APPLIED - revisit' and does not mention the 'seen' definition. The lead should record it.
+

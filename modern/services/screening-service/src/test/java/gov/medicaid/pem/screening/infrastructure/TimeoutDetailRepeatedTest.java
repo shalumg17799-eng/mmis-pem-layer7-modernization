@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Timeout;
 
 /**
  * MAM-20 AC-2 under repetition: a source that does not answer within its limit is recorded with the
- * detail DID NOT ANSWER IN TIME every time, not only most of the time. The detail decides whether an
- * analyst sees "slow" or "down"; it must not depend on which way the HTTP client of the JDK
+ * detail DID NOT ANSWER IN TIME every time, not only most of the time. The detail decides whether
+ * an analyst sees "slow" or "down"; it must not depend on which way the HTTP client of the JDK
  * reports the cancelled call. Both ways to reach the last attempt are repeated: two attempts that
  * time out, and an error answer followed by an attempt that times out (the connection of the first
  * answer is reused). The WARN lines the service logged for the failing repetition are in the
@@ -53,7 +53,10 @@ class TimeoutDetailRepeatedTest {
     return new HttpScreeningSources(MOCK.baseUrl(), Duration.ofMillis(300), 1, CLOCK);
   }
 
-  /** SAM is asked about the provider: C, no error code, the detail of a timeout; the WARN lines are shown on failure. */
+  /**
+   * SAM is asked about the provider: C, no error code, the detail of a timeout; the WARN lines are
+   * shown on failure.
+   */
   static void assertTimedOut() {
     try (LogCapture log = LogCapture.open()) {
       SourceResult sam =
