@@ -91,3 +91,17 @@ Changed for the next run (local at 00:45, in the next push): the Gradle job runs
 writes the failed tasks, the first lines of each "What went wrong" and the failed tests as error annotations; the web UI
 job writes the lint output or the failed tests the same way. Annotations can be read through the public API without a
 sign-in (`<check_run_url>/annotations`), so every later run can be diagnosed from here.
+
+## Third run (2026-11-21 00:48, commit c606832, run 44800779162): a FALSE green in the Gradle job, found and corrected
+
+| Job | Result as GitHub shows it | What it really means |
+|---|---|---|
+| Contract lint | success | passed |
+| Web UI tests | failure | 4 of 1132 tests not passed: the new unit test of ScrollableTable that was being written when the commit was taken (read from the new annotations) |
+| Gradle build and full check | success after 31 s | **not a pass.** The step was `gradlew ... 2>&1 | tee file`; GitHub's default shell is `bash -e` without `pipefail`, so the step reported the exit code of `tee`. A real build takes more than 45 minutes; what the build did in those seconds is not known |
+| Compose smoke test | success after 3m32s | **a real pass of this job** (it ran only because the Gradle job looked green, but it does its own work): `make up` built the jar and the web UI on the runner and started the stack with every container healthy (3m05s), the gateway health check and the provider lookup through Keycloak and the gateway passed, the stack was stopped. First proof that the stack builds and starts on a clean Linux machine (AC-4) |
+
+Cause: the lead's own change of c606832 (the `tee` for the failure annotations). Correction (commit after c606832):
+`defaults.run.shell: bash`, which GitHub runs as `bash --noprofile --norc -eo pipefail`. Checked locally: `false | tee`
+ends with 0 under `bash -e` and with 1 under `bash -eo pipefail`. Run 3 must not be counted as a green Gradle run.
+The annotations themselves work: the web UI failure above was read through the public API without a sign-in.

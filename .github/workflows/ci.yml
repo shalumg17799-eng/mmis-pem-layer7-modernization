@@ -10,6 +10,10 @@ on:
 
 defaults:
   run:
+    # "shell: bash" makes GitHub run every step with "bash -eo pipefail". Without it the default is "bash -e", and a
+    # step such as "gradlew ... | tee file" would report the exit code of tee: run 3 (commit c606832) showed the Gradle
+    # job green after 31 seconds for exactly this reason.
+    shell: bash
     working-directory: modern
 
 jobs:

@@ -1,4 +1,4 @@
-46979754b29af538a958be0c272920ea20b16087  modern/web-ui/e2e/a11y/gate.a11y.spec.ts
+a3fdc627332363fb3cfd41210628e34803634eb2  modern/web-ui/e2e/a11y/gate.a11y.spec.ts
 37a0d0bb81d7244013b576f833e4353e05baaa93  modern/web-ui/e2e/a11y/keyboard-journeys.spec.ts
 2df79a06fab7a8f8fe1705ef2c2cb38952b0acba  modern/web-ui/e2e/a11y/pages.a11y.spec.ts
 441857b94198b4dfd59296852137ab37e4a2d31a  modern/web-ui/e2e/a11y/policy.a11y.spec.ts
@@ -6,6 +6,7 @@
 3f5e75746812bbd094b39dd69ae69338891220b3  modern/web-ui/e2e/a11y/support/axe-gate.ts
 d6d5a5a39d347ccb8dbaf2aaee44fc78dd4c9ba0  modern/web-ui/e2e/a11y/support/focus.ts
 2c1162d92ea006a5fd385f458e95f347e506da63  modern/web-ui/e2e/a11y/support/keyboard.ts
-bee75cec79d51f5a4258e26640666155b4eea945  modern/web-ui/e2e/a11y/support/screens.ts
+6113436988a5af2ae77ef82af2146a55ed3e2b70  modern/web-ui/e2e/a11y/support/screens.ts
 df2aee5275e7e3be5b50e3e5fe66e2e02192d6c2  modern/web-ui/e2e/a11y/support/sessions.ts
-07c8206b4e1b7206e3027a001eeb7a2fc52e2e6c  modern/web-ui/e2e/a11y/support/structure.ts
+a446e95a5e4558cf08a53e51a1d153f76cbccdc0  modern/web-ui/e2e/a11y/support/structure.ts
+8dbe97e49495bda4a71ad466485bdcb4a4865b86  modern/web-ui/tests/ux/scrollable-table.test.tsx

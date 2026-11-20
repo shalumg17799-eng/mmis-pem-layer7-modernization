@@ -1,11 +1,82 @@
 # Red report: MAM-86 accessibility (WCAG 2.1 AA, zero axe violations, keyboard-only walk-through)
 
-Written by the test-writer on 2026-11-20; corrected on 2026-11-20 evening / 2026-11-21 after an independent review (see "Correction round"). This story verifies a UI that was built before it: the 13 screens, the shared shell and the
+Written by the test-writer on 2026-11-20; corrected on 2026-11-20 evening / 2026-11-21 after an independent review (see "Correction round"); changed again on 2026-11-21 night (see "Round of 2026-11-21": the AC-6 label check, new gate cases, unit tests of ScrollableTable). This story verifies a UI that was built before it: the 13 screens, the shared shell and the
 seven journeys already exist. So the "red" step looks different from a feature story: a test goes red only where the built UI really
 breaks the acceptance criterion. Tests that go green at once describe behaviour the UI already has; they are still the regression net for
 AC-1 to AC-7 and are protected by the hash file. No production code (`modern/web-ui/src`) was changed.
 
-## Result of the final runs (correction round, 2026-11-20 23:55 to 2026-11-21 00:09)
+## Round of 2026-11-21 (00:20 to 00:50): the AC-6 label check brought in line with its criterion (Q-137 A), 28 new gate cases, 20 unit tests of ScrollableTable
+
+The sections below this one describe the rounds of 2026-11-20 and stay as they were written (history). This section is the current state.
+The test-writer changed no production code (`modern/web-ui/src`) and built nothing; the lead deployed the build of 2026-11-21 00:19 (`modern/web-ui/dist`, files dated 00:19:47), which contains the fix of D1 (`src/shared/ui/ScrollableTable.tsx`).
+
+### Result of the final runs
+
+| File | Level | Tests | Passed | Failed |
+|---|---|---|---|---|
+| e2e/a11y/pages.a11y.spec.ts | Playwright, page scans on the live stack (PEM_JOURNEYS=1), build of 00:19 | 77 | 77 | 0 |
+| e2e/a11y/gate.a11y.spec.ts | Playwright, gate (4) and the AC-6 label rule (28 new), default suite | 32 | 32 | 0 |
+| e2e/a11y/policy.a11y.spec.ts | Playwright, repository checks, no browser, default suite | 12 | 12 | 0 |
+| tests/ux/scrollable-table.test.tsx | Vitest, component (new) | 20 | 20 | 0 |
+| e2e/a11y/keyboard-journeys.spec.ts | Playwright, keyboard-only journeys | 7 | not run in this round | 7 of 7 passed in the correction round, on the build of 2026-11-20 22:02 |
+| Total | | 148 | 141 run, 141 passed | 0 |
+
+Per criterion, computed with the trace tool's own `tests()` function (imported, run over a scratch copy of the reports; `main()` not run, no file of the tool written), the 7 journeys counted from the correction round: AC-1 19 (19 passed), AC-2 5 (5), AC-3 11 (11), AC-4 34 (34: 14 Playwright and 20 Vitest), AC-5 30 (30), AC-6 42 (42: 14 pages and 28 gate), AC-7 7 (7); total 148, 148 passed, 0 failed (141 of them run in this round).
+`npx tsc -b` and `npx eslint . --max-warnings 0` in modern/web-ui: both clean (exit 0).
+The 7 reds of the correction round are gone: the 6 tests of D1 pass on the build of 00:19 (the container is no longer a Tab stop where the table fits), and the AC-6 test of console.risk-rules passes with the checker changed as described next.
+
+### 1. The change of a recorded test: the AC-6 check (user rule Q-097 C, decision Q-137 A of the lead, 2026-11-21)
+
+What the check accepted before: an input counted as labelled only when it had a label element with text that is shown (`labelVisible`). A name from aria-label, aria-labelledby or the column header never counted. For console.risk-rules this gave the one red of AC-6: its 10 inputs ("Taxonomy prefix, row N", "Tier, row N") are named by aria-label and the visible text is the column header.
+
+What it accepts now (support/structure.ts: `readFacts` reads more facts in the browser, `structureProblems` decides): an input counts as labelled when
+(a) it has a visible label element, as before, OR
+(b) it sits in a table cell (td or th), the header cell over its column is shown and has visible text, and that text (trimmed, case kept) is contained in the input's accessible name. The column is found on the column grid of the table (colspan widens a cell; a rowspan keeps its columns taken in the rows below); the header cell is the lowest one over that column in the thead, or in the first row made only of th when there is no thead. "Visible text" leaves out parts of the header that are not shown (display none, visibility hidden, opacity 0, one pixel clipped). The accessible name is the text of the elements named by aria-labelledby, else aria-label, else the label elements.
+An input that meets neither is a problem, and its message names the input and says what each case misses, for example: `input "tier-1" (select-one) is not labelled for a sighted user: it meets neither (a) a visible label element (it is named only by aria-label "Quantity, row 1") nor (b) a visible column header whose text is in its accessible name (its accessible name "Quantity, row 1" does not contain the visible header text "Tier" of its column)`.
+
+Why: the criterion and the front-end standard say "every input has a visible label". Option B of Q-137 (a visible label element per input of the table) was tried first and failed the recorded test of MAM-92 AC-1 (a rule row may hold no other text), so the lead decided A (Q-137, default applied at 23:56): the visible column header is the visible label, and the check is brought in line with the wording of the criterion. WCAG 2.1: 3.3.2 Labels or Instructions, 2.5.3 Label in Name, 1.3.1 Info and Relationships.
+
+What it still refuses (each proved by a gate test, section 2): an input outside a table that is named only by aria-label; a table input whose name does not contain the header text of its column; a table input under an empty header cell, or under a header cell that is not shown; a table input whose name holds only the header text of another column; an input whose label element is not shown; also (extra cases): a table input with no name at all, an aria-labelledby that wins over an aria-label, a column with no header cell, the header text matched without regard to case, a header whose only text is hidden inside it.
+What did not change: every other assertion. One h1 (and, on the pages, equal to the title of the inventory), exactly one banner and one main, a navigation landmark, header cells in every table, none empty. The test of console.risk-rules keeps its title, its group and its assertion (`expect(problems).toEqual([])`); only the checker that it calls changed. pages.a11y.spec.ts itself is unchanged in this round. `Facts.inputs` has three more fields (`name`, `inCell`, `header`), and the other tests that read `facts.inputs` only count it.
+This is a change of a recorded test; the hashes are recorded again (section 5).
+
+### 2. New gate cases (28 tests in e2e/a11y/gate.a11y.spec.ts, groups tagged [MAM-86 AC-6], no stack needed)
+
+Each case is a small page built with `page.setContent` (landmarks and one h1 around the case, so that the only problems a case can raise are about its inputs) and is read by the same checker as the page scans (`readFacts`, then `structureProblems`). An accepted case must give no problem at all; a refused case must give exactly one problem that names the input, with the text of what (a) and (b) miss.
+
+| Case | Tests | Expectation |
+|---|---|---|
+| (i) a visible label element | 2: an input with a label; a table input with a label under a header that says something else | accepted |
+| (ii) a table input whose name contains the visible header of its own column | 7: text field and select (as on the risk rules page); colspan; rowspan; name by aria-labelledby; a hidden suffix of the header; no thead; two header rows | accepted |
+| (iii) an input outside a table named only by aria-label | 2: alone; beside a table whose header has the same words | refused |
+| (iv) a table input whose name does not contain its column's header | 5: other words (the neighbour that is right is not reported); case differs; no name; aria-labelledby wins over aria-label; a column with no header cell | refused |
+| (v) a table input under an empty or hidden header | 6: empty header; header whose text is hidden inside it; header cell with display none, visibility hidden, opacity 0, one pixel clipped | refused |
+| (vi) a name that holds only another column's header | 2: the two inputs swapped; over a colspan | refused |
+| (vii) a label element that is not shown | 4: display none, visibility hidden, opacity 0, one pixel clipped | refused |
+
+Red evidence (the tests were written after the checker, so red is shown against the old rule and by mutation):
+- Against the old rule (the version of structure.ts in HEAD put back for one run, then restored byte for byte, sha256 checked): 26 of the 28 fail. The 7 accepted cases of (ii) fail because the old rule refuses them (the real red). The 19 refused cases fail on the message only: the old rule refused them too, by its stricter test, but did not say which of the two cases it misses, which the lead asked for; for these the mutants below are the proof that they bite. The 2 that pass are the two (i) cases, which the old rule already accepted (they guard that case (a) is kept).
+- Ten mutants of the new checker, each run against the 28 tests, each killed (the mutant is applied to structure.ts for one run and the file is restored byte for byte afterwards): case (b) removed (8 tests fail); the header text need not be in the name (5); a hidden header still counts (4); the column taken by position in the row, no rowspan grid (1); a label element that is not shown still counts (4); case (b) also outside a table (6); the match ignores case (1); the header text taken as textContent, hidden parts included (2); aria-labelledby ignored (2); an empty header text accepted (2).
+- Run on the live pages: the AC-6 test of console.risk-rules passes (10 table inputs under "Taxonomy prefix" and "Tier"; the 11th input of the page has a label element); the other 12 screens and the filled work queues pass as before.
+
+### 3. A fault in the start state of a test, found by these runs and fixed (e2e/a11y/support/screens.ts)
+
+The first run of the pages file on the build of 00:19 gave 76 passed and 1 failed: "MAM-86 AC-4 console.provider-search" waited 30 s for the table "Search results" and did not find it. The page showed "No provider found" with the NPI field already filled with 1003000999 and the name TESTPROV. Cause: the search page pre-fills the NPI of the last search made in the tab (sessionStorage, MAM-77 AC-6), and the AC-2 test "No provider found" (same tab, runs earlier) had typed 1003000999; the preparation of the screen typed only the name, so the search was NPI and name together, and every given filter must match. Evidence: the test passes alone; AC-2 then AC-4 of the search fails; after the fix both pass. It is a fault of the test start state (the screen's main state is "a search by name"), not of the page and not of the label rule. It is not established why the same order passed in the correction round (the page file ProviderSearch.tsx did not change between the commits).
+Fix: the preparation of console.provider-search empties the NPI field before it types the name (one line, with a comment); no assertion changed. The next run of the whole pages file: 77 of 77 passed. The other tests that use this screen (AC-1, AC-5, AC-6) are now independent of the order too.
+
+### 4. Unit tests of ScrollableTable (20 tests, tests/ux/scrollable-table.test.tsx, tagged [MAM-86 AC-4])
+
+Written after the component, not before it (the tests that were red first for D1 are the six Playwright Tab walks of AC-4, which failed against the old build). jsdom has no layout, so the test stubs `ResizeObserver` (a fake that the test fires by hand, as the browser would) and the `scrollWidth` and `clientWidth` of the container; the real measuring is proved only by the Playwright runs on the live build. All 20 passed at the first run, so no defect of the component was found.
+Cases: overflowing gives tabindex 0, role region and the name "<label> (scrollable table)" (4 tests, one of them with a second label); fitting gives no tabindex, no role, no name; equal widths fit, one pixel more overflows; after the sizes change and the observer fires the attributes follow in both directions, on the same element; an observer that fires with the sizes unchanged changes nothing; the observer watches the container and the table in it and is disconnected on unmount; without a ResizeObserver (jsdom as it is) the container is no Tab stop; with the user-event Tab key an overflowing table's container takes the focus before the link in the first row, a fitting table's does not (the first Tab goes to the link); the USWDS container class is on the container, there is one container not two, and the properties of the table (caption, class) reach the table.
+Mutation check (the component itself was not touched; each mutant is a temporary copy of it inside tests/ux, with a copy of the test pointed at it, both removed afterwards): 11 mutants, all killed: always a Tab stop (7 tests fail); never a Tab stop (9); no role (4); no name (3); the name without the label (3); >= instead of > (7); the observer never created (4); the table not observed (1); never disconnected (1); the USWDS scrollable option used as well (19); the table properties lost (4).
+
+### 5. How the runs were made
+
+Procedure: the new gate cases first (no stack, 28 of 28 passed, 13 s), then the old-rule run and the mutants (no stack, 00:24 to 00:34); then, under the stack lock (taken 00:35:03, released 00:45:10; seed before taking the run and again before the release): the whole pages file (00:35: 76 passed, 1 failed, 2.1 min), the two small runs that located the fault of section 3, the whole pages file again (00:42: 77 passed, 1.6 min), and the default suite `npx playwright test e2e/a11y` without PEM_JOURNEYS (00:44: 44 passed in 32 s: gate 32, repository checks 12; it includes the nested real Playwright run of the gate, which needs only the web UI). Free memory before the runs: 1025 MB (first gate run, started after waiting until it reached 1024), 1070 MB (mutants), 1051, 1826 and 2110 MB (the three runs on the stack). The Vitest file ran from PowerShell (20 passed, 13.6 s), tsc and eslint last.
+Test protection: recorded again for the 11 files of the story and the new Vitest file (12 files): `check MAM-86` prints OK; the changed files are gate.a11y.spec.ts, support/structure.ts and support/screens.ts, the new one is tests/ux/scrollable-table.test.tsx; the other files of the story are byte-identical to the correction round.
+Not run in this round: the seven keyboard journeys (they need no change; they were not part of this task), and no run on the old build (the build of 22:02 was replaced at 00:19, so D1 and D2 cannot be reproduced any more except from the history above).
+
+## Result of the final runs (correction round, 2026-11-20 23:55 to 2026-11-21 00:09; history)
 
 | File | Level | Tests | Passed | Failed |
 |---|---|---|---|---|
@@ -18,7 +89,7 @@ AC-1 to AC-7 and are protected by the hash file. No production code (`modern/web
 Support files (shared by the specs, no tests of their own): e2e/a11y/support/api.ts, axe-gate.ts, focus.ts, keyboard.ts, screens.ts, sessions.ts, structure.ts.
 There is no unit, integration or contract level in this story: no endpoint, event or domain rule changes (rules: none, enabler).
 
-Failures (7), expected and kept as they are (a failing test for a UI defect is not weakened; see modern/docs/reports/accessibility-report.md):
+Failures (7) of the correction round, expected and kept as they were (a failing test for a UI defect is not weakened; see modern/docs/reports/accessibility-report.md). Both are closed in the round of 2026-11-21: D1 by the fix in the source (confirmed on the build of 00:19), D2 by the decision Q-137 A and the changed AC-6 check (no change to the page):
 
 - D1 (6 tests, AC-4): the Tab key stops on `div.usa-table-container--scrollable[tabindex=0]`, which has no role, no name and does not scroll (client width = scroll width).
   Pages: portal.home, portal.notices, console.provider-detail, console.approval, public.directory, and the four tables of console.work-queues when filled.
@@ -60,8 +131,9 @@ Before the correction the same function gave AC-1 17 (1 failed), AC-4 13 (5 fail
 Build tested: the one the stack serves (modern/web-ui/dist, 2026-11-20 22:02). The UI source changed after it (commit 14e0707 at 23:57 touches the table pages, a new ScrollableTable.tsx and RiskRulesPage.tsx, which differs again in the working tree); nothing was built or run against that source, so the 7 reds stand until a deploy and a new run of the pages file.
 Run procedure: seed, pages (23:55 to 23:59), keyboard journeys (23:59 to 00:08, seeded again before each journey), gate and repository checks (00:08 to 00:09), seed; stack lock taken 23:54, released 00:09; free memory before the three runs 1382, 3088 and 1876 MB. Test protection recorded again (11 files, `check MAM-86` prints OK; the four spec files changed, the seven support files did not).
 
-## Every test and its result
+## Every test and its result (correction round, with the tests added in the round of 2026-11-21 at the end)
 
+Rows marked FAIL (the six D1 tests of AC-4 and the D2 test of AC-6) were the result of the correction round; in the round of 2026-11-21 all of them pass (section "Round of 2026-11-21").
 
 ### a11y/pages.a11y.spec.ts
 
@@ -184,3 +256,63 @@ All seven re-run in the correction round with the added outcome checks (J1 81 s,
 | MAM-86 AC-1 the checker accepts a test in the group of its criterion, written with a plain or a template title | PASS | added in the correction round; passes |
 | MAM-86 AC-1 every test in the four spec files of this story sits in a group tagged with its own criterion | PASS | added in the correction round; passes after the two tests were moved (the mis-grouping it guards against is the sample of the first of these three tests) |
 | MAM-86 AC-1 no test of the files of this story is skipped, marked fixme or restricted with only | PASS | passes: the built UI already meets it, no production change needed |
+
+### Tests added in the round of 2026-11-21
+
+#### a11y/gate.a11y.spec.ts, the AC-6 label rule (28 tests; no stack needed). Result against the old rule (HEAD version of structure.ts): FAIL for 26, PASS for the two (i) cases; against the new rule: all PASS
+
+| Test | Result | Reason |
+|---|---|---|
+| MAM-86 AC-6 (i) an input with a visible label element is accepted: no problem at all on the page | PASS | passes; against the old rule it passes too (case (a) kept) |
+| MAM-86 AC-6 (i) a table input with a visible label element is accepted, whatever the header of its column says | PASS | passes; against the old rule it passes too (case (a) kept) |
+| MAM-86 AC-6 (ii) a table input whose aria-label contains the visible header text of its own column is accepted (a text field and a select, as on the risk rules page) | PASS | passes; against the old rule it FAILS: the old rule refuses this input |
+| MAM-86 AC-6 (ii) the column is counted over a colspan: a header that spans two columns is the header of both | PASS | passes; against the old rule it FAILS: the old rule refuses this input |
+| MAM-86 AC-6 (ii) the column is counted over a rowspan: a cell that reaches into the next row keeps its column taken there | PASS | passes; against the old rule it FAILS: the old rule refuses this input |
+| MAM-86 AC-6 (ii) the name may come from aria-labelledby: the text of the elements it points to is the accessible name | PASS | passes; against the old rule it FAILS: the old rule refuses this input |
+| MAM-86 AC-6 (ii) only the text a person can read in the header counts: a visually hidden suffix of the header need not be in the name | PASS | passes; against the old rule it FAILS: the old rule refuses this input |
+| MAM-86 AC-6 (ii) a table without a thead has its header in the first row made only of th | PASS | passes; against the old rule it FAILS: the old rule refuses this input |
+| MAM-86 AC-6 (ii) with two header rows the lowest header cell over the column is the one that counts | PASS | passes; against the old rule it FAILS: the old rule refuses this input |
+| MAM-86 AC-6 (iii) an input outside a table that is named only by aria-label is refused | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (iii) an input beside a table is refused even when its name equals a header of that table (only a cell of the table counts) | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (iv) a table input whose aria-label does not contain the header text of its column is refused; the other input of the row, which does, is not | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (iv) the header text is matched with its case kept: "tier, row 1" does not contain "Tier" | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (iv) a table input with no name at all is refused | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (iv) aria-labelledby comes before aria-label: an aria-label that holds the header text does not help when the name is taken from elsewhere | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (iv) an input in a column that has no header cell is refused (more cells in the row than header cells) | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (v) a table input under an empty header cell is refused, even when its name is a full sentence | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (v) a table input under a header cell whose only text is hidden inside it is refused | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (v) a table input under a hidden header cell is refused, though the header text is in its name: header with display none | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (v) a table input under a hidden header cell is refused, though the header text is in its name: header with visibility hidden | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (v) a table input under a hidden header cell is refused, though the header text is in its name: header with opacity 0 | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (v) a table input under a hidden header cell is refused, though the header text is in its name: header with visually hidden (one pixel, clipped) | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (vi) a table input whose name holds only the header text of ANOTHER column is refused (the two inputs are swapped here) | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (vi) the other column is found over a colspan too: the name holds the header of the spanning cell, the column is under "Tier" | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (vii) an input whose label element is not shown is refused: label with display none | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (vii) an input whose label element is not shown is refused: label with visibility hidden | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (vii) an input whose label element is not shown is refused: label with opacity 0 | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+| MAM-86 AC-6 (vii) an input whose label element is not shown is refused: label with visually hidden (one pixel, clipped) | PASS | passes; against the old rule it FAILS on the message (no "neither (a) nor (b)" text) |
+
+#### tests/ux/scrollable-table.test.tsx (Vitest, 20 tests, written after the component; mutants of the component are all killed, see section 4 of the round)
+
+| Test | Result | Reason |
+|---|---|---|
+| [MAM-86 AC-4] a table wider than its container makes the container a Tab stop: tabindex is 0 | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] a table wider than its container gives the container the role region | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] the name of the scrolling region contains the label of the table: "Screening results (scrollable table)" | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] the name follows the label that the page gives: another table is named after its own label | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] a table that fits has no tabindex on its container | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] a table that fits has no role and no name on its container, so there is no region to announce | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] a table exactly as wide as its container fits: equal widths are not an overflow | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] a table one pixel wider than its container overflows | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] when the sizes change and the observer fires, a table that fitted becomes a Tab stop with role and name | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] when the sizes change and the observer fires, a table that overflowed stops being a Tab stop and loses role and name | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] the attributes follow the sizes in both directions on the same element, so that the focus is not lost by a new element | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] an observer that fires with the sizes unchanged changes nothing | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] the observer watches the container and the table in it (rows that arrive or a window that changes both change the answer) | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] the observer is disconnected when the table leaves the page | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] where the browser has no ResizeObserver and nothing is measured (jsdom: no layout), the container is not a Tab stop | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] a table that overflows is reached by Tab: the container takes the focus before the link in the first row | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] a table that fits is not a stop: the first Tab goes straight to the link in the first row | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] the table is inside the USWDS scrolling container, with its header cells and its data | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] there is one scrolling container, not two (the USWDS scrollable option of the table is not used as well) | PASS | passes at the first run: written after the component, which already meets it |
+| [MAM-86 AC-4] the properties of the table (a caption, a class) reach the table, not the container | PASS | passes at the first run: written after the component, which already meets it |

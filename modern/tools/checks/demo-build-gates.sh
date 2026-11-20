@@ -479,25 +479,31 @@ printf '%s\n' 'package gov.medicaid.pem.fixedwidth;' 'import org.junit.Test;' '@
 scan_only "$WORK/s3.log"; rc=$?
 remove_temp
 read_n="$(sed -n 's/.*testSourceCheck: read \([0-9]*\) test source files.*/\1/p' "$WORK/s3.log" | head -n 1)"
-if [ $rc -eq 0 ] && [ "$read_n" = "$((before + 3))" ]; then
-  pass "AC-7 source: the same words in comments, in string literals (also a text block and a char literal), in a feature file and in a file outside src/test do not fail (exit 0; read $read_n files = $before of the real tree + 3 temporary)"
+after="$(expected_sources)"   # another lane may add a test file while this script runs: the count must lie between before and after
+lo=$before; hi=$after; [ "$lo" -le "$hi" ] || { lo=$after; hi=$before; }
+case "$read_n" in ''|*[!0-9]*) read_n=-1 ;; esac
+if [ $rc -eq 0 ] && [ "$read_n" -ge $((lo + 3)) ] && [ "$read_n" -le $((hi + 3)) ]; then
+  pass "AC-7 source: the same words in comments, in string literals (also a text block and a char literal), in a feature file and in a file outside src/test do not fail (exit 0; read $read_n files = $lo of the real tree + 3 temporary$([ "$lo" = "$hi" ] || echo "; the real tree changed during the run: $lo to $hi"))"
   excerpt "$WORK/s3.log" 'testSourceCheck:' 1
 else
-  fail "AC-7 source: no false alarm (exit $rc; read '${read_n}', expected $((before + 3)))" "$WORK/s3.log"
+  fail "AC-7 source: no false alarm (exit $rc; read '${read_n}', expected $((lo + 3)) to $((hi + 3)))" "$WORK/s3.log"
 fi
 
 # --- d: the real tree passes and the output says how many files were read
 if [ -n "$(temp_left)" ]; then
   fail "AC-7 source: a temporary source is still there before the run on the real tree: $(temp_left | head -n 3 | tr '\n' ' ')"
 else
+  before="$(expected_sources)"
   scan_only "$WORK/s4.log"; rc=$?
-  expected="$(expected_sources)"
+  expected="$(expected_sources)"   # counted before and after the run: another lane may add a test file meanwhile
+  lo=$before; hi=$expected; [ "$lo" -le "$hi" ] || { lo=$expected; hi=$before; }
   read_n="$(sed -n 's/.*testSourceCheck: read \([0-9]*\) test source files.*/\1/p' "$WORK/s4.log" | head -n 1)"
-  if [ $rc -eq 0 ] && [ "$read_n" = "$expected" ] && [ "$read_n" -gt 0 ]; then
-    pass "AC-7 source: the real tree passes testSourceCheck (exit 0) and the output says $read_n test source files were read (find counts $expected)"
+  case "$read_n" in ''|*[!0-9]*) read_n=-1 ;; esac
+  if [ $rc -eq 0 ] && [ "$read_n" -ge "$lo" ] && [ "$read_n" -le "$hi" ] && [ "$read_n" -gt 0 ]; then
+    pass "AC-7 source: the real tree passes testSourceCheck (exit 0) and the output says $read_n test source files were read (find counts $lo$([ "$lo" = "$hi" ] || echo " to $hi, the tree changed during the run"))"
     excerpt "$WORK/s4.log" 'testSourceCheck:' 1
   else
-    fail "AC-7 source: the real tree (exit $rc; read '${read_n}', find counts $expected)" "$WORK/s4.log"
+    fail "AC-7 source: the real tree (exit $rc; read '${read_n}', find counts $lo to $hi)" "$WORK/s4.log"
   fi
 
   # --- e: the task is in the plan of a module's check and of checkAll exactly once
