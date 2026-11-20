@@ -12,6 +12,8 @@ import org.junit.platform.suite.api.Suite;
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "gov.medicaid.pem.revalidation.acceptance")
+@ConfigurationParameter(
+    key = GLUE_PROPERTY_NAME,
+    value = "gov.medicaid.pem.revalidation.acceptance")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty, summary")
 class CucumberSuiteTest {}

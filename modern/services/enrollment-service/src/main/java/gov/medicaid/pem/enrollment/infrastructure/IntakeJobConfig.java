@@ -1,5 +1,6 @@
 package gov.medicaid.pem.enrollment.infrastructure;
 
+import gov.medicaid.pem.enrollment.application.IntakeFailure;
 import gov.medicaid.pem.enrollment.application.IntakeLauncher;
 import gov.medicaid.pem.enrollment.application.IntakeLoad;
 import java.time.LocalDate;
@@ -53,7 +54,7 @@ public class IntakeJobConfig implements IntakeLauncher, DisposableBean {
                   String runId = p.getString("runId");
                   byte[] file = files.remove(runId);
                   if (file == null) {
-                    throw new IllegalStateException("the uploaded file of run " + runId + " is gone");
+                    throw new IntakeFailure("the uploaded file of run " + runId + " is gone");
                   }
                   load.process(
                       UUID.fromString(runId),
@@ -64,7 +65,8 @@ public class IntakeJobConfig implements IntakeLauncher, DisposableBean {
                 },
                 new ResourcelessTransactionManager())
             .build();
-    this.job = new JobBuilder(JOB, repo).listener(failedRunListener(load, files)).start(step).build();
+    this.job =
+        new JobBuilder(JOB, repo).listener(failedRunListener(load, files)).start(step).build();
     this.launcher = new TaskExecutorJobLauncher();
     this.launcher.setJobRepository(repo);
     this.launcher.setTaskExecutor(new TaskExecutorAdapter(thread));
@@ -84,11 +86,12 @@ public class IntakeJobConfig implements IntakeLauncher, DisposableBean {
               .toJobParameters());
     } catch (Exception e) {
       files.remove(runId.toString());
-      throw new IllegalStateException("job " + JOB + " not started: " + e.getMessage(), e);
+      throw new IllegalStateException("job " + JOB + " not started", e);
     }
   }
 
-  private static JobExecutionListener failedRunListener(IntakeLoad load, Map<String, byte[]> files) {
+  private static JobExecutionListener failedRunListener(
+      IntakeLoad load, Map<String, byte[]> files) {
     return new JobExecutionListener() {
       @Override
       public void afterJob(JobExecution job) {
@@ -97,11 +100,13 @@ public class IntakeJobConfig implements IntakeLauncher, DisposableBean {
         if (job.getStatus() == BatchStatus.COMPLETED) {
           return;
         }
+        // only the intake's own message is shown (D-024); Spring Batch has logged the exception
         String reason =
             job.getAllFailureExceptions().stream()
+                .filter(IntakeFailure.class::isInstance)
+                .map(Throwable::getMessage)
                 .findFirst()
-                .map(e -> e.getMessage() == null ? e.toString() : e.getMessage())
-                .orElse(job.getStatus().name());
+                .orElse("job " + JOB + " ended " + job.getStatus());
         load.failed(
             UUID.fromString(runId), job.getJobParameters().getLocalDate("businessDate"), reason);
       }

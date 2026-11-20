@@ -1,0 +1,161 @@
+{
+  "story": "MAM-32",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/Bounded.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ContractFile.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/EventsContractFile.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/Lane3Test.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/LogCapture.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ScreeningEvents.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ScreeningWorld.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/Scrnout.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/BatchRunSteps.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/Lane3Hooks.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/adapter/legacy/ScrnoutRoundTripTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/adapter/legacy/ScrnoutWriterTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/api/BatchRunApiTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/Fakes.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/RunScreeningBatchTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/StartScreeningBatchTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunDatabaseErrorTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunFailureTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunFileTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunRepositoryTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/JdbcScreeningRunsTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/ProviderContractUseTest.java",
+    "modern/services/screening-service/src/test/resources/features/MAM-32.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ApplicationRecordsTest: PASSED",
+      "BatchRunApiTest: PASSED",
+      "BatchRunRepositoryTest: PASSED",
+      "JdbcScreeningRunsTest: PASSED",
+      "RunScreeningBatchTest: PASSED",
+      "StartScreeningBatchTest: PASSED",
+      "MAM-32.feature 'Only an administrator or the scheduler starts screening for a business date': PASSED",
+      "MAM-32.feature 'The 202 answer is the RUNNING BatchRun of the screening job': PASSED",
+      "MAM-32.feature 'A request without a business date is refused': PASSED"
+    ],
+    "AC-2": [
+      "ApplicationRecordsTest: PASSED",
+      "BatchRunFileTest: PASSED",
+      "ProviderContractUseTest: PASSED",
+      "ProviderServiceClientTest: PASSED",
+      "RunScreeningBatchTest: PASSED",
+      "ScreeningEventContractTest: PASSED",
+      "MAM-32.feature 'Only unscreened providers are screened and every page is read once': PASSED",
+      "MAM-32.feature 'A provider list of several pages is read page by page until no page remains': PASSED"
+    ],
+    "AC-3": [
+      "BatchRunFileTest: PASSED",
+      "JdbcScreeningRunsTest: PASSED",
+      "RunScreeningBatchTest: PASSED",
+      "ScrnoutRoundTripTest: PASSED",
+      "ScrnoutWriterTest: PASSED",
+      "MAM-32.feature 'The SCRNOUT file has four 67-byte rows per screened provider': PASSED"
+    ],
+    "AC-4": [
+      "BatchRunFileTest: PASSED",
+      "ScrnoutWriterTest: PASSED",
+      "MAM-32.feature 'A failed provider's rows show the failing source': PASSED"
+    ],
+    "AC-5": [
+      "ApplicationRecordsTest: PASSED",
+      "BatchRunApiTest: PASSED",
+      "BatchRunFileTest: PASSED",
+      "BatchRunRepositoryTest: PASSED",
+      "JdbcScreeningRunsTest: PASSED",
+      "RunScreeningBatchTest: PASSED",
+      "MAM-32.feature 'The run records how many providers it read, screened, skipped and failed': PASSED"
+    ],
+    "AC-6": [
+      "BatchRunApiTest: PASSED",
+      "BatchRunDatabaseErrorTest: PASSED",
+      "BatchRunFailureTest: PASSED",
+      "BatchRunRepositoryTest: PASSED",
+      "JdbcScreeningRunsTest: PASSED",
+      "ProviderServiceClientTest: PASSED",
+      "RunScreeningBatchTest: PASSED",
+      "ScreenProviderReasonsTest: PASSED",
+      "StartScreeningBatchTest: PASSED",
+      "MAM-32.feature 'A run during which provider-service answers 5xx is FAILED and stops reading': PASSED",
+      "MAM-32.feature 'A run whose SCRNOUT file cannot be written is FAILED, never COMPLETED': PASSED"
+    ],
+    "AC-7": [
+      "BatchRunDatabaseErrorTest: PASSED",
+      "BatchRunFailureTest: PASSED",
+      "BatchRunRepositoryTest: PASSED",
+      "JdbcScreeningRunsTest: PASSED",
+      "RunScreeningBatchTest: PASSED",
+      "ScrnoutWriterTest: PASSED",
+      "MAM-32.feature 'Running again does not screen anyone twice': PASSED"
+    ],
+    "AC-8": [
+      "BatchRunApiTest: PASSED",
+      "MAM-32.feature 'Only an administrator can download the SCRNOUT file': PASSED",
+      "MAM-32.feature 'An unknown run id is not found': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/adapter/legacy/ScrnoutWriter.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/api/ScreeningRunController.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/FailureReason.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderListing.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/RunScreeningBatch.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreenProvider.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningBatchLauncher.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningRuns.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScrnoutFile.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/StartScreeningBatch.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/JdbcScreeningRuns.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClient.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ScreeningBatchJobConfig.java"
+  ],
+  "rules": [
+    "R-PRVSCR01-ADD-04",
+    "R-PRVSCR01-ADD-05",
+    "R-PRVSCR01-ADD-06",
+    "R-PRVSCR01-cbl-00001",
+    "R-PRVSCR01-cbl-00002",
+    "R-PRVSCR01-cbl-00003",
+    "R-PRVSCR01-cbl-00012",
+    "R-PRVSCR01-cbl-00013",
+    "R-PRVSCR01-cbl-00014",
+    "R-PRVSCR01-cbl-00015",
+    "R-PRVSCR01-cbl-00016",
+    "R-PRVSCR01-cbl-00017",
+    "R-PRVSCR01-cbl-00018",
+    "R-PRVSCR01-cbl-00019",
+    "R-PRVSCR01-cbl-00022",
+    "R-PRVSCR01-cbl-00023",
+    "R-PRVSCR01-cbl-00048",
+    "R-PRVSCR01-cbl-00053",
+    "R-PRVSCR01-cbl-00054",
+    "R-PRVSCR01-cbl-00055",
+    "R-PRVSCR01-cbl-00056",
+    "R-PRVSCR01-cbl-00057",
+    "R-PRVSCR01-cbl-00058",
+    "R-PRVSCR01-cbl-00059",
+    "R-PRVSCR01-cbl-00060",
+    "R-PRVSCR01-cbl-00061",
+    "R-PRVSCR01-cbl-00062"
+  ],
+  "decisions": [
+    "D-020",
+    "D-024",
+    "D-005",
+    "D-004",
+    "D-009"
+  ]
+}

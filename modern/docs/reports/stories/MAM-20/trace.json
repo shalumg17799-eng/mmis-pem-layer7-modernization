@@ -1,0 +1,96 @@
+{
+  "story": "MAM-20",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "tests": [
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/Bounded.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ContractFile.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/EventsContractFile.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/Lane3Test.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/LogCapture.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ScreeningEvents.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ScreeningWorld.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/Lane3Hooks.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/SourceSteps.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/ApplicationRecordsTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/domain/SourceRulesNotAnsweredTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunRepositoryTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/HttpScreeningSourcesTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClientTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/ProviderUnavailableTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/SlowSourceBudgetTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/SourceAnswerShapeTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/TimeoutDetailRepeatedTest.java",
+    "modern/services/screening-service/src/test/resources/features/MAM-20.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ApplicationRecordsTest: PASSED",
+      "HttpScreeningSourcesTest: PASSED",
+      "ScreenProviderReasonsTest: PASSED",
+      "ScreeningEventContractTest: PASSED",
+      "SourceAnswerShapeTest: PASSED",
+      "SourceRulesNotAnsweredTest: PASSED",
+      "MAM-20.feature 'A source that returns an error is recorded as not answered': PASSED",
+      "MAM-20.feature 'Whichever source returns an error is recorded as not answered after one retry, the other three are still recorded': PASSED"
+    ],
+    "AC-2": [
+      "BatchRunRepositoryTest: PASSED",
+      "HttpScreeningSourcesTest: PASSED",
+      "SlowSourceBudgetTest: PASSED",
+      "SourceRulesNotAnsweredTest: PASSED",
+      "TimeoutDetailRepeatedTest: PASSED",
+      "MAM-20.feature 'A slow source does not hold the screening': PASSED",
+      "MAM-20.feature 'Whichever source is slow, the screening is completed within 5 seconds': PASSED"
+    ],
+    "AC-3": [
+      "HttpScreeningSourcesTest: PASSED",
+      "ProviderServiceClientTest: PASSED",
+      "SourceRulesNotAnsweredTest: PASSED",
+      "MAM-20.feature 'A licence the board does not know fails without an error code': PASSED"
+    ],
+    "AC-4": [
+      "ApplicationRecordsTest: PASSED",
+      "HttpScreeningSourcesTest: PASSED",
+      "ProviderServiceClientTest: PASSED",
+      "SourceRulesNotAnsweredTest: PASSED",
+      "MAM-20.feature 'Groups and facilities are not checked against a licence': PASSED"
+    ],
+    "AC-5": [
+      "ApplicationRecordsTest: PASSED",
+      "ProviderServiceClientTest: PASSED",
+      "ProviderUnavailableTest: PASSED",
+      "ScreenProviderReasonsTest: PASSED",
+      "MAM-20.feature 'A provider that cannot be read is not screened on made-up data and is screened once when provider-service is back': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Source.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceResult.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceRules.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Verdict.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFacts.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFactsSource.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreenProvider.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningSources.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/HttpScreeningSources.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderEventsListener.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderReadRetry.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClient.java"
+  ],
+  "rules": [
+    "R-PRVSCR01-ADD-05",
+    "R-PRVSCR01-cbl-00010",
+    "R-PRVSCR01-cbl-00032"
+  ],
+  "decisions": [
+    "D-024",
+    "D-016",
+    "D-005"
+  ]
+}

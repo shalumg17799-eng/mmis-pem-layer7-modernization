@@ -3,9 +3,9 @@ package gov.medicaid.pem.revalidation.api;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import gov.medicaid.pem.revalidation.ContractFile;
 import gov.medicaid.pem.revalidation.IntegrationTest;
 import gov.medicaid.pem.revalidation.RevalidationFixtures;
-import gov.medicaid.pem.revalidation.ContractFile;
 import gov.medicaid.pem.testsupport.PemJwt;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,7 +53,10 @@ class RevalidationContractTest extends IntegrationTest {
 
   @Autowired MockMvc mvc;
   @Autowired JdbcTemplate jdbc;
-  @Autowired @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping mappings;
+
+  @Autowired
+  @Qualifier("requestMappingHandlerMapping")
+  RequestMappingHandlerMapping mappings;
 
   @BeforeEach
   void cleanBefore() {
@@ -156,13 +159,16 @@ class RevalidationContractTest extends IntegrationTest {
   // ---- the operations served are the operations of the contract --------------------------------
 
   @Test
-  @DisplayName("[MAM-45 AC-1] the application serves exactly the operations of the contract under /api/v1")
+  @DisplayName(
+      "[MAM-45 AC-1] the application serves exactly the operations of the contract under /api/v1")
   void servedOperationsAreTheContractOperations() {
     Set<String> served = new TreeSet<>();
     for (RequestMappingInfo info : mappings.getHandlerMethods().keySet()) {
       for (String pattern : info.getPathPatternsCondition().getPatternValues()) {
         if (pattern.startsWith("/api/v1")) {
-          info.getMethodsCondition().getMethods().forEach(m -> served.add(m.name() + " " + pattern));
+          info.getMethodsCondition()
+              .getMethods()
+              .forEach(m -> served.add(m.name() + " " + pattern));
         }
       }
     }
@@ -186,9 +192,7 @@ class RevalidationContractTest extends IntegrationTest {
     MvcResult r = mvc.perform(harmless(op).with(token(role))).andReturn();
 
     if (op.roles().contains(role)) {
-      assertThat(r.getResponse().getStatus())
-          .as("%s may call %s", role, op)
-          .isNotIn(401, 403);
+      assertThat(r.getResponse().getStatus()).as("%s may call %s", role, op).isNotIn(401, 403);
     } else {
       assertThat(r.getResponse().getStatus()).as("%s may not call %s", role, op).isEqualTo(403);
     }
@@ -204,7 +208,8 @@ class RevalidationContractTest extends IntegrationTest {
 
   // ---- 401 and 403 are application/problem+json of the contract's Problem schema ----------------
 
-  @ParameterizedTest(name = "[MAM-48 AC-8] the 401 of {0} is a problem+json that conforms to the contract")
+  @ParameterizedTest(
+      name = "[MAM-48 AC-8] the 401 of {0} is a problem+json that conforms to the contract")
   @MethodSource("everyOperation")
   void problemOf401(Operation op) throws Exception {
     MvcResult r = mvc.perform(harmless(op)).andReturn();
@@ -217,7 +222,8 @@ class RevalidationContractTest extends IntegrationTest {
     conforms(op.id(), 401, r);
   }
 
-  @ParameterizedTest(name = "[MAM-48 AC-8] the 403 of {0} is a problem+json that conforms to the contract")
+  @ParameterizedTest(
+      name = "[MAM-48 AC-8] the 403 of {0} is a problem+json that conforms to the contract")
   @MethodSource("everyOperation")
   void problemOf403(Operation op) throws Exception {
     String forbidden =
@@ -262,9 +268,11 @@ class RevalidationContractTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-48 AC-2] completeRevalidation: 200 is a RevalidationCase, 404 and 409 are Problems")
+  @DisplayName(
+      "[MAM-48 AC-2] completeRevalidation: 200 is a RevalidationCase, 404 and 409 are Problems")
   void completionContract() throws Exception {
-    UUID open = RevalidationFixtures.insertCase(jdbc, "1003000222", LocalDate.of(2026, 2, 28), "DUE");
+    UUID open =
+        RevalidationFixtures.insertCase(jdbc, "1003000222", LocalDate.of(2026, 2, 28), "DUE");
     String body = "{\"screeningId\":\"" + UUID.randomUUID() + "\",\"result\":\"PASS\"}";
     String path = "/api/v1/revalidations/{caseId}/completion";
 
@@ -303,7 +311,11 @@ class RevalidationContractTest extends IntegrationTest {
     MvcResult started =
         RevalidationFixtures.startSweep(mvc, PemJwt.admin(), "{\"businessDate\":\"2026-03-31\"}");
     MvcResult refused = RevalidationFixtures.startSweep(mvc, PemJwt.admin(), "{}");
-    UUID run = UUID.fromString(RevalidationFixtures.read(started.getResponse().getContentAsString()).path("runId").asText());
+    UUID run =
+        UUID.fromString(
+            RevalidationFixtures.read(started.getResponse().getContentAsString())
+                .path("runId")
+                .asText());
     RevalidationFixtures.awaitRun(mvc, run);
     MvcResult read =
         as(MockMvcRequestBuilders.get(RevalidationFixtures.SWEEPS + "/{runId}", run), "ADMIN");
@@ -349,7 +361,8 @@ class RevalidationContractTest extends IntegrationTest {
   @DisplayName(
       "[MAM-48 AC-2] the contract of completeRevalidation lists no 400, but the service answers 400 with a problem")
   void completionBadRequestIsAProblem() throws Exception {
-    UUID open = RevalidationFixtures.insertCase(jdbc, "1003000222", LocalDate.of(2026, 2, 28), "DUE");
+    UUID open =
+        RevalidationFixtures.insertCase(jdbc, "1003000222", LocalDate.of(2026, 2, 28), "DUE");
 
     MvcResult bad =
         as(

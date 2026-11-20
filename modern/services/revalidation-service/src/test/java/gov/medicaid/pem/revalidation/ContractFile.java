@@ -16,11 +16,11 @@ import java.util.UUID;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- * modern/contracts/openapi/revalidation-service.yaml (1.1.0) for the contract tests: the roles, status
- * codes and media types of an operation, and a response body checked against a component schema
- * (required properties, no properties outside the schema, enums, types, formats, patterns and
- * additionalProperties). The shared OpenApiContract helper cannot read additionalProperties, which
- * BatchRun.counts needs.
+ * modern/contracts/openapi/revalidation-service.yaml (1.1.0) for the contract tests: the roles,
+ * status codes and media types of an operation, and a response body checked against a component
+ * schema (required properties, no properties outside the schema, enums, types, formats, patterns
+ * and additionalProperties). The shared OpenApiContract helper cannot read additionalProperties,
+ * which BatchRun.counts needs.
  */
 public final class ContractFile {
 

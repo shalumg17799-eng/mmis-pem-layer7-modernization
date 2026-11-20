@@ -168,6 +168,22 @@ class ApplicationLessonsTest extends IntakeIntegrationTest {
 
   @Test
   @DisplayName(
+      "[MAM-46 AC-1] an X-Correlation-Id with a tab (legal in HTTP, refused by Spring Security's firewall) never leaves an application stored behind a 400 answer")
+  void tabInTheCorrelationIdIsAnsweredConsistently() throws Exception {
+    MvcResult r =
+        mvc.perform(
+                submit(PemJwt.provider("1003000111"), individual("1003000111", "IN", "207Q00000X"))
+                    .header("X-Correlation-Id", "abc\tdef"))
+            .andReturn();
+    int status = r.getResponse().getStatus();
+    assertThat(status).isIn(201, 400);
+    assertThat(applications("1003000111"))
+        .as("applications stored while the answer was %s", status)
+        .isEqualTo(status == 201 ? 1 : 0);
+  }
+
+  @Test
+  @DisplayName(
       "[MAM-46 AC-1] an X-Correlation-Id that is safe to log but no uuid still gives an event whose correlationId is a uuid (events.yaml)")
   void eventCorrelationIdIsAlwaysAUuid() throws Exception {
     mvc.perform(

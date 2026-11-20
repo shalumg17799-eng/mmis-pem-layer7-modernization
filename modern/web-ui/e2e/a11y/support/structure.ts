@@ -62,33 +62,107 @@ export async function readFacts(page: Page): Promise<Facts> {
           dataCells: table.querySelectorAll('td').length,
         };
       });
-    // Can a sighted user see this element? Stricter than `shown`, which reads only the element's own style and size. On top of it:
-    //  - no ancestor has opacity 0 (opacity is not inherited, so the child of a transparent wrapper has opacity 1 and a box, and is
-    //    still invisible); the ancestors are walked here and `checkVisibility` is asked as well (display none or content-visibility
-    //    on an ancestor, and the visibility of the element itself);
-    //  - the box is not wholly off the page: its right edge at or left of the page origin, or its bottom edge at or above it
-    //    (the USWDS class usa-sr-only moves a box 999em to the left; a box there cannot be scrolled to). A box that merely starts left
-    //    of the edge but reaches into the page is seen.
-    // Not detected (a known limit, stated in the accessibility report): text made invisible by its own colour (color transparent, the
-    // colour of the background), font-size 0, a negative text-indent, text pushed out of a box that clips it, or a box covered by
-    // another one.
+    // --- What hides an element, or a text, from a sighted user (the pieces of `seen` and `visibleText` below) ---------------------------
+    // The alpha of a computed colour: rgba(r, g, b, a), or a colour function with "/ a" (rgb, color, lab, oklch). 1 when there is none.
+    const alphaOf = (color: string): number => {
+      const found = /\/\s*([\d.]+)(%?)\s*\)\s*$/.exec(color) ?? /^rgba\(\s*[^,]+,[^,]+,[^,]+,\s*([\d.]+)(%?)\s*\)$/.exec(color);
+      if (found === null) return 1;
+      const alpha = Number(found[1]) / (found[2] ? 100 : 1);
+      return Number.isNaN(alpha) ? 1 : alpha;
+    };
+    // True when a computed `filter` holds opacity(0), opacity(0%) or opacity(.0); opacity(0.5) does not count.
+    const filterHides = (filter: string): boolean => (filter.match(/opacity\(\s*[\d.]+%?\s*\)/g) ?? []).some((each) => Number.parseFloat(each.slice('opacity('.length)) === 0);
+    // The legacy `clip` property (it works on an absolutely or fixed positioned box only): true when its rectangle is under 2 by 2 pixels.
+    const clipRectEmpty = (s: CSSStyleDeclaration): boolean => {
+      if (s.position !== 'absolute' && s.position !== 'fixed') return false;
+      const m = /^rect\(\s*([^,\s]+)[,\s]+([^,\s]+)[,\s]+([^,\s]+)[,\s]+([^,\s)]+)\s*\)$/.exec(s.clip);
+      if (m === null) return false;
+      const [top, right, bottom, left] = [1, 2, 3, 4].map((index) => Number.parseFloat(m[index] ?? 'auto')); // 'auto' is NaN: no comparison is true
+      return Number(right) - Number(left) < 2 || Number(bottom) - Number(top) < 2;
+    };
+    // What takes an element and all its descendants out of sight, whatever their own style: opacity 0, filter opacity(0), any clip-path
+    // (even a decorative one: it errs on the side of reporting), a clip rectangle under 2 by 2 pixels.
+    const hidesSubtree = (s: CSSStyleDeclaration): boolean => Number(s.opacity) === 0 || (s.clipPath !== 'none' && s.clipPath !== '') || filterHides(s.filter) || clipRectEmpty(s);
+    // A box that is the containing block of an absolutely positioned descendant (a positioned box, or one with a transform, filter,
+    // perspective or layout/paint containment), and one that is the containing block of a fixed one (the same, without `position`).
+    const anchorsFixed = (s: CSSStyleDeclaration): boolean =>
+      ['transform', 'translate', 'rotate', 'scale', 'perspective', 'filter'].some((name) => !['', 'none'].includes(s.getPropertyValue(name))) || /\b(layout|paint|strict|content)\b/.test(s.getPropertyValue('contain'));
+    // Boxes to which `overflow` does not apply (an inline box, a table, a row or a column): they clip nothing.
+    const NO_OVERFLOW = /^(inline|contents|table|inline-table|table-(row|row-group|header-group|footer-group|column|column-group))$/;
+    // Is the part of `node` that the ancestors leave visible smaller than 2 by 2 pixels? Walks the containing blocks of the box (an
+    // absolutely positioned box is not clipped by a wrapper that is not its containing block). An ancestor with overflow hidden or clip
+    // cuts the box on that axis. An ancestor with overflow auto or scroll is a scroll container: its content can be scrolled to, as
+    // with a box far right of the page, so only its own size matters (under 2 pixels shows nothing). The html and body elements are
+    // left out: their overflow belongs to the page.
+    const clippedAway = (node: Element): boolean => {
+      const own = node.getBoundingClientRect();
+      let left = own.left;
+      let right = own.right;
+      let top = own.top;
+      let bottom = own.bottom;
+      let placed = getComputedStyle(node).position; // how the box that is followed up the tree is placed
+      for (let up = node.parentElement; up !== null; up = up.parentElement) {
+        const s = getComputedStyle(up);
+        const isContainingBlock = placed === 'absolute' ? s.position !== 'static' || anchorsFixed(s) : placed === 'fixed' ? anchorsFixed(s) : true;
+        if (!isContainingBlock) continue;
+        placed = s.position;
+        if (NO_OVERFLOW.test(s.display)) continue;
+        const box = up.getBoundingClientRect(); // overflow clips at the padding box: the border box less the borders
+        const x0 = box.left + (Number.parseFloat(s.borderLeftWidth) || 0);
+        const x1 = box.right - (Number.parseFloat(s.borderRightWidth) || 0);
+        const y0 = box.top + (Number.parseFloat(s.borderTopWidth) || 0);
+        const y1 = box.bottom - (Number.parseFloat(s.borderBottomWidth) || 0);
+        if (s.overflowX === 'hidden' || s.overflowX === 'clip') {
+          left = Math.max(left, x0);
+          right = Math.min(right, x1);
+        } else if (s.overflowX !== 'visible' && x1 - x0 < 2) return true;
+        if (s.overflowY === 'hidden' || s.overflowY === 'clip') {
+          top = Math.max(top, y0);
+          bottom = Math.min(bottom, y1);
+        } else if (s.overflowY !== 'visible' && y1 - y0 < 2) return true;
+      }
+      return right - left < 2 || bottom - top < 2;
+    };
+    // Can a sighted user see this element? Stricter than `shown`, which reads only the element's own style and size. On top of it the
+    // element is NOT seen when:
+    //  - it or an ancestor has opacity 0, a filter with opacity(0), a clip-path other than none, or a clip rectangle under 2 by 2 pixels
+    //    (opacity is not inherited, so the child of a transparent wrapper has opacity 1 and a box, and is still invisible);
+    //    `checkVisibility` is asked as well (display none or content-visibility on an ancestor, the visibility of the element itself);
+    //  - the part of its box that the ancestors that clip it leave is under 2 by 2 pixels (see `clippedAway`);
+    //  - its box is wholly off the page: its right edge at or left of the page origin, or its bottom edge at or above it (the USWDS
+    //    class usa-sr-only moves a box 999em to the left; a box there cannot be scrolled to). A box that merely starts left of the edge
+    //    but reaches into the page is seen.
+    // What the check does not detect is listed in the accessibility report (section "Page structure (AC-6)"), word for word.
     const seen = (node: Element): boolean => {
       if (!shown(node)) return false;
-      for (let up = node.parentElement; up !== null; up = up.parentElement) {
-        if (Number(getComputedStyle(up).opacity) === 0) return false;
+      for (let each: Element | null = node; each !== null; each = each.parentElement) {
+        if (hidesSubtree(getComputedStyle(each))) return false;
       }
       const options: Record<string, boolean> = { opacityProperty: true, visibilityProperty: true, checkOpacity: true, checkVisibilityCSS: true };
       const check = (node as HTMLElement).checkVisibility;
       if (typeof check === 'function' && !check.call(node, options)) return false;
       const r = node.getBoundingClientRect();
-      return !(r.right + window.scrollX <= 0 || r.bottom + window.scrollY <= 0);
+      if (r.right + window.scrollX <= 0 || r.bottom + window.scrollY <= 0) return false;
+      return !clippedAway(node);
     };
-    // The text of an element that a sighted user can read: text nodes whose own element and every element up to `root` are seen.
+    // Controls inside a label or a header cell: what they hold (the text of a textarea, the options of a select, a button's caption) is
+    // their content, not the text of the label, so it is not read.
+    const CONTROLS = ['TEXTAREA', 'SELECT', 'OPTION', 'INPUT', 'BUTTON'];
+    // A text can be read only when its own element has a font size above 0 and a colour with an alpha above 0.
+    const readable = (text: Node): boolean => {
+      const owner = text.parentElement;
+      if (owner === null) return false;
+      const s = getComputedStyle(owner);
+      return Number.parseFloat(s.fontSize) > 0 && alphaOf(s.color) > 0;
+    };
+    // The text of an element that a sighted user can read: text nodes that are readable, whose own element and every element up to
+    // `root` are seen, and that are not inside a control.
     const visibleText = (root: Element): string => {
       const parts: string[] = [];
       const walk = (node: Node): void => {
-        if (node.nodeType === Node.TEXT_NODE) parts.push(node.textContent ?? '');
-        else if (node.nodeType === Node.ELEMENT_NODE && (node === root || seen(node as Element))) node.childNodes.forEach(walk);
+        if (node.nodeType === Node.TEXT_NODE) {
+          if (readable(node)) parts.push(node.textContent ?? '');
+        } else if (node.nodeType === Node.ELEMENT_NODE && !CONTROLS.includes((node as Element).tagName) && (node === root || seen(node as Element))) node.childNodes.forEach(walk);
       };
       walk(root);
       return clean(parts.join(''));

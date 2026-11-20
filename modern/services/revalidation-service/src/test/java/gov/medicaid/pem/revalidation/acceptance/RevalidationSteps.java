@@ -102,7 +102,9 @@ public class RevalidationSteps {
     assertThat(p.path("status").asInt()).isEqualTo(expected);
   }
 
-  /** The last answer conforms to the schema the contract documents for this operation and status. */
+  /**
+   * The last answer conforms to the schema the contract documents for this operation and status.
+   */
   private void contract(String operation, int status) throws Exception {
     assertThat(ContractFile.responseViolations(operation, status, body()))
         .as("%s %s: %s", operation, status, result.getResponse().getContentAsString())
@@ -302,9 +304,7 @@ public class RevalidationSteps {
   // ---- the sweep -------------------------------------------------------------------------------
 
   private void startSweep(String role, String requestBody) throws Exception {
-    result =
-        call(
-            post(SWEEPS).contentType(MediaType.APPLICATION_JSON).content(requestBody), role);
+    result = call(post(SWEEPS).contentType(MediaType.APPLICATION_JSON).content(requestBody), role);
     if (result.getResponse().getStatus() == 202) {
       runs.add(UUID.fromString(body().path("runId").asText()));
     }
@@ -493,7 +493,8 @@ public class RevalidationSteps {
     readFile("ADMIN", run);
     status(200);
     assertThat(result.getResponse().getContentType()).startsWith("text/plain");
-    String file = new String(result.getResponse().getContentAsByteArray(), StandardCharsets.ISO_8859_1);
+    String file =
+        new String(result.getResponse().getContentAsByteArray(), StandardCharsets.ISO_8859_1);
     assertThat(file.length() % 80).as("the file is made of 80-byte records").isZero();
     List<String> rows = new ArrayList<>();
     for (int i = 0; i < file.length(); i += 80) {
@@ -527,7 +528,9 @@ public class RevalidationSteps {
     for (int i = 0; i < n; i++) {
       String r = rows.get(i);
       assertThat(r).hasSize(80);
-      assertThat(r.substring(0, 10)).as("REV-NPI of record " + (i + 1)).isEqualTo(expected.get(i).get("npi"));
+      assertThat(r.substring(0, 10))
+          .as("REV-NPI of record " + (i + 1))
+          .isEqualTo(expected.get(i).get("npi"));
       assertThat(r.substring(10, 18))
           .as("REV-DUE-DATE (CCYYMMDD) of record " + (i + 1))
           .isEqualTo(expected.get(i).get("dueDate"));
@@ -576,11 +579,16 @@ public class RevalidationSteps {
   public void onTopic(String topic, String key) {
     Map<String, Object> cfg =
         Map.of(
-            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, PemContainers.KAFKA.getBootstrapServers(),
-            ConsumerConfig.GROUP_ID_CONFIG, "probe-" + UUID.randomUUID(),
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            PemContainers.KAFKA.getBootstrapServers(),
+            ConsumerConfig.GROUP_ID_CONFIG,
+            "probe-" + UUID.randomUUID(),
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+            "earliest",
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+            StringDeserializer.class,
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+            StringDeserializer.class);
     ConsumerRecord<String, String> found = null;
     try (var consumer = new KafkaConsumer<String, String>(cfg)) {
       consumer.subscribe(List.of(topic));

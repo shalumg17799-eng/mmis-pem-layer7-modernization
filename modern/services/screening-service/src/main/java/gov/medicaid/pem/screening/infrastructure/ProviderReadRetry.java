@@ -14,9 +14,9 @@ import org.springframework.util.backoff.ExponentialBackOff;
 /**
  * MAM-20 AC-5 (D-024, ADR-003): an event whose provider cannot be read from provider-service (5xx
  * or no answer) is not parked on the DLT after the usual retries; it is retried, with a growing
- * pause capped at {@code pem.screening.provider-retry-max-interval}, until provider-service answers.
- * The event's processed_event row is rolled back with the failed attempt, so the screening runs
- * exactly once when it succeeds. Every other failure keeps the kit's retries and DLT.
+ * pause capped at {@code pem.screening.provider-retry-max-interval}, until provider-service
+ * answers. The event's processed_event row is rolled back with the failed attempt, so the screening
+ * runs exactly once when it succeeds. Every other failure keeps the kit's retries and DLT.
  */
 @Component
 public class ProviderReadRetry implements SmartInitializingSingleton {

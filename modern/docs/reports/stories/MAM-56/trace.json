@@ -1,0 +1,142 @@
+{
+  "story": "MAM-56",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/AppInputFile.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/ContractFile.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/DbRejections.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/EventsContractFile.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/IntakeApi.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/IntakeIntegrationTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/IntakeRunSteps.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/IntakeRunContractTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/IntakeRunDatasetsTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/IntakeRunLoadTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/IntakeRunRolesTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/IntakeRunStartApiTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/IntakeUploadLimitTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/IntakeFakes.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/IntakeLoadTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/IntakeRecordsEdgeTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/SubmitFromFileTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/domain/ErrorCodeTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/infrastructure/IntakeAtomicityTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/infrastructure/IntakeEventContractTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/infrastructure/IntakeFailureReasonTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/infrastructure/IntakeJobTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/infrastructure/JdbcIntakeRunsTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/infrastructure/MultipartSupportTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/infrastructure/NoOutboundCallsTest.java",
+    "modern/services/enrollment-service/src/test/resources/features/MAM-56.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "IntakeJobTest: PASSED",
+      "IntakeLoadTest: PASSED",
+      "IntakeRunContractTest: PASSED",
+      "IntakeRunStartApiTest: PASSED",
+      "IntakeUploadLimitTest: PASSED",
+      "MAM-56.feature 'An intake run starts with an explicit business date and batch id': PASSED",
+      "MultipartSupportTest: PASSED",
+      "NoOutboundCallsTest: PASSED"
+    ],
+    "AC-2": [
+      "IntakeLoadTest: PASSED",
+      "IntakeRunStartApiTest: PASSED",
+      "MAM-56.feature 'A batch id of blanks defaults to DEFBATCH': PASSED",
+      "MAM-56.feature 'A missing batch id defaults to DEFBATCH': PASSED"
+    ],
+    "AC-3": [
+      "IntakeEventContractTest: PASSED",
+      "IntakeLoadTest: PASSED",
+      "IntakeRecordsEdgeTest: PASSED",
+      "IntakeRunDatasetsTest: PASSED",
+      "IntakeRunLoadTest: PASSED",
+      "MAM-56.feature 'Each record is read as the 130-byte PRVRECRD in bytes 1-130': PASSED"
+    ],
+    "AC-4": [
+      "ErrorCodeTest: PASSED",
+      "IntakeEventContractTest: PASSED",
+      "IntakeLoadTest: PASSED",
+      "IntakeRunDatasetsTest: PASSED",
+      "IntakeRunLoadTest: PASSED",
+      "MAM-56.feature 'Each record gets the same validation as an online application': PASSED",
+      "SubmitFromFileTest: PASSED"
+    ],
+    "AC-5": [
+      "IntakeLoadTest: PASSED",
+      "MAM-56.feature 'One rejected application does not stop the load': PASSED"
+    ],
+    "AC-6": [
+      "IntakeAtomicityTest: PASSED",
+      "IntakeLoadTest: PASSED",
+      "IntakeRunContractTest: PASSED",
+      "IntakeRunDatasetsTest: PASSED",
+      "IntakeRunLoadTest: PASSED",
+      "JdbcIntakeRunsTest: PASSED",
+      "MAM-56.feature 'A run with no rejected application has an empty error file': PASSED",
+      "MAM-56.feature 'The APPERROR file has exactly one row per rejected application': PASSED"
+    ],
+    "AC-7": [
+      "IntakeFailureReasonTest: PASSED",
+      "IntakeRunContractTest: PASSED",
+      "IntakeRunLoadTest: PASSED",
+      "IntakeRunRolesTest: PASSED",
+      "IntakeRunStartApiTest: PASSED",
+      "IntakeUploadLimitTest: PASSED",
+      "MAM-56.feature 'A run without a business date is refused and no run is created': PASSED",
+      "MAM-56.feature 'A run without a file is refused and no run is created': PASSED",
+      "MAM-56.feature 'An unknown run has no error file': PASSED",
+      "MAM-56.feature 'Only ADMIN and SYSTEM may start a run': PASSED",
+      "MAM-56.feature 'Only ADMIN may download the error file': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/api/IntakeRunController.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/api/RequestProblems.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/IntakeFailure.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/IntakeLauncher.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/IntakeLoad.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/IntakeRuns.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/SubmitApplication.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/infrastructure/IntakeJobConfig.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/infrastructure/JdbcIntakeRuns.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/infrastructure/KitEventOutbox.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/infrastructure/MultipartSupport.java"
+  ],
+  "rules": [
+    "R-PRVENR01-ADD-01",
+    "R-PRVENR01-ADD-06",
+    "R-PRVENR01-cbl-00001",
+    "R-PRVENR01-cbl-00002",
+    "R-PRVENR01-cbl-00006",
+    "R-PRVENR01-cbl-00010",
+    "R-PRVENR01-cbl-00012",
+    "R-PRVENR01-cbl-00014",
+    "R-PRVENR01-cbl-00015",
+    "R-PRVENR01-cbl-00016",
+    "R-PRVENR01-cbl-00017",
+    "R-PRVENR01-cbl-00018",
+    "R-PRVENR01-cbl-00019",
+    "R-PRVENR01-cbl-00020",
+    "R-PRVENR01-cbl-00022",
+    "R-PRVENR01-cbl-00027",
+    "R-PRVENR01-cbl-00033",
+    "R-PRVENR01-cbl-00037",
+    "R-PRVENR01-cbl-00038",
+    "R-PRVENR01-cbl-00043",
+    "R-PRVENR01-cbl-00044",
+    "R-PRVENR01-cbl-00045",
+    "R-PRVENR01-cbl-00046",
+    "R-PRVENR01-cbl-00047",
+    "R-PRVENR01-cbl-00048"
+  ]
+}

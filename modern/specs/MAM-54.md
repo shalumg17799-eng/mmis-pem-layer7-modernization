@@ -15,7 +15,7 @@ dependsOn: [MAM-46]
 mainJourney: true
 labels: [svc-enrollment-service, kag-L-S026, agentic, decision-D-001, decision-D-016, decision-D-023, slice-main-journey]
 builtCommit: pending-user-commit
-testsSha256: f79e23bd03a599b931e9f29ff54dbe0c214076b77398dee3b5e731e63d11c5ef
+testsSha256: c2409a1dad729c43ddc0707e812a4747f74828d479eacc3a36500e1ecfbf84c5
 ---
 ## Business requirement
 Providers need to see what happened to the applications they sent, and analysts need to see every application, including the rejected ones, so that they can follow up. A provider sees only their own applications and, for a rejected one, every reason it was rejected. An analyst or supervisor sees all applications and can narrow the list by outcome or by identification number.

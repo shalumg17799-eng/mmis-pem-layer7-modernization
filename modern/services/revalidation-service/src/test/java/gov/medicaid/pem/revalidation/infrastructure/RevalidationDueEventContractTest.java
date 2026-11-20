@@ -24,17 +24,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
  * The RevalidationDue events of a sweep against modern/contracts/asyncapi/events.yaml
- * (RevalidationDueEnvelope, lesson f of the earlier reviews): the envelope fields are all there
- * and typed as the contract says, no member is null where the contract says string, the subject and
- * the Kafka message key are the NPI, and the data holds caseId, npi and dueDate. Both what is in
- * the outbox and what reaches Kafka are checked.
+ * (RevalidationDueEnvelope, lesson f of the earlier reviews): the envelope fields are all there and
+ * typed as the contract says, no member is null where the contract says string, the subject and the
+ * Kafka message key are the NPI, and the data holds caseId, npi and dueDate. Both what is in the
+ * outbox and what reaches Kafka are checked.
  */
 @Timeout(240)
 class RevalidationDueEventContractTest extends IntegrationTest {
@@ -75,7 +75,8 @@ class RevalidationDueEventContractTest extends IntegrationTest {
   // ---- what the outbox holds -------------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-45 AC-4] every RevalidationDue of a sweep conforms to the contract's RevalidationDueEnvelope")
+  @DisplayName(
+      "[MAM-45 AC-4] every RevalidationDue of a sweep conforms to the contract's RevalidationDueEnvelope")
   void outboxEventsConform() throws Exception {
     twoDueProviders();
 
@@ -88,7 +89,8 @@ class RevalidationDueEventContractTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-4] no member of a RevalidationDue is null (a string member is a string, never null)")
+  @DisplayName(
+      "[MAM-45 AC-4] no member of a RevalidationDue is null (a string member is a string, never null)")
   void noNulls() throws Exception {
     twoDueProviders();
 
@@ -119,7 +121,8 @@ class RevalidationDueEventContractTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-4] the data holds the case id of the case just opened, the NPI and its own due date")
+  @DisplayName(
+      "[MAM-45 AC-4] the data holds the case id of the case just opened, the NPI and its own due date")
   void dataIsTheCase() throws Exception {
     twoDueProviders();
 
@@ -174,11 +177,16 @@ class RevalidationDueEventContractTest extends IntegrationTest {
 
     Map<String, Object> cfg =
         Map.of(
-            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, PemContainers.KAFKA.getBootstrapServers(),
-            ConsumerConfig.GROUP_ID_CONFIG, "probe-" + UUID.randomUUID(),
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            PemContainers.KAFKA.getBootstrapServers(),
+            ConsumerConfig.GROUP_ID_CONFIG,
+            "probe-" + UUID.randomUUID(),
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+            "earliest",
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+            StringDeserializer.class,
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+            StringDeserializer.class);
     ConsumerRecord<String, String> found = null;
     try (var consumer = new KafkaConsumer<String, String>(cfg)) {
       consumer.subscribe(List.of("pem.revalidation.events"));
@@ -213,7 +221,8 @@ class RevalidationDueEventContractTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-4] the checker names a null caseId, a missing dueDate and a wrong source")
+  @DisplayName(
+      "[MAM-45 AC-4] the checker names a null caseId, a missing dueDate and a wrong source")
   void checkerFindsViolations() {
     ObjectNode nullCase = (ObjectNode) sample();
     ((ObjectNode) nullCase.get("data")).putNull("caseId");

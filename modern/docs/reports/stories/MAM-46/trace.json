@@ -11,17 +11,22 @@
     "AC-8"
   ],
   "tests": [
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/DbRejections.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/EventsContractFile.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/IntakeIntegrationTest.java",
     "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/IntegrationTest.java",
     "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/PlatformChecksTest.java",
     "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/CucumberSpringConfig.java",
     "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/CucumberSuiteTest.java",
     "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/SubmitApplicationSteps.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/ApplicationLessonsTest.java",
     "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/SubmitApplicationTest.java",
     "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/domain/ApplicationValidatorTest.java",
     "modern/services/enrollment-service/src/test/resources/features/MAM-46.feature"
   ],
   "testIds": {
     "AC-1": [
+      "ApplicationLessonsTest: PASSED",
       "ApplicationValidatorTest: PASSED",
       "MAM-46.feature 'A valid application is accepted': PASSED",
       "SubmitApplicationTest: PASSED"
@@ -32,6 +37,7 @@
       "SubmitApplicationTest: PASSED"
     ],
     "AC-3": [
+      "ApplicationLessonsTest: PASSED",
       "ApplicationValidatorTest: PASSED",
       "MAM-46.feature 'An invalid provider type fails with E102, and IN, GR and FA are accepted': PASSED",
       "SubmitApplicationTest: PASSED"
@@ -46,6 +52,7 @@
       "SubmitApplicationTest: PASSED"
     ],
     "AC-6": [
+      "ApplicationLessonsTest: PASSED",
       "ApplicationValidatorTest: PASSED",
       "MAM-46.feature 'Several failed checks give one error each, stored once and announced once': PASSED",
       "SubmitApplicationTest: PASSED"
@@ -64,7 +71,8 @@
     "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/ListApplications.java",
     "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/SubmitApplication.java",
     "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/domain/ApplicationValidator.java",
-    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/domain/ProviderTypeMapping.java"
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/domain/ProviderTypeMapping.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/infrastructure/KitEventOutbox.java"
   ],
   "rules": [
     "R-PRVENR01-ADD-04",

@@ -87,7 +87,8 @@ class CaseApiTest extends IntegrationTest {
   // ---- AC-1: the list ---------------------------------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-48 AC-1] without parameters the list is page 0 of size 20 and holds every case")
+  @DisplayName(
+      "[MAM-48 AC-1] without parameters the list is page 0 of size 20 and holds every case")
   void defaults() throws Exception {
     RevalidationFixtures.insertCase(jdbc, "1003000222", DUE, "DUE");
     RevalidationFixtures.insertCase(jdbc, "1003000333", DUE, "COMPLETED");
@@ -229,8 +230,7 @@ class CaseApiTest extends IntegrationTest {
     UUID id = RevalidationFixtures.insertCase(jdbc, "1003000222", DUE, "IN_SCREENING");
     UUID screening = UUID.randomUUID();
 
-    complete(
-        id, "{\"screeningId\":\"" + screening + "\",\"result\":\"PASS\"}");
+    complete(id, "{\"screeningId\":\"" + screening + "\",\"result\":\"PASS\"}");
 
     assertThat(
             jdbc.queryForObject(
@@ -302,7 +302,8 @@ class CaseApiTest extends IntegrationTest {
   void caseIdIsNotAUuid() throws Exception {
     MvcResult r =
         mvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/revalidations/{caseId}/completion", "1003000222")
+                MockMvcRequestBuilders.post(
+                        "/api/v1/revalidations/{caseId}/completion", "1003000222")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(completion("PASS"))
                     .with(PemJwt.analyst()))

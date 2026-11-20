@@ -137,8 +137,9 @@ class CompleteCaseTest {
 
     assertThat(store.tracked.get("1003000222").dueDate()).isEqualTo(DUE);
     assertThat(store.events).isEmpty();
-    assertThat(store.cases.values()).singleElement().satisfies(
-        c -> assertThat(c.dueDate()).isEqualTo(DUE));
+    assertThat(store.cases.values())
+        .singleElement()
+        .satisfies(c -> assertThat(c.dueDate()).isEqualTo(DUE));
   }
 
   @Test
@@ -190,7 +191,8 @@ class CompleteCaseTest {
   }
 
   @ParameterizedTest(
-      name = "[MAM-49 AC-3] a late REVALIDATION result does not reopen a {0} case and raises no error")
+      name =
+          "[MAM-49 AC-3] a late REVALIDATION result does not reopen a {0} case and raises no error")
   @ValueSource(strings = {"CANCELLED", "COMPLETED"})
   void lateResultDoesNotReopen(CaseStatus closed) {
     RevalidationCase c = store.addCase("1003000222", closed, DUE);

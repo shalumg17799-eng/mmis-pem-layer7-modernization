@@ -66,7 +66,8 @@ class EventListenersTest extends IntegrationTest {
   // ---- ProviderStatusChanged (MAM-45, MAM-49) --------------------------------------------------
 
   @Test
-  @DisplayName("[MAM-45 AC-3] a ProviderStatusChanged sets the tracked status and due date of the provider")
+  @DisplayName(
+      "[MAM-45 AC-3] a ProviderStatusChanged sets the tracked status and due date of the provider")
   void providerStatusChangedIsTracked() {
     providerEvents.onEvent(
         RevalidationFixtures.providerStatusChanged(
@@ -76,7 +77,8 @@ class EventListenersTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-48 AC-7] a later ProviderStatusChanged from A to A moves the tracked due date forward")
+  @DisplayName(
+      "[MAM-48 AC-7] a later ProviderStatusChanged from A to A moves the tracked due date forward")
   void laterEventMovesTheDate() {
     providerEvents.onEvent(
         RevalidationFixtures.providerStatusChanged(
@@ -112,7 +114,8 @@ class EventListenersTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-3] the optional fields of the contract (reason, actor, displayName, ...) do not matter")
+  @DisplayName(
+      "[MAM-45 AC-3] the optional fields of the contract (reason, actor, displayName, ...) do not matter")
   void contractOptionalFieldsAreAccepted() {
     Map<String, Object> data = new LinkedHashMap<>();
     data.put("npi", "1003000222");
@@ -153,7 +156,8 @@ class EventListenersTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-3] other event types on the provider topic are recorded as seen and change nothing")
+  @DisplayName(
+      "[MAM-45 AC-3] other event types on the provider topic are recorded as seen and change nothing")
   void otherProviderEventsAreIgnored() {
     UUID id = UUID.randomUUID();
     Map<String, Object> data = new LinkedHashMap<>();
@@ -242,7 +246,9 @@ class EventListenersTest extends IntegrationTest {
     assertThatThrownBy(() -> providerEvents.onEvent(message)).isInstanceOf(RuntimeException.class);
 
     assertThat(processed(id)).isZero();
-    assertThat(tracked("1003000222")).as("the read model is rolled back too").isEqualTo("A|2026-02-28");
+    assertThat(tracked("1003000222"))
+        .as("the read model is rolled back too")
+        .isEqualTo("A|2026-02-28");
     assertThat(RevalidationFixtures.caseStatus(jdbc, caseId)).isEqualTo("DUE");
 
     RevalidationFixtures.dropFailures(jdbc);
@@ -256,7 +262,8 @@ class EventListenersTest extends IntegrationTest {
   // ---- ScreeningCompleted (MAM-48 AC-4 to AC-6, MAM-49 AC-3) -----------------------------------
 
   @ParameterizedTest(
-      name = "[MAM-48 AC-4] a REVALIDATION screening with result {0} completes the open case and keeps the screening id")
+      name =
+          "[MAM-48 AC-4] a REVALIDATION screening with result {0} completes the open case and keeps the screening id")
   @ValueSource(strings = {"PASS", "FAIL"})
   void revalidationScreeningCompletesTheCase(String result) {
     UUID caseId = RevalidationFixtures.insertCase(jdbc, "1003000222", DUE, "IN_SCREENING");
@@ -324,7 +331,8 @@ class EventListenersTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-48 AC-4] an event id is applied once: a redelivery does not close the next open case")
+  @DisplayName(
+      "[MAM-48 AC-4] an event id is applied once: a redelivery does not close the next open case")
   void screeningEventIsIdempotent() {
     UUID id = UUID.randomUUID();
     String message =

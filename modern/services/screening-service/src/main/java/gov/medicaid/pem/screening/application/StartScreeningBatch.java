@@ -27,8 +27,7 @@ public class StartScreeningBatch {
     try {
       launcher.launch(run.runId(), businessDate);
     } catch (RuntimeException e) {
-      batch.failed(
-          run.runId(), businessDate, 0, e.getMessage() == null ? e.toString() : e.getMessage());
+      batch.failed(run.runId(), businessDate, 0, e);
       return runs.find(run.runId()).orElse(run);
     }
     return run;

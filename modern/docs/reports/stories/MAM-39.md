@@ -105,3 +105,32 @@ Cause: the lead's own change of c606832 (the `tee` for the failure annotations).
 `defaults.run.shell: bash`, which GitHub runs as `bash --noprofile --norc -eo pipefail`. Checked locally: `false | tee`
 ends with 0 under `bash -e` and with 1 under `bash -eo pipefail`. Run 3 must not be counted as a green Gradle run.
 The annotations themselves work: the web UI failure above was read through the public API without a sign-in.
+
+## Fourth run (2026-11-21 01:05, commit 00cfc3b, run 44803538965): the first run with real exit codes and readable causes
+
+| Job | Result | Time on the runner |
+|---|---|---|
+| Contract lint | success | 1m11s |
+| Web UI tests | **success** (first green on GitHub: install, lint and the whole Vitest suite on Node 22.22.2) | 1m08s |
+| Gradle build and full check | failure, with `--continue` and annotations | 61m24s |
+| Compose smoke test | skipped (it needs the Gradle job; it passed on its own in run 3) | |
+
+Read from the annotations through the public API (no sign-in). **Failed Gradle tasks: 6, all in the three services whose
+lanes are still open:** `:services:enrollment-service:test` and `:spotlessJavaCheck`, `:services:revalidation-service:test`
+and `:spotlessJavaCheck`, `:services:screening-service:test` and `:spotlessJavaCheck`; 169 failed tests in them (for example
+enrollment `IntakeAtomicityTest` and `IntakeUploadLimitTest`, tests written for stories that are not built to the end yet),
+and format violations in unfinished sources (`IntakeLoad.java`, `ExecuteSweep.java`).
+
+**Every other module passed its whole check on GitHub, on Linux:** libs fixed-width, service-kit and test-support,
+api-gateway, directory-service, notification-service, provider-service, risk-service, sanctions-service, tmsis-service and
+infra:local-runtime, with tests, JaCoCo, PIT, Spotless (CRLF sources accepted), `versionCheck` and the new
+`testSourceCheck`. So what keeps the pipeline red is exactly the open work of the three service lanes, nothing of the
+platform.
+
+## Fifth run (2026-11-21 02:00, commit c75af16, run 44811923545)
+
+Contract lint success and Web UI tests success (second green in a row). The Gradle job ended red after 23m49s with the
+same 6 failed tasks as run 4 (test and spotlessJavaCheck of enrollment-service, revalidation-service and
+screening-service) and 109 failed tests (run 4: 169; the lanes' work in progress moved on between the two snapshots).
+Every other module passed again. Run 4 needed 61 minutes because of tests of an unfinished lane that waited for
+database connections; a run without such waits takes about 24 minutes on the runner.

@@ -2,8 +2,10 @@ package gov.medicaid.pem.enrollment.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.qos.logback.classic.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.medicaid.pem.enrollment.IntakeIntegrationTest.Captured;
 import gov.medicaid.pem.testsupport.PemContainers;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
@@ -26,6 +28,7 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -108,9 +111,7 @@ class IntakeUploadLimitTest {
 
   final HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 
-  @BeforeEach
-  @AfterEach
-  void clean() {
+  void awaitNoJob() {
     Awaitility.await("no intake job is still running")
         .atMost(Duration.ofSeconds(60))
         .pollInterval(Duration.ofMillis(100))
@@ -121,6 +122,12 @@ class IntakeUploadLimitTest {
                             + " WHERE status IN ('STARTING', 'STARTED')",
                         Integer.class)
                     == 0);
+  }
+
+  @BeforeEach
+  @AfterEach
+  void clean() {
+    awaitNoJob();
     jdbc.update("DELETE FROM application_error");
     jdbc.update("DELETE FROM application");
     jdbc.update("DELETE FROM intake_run");
@@ -236,5 +243,54 @@ class IntakeUploadLimitTest {
     assertThat(r.headers().firstValue("Content-Type").orElse(""))
         .startsWith("application/problem+json");
     assertThat(jdbc.queryForObject("SELECT count(*) FROM intake_run", Integer.class)).isZero();
+  }
+
+  // ---- a database that cannot be read (lesson a of the code reviews) ---------------------------
+
+  HttpResponse<String> get(String path) throws Exception {
+    HttpRequest request =
+        HttpRequest.newBuilder(URI.create("http://localhost:" + port + path))
+            .timeout(Duration.ofSeconds(60))
+            .header("Authorization", "Bearer admin-token")
+            .GET()
+            .build();
+    return client.send(request, HttpResponse.BodyHandlers.ofString());
+  }
+
+  /** The two reads of a run, each with the column of intake_run that it selects. */
+  static Stream<Arguments> readsThatFail() {
+    return Stream.of(
+        Arguments.of("getIntakeRun", "", "read_count"),
+        Arguments.of("getIntakeErrorFile", "/error-file", "error_file"));
+  }
+
+  @ParameterizedTest(
+      name =
+          "[MAM-57 AC-7] [lesson a] when the database cannot be read, {0} answers 5xx and never 404, with no SQL text in at most 200 characters, and the exception is logged")
+  @MethodSource("readsThatFail")
+  void readFailureIsNeitherNotFoundNorSql(String operation, String suffix, String column)
+      throws Exception {
+    String runId = json.readTree(upload(unreadableFileOf(10_000)).body()).path("runId").asText();
+    awaitNoJob();
+    Captured log = new Captured();
+    Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    log.setContext(root.getLoggerContext());
+    log.start();
+    root.addAppender(log);
+    jdbc.execute("ALTER TABLE intake_run RENAME COLUMN " + column + " TO " + column + "_off");
+    HttpResponse<String> r;
+    try {
+      r = get("/api/v1/batch/intake-runs/" + runId + suffix);
+    } finally {
+      jdbc.execute("ALTER TABLE intake_run RENAME COLUMN " + column + "_off TO " + column);
+      root.detachAppender(log);
+      log.stop();
+    }
+    assertThat(r.statusCode()).as("answer " + r.body()).isBetween(500, 599);
+    assertThat(r.body()).hasSizeLessThanOrEqualTo(200);
+    assertThat(r.body().toLowerCase()).doesNotContain("select", "insert", "update", "sql");
+    assertThat(log.lines)
+        .filteredOn(line -> line.level().equals("ERROR") || line.level().equals("WARN"))
+        .anySatisfy(line -> assertThat(line.everything()).contains("does not exist"));
   }
 }

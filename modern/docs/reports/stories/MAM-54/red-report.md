@@ -23,3 +23,8 @@
   and `E102/providerType,E104/taxonomy` (no E103, which was the reason for moving to `1003000119` earlier).
 - **Production code:** the Q-095 rule (enrollment-service `OwnNpiRule`, `SubmitApplication`).
 - **Hashes:** re-recorded with `test_protection.py record MAM-54`.
+
+## Test change of the Lane 3 tests (2026-11-21)
+
+- `application/ListApplicationsTest` (6 unit tests, [MAM-54 AC-1], [MAM-54 AC-5]) is new and recorded in `MAM-54.tests.sha256` (now 7 files). Nothing existing was changed for this story except the shared
+  `api/ApplicationLessonsTest` (see MAM-46/red-report.md): its tests tagged MAM-54 are unchanged.

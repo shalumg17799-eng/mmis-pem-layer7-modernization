@@ -36,14 +36,16 @@ import org.springframework.transaction.PlatformTransactionManager;
  * and businessDate (D-020):
  *
  * <ol>
- *   <li>{@code screen}: every provider of provider-service, page by page; one item per provider;
- *       a due provider is screened (each screening commits on its own, so the step's chunks use a
- *       resourceless transaction); read and filter counts are kept by Spring Batch;
+ *   <li>{@code screen}: every provider of provider-service, page by page; one item per provider; a
+ *       due provider is screened (the screening, its ScreeningCompleted and its link to the run
+ *       commit together in a transaction of their own, so the step's chunks use a resourceless
+ *       transaction); read and filter counts are kept by Spring Batch;
  *   <li>{@code results}: the SCRNOUT file and the run's counts, in one transaction.
  * </ol>
  *
- * A job that does not complete marks its run FAILED with the reason (AC-6). Runs are started on one
- * background thread, so the 202 answer is RUNNING (AC-1).
+ * A job that does not complete marks its run FAILED with a short reason, the whole exception going
+ * to the log (AC-6, D-024). Runs are started on one background thread, so the 202 answer is RUNNING
+ * (AC-1).
  */
 @Configuration
 public class ScreeningBatchJobConfig {
@@ -58,7 +60,9 @@ public class ScreeningBatchJobConfig {
 
   @Bean
   Job screeningBatchJob(
-      JobRepository repo, Step screeningBatchScreenStep, Step screeningBatchResultsStep,
+      JobRepository repo,
+      Step screeningBatchScreenStep,
+      Step screeningBatchResultsStep,
       RunScreeningBatch batch) {
     return new JobBuilder(JOB, repo)
         .listener(failedRunListener(batch))
@@ -170,12 +174,13 @@ public class ScreeningBatchJobConfig {
         }
         String runId = job.getJobParameters().getString("runId");
         LocalDate businessDate = job.getJobParameters().getLocalDate("businessDate");
-        String reason =
-            job.getAllFailureExceptions().stream()
-                .findFirst()
-                .map(e -> e.getMessage() == null ? e.toString() : e.getMessage())
-                .orElse(job.getStatus().name());
-        batch.failed(UUID.fromString(runId), businessDate, read(job), reason);
+        job.getAllFailureExceptions().stream()
+            .findFirst()
+            .ifPresentOrElse(
+                failure -> batch.failed(UUID.fromString(runId), businessDate, read(job), failure),
+                () ->
+                    batch.failed(
+                        UUID.fromString(runId), businessDate, read(job), job.getStatus().name()));
       }
     };
   }

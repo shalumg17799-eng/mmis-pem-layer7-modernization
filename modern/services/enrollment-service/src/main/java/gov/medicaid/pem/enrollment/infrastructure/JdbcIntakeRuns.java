@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JdbcIntakeRuns implements IntakeRuns {
 
-  static final int ERROR_MAX = 500;
+  static final int ERROR_MAX = 200;
 
   private final JdbcTemplate jdbc;
 

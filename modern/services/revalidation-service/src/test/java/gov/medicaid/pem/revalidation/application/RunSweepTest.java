@@ -84,7 +84,8 @@ class RunSweepTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-8] a job that cannot be started leaves a FAILED run with the reason (D-024)")
+  @DisplayName(
+      "[MAM-45 AC-8] a job that cannot be started leaves a FAILED run with the reason (D-024)")
   void jobThatCannotBeStartedIsRecordedFailed() {
     RunSweep failing =
         sweepWith(
@@ -102,7 +103,8 @@ class RunSweepTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-8] a launch failure without a message is recorded with the exception's name")
+  @DisplayName(
+      "[MAM-45 AC-8] a launch failure without a message is recorded with the exception's name")
   void failureWithoutMessage() {
     RunSweep failing =
         sweepWith(

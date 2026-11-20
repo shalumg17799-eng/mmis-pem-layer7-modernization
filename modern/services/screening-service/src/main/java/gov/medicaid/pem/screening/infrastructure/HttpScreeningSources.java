@@ -12,6 +12,7 @@ import java.net.http.HttpTimeoutException;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,8 +29,10 @@ import org.springframework.web.client.RestClient;
  * The four sources over HTTP (the simple JSON of infra/wiremock/README.md, D-005), asked in
  * parallel. Each call has a time limit and one retry; a source that still gives no answer is
  * recorded as C (Q-039 A), with a detail saying whether it failed or did not answer in time
- * (MAM-20). The LEIE is asked for the provider and, for an organisation with an owner NPI, for the
- * owner as well (MAM-22).
+ * (MAM-20). An answer is only an answer when it holds the verdict of the question (found, excluded,
+ * debarred or deceased, as true or false): an empty object, an error document, an array, a text or
+ * a verdict that is null is no answer, never a pass (MAM-20 AC-1, D-024). The LEIE is asked for the
+ * provider and, for an organisation with an owner NPI, for the owner as well (MAM-22).
  */
 @Component
 public class HttpScreeningSources implements ScreeningSources {
@@ -155,8 +158,8 @@ public class HttpScreeningSources implements ScreeningSources {
     for (int attempt = 0; attempt <= retries; attempt++) {
       try {
         JsonNode body = call.get();
-        if (body == null) {
-          throw new IllegalStateException("empty answer");
+        if (body == null || !body.path(verdictMember(source)).isBoolean()) {
+          throw new IllegalStateException("answer holds no " + verdictMember(source) + " verdict");
         }
         return new Answer(body, false);
       } catch (RuntimeException e) {
@@ -173,9 +176,27 @@ public class HttpScreeningSources implements ScreeningSources {
         : SourceRules.unreachable(source, clock.instant());
   }
 
+  /** The member of the source's answer that holds the verdict. */
+  private static String verdictMember(Source source) {
+    return switch (source) {
+      case LICBOARD -> "found";
+      case OIGLEIE -> "excluded";
+      case SAMGOV -> "debarred";
+      case SSADMF -> "deceased";
+    };
+  }
+
+  /**
+   * True when the call ran out of time. The JDK client reports that as a timeout exception, but
+   * Spring's request of the JDK client, which enforces the read limit, reports a call it cancelled
+   * as "Request cancelled" with a CancellationException as the cause and no timeout exception; the
+   * detail of the result must not depend on which of the two the client gives (MAM-20 AC-2).
+   */
   private static boolean isTimeout(Throwable e) {
     for (Throwable c = e; c != null; c = c.getCause()) {
-      if (c instanceof HttpTimeoutException || c instanceof SocketTimeoutException) {
+      if (c instanceof HttpTimeoutException
+          || c instanceof SocketTimeoutException
+          || c instanceof CancellationException) {
         return true;
       }
     }

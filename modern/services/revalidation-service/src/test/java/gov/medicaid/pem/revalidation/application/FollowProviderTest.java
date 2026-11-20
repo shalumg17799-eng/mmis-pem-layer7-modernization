@@ -50,7 +50,8 @@ class FollowProviderTest {
   }
 
   @Test
-  @DisplayName("[MAM-48 AC-7] a later event moves the tracked due date forward (A to A, 2031-03-31)")
+  @DisplayName(
+      "[MAM-48 AC-7] a later event moves the tracked due date forward (A to A, 2031-03-31)")
   void laterEventMovesTheDate() {
     follow.statusChanged(new TrackedProvider("1003000222", "A", DUE));
     follow.statusChanged(new TrackedProvider("1003000222", "A", LocalDate.of(2031, 3, 31)));
@@ -106,7 +107,8 @@ class FollowProviderTest {
     assertThat(store.caseOf(other.caseId())).isEqualTo(other);
   }
 
-  @ParameterizedTest(name = "[MAM-49 AC-2] a {0} case is not touched when its provider leaves ACTIVE")
+  @ParameterizedTest(
+      name = "[MAM-49 AC-2] a {0} case is not touched when its provider leaves ACTIVE")
   @ValueSource(strings = {"COMPLETED", "CANCELLED"})
   void closedCasesAreNotTouched(CaseStatus closed) {
     RevalidationCase c = store.addCase("1003000222", closed, DUE);

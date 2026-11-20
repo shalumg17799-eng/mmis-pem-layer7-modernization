@@ -105,6 +105,19 @@ class RevalidationCorrelationIdTest extends IntegrationTest {
         Arguments.of("an empty string", ""));
   }
 
+  /**
+   * The crafted ids that contain a control character (CR, LF, ESC, tab): the request does not get
+   * as far as the controller, see {@link #controlCharactersAreRefusedBeforeTheController}.
+   */
+  static Stream<Arguments> craftedWithControlCharacters() {
+    return crafted().filter(a -> ((String) a.get()[1]).chars().anyMatch(c -> c < 0x20));
+  }
+
+  /** The crafted ids that the web layer lets through to the controller. */
+  static Stream<Arguments> craftedForTheController() {
+    return crafted().filter(a -> ((String) a.get()[1]).chars().noneMatch(c -> c < 0x20));
+  }
+
   // ---- the header of the sweep call ------------------------------------------------------------
 
   @ParameterizedTest(
@@ -129,23 +142,56 @@ class RevalidationCorrelationIdTest extends IntegrationTest {
   @ParameterizedTest(
       name =
           "[MAM-45 AC-4] an X-Correlation-Id header with {0}: the RevalidationDue of the sweep carries a safe id, not the raw value")
-  @MethodSource("crafted")
+  @MethodSource("craftedForTheController")
   void outgoingEventIsSafe(String what, String raw) throws Exception {
     RevalidationFixtures.track(jdbc, NPI, "A", LocalDate.of(2026, 2, 28));
-    mvc.perform(
-            MockMvcRequestBuilders.post(RevalidationFixtures.SWEEPS)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Correlation-Id", raw)
-                .content("{\"businessDate\":\"2026-03-31\"}")
-                .with(PemJwt.admin()))
-        .andReturn();
+    MvcResult r =
+        mvc.perform(
+                MockMvcRequestBuilders.post(RevalidationFixtures.SWEEPS)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("X-Correlation-Id", raw)
+                    .content("{\"businessDate\":\"2026-03-31\"}")
+                    .with(PemJwt.admin()))
+            .andReturn();
     RevalidationFixtures.awaitNoRunningJob(jdbc);
 
     List<JsonNode> events = RevalidationFixtures.outbox(jdbc, "RevalidationDue");
 
+    assertThat(r.getResponse().getStatus()).isEqualTo(202);
     assertThat(events).hasSize(1);
     String id = events.get(0).path("correlationId").asText();
     assertThat(id).matches(SAFE).isNotEqualTo(raw);
+    assertThat(capture.lines).noneMatch(l -> l.message().contains("FORGED"));
+  }
+
+  /**
+   * A header value with CR, LF, ESC or a tab is refused by the web layer (Spring Security's request
+   * firewall answers 400 with no body) before the controller runs. That is a second safe outcome of
+   * lesson g: no run starts, no event is written, and nothing of the raw value is logged or echoed.
+   * (The first draft of this test expected a 202 for these values; MockMvc goes through the same
+   * firewall as the real server, so it could never get one.)
+   */
+  @ParameterizedTest(
+      name =
+          "[MAM-45 AC-4] an X-Correlation-Id header with {0} is refused with a 400 before the sweep starts: no run, no event, nothing logged")
+  @MethodSource("craftedWithControlCharacters")
+  void controlCharactersAreRefusedBeforeTheController(String what, String raw) throws Exception {
+    RevalidationFixtures.track(jdbc, NPI, "A", LocalDate.of(2026, 2, 28));
+
+    MvcResult r =
+        mvc.perform(
+                MockMvcRequestBuilders.post(RevalidationFixtures.SWEEPS)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("X-Correlation-Id", raw)
+                    .content("{\"businessDate\":\"2026-03-31\"}")
+                    .with(PemJwt.admin()))
+            .andReturn();
+    RevalidationFixtures.awaitNoRunningJob(jdbc);
+
+    assertThat(r.getResponse().getStatus()).isEqualTo(400);
+    assertThat(r.getResponse().getHeader("X-Correlation-Id")).matches(SAFE).isNotEqualTo(raw);
+    assertThat(RevalidationFixtures.count(jdbc, "SELECT count(*) FROM sweep_run")).isZero();
+    assertThat(RevalidationFixtures.outbox(jdbc, "RevalidationDue")).isEmpty();
     assertThat(capture.lines).noneMatch(l -> l.message().contains("FORGED"));
   }
 
@@ -226,7 +272,8 @@ class RevalidationCorrelationIdTest extends IntegrationTest {
     completeACaseWith(raw);
 
     assertThat(capture.lines)
-        .noneMatch(l -> l.message().contains("FORGED") || (!raw.isEmpty() && l.message().contains(raw)));
+        .noneMatch(
+            l -> l.message().contains("FORGED") || (!raw.isEmpty() && l.message().contains(raw)));
     assertThat(capture.lines)
         .noneMatch(l -> l.mdc().values().stream().anyMatch(v -> v.contains("FORGED")));
   }

@@ -2,6 +2,7 @@ package gov.medicaid.pem.screening.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import gov.medicaid.pem.kit.web.ApiException;
+import gov.medicaid.pem.screening.application.ProviderFactsSource;
 import gov.medicaid.pem.screening.application.ReadScreenings;
 import gov.medicaid.pem.screening.application.RequestScreening;
 import gov.medicaid.pem.screening.application.Screening;
@@ -10,6 +11,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/screenings")
 public class ScreeningController {
 
+  private static final Logger LOG = LoggerFactory.getLogger(ScreeningController.class);
+
   private final ReadScreenings read;
   private final RequestScreening request;
 
@@ -39,7 +44,8 @@ public class ScreeningController {
 
   /**
    * requestScreening (MAM-28): x-roles ANALYST, SUPERVISOR, SYSTEM; 202 with the RUNNING MANUAL
-   * screening, 400 for a malformed NPI, 404 for an NPI provider-service does not know.
+   * screening, 400 for a malformed NPI, 404 for an NPI provider-service does not know, 503 when
+   * provider-service gives no answer (nothing is created then).
    */
   @PostMapping
   @ResponseStatus(HttpStatus.ACCEPTED)
@@ -48,7 +54,18 @@ public class ScreeningController {
     if (body == null || body.npi() == null || !body.npi().matches("[0-9]{10}")) {
       throw ApiException.badRequest("The NPI must be 10 digits.");
     }
-    return ScreeningResponse.of(request.request(body.npi()));
+    try {
+      return ScreeningResponse.of(request.request(body.npi()));
+    } catch (ProviderFactsSource.Unavailable e) {
+      LOG.warn("requested screening of NPI {} refused: {}", body.npi(), e.getMessage());
+      throw new ApiException(
+          HttpStatus.SERVICE_UNAVAILABLE,
+          null,
+          "The provider record of NPI "
+              + body.npi()
+              + " cannot be read right now. Try again later.",
+          List.of());
+    }
   }
 
   /** listScreenings: x-roles ANALYST, SUPERVISOR, ADMIN. */

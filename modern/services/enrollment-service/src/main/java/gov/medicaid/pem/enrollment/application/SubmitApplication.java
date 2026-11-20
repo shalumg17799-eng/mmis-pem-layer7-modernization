@@ -47,7 +47,7 @@ public class SubmitApplication {
       throw new AccessDeniedException(
           "An individual application can only be submitted under your own NPI.");
     }
-    return store(in, "PORTAL", user.name(), id -> {});
+    return store(in, "PORTAL", user.name(), id -> {}, () -> {});
   }
 
   /**
@@ -57,11 +57,26 @@ public class SubmitApplication {
    */
   @Transactional
   public StoredApplication fromFile(NewApplication in, String submittedBy, Consumer<UUID> attach) {
-    return store(in, "LEGACY_FILE", submittedBy, attach);
+    return store(in, "LEGACY_FILE", submittedBy, attach, () -> {});
+  }
+
+  /**
+   * As {@link #fromFile(NewApplication, String, Consumer)}, and {@code whenRejected} runs in the
+   * same transaction when the application is REJECTED (MAM-56 AC-6: the APPERROR row is written
+   * with the application, so a row that cannot be written leaves no rejected application behind).
+   */
+  @Transactional
+  public StoredApplication fromFile(
+      NewApplication in, String submittedBy, Consumer<UUID> attach, Runnable whenRejected) {
+    return store(in, "LEGACY_FILE", submittedBy, attach, whenRejected);
   }
 
   private StoredApplication store(
-      NewApplication in, String source, String submittedBy, Consumer<UUID> attach) {
+      NewApplication in,
+      String source,
+      String submittedBy,
+      Consumer<UUID> attach,
+      Runnable whenRejected) {
     ProviderTypeMapping types = ProviderTypeMapping.of(store.providerTypeMappings());
     boolean npi = ApplicationValidator.isNpi(in.npi());
     Validation v =
@@ -82,6 +97,9 @@ public class SubmitApplication {
             clock.instant());
     store.save(app, submittedBy);
     attach.accept(app.applicationId());
+    if (!v.valid()) {
+      whenRejected.run();
+    }
     LOG.info("Application {} for NPI {}: {}", app.applicationId(), app.npi(), app.status());
     if (v.valid()) {
       outbox.enqueue(

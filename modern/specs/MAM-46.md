@@ -15,7 +15,7 @@ dependsOn: [MAM-31]
 mainJourney: true
 labels: [svc-enrollment-service, kag-L-S025, agentic, decision-D-001, decision-D-008, decision-D-016, decision-D-019, decision-D-023, slice-main-journey]
 builtCommit: pending-user-commit
-testsSha256: 788d3079ced0a3c6ecb96dc4f0ece61c9b65531847b787a9bda92468914af924
+testsSha256: 1239d8e44331c8c7dfac82b43b7cab6b3e0832be22e95a9f20b47b8b05bea157
 ---
 ## Business requirement
 A provider, or an analyst acting for a provider, can apply for Medicaid enrolment online. Before anything else happens the system checks that the application names the provider's identification number, that the provider type is individual, group or facility, that a specialty (taxonomy) code is given, and that no application for the same identification number has already been accepted. Every failed check is reported to the applicant once, with its legacy error code. A rejected application is kept for review but never becomes a provider. An accepted application is passed on so that the provider can be registered as pending and then screened. Codes used by the old provider feeds are translated to the three official types.

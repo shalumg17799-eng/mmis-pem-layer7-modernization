@@ -14,8 +14,8 @@ decisions: [D-001, D-016, D-023, D-024]
 dependsOn: [MAM-56]
 mainJourney: false
 labels: [svc-enrollment-service, kag-L-S028, agentic, decision-D-001, decision-D-016, decision-D-023, decision-D-024]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 9541345ee43bbd1d2f7476c0270a1e5e1adf9ede97dfb0024894fb86920d5fd0
 ---
 ## Business requirement
 After an intake run, operations need an honest result: how many applications were read, accepted, rejected and skipped, and whether the run finished cleanly, finished with rejected applications, or failed and why. The old job counted one application several times, hid a hard error behind a warning code and could loop forever on a bad record. The new run reports counts that add up and an explicit result, and a run can be repeated for the same business date without loading anything twice.

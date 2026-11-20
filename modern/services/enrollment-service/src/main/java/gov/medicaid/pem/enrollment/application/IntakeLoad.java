@@ -1,5 +1,6 @@
 package gov.medicaid.pem.enrollment.application;
 
+import gov.medicaid.pem.enrollment.domain.ApplicationValidator;
 import gov.medicaid.pem.enrollment.domain.ErrorCode;
 import gov.medicaid.pem.fixedwidth.FieldDef;
 import gov.medicaid.pem.fixedwidth.FixedWidthCodec;
@@ -25,6 +26,11 @@ import org.springframework.stereotype.Service;
  * loaded twice, no row, no event); errored = any other rejection, an unreadable record or a record
  * that could not be stored. An unreadable record or a storage failure ends the run FAILED naming
  * the record (MAM-57 AC-5, AC-6); a run with rejections alone is COMPLETED (legacy RC 4).
+ *
+ * <p>A run ends with an {@link IntakeFailure}: a short reason without SQL text (D-024); the
+ * exception behind it is logged. Everything one record needs, from the check whether it was
+ * processed to its APPERROR row, is one transaction (SubmitApplication), so a record that cannot be
+ * stored leaves nothing behind and a re-run stores it once (MAM-57 AC-8).
  */
 @Service
 public class IntakeLoad {
@@ -101,44 +107,49 @@ public class IntakeLoad {
       read++;
       if (raw.length != LRECL) {
         errored++;
-        runs.counts(runId, read, written, errored, skipped);
-        throw new IllegalStateException(
-            "record " + n + " is " + raw.length + " bytes, not " + LRECL + ": the file is unreadable");
+        counts(runId, n, read, written, errored, skipped);
+        throw new IntakeFailure(
+            "record "
+                + n
+                + " is "
+                + raw.length
+                + " bytes, not "
+                + LRECL
+                + ": the file is unreadable");
       }
       String rawText = new String(raw, StandardCharsets.US_ASCII);
-      if (runs.alreadyProcessed(runId, businessDate, rawText)) {
-        skipped++;
-        runs.counts(runId, read, written, errored, skipped);
-        continue;
-      }
       NewApplication app = application(rawText);
-      StoredApplication stored;
       try {
-        stored =
-            submit.fromFile(app, submittedBy, applicationId -> runs.attach(applicationId, runId, rawText));
-      } catch (RuntimeException e) {
-        errored++;
-        runs.counts(runId, read, written, errored, skipped);
-        throw new IllegalStateException(
-            "record " + n + " NPI " + app.npi() + " could not be stored: "
-                + e.getMessage(),
-            e);
-      }
-      if (SubmitApplication.VALIDATED.equals(stored.status())) {
-        written++;
-      } else {
-        runs.addErrorRow(runId, errorRow(rawText));
-        boolean duplicateOnly =
-            stored.errors().stream().allMatch(e -> e.code() == ErrorCode.E103);
-        if (duplicateOnly) {
+        if (runs.alreadyProcessed(runId, businessDate, rawText)) {
           skipped++;
         } else {
-          errored++;
+          StoredApplication stored =
+              submit.fromFile(
+                  app,
+                  submittedBy,
+                  applicationId -> runs.attach(applicationId, runId, rawText),
+                  () -> runs.addErrorRow(runId, errorRow(rawText)));
+          if (SubmitApplication.VALIDATED.equals(stored.status())) {
+            written++;
+          } else if (stored.errors().stream().allMatch(e -> e.code() == ErrorCode.E103)) {
+            skipped++;
+          } else {
+            errored++;
+          }
         }
+      } catch (RuntimeException e) {
+        errored++;
+        IntakeFailure ended = failure(named(n, app.npi()) + " could not be stored", e);
+        counts(runId, n, read, written, errored, skipped);
+        throw ended;
       }
-      runs.counts(runId, read, written, errored, skipped);
+      counts(runId, n, read, written, errored, skipped);
     }
-    runs.complete(runId, clock.instant());
+    try {
+      runs.complete(runId, clock.instant());
+    } catch (RuntimeException e) {
+      throw failure("the run could not be completed", e);
+    }
     LOG.info(
         "PRVENR01: ENROLLMENT LOAD ENDED - READ={} WRITTEN={} ERRORED={} SKIPPED={}",
         read,
@@ -150,6 +161,26 @@ public class IntakeLoad {
   public void failed(UUID runId, LocalDate businessDate, String reason) {
     LOG.error("PRVENR01 run {} for {} FAILED: {}", runId, businessDate, reason);
     runs.fail(runId, reason, clock.instant());
+  }
+
+  /** The counts after record n; a failure to write them ends the run like any other. */
+  private void counts(UUID runId, int n, int read, int written, int errored, int skipped) {
+    try {
+      runs.counts(runId, read, written, errored, skipped);
+    } catch (RuntimeException e) {
+      throw failure("the run counts after record " + n + " could not be written", e);
+    }
+  }
+
+  /** The failure that ends the run: the reason is short and clean, the cause goes to the log. */
+  private static IntakeFailure failure(String reason, RuntimeException cause) {
+    LOG.error("PRVENR01: {}", reason, cause);
+    return new IntakeFailure(reason, cause);
+  }
+
+  /** "record 2 NPI 1003000333"; bytes of the file other than a 10-digit NPI are not repeated. */
+  private static String named(int n, String npi) {
+    return ApplicationValidator.isNpi(npi) ? "record " + n + " NPI " + npi : "record " + n;
   }
 
   /** PRVRECRD bytes 1-130: the key fields and the view of the type (individual or organisation). */
@@ -167,9 +198,7 @@ public class IntakeLoad {
     } else if ("GR".equals(type) || "FA".equals(type)) {
       organization =
           new NewApplication.Organization(
-              field(r, "PRV-LEGAL-NAME"),
-              field(r, "PRV-DBA-NAME"),
-              field(r, "PRV-OWNER-NPI"));
+              field(r, "PRV-LEGAL-NAME"), field(r, "PRV-DBA-NAME"), field(r, "PRV-OWNER-NPI"));
     }
     return new NewApplication(
         field(r, "PRV-NPI"),

@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1/batch/intake-runs")
 public class IntakeRunController {
+
+  private static final Logger LOG = LoggerFactory.getLogger(IntakeRunController.class);
 
   static final String JOB = "PRVENR01";
   static final int BATCH_ID_MAX = 8;
@@ -115,7 +119,9 @@ public class IntakeRunController {
     try {
       launcher.launch(runId, date, bytes, login());
     } catch (RuntimeException e) {
-      load.failed(runId, date, e.getMessage() == null ? e.toString() : e.getMessage());
+      // the caller and the run get a short reason (D-024); the exception goes to the log
+      LOG.error("PRVENR01: job not started for run {}", runId, e);
+      load.failed(runId, date, "job " + JOB + " not started");
     }
     return BatchRun.of(runs.find(runId).orElseThrow());
   }

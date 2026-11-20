@@ -10,6 +10,11 @@
 // "Shown" and "hidden" mean what a sighted user sees (correction of 2026-11-21 night, after a review): the element's own style, the
 // style of its ancestors (opacity 0, display none, a closed details element, content-visibility hidden) and a box that lies wholly off
 // the page (the USWDS class usa-sr-only, top -999em, a transform) are all judged, for the label, the header cell and each part of their text.
+// Second correction (2026-11-21 night, after a second review): also judged now are clipping by an ancestor (overflow hidden on a box
+// under 2 by 2 pixels, a wrapper that pushes the element out of its box, the clip property), clip-path, filter opacity(0), text whose own
+// element has font-size 0 or a colour with alpha 0, and the content of a control (textarea, select, option, input, button) inside a
+// label or a header cell, which is not the label's text. Guards keep what a person can see accepted (a wrapper large enough, a scroll
+// container, a label with its own text beside a textarea, a partly transparent colour).
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -306,6 +311,19 @@ test.describe('[MAM-86 AC-6] the label rule accepts a visible label element, or 
     expect(problems).toEqual([]);
   });
 
+  test('MAM-86 AC-6 (i) overflow hidden on a wrapper that has no box of its own (display contents) clips nothing, so the label inside it is accepted', async ({ page }) => {
+    const problems = await problemsOf(page, '<div style="display:contents;overflow:hidden"><label for="npi">NPI</label></div><input id="npi" type="text">');
+    expect(problems, 'a display contents element has no box: its overflow does not apply and its empty rectangle must not clip the label').toEqual([]);
+  });
+
+  test('MAM-86 AC-6 (i) overflow hidden on the body element belongs to the page, not to the body box: a label below the end of the body box is accepted', async ({ page }) => {
+    await page.setContent(pageWith('<div style="height:200px"></div><label for="npi">NPI</label><input id="npi" type="text">'));
+    await page.evaluate(() => {
+      document.body.style.cssText = 'margin:0;height:30px;overflow:hidden';
+    });
+    expect(structureProblems(await readFacts(page)), 'the label lies 200 pixels below the end of the 30 pixel body, inside the window').toEqual([]);
+  });
+
   test('MAM-86 AC-6 (i) an absolutely positioned label is not clipped by an overflow hidden wrapper that is not its containing block', async ({ page }) => {
     const wrapper = '<div style="position:relative"><div style="width:1px;height:1px;overflow:hidden"><label for="npi" style="position:absolute;left:0;top:0">NPI</label></div></div>';
     const problems = await problemsOf(page, `${wrapper}<input id="npi" type="text">`);
@@ -328,7 +346,8 @@ test.describe('[MAM-86 AC-6] the label rule accepts a visible label element, or 
   });
 
   test('MAM-86 AC-6 (i) a label whose text sits in an element with a normal font size inside an element with font-size 0 is accepted: the element that holds the text is judged', async ({ page }) => {
-    const problems = await problemsOf(page, '<label for="npi"><span style="font-size:0"><span style="font-size:16px">NPI</span></span></label><input id="npi" type="text">');
+    const outer = '<span style="display:inline-block;width:60px;height:20px;font-size:0"><span style="font-size:16px">NPI</span></span>';
+    const problems = await problemsOf(page, `<label for="npi">${outer}</label><input id="npi" type="text">`);
     expect(problems).toEqual([]);
   });
 
@@ -452,6 +471,59 @@ test.describe('[MAM-86 AC-6] the label rule still refuses an input with no visib
     expect(message).toContain('the header cell of its column ("Taxonomy prefix") is not shown');
   });
 
+  // Second correction round (2026-11-21 night): hiding methods that a second review found the check did not see. The header text is in
+  // the name of the input every time, so that only the hiding is what is judged.
+  const named = prefixCell('Taxonomy prefix, row 1') + tierCell('Tier, row 1');
+  /** A thead with the header cell of the "Taxonomy prefix" column as given, then the plain "Tier" header; `style` goes on the thead. */
+  const theadOf = (prefixHeader: string, style = ''): string => `<thead style="${style}"><tr>${prefixHeader}<th scope="col">Tier</th></tr></thead>`;
+  const plainPrefixHeader = '<th scope="col">Taxonomy prefix</th>';
+
+  for (const [how, head] of [
+    ['clip-path inset(50%) on the header cell', theadOf('<th scope="col" style="clip-path:inset(50%)">Taxonomy prefix</th>')],
+    ['clip-path inset(50%) on the thead (an ancestor of the header cell)', theadOf(plainPrefixHeader, 'clip-path:inset(50%)')],
+    ['filter opacity(0) on the header cell', theadOf('<th scope="col" style="filter:opacity(0)">Taxonomy prefix</th>')],
+    ['filter opacity(0) on the thead (an ancestor of the header cell)', theadOf(plainPrefixHeader, 'filter:opacity(0)')],
+  ] as const) {
+    test(`MAM-86 AC-6 (v) a table input under a header cell that nobody sees is refused, though the header text is in its name: header with ${how}`, async ({ page }) => {
+      const message = problemAbout(await problemsOf(page, rulesTable(named, head)), 'prefix-1');
+      expect(message).toContain('the header cell of its column ("Taxonomy prefix") is not shown');
+    });
+  }
+
+  // The whole table sits in a wrapper that clips it away: the header cell has a box of its own, the wrapper shows none of it.
+  for (const [how, style] of [
+    ['a wrapper one pixel wide and high with overflow hidden', 'position:absolute;width:1px;height:1px;overflow:hidden'],
+    ['a wrapper of height 0 with overflow hidden', 'height:0;overflow:hidden'],
+    ['a wrapper of width 0 with overflow hidden', 'width:0;overflow:hidden'],
+    ['a wrapper with the clip property at rect(0,0,0,0)', 'position:absolute;clip:rect(0,0,0,0)'],
+    ['a wrapper with clip-path inset(50%)', 'clip-path:inset(50%)'],
+  ] as const) {
+    test(`MAM-86 AC-6 (v) a table input under a header cell whose table is clipped away by its wrapper is refused: ${how}`, async ({ page }) => {
+      const message = problemAbout(await problemsOf(page, `<div style="${style}">${rulesTable(named)}</div>`), 'prefix-1');
+      expect(message).toContain('the header cell of its column ("Taxonomy prefix") is not shown');
+    });
+  }
+
+  // The header cell is seen but nobody can read the text in it.
+  for (const [how, cell] of [
+    ['the colour transparent on the header cell', '<th scope="col" style="color:transparent">Taxonomy prefix</th>'],
+    ['a colour with alpha 0 on the header cell', '<th scope="col" style="color:rgba(20,30,40,0)">Taxonomy prefix</th>'],
+    ['font-size 0 on the header cell (its padding keeps its box)', '<th scope="col" style="font-size:0;padding:8px">Taxonomy prefix</th>'],
+    ['the text in a span with clip-path inset(50%)', '<th scope="col"><span style="clip-path:inset(50%)">Taxonomy prefix</span></th>'],
+    ['the text in a span with filter opacity(0)', '<th scope="col"><span style="filter:opacity(0)">Taxonomy prefix</span></th>'],
+    ['the text in a span with the colour transparent', '<th scope="col"><span style="color:transparent">Taxonomy prefix</span></th>'],
+    ['the text in a box of its own (inline-block) with font-size 0', '<th scope="col"><span style="display:inline-block;width:80px;height:20px;font-size:0">Taxonomy prefix</span></th>'],
+    [
+      'the text pushed out of the box that clips it (a wrapper 100 by 20 pixels with overflow hidden, the text moved 300 pixels to the right)',
+      '<th scope="col"><div style="width:100px;height:20px;overflow:hidden"><span style="position:relative;left:300px">Taxonomy prefix</span></div></th>',
+    ],
+  ] as const) {
+    test(`MAM-86 AC-6 (v) a table input under a header cell whose text nobody can read is refused: ${how}`, async ({ page }) => {
+      const message = problemAbout(await problemsOf(page, rulesTable(named, theadOf(cell))), 'prefix-1');
+      expect(message).toContain('the header cell of its column has no visible text');
+    });
+  }
+
   test('MAM-86 AC-6 (vi) a table input whose name holds only the header text of ANOTHER column is refused (the two inputs are swapped here)', async ({ page }) => {
     const problems = await problemsOf(page, rulesTable(prefixCell('Tier, row 1') + tierCell('Taxonomy prefix, row 1')));
     expect(problemAbout(problems, 'prefix-1')).toContain('its accessible name "Tier, row 1" does not contain the visible header text "Taxonomy prefix" of its column');
@@ -496,6 +568,52 @@ test.describe('[MAM-86 AC-6] the label rule still refuses an input with no visib
     test(`MAM-86 AC-6 (vii) an input whose label is not seen by a person is refused: ${how}`, async ({ page }) => {
       const message = problemAbout(await problemsOf(page, body), 'npi');
       expect(message).toContain(`${NEITHER_A}its label element "NPI" is not shown)`);
+      expect(message).toContain('it is not in a table cell');
+    });
+  }
+
+  // Second correction round (2026-11-21 night): the labels that a second review found the check did not refuse. Each case is
+  // [how, markup, id of the input, the label text that the problem quotes].
+  const BOX = 'display:inline-block;width:60px;height:20px'; // a box of its own, so that it is the clipping or the text that hides the label
+  for (const [how, body, id, text] of [
+    ['the label inside a wrapper one pixel wide and high with overflow hidden', '<div style="position:absolute;width:1px;height:1px;overflow:hidden"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['the label inside a wrapper of height 0 with overflow hidden', '<div style="height:0;overflow:hidden"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['the label inside a wrapper of width 0 with overflow hidden', '<div style="width:0;overflow:hidden"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['the label inside a wrapper one pixel wide and high with overflow auto (a scroll container too small to show anything)', '<div style="position:absolute;width:1px;height:1px;overflow:auto"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['the label inside a wrapper one pixel wide and 100 high with overflow auto (a scroll container with no width)', '<div style="width:1px;height:100px;overflow:auto"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['the label inside a wrapper 200 wide and one pixel high with overflow auto (a scroll container with no height)', '<div style="width:200px;height:1px;overflow:auto"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['the label two levels inside a wrapper one pixel wide and high with overflow hidden', '<div style="position:absolute;width:1px;height:1px;overflow:hidden"><p><label for="npi">NPI</label></p></div><input id="npi" type="text">', 'npi', 'NPI'],
+    [
+      'the label pushed out of the box that clips it (a wrapper 100 by 20 pixels with overflow hidden, the label moved 300 pixels to the right)',
+      '<div style="width:100px;height:20px;overflow:hidden"><label for="npi" style="position:relative;left:300px">NPI</label></div><input id="npi" type="text">',
+      'npi',
+      'NPI',
+    ],
+    ['the label inside a wrapper with the clip property at rect(0,0,0,0)', '<div style="position:absolute;clip:rect(0,0,0,0)"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['clip-path inset(50%) on the label', '<label for="npi" style="clip-path:inset(50%)">NPI</label><input id="npi" type="text">', 'npi', 'NPI'],
+    ['clip-path inset(50%) on a wrapper of the label', '<div style="clip-path:inset(50%)"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['filter opacity(0) on the label', '<label for="npi" style="filter:opacity(0)">NPI</label><input id="npi" type="text">', 'npi', 'NPI'],
+    ['filter opacity(0) on a wrapper of the label', '<div style="filter:opacity(0)"><label for="npi">NPI</label></div><input id="npi" type="text">', 'npi', 'NPI'],
+    ['the colour transparent on the label', '<label for="npi" style="color:transparent">NPI</label><input id="npi" type="text">', 'npi', 'NPI'],
+    ['a colour with alpha 0 on the label', '<label for="npi" style="color:rgba(20,30,40,0)">NPI</label><input id="npi" type="text">', 'npi', 'NPI'],
+    ['font-size 0 on the label (it has a box of its own)', `<label for="npi" style="${BOX};font-size:0">NPI</label><input id="npi" type="text">`, 'npi', 'NPI'],
+    [
+      'its only text in a box of its own (inline-block) with font-size 0 inside the label',
+      `<label for="npi" style="${BOX}"><span style="display:inline-block;width:40px;height:10px;font-size:0">NPI</span></label><input id="npi" type="text">`,
+      'npi',
+      'NPI',
+    ],
+    ['its only text in a span with the colour transparent inside the label', '<label for="npi"><span style="color:transparent">NPI</span></label><input id="npi" type="text">', 'npi', 'NPI'],
+    ['its only text in a span with clip-path inset(50%) inside the label', '<label for="npi"><span style="clip-path:inset(50%)">NPI</span></label><input id="npi" type="text">', 'npi', 'NPI'],
+    // A label whose only text is the content of a control inside it: what a person reads there is the control, not a label.
+    ['no text of its own and a textarea with content inside it', '<label><textarea id="note">Write the reason here</textarea></label>', 'note', 'Write the reason here'],
+    ['no text of its own and a select (a list box of three rows) inside it', '<label><select id="tier" size="3"><option>Limited (L)</option></select></label>', 'tier', 'Limited (L)'],
+    ['no text of its own and a select (a drop-down) inside it', '<label><select id="tier"><option>Limited (L)</option></select></label>', 'tier', 'Limited (L)'],
+    ['its only text in a button inside the label', '<label for="npi"><button type="button">NPI</button></label><input id="npi" type="text">', 'npi', 'NPI'],
+  ] as const) {
+    test(`MAM-86 AC-6 (vii) an input whose label nobody sees or reads is refused: ${how}`, async ({ page }) => {
+      const message = problemAbout(await problemsOf(page, body), id);
+      expect(message).toContain(`${NEITHER_A}its label element "${text}" is not shown)`);
       expect(message).toContain('it is not in a table cell');
     });
   }

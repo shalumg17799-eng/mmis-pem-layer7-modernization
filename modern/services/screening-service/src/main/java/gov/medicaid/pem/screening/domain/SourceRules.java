@@ -54,8 +54,8 @@ public final class SourceRules {
   /**
    * MAM-22 (D-016, R-PRVSCR01-cbl-00033): the provider and, for an organisation, its owner checked
    * against the LEIE, as one OIGLEIE result. Both listed: E201 naming both (question C-6); the
-   * provider only: E201 as before; the owner only: E203 naming the owner; neither: P. A blank
-   * owner NPI means the provider is checked on its own NPI only.
+   * provider only: E201 as before; the owner only: E203 naming the owner; neither: P. A blank owner
+   * NPI means the provider is checked on its own NPI only.
    */
   public static SourceResult leie(
       String npi, Exclusion own, String ownerNpi, Exclusion owner, Instant at) {

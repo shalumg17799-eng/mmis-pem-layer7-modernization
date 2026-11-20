@@ -159,9 +159,9 @@ public final class RevalidationFixtures {
   // ---- failures of the real database ----------------------------------------------------------
 
   /**
-   * Makes every write of this kind to the table fail with the message, until {@link
-   * #dropFailures}. {@code operation} is INSERT or UPDATE; {@code condition} is a boolean SQL
-   * expression on {@code NEW} ("true" rejects every write).
+   * Makes every write of this kind to the table fail with the message, until {@link #dropFailures}.
+   * {@code operation} is INSERT or UPDATE; {@code condition} is a boolean SQL expression on {@code
+   * NEW} ("true" rejects every write).
    */
   public static void reject(
       JdbcTemplate jdbc,

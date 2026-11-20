@@ -6,6 +6,9 @@ import gov.medicaid.pem.screening.application.ScreeningRuns;
 import gov.medicaid.pem.screening.application.StartScreeningBatch;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -31,6 +34,10 @@ public class ScreeningRunController {
 
   static final String JOB = "PRVSCR01";
 
+  /** The contract's format date: yyyy-MM-dd and nothing else, an impossible date is no date. */
+  private static final DateTimeFormatter ISO_DATE =
+      DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
+
   private final StartScreeningBatch start;
   private final ScreeningRuns runs;
 
@@ -39,8 +46,12 @@ public class ScreeningRunController {
     this.runs = runs;
   }
 
-  /** Contract BatchRunRequest. */
-  public record BatchRunRequest(LocalDate businessDate) {}
+  /**
+   * Contract BatchRunRequest. The date is read as text and parsed strictly: a date-time such as
+   * 2026-03-31T00:00:00Z, a number or an array is not a date, and Jackson's default LocalDate
+   * reading would accept them (MAM-32 AC-1).
+   */
+  public record BatchRunRequest(String businessDate) {}
 
   /** Contract BatchRun; counts read, screened, skipped and failed (AC-5). */
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -80,7 +91,15 @@ public class ScreeningRunController {
     if (request == null || request.businessDate() == null) {
       throw ApiException.badRequest("businessDate is required.");
     }
-    return BatchRun.of(start.start(request.businessDate()));
+    return BatchRun.of(start.start(parseBusinessDate(request.businessDate())));
+  }
+
+  private static LocalDate parseBusinessDate(String text) {
+    try {
+      return LocalDate.parse(text, ISO_DATE);
+    } catch (DateTimeParseException e) {
+      throw ApiException.badRequest("businessDate must be a date in the form yyyy-mm-dd.");
+    }
   }
 
   /** The run with its status, counts and error (question C-8 answer A): x-roles ADMIN. */

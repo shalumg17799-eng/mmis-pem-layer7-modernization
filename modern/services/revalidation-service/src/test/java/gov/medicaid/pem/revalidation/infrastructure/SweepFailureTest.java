@@ -39,8 +39,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
  *       "insert", "update" or "sql" in any case (lesson a);
  *   <li>the full exception is logged, with the run id (lesson a);
  *   <li>the cases, the RevalidationDue events, the counts and the REVALQ file are written in one
- *       transaction: when the write fails in between, nothing of the run stays, so a re-run
- *       applies the work once, not twice and not never (lesson c).
+ *       transaction: when the write fails in between, nothing of the run stays, so a re-run applies
+ *       the work once, not twice and not never (lesson c).
  * </ul>
  *
  * The failures of the real database are made with triggers that reject one kind of write, lifted
@@ -60,8 +60,7 @@ class SweepFailureTest extends IntegrationTest {
     /** the insert of the RevalidationDue event, after the case was inserted */
     EVENT_INSERT("outbox_event", "INSERT", "true", "SYNTHETIC OUTBOX DOWN"),
     /** the write that completes the run with its counts and its file */
-    RUN_COMPLETE(
-        "sweep_run", "UPDATE", "NEW.status = 'COMPLETED'", "SYNTHETIC RUN TABLE LOCKED"),
+    RUN_COMPLETE("sweep_run", "UPDATE", "NEW.status = 'COMPLETED'", "SYNTHETIC RUN TABLE LOCKED"),
     /** the job repository when the job is started */
     JOB_LAUNCH("batch_job_instance", "INSERT", "true", "SYNTHETIC JOB REPOSITORY DOWN");
 
@@ -146,7 +145,8 @@ class SweepFailureTest extends IntegrationTest {
         run.path("runId").asText());
   }
 
-  // ---- lesson a: a short reason without SQL text -------------------------------------------------
+  // ---- lesson a: a short reason without SQL text
+  // -------------------------------------------------
 
   @ParameterizedTest(
       name =
@@ -225,15 +225,19 @@ class SweepFailureTest extends IntegrationTest {
               assertThat(l.message()).contains(runId).contains("FAILED");
             });
     assertThat(capture.lines)
-        .as("an ERROR event carries the whole exception, with the statement and the database message")
+        .as(
+            "an ERROR event carries the whole exception, with the statement and the database message")
         .anySatisfy(
             l -> {
               assertThat(l.level()).isEqualTo(Level.ERROR.toString());
-              assertThat(l.throwable()).contains("SYNTHETIC DISK FULL").containsIgnoringCase("insert");
+              assertThat(l.throwable())
+                  .contains("SYNTHETIC DISK FULL")
+                  .containsIgnoringCase("insert");
             });
   }
 
-  // ---- lesson c: the work of a run is all or nothing ---------------------------------------------
+  // ---- lesson c: the work of a run is all or nothing
+  // ---------------------------------------------
 
   @ParameterizedTest(
       name =
@@ -267,8 +271,7 @@ class SweepFailureTest extends IntegrationTest {
     JsonNode counts =
         RevalidationFixtures.read(
                 mvc.perform(
-                        MockMvcRequestBuilders.get(
-                                RevalidationFixtures.SWEEPS + "/{runId}", rerun)
+                        MockMvcRequestBuilders.get(RevalidationFixtures.SWEEPS + "/{runId}", rerun)
                             .with(PemJwt.admin()))
                     .andReturn()
                     .getResponse()

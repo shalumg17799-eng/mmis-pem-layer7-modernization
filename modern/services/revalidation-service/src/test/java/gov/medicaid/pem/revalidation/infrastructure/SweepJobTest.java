@@ -28,8 +28,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
  * The sweep is a Spring Batch job (ADR-004, question Q-102 answer A): job "revalidation-sweep" with
  * the job parameters runId and businessDate (D-020), one step "sweep" that reads every tracked
  * provider, writes the cases it opens and filters the rest; Spring Batch keeps the job and step
- * records in revalidation_db (Flyway V3). Runs never overlap (one thread), and a job that cannot
- * be started is a failed run, not a lost one (D-024).
+ * records in revalidation_db (Flyway V3). Runs never overlap (one thread), and a job that cannot be
+ * started is a failed run, not a lost one (D-024).
  */
 @Timeout(240)
 class SweepJobTest extends IntegrationTest {
@@ -139,6 +139,12 @@ class SweepJobTest extends IntegrationTest {
   @DisplayName(
       "[MAM-45 AC-5] each run is its own job instance, also for the same business date twice")
   void everyRunIsItsOwnJobInstance() throws Exception {
+    // the Spring Batch tables are not emptied between tests, so the instances are counted by
+    // difference
+    int before =
+        RevalidationFixtures.count(
+            jdbc, "SELECT count(*) FROM batch_job_instance WHERE job_name = 'revalidation-sweep'");
+
     UUID first = RevalidationFixtures.sweep(mvc, "2026-03-31");
     UUID second = RevalidationFixtures.sweep(mvc, "2026-03-31");
 
@@ -149,7 +155,7 @@ class SweepJobTest extends IntegrationTest {
             RevalidationFixtures.count(
                 jdbc,
                 "SELECT count(*) FROM batch_job_instance WHERE job_name = 'revalidation-sweep'"))
-        .isEqualTo(2);
+        .isEqualTo(before + 2);
   }
 
   @Test
@@ -204,8 +210,7 @@ class SweepJobTest extends IntegrationTest {
     UUID run = RevalidationFixtures.startAsAdmin(mvc, "2026-03-31");
 
     String status =
-        jdbc.queryForObject(
-            "SELECT status FROM sweep_run WHERE public_id = ?", String.class, run);
+        jdbc.queryForObject("SELECT status FROM sweep_run WHERE public_id = ?", String.class, run);
     assertThat(status).isIn("RUNNING", "COMPLETED");
     RevalidationFixtures.awaitRun(mvc, run);
     assertThat(
@@ -230,8 +235,7 @@ class SweepJobTest extends IntegrationTest {
 
     byte[] file =
         mvc.perform(
-                MockMvcRequestBuilders.get(
-                        RevalidationFixtures.SWEEPS + "/{runId}/queue-file", run)
+                MockMvcRequestBuilders.get(RevalidationFixtures.SWEEPS + "/{runId}/queue-file", run)
                     .with(PemJwt.admin()))
             .andReturn()
             .getResponse()
@@ -240,11 +244,7 @@ class SweepJobTest extends IntegrationTest {
     for (int i = 0; i < 250; i++) {
       String record = new String(file, i * 80, 80, java.nio.charset.StandardCharsets.ISO_8859_1);
       assertThat(record)
-          .isEqualTo(
-              (1003001000 + i + 1)
-                  + "20260228"
-                  + "RESCREEN-REQUIRED   "
-                  + " ".repeat(42));
+          .isEqualTo((1003001000 + i + 1) + "20260228" + "RESCREEN-REQUIRED   " + " ".repeat(42));
     }
     assertThat(RevalidationFixtures.count(jdbc, "SELECT count(*) FROM revalidation_case"))
         .isEqualTo(250);

@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 /**
  * The legacy SCRNOUT file (SCRNREC, 67 bytes, ADR-005) through the MAM-42 codec: four rows per
  * screened provider, providers in ascending NPI order and rows in the order LICBOARD, OIGLEIE,
- * SAMGOV, SSADMF; NPI, SOURCE (left-justified), RESULT (P, F or C), VERDICT-DATE (the run's business
- * date, CCYYMMDD) and DETAIL cut to 40 characters. No line ends (fixed-length records).
+ * SAMGOV, SSADMF; NPI, SOURCE (left-justified), RESULT (P, F or C), VERDICT-DATE (the run's
+ * business date, CCYYMMDD) and DETAIL cut to 40 characters. No line ends (fixed-length records).
  */
 @Component
 public class ScrnoutWriter implements ScrnoutFile {

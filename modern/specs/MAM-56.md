@@ -14,8 +14,8 @@ decisions: [D-001, D-007, D-016, D-017, D-020, D-023, D-025]
 dependsOn: [MAM-46, MAM-42]
 mainJourney: false
 labels: [svc-enrollment-service, kag-L-S027, agentic, decision-D-001, decision-D-007, decision-D-016, decision-D-017, decision-D-020, decision-D-023, decision-D-025]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: 6036d32caf8a9e56344265e447b019c995453e5247dd32e485cf839d3f0446a7
 ---
 ## Business requirement
 Some applications still arrive in the old fixed-width daily application file. An administrator or a scheduler can load such a file for a stated business date and batch identifier. Each application in the file is checked exactly like an online one, a bad application never stops the rest of the file, and every rejected application is listed once in an error file in the old layout, so that the run can later be compared with what the legacy job produced.

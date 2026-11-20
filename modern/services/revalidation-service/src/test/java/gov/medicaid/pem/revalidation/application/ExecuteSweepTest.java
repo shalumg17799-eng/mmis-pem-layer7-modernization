@@ -22,10 +22,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * The work of one sweep run (MAM-45, PRVREV01): every tracked provider is evaluated; each due ACTIVE
- * provider without an open case gets one DUE case and one RevalidationDue; the run records its
- * counts and its REVALQ file last (D-003, D-006, D-020, D-024, D-029). The store, the outbox and
- * the queue file are the ports; the class under test is the real ExecuteSweep.
+ * The work of one sweep run (MAM-45, PRVREV01): every tracked provider is evaluated; each due
+ * ACTIVE provider without an open case gets one DUE case and one RevalidationDue; the run records
+ * its counts and its REVALQ file last (D-003, D-006, D-020, D-024, D-029). The store, the outbox
+ * and the queue file are the ports; the class under test is the real ExecuteSweep.
  */
 class ExecuteSweepTest {
 
@@ -85,8 +85,7 @@ class ExecuteSweepTest {
     assertThat(store.cases.values())
         .extracting(RevalidationCase::npi, RevalidationCase::dueDate)
         .containsExactly(
-            tuple("1003000222", day(2026, 2, 28)),
-            tuple("1003000333", day(2026, 3, 31)));
+            tuple("1003000222", day(2026, 2, 28)), tuple("1003000333", day(2026, 3, 31)));
     assertThat(store.openedByRun.values()).containsOnly(RUN);
     assertThat(result.queued()).isEqualTo(2);
     Set<UUID> ids = new HashSet<>();
@@ -190,7 +189,8 @@ class ExecuteSweepTest {
   // ---- AC-5: an open case is not queued again --------------------------------------------------
 
   @ParameterizedTest(
-      name = "[MAM-45 AC-5] a provider with a {0} case is not queued again and nothing is announced")
+      name =
+          "[MAM-45 AC-5] a provider with a {0} case is not queued again and nothing is announced")
   @ValueSource(strings = {"DUE", "IN_SCREENING"})
   void openCaseIsNotQueuedAgain(CaseStatus open) {
     store.track("1003000222", "A", day(2026, 2, 28));
@@ -223,7 +223,8 @@ class ExecuteSweepTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-5] the open-case check is made per provider: only the provider with a case is skipped")
+  @DisplayName(
+      "[MAM-45 AC-5] the open-case check is made per provider: only the provider with a case is skipped")
   void openCaseCheckIsPerProvider() {
     store.track("1003000222", "A", day(2026, 2, 28));
     store.track("1003000333", "A", day(2026, 2, 28));
@@ -249,11 +250,14 @@ class ExecuteSweepTest {
     assertThat(store.cases).isEmpty();
     assertThat(filed).isEmpty();
     assertThat(result).isEqualTo(new ExecuteSweep.Result(1, 0, 1));
-    assertThat(store.completions).singleElement().satisfies(c -> assertThat(c.noDueDate()).isEqualTo(1));
+    assertThat(store.completions)
+        .singleElement()
+        .satisfies(c -> assertThat(c.noDueDate()).isEqualTo(1));
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-6] a provider that is not ACTIVE and has no due date is not counted under noDueDate")
+  @DisplayName(
+      "[MAM-45 AC-6] a provider that is not ACTIVE and has no due date is not counted under noDueDate")
   void inactiveWithoutDueDateIsNotCounted() {
     store.track("1003000666", "S", null);
 
@@ -303,7 +307,8 @@ class ExecuteSweepTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-8] a sweep with no tracked provider completes with 0 evaluated, 0 queued, 0 noDueDate")
+  @DisplayName(
+      "[MAM-45 AC-8] a sweep with no tracked provider completes with 0 evaluated, 0 queued, 0 noDueDate")
   void emptySweep() {
     ExecuteSweep.Result result = sweep.execute(RUN, BUSINESS_DATE);
 
@@ -313,7 +318,8 @@ class ExecuteSweepTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-8] a failure while opening a case ends the sweep: the run is never completed")
+  @DisplayName(
+      "[MAM-45 AC-8] a failure while opening a case ends the sweep: the run is never completed")
   void failureOnOpenNeverCompletes() {
     store.track("1003000222", "A", day(2026, 2, 28));
     store.failOnOpen = new IllegalStateException("SYNTHETIC DISK FULL");
@@ -327,7 +333,8 @@ class ExecuteSweepTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-8] a failure while writing the event ends the sweep: the run is never completed")
+  @DisplayName(
+      "[MAM-45 AC-8] a failure while writing the event ends the sweep: the run is never completed")
   void failureOnEventNeverCompletes() {
     store.track("1003000222", "A", day(2026, 2, 28));
     store.failOnEvent = new IllegalStateException("SYNTHETIC OUTBOX DOWN");
@@ -340,7 +347,8 @@ class ExecuteSweepTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-8] a run whose job did not complete is recorded FAILED with the reason and the end time")
+  @DisplayName(
+      "[MAM-45 AC-8] a run whose job did not complete is recorded FAILED with the reason and the end time")
   void failedRunIsRecorded() {
     sweep.failed(RUN, BUSINESS_DATE, "SYNTHETIC REASON");
 

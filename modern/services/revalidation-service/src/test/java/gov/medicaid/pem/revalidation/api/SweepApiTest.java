@@ -87,13 +87,12 @@ class SweepApiTest extends IntegrationTest {
 
     assertThat(
             jdbc.queryForObject(
-                "SELECT business_date::text FROM sweep_run WHERE public_id = ?",
-                String.class,
-                run))
+                "SELECT business_date::text FROM sweep_run WHERE public_id = ?", String.class, run))
         .isEqualTo("2031-03-31");
   }
 
-  @ParameterizedTest(name = "[MAM-45 AC-1] the body {0} is refused with a 400 problem and starts no run")
+  @ParameterizedTest(
+      name = "[MAM-45 AC-1] the body {0} is refused with a 400 problem and starts no run")
   @ValueSource(
       strings = {
         "",
@@ -127,7 +126,9 @@ class SweepApiTest extends IntegrationTest {
         RevalidationFixtures.insertRun(
             jdbc, "COMPLETED", LocalDate.of(2026, 3, 31), 2, 1, "", null);
 
-    JsonNode body = RevalidationFixtures.read(adminGet(SWEEPS + "/{runId}", run).getResponse().getContentAsString());
+    JsonNode body =
+        RevalidationFixtures.read(
+            adminGet(SWEEPS + "/{runId}", run).getResponse().getContentAsString());
 
     assertThat(body.path("runId").asText()).isEqualTo(run.toString());
     assertThat(body.path("job").asText()).isEqualTo("revalidation-sweep");
@@ -141,13 +142,16 @@ class SweepApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-8] a FAILED run shows its reason in error and is never shown as COMPLETED")
+  @DisplayName(
+      "[MAM-45 AC-8] a FAILED run shows its reason in error and is never shown as COMPLETED")
   void failedRun() throws Exception {
     UUID run =
         RevalidationFixtures.insertRun(
             jdbc, "FAILED", LocalDate.of(2026, 3, 31), 0, 0, null, "SYNTHETIC REASON");
 
-    JsonNode body = RevalidationFixtures.read(adminGet(SWEEPS + "/{runId}", run).getResponse().getContentAsString());
+    JsonNode body =
+        RevalidationFixtures.read(
+            adminGet(SWEEPS + "/{runId}", run).getResponse().getContentAsString());
 
     assertThat(body.path("status").asText()).isEqualTo("FAILED");
     assertThat(body.path("error").asText()).isEqualTo("SYNTHETIC REASON");
@@ -158,9 +162,12 @@ class SweepApiTest extends IntegrationTest {
   @DisplayName("[MAM-45 AC-8] a RUNNING run has no end time and no error")
   void runningRun() throws Exception {
     UUID run =
-        RevalidationFixtures.insertRun(jdbc, "RUNNING", LocalDate.of(2026, 3, 31), 0, 0, null, null);
+        RevalidationFixtures.insertRun(
+            jdbc, "RUNNING", LocalDate.of(2026, 3, 31), 0, 0, null, null);
 
-    JsonNode body = RevalidationFixtures.read(adminGet(SWEEPS + "/{runId}", run).getResponse().getContentAsString());
+    JsonNode body =
+        RevalidationFixtures.read(
+            adminGet(SWEEPS + "/{runId}", run).getResponse().getContentAsString());
 
     assertThat(body.path("status").asText()).isEqualTo("RUNNING");
     assertThat(body.has("endedAt")).isFalse();
@@ -205,7 +212,8 @@ class SweepApiTest extends IntegrationTest {
   @DisplayName("[MAM-45 AC-7] a COMPLETED run that opened no case has an empty file, not a 404")
   void emptyQueueFile() throws Exception {
     UUID run =
-        RevalidationFixtures.insertRun(jdbc, "COMPLETED", LocalDate.of(2026, 3, 31), 0, 0, "", null);
+        RevalidationFixtures.insertRun(
+            jdbc, "COMPLETED", LocalDate.of(2026, 3, 31), 0, 0, "", null);
 
     MvcResult r = adminGet(SWEEPS + "/{runId}/queue-file", run);
 

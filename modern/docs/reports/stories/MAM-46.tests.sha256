@@ -6,7 +6,7 @@
 757d19ce40cd3e1f388eab14dc869da66d0e015c74e556a9ab74a226a177b4f1  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/CucumberSpringConfig.java
 354a92efe0aeddc329fc231eac458067c148a5dc2f2b6d48f09315eb551c3cfe  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/CucumberSuiteTest.java
 f2eb742c88100b009d8fbd2ba652dcc1f9d8f65622b396b128c3f207f3c551da  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/SubmitApplicationSteps.java
-a8aef21efebf58f75174accbeaee44d866674e0b05784487b241af33259d3407  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/ApplicationLessonsTest.java
+a06a5a6dedeee7311da0dea17032dfaec7d1b090a839dd54cbf81acbe0810782  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/api/ApplicationLessonsTest.java
 fba48c1d3bb567ded852daec5e152dd1c1c37a2dd47f251e5130b0700977b68e  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/SubmitApplicationTest.java
 39d36d63a2b06f3e4ebd378eae25a043c92a2f5a46341430f5705706775154a3  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/domain/ApplicationValidatorTest.java
 c3122ba7ac358d1c69db29f8a719992a9be2a56b1f5b52902090250f39521072  modern/services/enrollment-service/src/test/resources/features/MAM-46.feature

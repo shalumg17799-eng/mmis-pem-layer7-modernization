@@ -49,7 +49,8 @@ class RevalqFileTest {
   @Test
   @DisplayName("[MAM-45 AC-7] the byte positions of the fields are 1-10, 11-18, 19-38 and 39-80")
   void fieldPositions() {
-    String record = text(new RevalqFile().write(List.of(opened("1003000222", LocalDate.of(2031, 3, 31)))));
+    String record =
+        text(new RevalqFile().write(List.of(opened("1003000222", LocalDate.of(2031, 3, 31)))));
 
     assertThat(record.substring(0, 10)).as("REV-NPI, bytes 1-10").isEqualTo("1003000222");
     assertThat(record.substring(10, 18)).as("REV-DUE-DATE, bytes 11-18").isEqualTo("20310331");
@@ -60,14 +61,16 @@ class RevalqFileTest {
   @Test
   @DisplayName("[MAM-45 AC-7] the action is RESCREEN-REQUIRED followed by 3 spaces (17 + 3 = 20)")
   void actionIsPaddedTo20() {
-    String record = text(new RevalqFile().write(List.of(opened("1003000222", LocalDate.of(2026, 2, 28)))));
+    String record =
+        text(new RevalqFile().write(List.of(opened("1003000222", LocalDate.of(2026, 2, 28)))));
 
     assertThat("RESCREEN-REQUIRED").hasSize(17);
     assertThat(record.substring(18, 38)).isEqualTo("RESCREEN-REQUIRED" + "   ");
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-7] the records are in ascending NPI order whatever order the cases came in")
+  @DisplayName(
+      "[MAM-45 AC-7] the records are in ascending NPI order whatever order the cases came in")
   void ascendingNpiOrder() {
     byte[] file =
         new RevalqFile()
@@ -107,7 +110,8 @@ class RevalqFileTest {
   }
 
   @Test
-  @DisplayName("[MAM-45 AC-7] every record of a larger file is exactly 80 bytes and starts with its NPI")
+  @DisplayName(
+      "[MAM-45 AC-7] every record of a larger file is exactly 80 bytes and starts with its NPI")
   void everyRecordIs80Bytes() {
     List<RevalidationCase> cases = new ArrayList<>();
     for (int i = 9; i >= 0; i--) {
@@ -147,7 +151,8 @@ class RevalqFileTest {
   @Test
   @DisplayName("[MAM-45 AC-7] the due date has a 4-digit year (D-004), also before 2000")
   void fourDigitYear() {
-    String record = text(new RevalqFile().write(List.of(opened("1003000222", LocalDate.of(1999, 12, 31)))));
+    String record =
+        text(new RevalqFile().write(List.of(opened("1003000222", LocalDate.of(1999, 12, 31)))));
 
     assertThat(record.substring(10, 18)).isEqualTo("19991231");
   }

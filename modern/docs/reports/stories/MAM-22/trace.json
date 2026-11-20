@@ -1,0 +1,76 @@
+{
+  "story": "MAM-22",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "tests": [
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/Bounded.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ContractFile.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/EventsContractFile.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/Lane3Test.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/LogCapture.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ScreeningEvents.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/ScreeningWorld.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/Lane3Hooks.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/SourceSteps.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/domain/SourceRulesOwnerTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/HttpScreeningSourcesTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/ProviderContractUseTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClientTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/SourceAnswerShapeTest.java",
+    "modern/services/screening-service/src/test/resources/features/MAM-22.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "HttpScreeningSourcesTest: PASSED",
+      "ProviderServiceClientTest: PASSED",
+      "ScreenProviderReasonsTest: PASSED",
+      "ScreeningEventContractTest: PASSED",
+      "SourceRulesOwnerTest: PASSED",
+      "MAM-22.feature 'An excluded owner fails the group (E203)': PASSED"
+    ],
+    "AC-2": [
+      "HttpScreeningSourcesTest: PASSED",
+      "SourceRulesOwnerTest: PASSED",
+      "MAM-22.feature 'A clean owner passes, and both NPIs are looked up': PASSED"
+    ],
+    "AC-3": [
+      "HttpScreeningSourcesTest: PASSED",
+      "ProviderContractUseTest: PASSED",
+      "ProviderServiceClientTest: PASSED",
+      "SourceRulesOwnerTest: PASSED",
+      "MAM-22.feature 'Providers without an owner NPI are checked on their own NPI only': PASSED",
+      "MAM-22.feature 'A blank or empty owner NPI is no owner': PASSED"
+    ],
+    "AC-4": [
+      "HttpScreeningSourcesTest: PASSED",
+      "SourceRulesOwnerTest: PASSED",
+      "MAM-22.feature 'A provider and its owner both on the LEIE report E201 naming both': PASSED"
+    ],
+    "AC-5": [
+      "HttpScreeningSourcesTest: PASSED",
+      "SourceAnswerShapeTest: PASSED",
+      "MAM-22.feature 'An owner lookup that fails is recorded as not answered after one retry': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceRules.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFacts.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreenProvider.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/HttpScreeningSources.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClient.java"
+  ],
+  "rules": [
+    "R-PRVSCR01-cbl-00010",
+    "R-PRVSCR01-cbl-00033",
+    "R-PRVSCR01-cbl-00034"
+  ],
+  "decisions": [
+    "D-016",
+    "D-005"
+  ]
+}

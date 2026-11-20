@@ -1230,3 +1230,95 @@ corrected 23:38). Totals: MATCH 168 (was 128), EXPECTED 41, UNEXPECTED 27 (was 6
 
 MAM-91 AC-7 asks for a human decision on every unexplained difference: Q-125 to Q-128 need the user's confirmation and
 Q-129 needs the lab account, so MAM-91 stays In Progress.
+
+## Q-138. (screening lane, MAM-20 AC-1 / MAM-22 AC-5, 2026-11-21 02:15) A source answers HTTP 200 without a verdict (status: DEFAULT APPLIED - revisit)
+
+A mocked screening source can answer 200 with a body that holds no verdict: an empty object, an error document, an array,
+plain text, or the verdict member set to null. Today the code reads such an answer as "not listed" (PASS), or for the
+licence board as "licence not found" (FAIL).
+Options: A) treat it as "the source gave no answer": result C (could not be determined) with its detail and no error
+code, as a source that errors or does not answer in time (Q-039 A); B) keep reading it as "not listed".
+**Default applied: A** (a provider must not pass a check that was never answered; the 25 new tests of the lane assume it).
+**Recommended: A.**
+
+## Q-139. (screening lane, MAM-28 AC-1, 2026-11-21 02:15) A requested screening that fails in the background can never be read (status: DEFAULT APPLIED - revisit)
+
+POST /api/v1/screenings answers 202 with a screening that is RUNNING and does the work in the background. If that work
+fails, only a log line remains: the contract has no FAILED status for a screening, so reading it by its id answers 404
+for ever.
+Options: A) add the status FAILED with a short error text to the screening contract and store it (a contract change, so
+it needs the user's approval); B) keep the contract; the failure is written to the log with the full exception and the
+correlation id of the request (fixed in this lane), and the caller sees 404.
+**Default applied: B** (no contract of a working service is changed without the user's approval).
+**Recommended: A** (a caller can then tell "failed" from "unknown id").
+
+## Q-140. (screening lane, MAM-32 AC-7, 2026-11-21 02:15) Screenings of a batch run that then fails are in no SCRNOUT file (status: DEFAULT APPLIED - revisit)
+
+When a batch run screens some providers and then fails, those screenings are stored and announced, the run is FAILED and
+writes no SCRNOUT file. The next run for the same date skips providers that already have their screening, so their rows
+appear in no file. (After the fix of this lane a screening and its link to the run are stored in one transaction, so a
+half-done provider cannot remain.)
+Options: A) accept: the file of a run lists what that run screened; B) the next run for the same business date also
+writes the rows of the earlier failed run.
+**Default applied: A** (the legacy job wrote what the run did; the parity comparison can revisit it). **Recommended: A.**
+
+## Q-141. (screening lane, MAM-28 AC-3, 2026-11-21 02:15) Two RevalidationDue events for the same case start two re-screenings (status: DEFAULT APPLIED - revisit)
+
+The re-screening for a revalidation is started once per event id (ADR-003: idempotency by event id). A second
+RevalidationDue with a new event id and the same case id starts a second re-screening.
+Options: A) keep (the publisher sends one event per case; a repeat with a new id is a new request); B) also remember the
+case id and start at most one re-screening per case.
+**Default applied: A.** **Recommended: A.**
+
+## Q-142. (enrollment lane, MAM-46 AC-1, 2026-11-21 02:26) An event can carry a correlation id that is not a uuid (status: DEFAULT APPLIED - revisit)
+
+The event contract (events.yaml) says correlationId is a uuid. The shared kit (OutboxWriter) copies the id of the request
+into every event written during that request. A caller that sends a safe but non-uuid X-Correlation-Id (for example
+"trace-42") therefore gets events with that text as correlationId. Found by a new test of the enrollment lane; the same
+code path serves every service that writes an event inside a request.
+Options: A) fix it once in the kit: use the request's id for an event only when it is a uuid, else generate one (shared
+code: the kit's own check and the tests of every service must run again, then one deploy); B) each service wraps its own
+outbox.
+**Default applied: B for enrollment-service now** (its lane fixes its own wrapper, so the lane does not wait for a change
+of shared code), **and A is planned as its own item after the service lanes** (tests first in the kit, regression of
+every service, one deploy), because the contract is explicit and the defect class exists in every service.
+**Recommended: A.**
+
+## Q-143. (enrollment lane, MAM-56 AC-7, 2026-11-21 02:26) Malformed multipart uploads answer 500, and Q-120's limit is 1 MB, not 2 MB (status: DEFAULT APPLIED - revisit)
+
+1. A multipart request whose body is malformed (no boundary parameter, a file part that is cut off) is answered 500 with
+   the default error body by both file-intake services, not 400 problem+json. Confirmed on the running stack at 02:27 for
+   POST /api/v1/batch/intake-runs (enrollment) and POST /api/v1/batch/sanction-intake-runs (sanctions).
+   Options: A) each file-intake service maps the multipart errors to a 400 problem in its own problem mapping; B) map
+   them once in the kit. **Default applied: A** (enrollment in its lane; sanctions as an item of the review-fix queue:
+   story MAM-55 and epic MAM-8 are reopened for it). **Recommended: A.**
+2. The text of Q-120 says Tomcat's 2 MB limit applies to an upload. Measured by the lane's test against the real web
+   server of the standalone service: Spring's multipart default of 1 MB per file applies there (1.5 MB is answered 413);
+   2 MB applies only in the local run mode. Options: A) correct the text and keep the implicit limits (the intake files
+   of the tests are far smaller); B) set an explicit limit and declare a 413 problem in the contracts (a contract
+   change). **Default applied: A.** **Recommended: B when real file sizes are known.**
+
+## Q-144. (screening lane, MAM-28 AC-2, 2026-11-21 03:02) The screening contract does not list the 503 of requestScreening (status: OPEN - needs the user's approval; nothing changed)
+
+After the fix of this lane POST /api/v1/screenings answers 503 problem+json when provider-service gives no answer (an
+error, a reset connection or no answer in time); before, the failure escaped as a 500. The recorded tests assert the 503.
+`modern/contracts/openapi/screening-service.yaml` (1.1.0) lists no 503 for that operation. The same case for
+sanctions-service was question Q-096, which the user answered A (the 503 was added additively, contract 1.0.1).
+Options: A) add the 503 response to requestScreening (additive, contract 1.1.1; the web UI types are regenerated);
+B) leave the contract as it is.
+**Nothing was changed:** a contract of a working service is changed only with the user's approval, and an approval for
+another service does not carry over (an attempt of the lead to apply Q-096 by analogy was refused by the permission
+check of the session, correctly). The service answers 503 and the contract does not say so until this is decided.
+**Recommended: A.** The same question exists for the 413 of the enrollment upload (Q-143, part 2, option B) and for the
+400 answers of four provider operations (review note of 2026-11-20).
+
+## Q-145. (code reviews of tmsis and enrollment, 2026-11-21 03:03) A batch run that is interrupted by a restart stays RUNNING for ever (status: DEFAULT APPLIED - revisit)
+
+The review of tmsis-service rated this MUST-FIX (a run whose service stops mid-run stays RUNNING; the failure is never
+shown; D-024): it is fixed in the review-fix step (at start-up every RUNNING run is ended as FAILED with a short reason).
+The review of enrollment-service found the same for the intake run and rated it SHOULD-FIX; the other batch jobs
+(screening run, revalidation sweep, sanction intake, directory extract) have the same shape.
+Options: A) build the same start-up recovery into every service that runs a batch job (tests first, one service at a
+time); B) only tmsis-service now, the others stay on the list of review notes.
+**Default applied: B** (the rule for the review rounds is MUST-FIX only, and only the tmsis review rated it so).
+**Recommended: A**, as one item after the open lanes, so that all six jobs behave the same.

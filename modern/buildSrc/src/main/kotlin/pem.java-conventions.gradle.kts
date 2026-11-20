@@ -64,7 +64,9 @@ tasks.test {
     useJUnitPlatform()
     maxParallelForks = 1
     maxHeapSize = "448m"
-    jvmArgs("-XX:+UseSerialGC", "-XX:TieredStopAtLevel=1", "-Xshare:auto")
+    // 128 MB of code cache: with TieredStopAtLevel=1 the JVM reserves only 48 MB, and the one test JVM of a module with
+    // about 700 tests filled it (screening-service, 2026-11-21: 8 tests failed with "Out of space in CodeCache").
+    jvmArgs("-XX:+UseSerialGC", "-XX:TieredStopAtLevel=1", "-XX:ReservedCodeCacheSize=128m", "-Xshare:auto")
     systemProperty("cucumber.publish.quiet", "true")
     // Report each Scenario Outline example under the outline's own name, so the rule trace can link it to its @AC tags.
     systemProperty("cucumber.junit-platform.naming-strategy.short.example-name", "pickle")
