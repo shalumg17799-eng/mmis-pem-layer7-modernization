@@ -1,0 +1,266 @@
+--- source-code/BATCH/PRVTMS01.cbl (cols 1-72)
++++ lab PRVTMS01 (compiled, PRVBLD01 job 154)
+@@ -2,3 +2,3 @@
+-      * PROGRAM:  PRVTMS01                                             *
+-      * PURPOSE:  T-MSIS PROVIDER FILE EXTRACT (PEM-10). EXTRACTS       
+-      *           ACTIVE PROVIDERS INTO THE MONTHLY CMS T-MSIS          
++      * PROGRAM:  PRVTMS01  (TK5 / OS ANS COBOL V2 LAB PORT)           *
++      * PURPOSE:  T-MSIS PROVIDER FILE EXTRACT (PEM-10). EXTRACTS      *
++      *           ACTIVE PROVIDERS INTO THE MONTHLY CMS T-MSIS         *
+@@ -6 +6,2 @@
+-      * CALLED BY: PRVMTH01 JOB                                       *
++      * CALLED BY: PRVMTH01 JOB                                        *
++      * ORIGINAL: source-code/BATCH/PRVTMS01.cbl.                      *
+@@ -8,7 +9,3 @@
+-      * ANTI-PATTERN: YYDDD JULIAN DATE ARITHMETIC                    *
+-      *   Enrollment age and submission period use packed YYDDD Julian  
+-      *   dates with a 2-digit year. Cross-year comparisons (e.g. a     
+-      *   provider enrolled 99365 vs reporting period 00001) sort wrong 
+-      *   because 99 > 00 numerically. T-MSIS period math breaks across 
+-      *   the century and any year boundary. A known source of T-MSIS   
+-      *   data-quality rejects.                                         
++      * ANTI-PATTERN: YYDDD JULIAN DATE ARITHMETIC                     *
++      *   Enrollment age and submission period use YYDDD Julian dates  *
++      *   with a 2-digit year; cross-year comparisons sort wrong.      *
+@@ -20 +16,0 @@
+-
+@@ -23,3 +19,2 @@
+-       SOURCE-COMPUTER. IBM-3090.
+-       OBJECT-COMPUTER. IBM-3090.
+-
++       SOURCE-COMPUTER. IBM-370.
++       OBJECT-COMPUTER. IBM-370.
+@@ -29,6 +24,3 @@
+-               ASSIGN TO PRVMSTR
+-               ORGANIZATION IS INDEXED
+-               ACCESS MODE IS DYNAMIC
+-               RECORD KEY IS PRV-NPI
+-               FILE STATUS IS WS-PRV-STATUS.
+-
++               ASSIGN TO DA-I-PRVMSTR
++               ACCESS MODE IS SEQUENTIAL
++               RECORD KEY IS PRV-NPI OF PRV-MASTER-RECORD.
+@@ -36,4 +28 @@
+-               ASSIGN TO TMSISOUT
+-               ORGANIZATION IS SEQUENTIAL
+-               FILE STATUS IS WS-TMS-STATUS.
+-
++               ASSIGN TO UT-S-TMSISOUT.
+@@ -43 +32,4 @@
+-           RECORD CONTAINS 121 CHARACTERS.
++           RECORDING MODE IS F
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 10 RECORDS
++           RECORD CONTAINS 130 CHARACTERS.
+@@ -45,2 +37,48 @@
+-           COPY PRVRECRD.
+-
++      *    PRVRECRD - PROVIDER MASTER RECORD (130 BYTES) - FLATTENED.
++      *    (LEGACY RECORD CONTAINS 121 IS WRONG: THIS LAYOUT IS 130.)
++           05  PRV-NPI                 PIC X(10).
++           05  PRV-MEDICAID-ID         PIC X(09).
++           05  PRV-TYPE-CODE           PIC X(02).
++               88  PRV-INDIVIDUAL      VALUE 'IN'.
++               88  PRV-GROUP           VALUE 'GR'.
++               88  PRV-FACILITY        VALUE 'FA'.
++           05  PRV-TAXONOMY            PIC X(10).
++           05  PRV-TAXONOMY-R REDEFINES PRV-TAXONOMY.
++               10  PRV-TAX-GRP         PIC X(03).
++               10  FILLER              PIC X(07).
++           05  PRV-RISK-TIER           PIC X(01).
++               88  PRV-RISK-LIMITED    VALUE 'L'.   2
++               88  PRV-RISK-MODERATE   VALUE 'M'.
++               88  PRV-RISK-HIGH       VALUE 'H'.
++           05  PRV-ENROLL-STATUS       PIC X(01).
++               88  PRV-PENDING         VALUE 'P'.
++               88  PRV-ACTIVE          VALUE 'A'.
++               88  PRV-TERMINATED      VALUE 'T'.
++               88  PRV-DENIED          VALUE 'D'.
++           05  PRV-SCREEN-FLAG         PIC X(01).
++               88  PRV-UNSCREENED      VALUE 'U'.
++               88  PRV-SCREEN-PASS     VALUE 'P'.
++               88  PRV-SCREEN-FAIL     VALUE 'F'.
++           05  PRV-EFFECTIVE-DATE      PIC 9(08).
++           05  PRV-EFFECTIVE-DATE-R REDEFINES PRV-EFFECTIVE-DATE.
++               10  PRV-EFF-CC          PIC 9(02).
++               10  PRV-EFF-YY          PIC 9(02).
++               10  PRV-EFF-MMDD        PIC 9(04).
++           05  PRV-REVAL-DUE-DATE      PIC 9(08).
++           05  PRV-VARIANT             PIC X(80).
++      *    --- Individual provider view of PRV-VARIANT ---
++           05  PRV-INDIVIDUAL-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LAST-NAME       PIC X(30).
++               10  PRV-FIRST-NAME      PIC X(20).
++               10  PRV-LICENSE-NO      PIC X(15).
++               10  PRV-LICENSE-STATE   PIC X(02).
++               10  FILLER              PIC X(13).
++      *    --- Group / Facility view of the SAME 80 bytes ---
++           05  PRV-ORG-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LEGAL-NAME      PIC X(40).
++               10  PRV-DBA-NAME        PIC X(30).
++               10  PRV-OWNER-NPI       PIC X(10).
++      *    --- port helper: replaces reference modification (1:60) ---
++           05  PRV-VARIANT-HEAD REDEFINES PRV-VARIANT.
++               10  PRV-VARIANT-60      PIC X(60).
++               10  FILLER              PIC X(20).
+@@ -48,0 +87,2 @@
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 0 RECORDS
+@@ -51 +90,0 @@
+-
+@@ -53,5 +92,70 @@
+-           COPY WRKSTORE.
+-
+-       01  WS-PRV-STATUS               PIC X(2).
+-       01  WS-TMS-STATUS               PIC X(2).
+-
++      *    WRKSTORE - STANDARD WORKING STORAGE (NESTED COPYBOOK)
++      *    LEGACY: INCLUDES BOTH SCRNREC AND ERRCODES.  KEPT NESTED.
++       01  WS-STANDARD-WORK.
++           05  WS-PROGRAM-ID           PIC X(08).
++           05  WS-END-OF-FILE-FLAG     PIC X(01) VALUE 'N'.
++               88  WS-END-OF-FILE      VALUE 'Y'.
++           05  WS-FILE-STATUS          PIC X(02) VALUE '00'.
++               88  WS-FS-OK            VALUE '00'.
++               88  WS-FS-EOF           VALUE '10'.
++               88  WS-FS-DUP           VALUE '22'.
++           05  WS-RECORDS-READ         PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-WRITTEN      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-SKIPPED      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-ERRORED      PIC 9(07) VALUE ZERO.   3
++      *    --- NESTED COPYBOOKS (the anti-pattern) ---
++       01  SCREENING-RECORD.
++      *    SCRNREC - SCREENING / VERIFICATION RESULT RECORD (67 BYTES)
++           05  SCR-NPI                 PIC X(10).
++           05  SCR-SOURCE              PIC X(08).
++               88  SCR-NPPES           VALUE 'NPPES'.
++               88  SCR-LEIE            VALUE 'OIGLEIE'.
++               88  SCR-SAM             VALUE 'SAMGOV'.
++               88  SCR-LICENSE         VALUE 'LICBOARD'.
++               88  SCR-DMF             VALUE 'SSADMF'.
++               88  SCR-PECOS           VALUE 'PECOS'.
++           05  SCR-RESULT              PIC X(01).
++               88  SCR-PASS            VALUE 'P'.
++               88  SCR-FAIL            VALUE 'F'.
++               88  SCR-COND            VALUE 'C'.
++           05  SCR-VERDICT-DATE        PIC 9(08).
++           05  SCR-DETAIL              PIC X(40).
++       01  ERROR-CODES.
++      *    ERRCODES - SHARED ENROLLMENT/SCREENING ERROR CODES
++           05  EC-OK                   PIC X(04) VALUE '0000'.
++           05  EC-MISSING-NPI          PIC X(04) VALUE 'E101'.
++           05  EC-INVALID-TYPE         PIC X(04) VALUE 'E102'.
++           05  EC-DUP-NPI              PIC X(04) VALUE 'E103'.
++           05  EC-MISSING-TAXONOMY     PIC X(04) VALUE 'E104'.
++           05  EC-EXCLUDED             PIC X(04) VALUE 'E201'.
++           05  EC-LICENSE-EXPIRED      PIC X(04) VALUE 'E202'.
++           05  EC-OWNER-EXCLUDED       PIC X(04) VALUE 'E203'.
++           05  EC-DECEASED             PIC X(04) VALUE 'E204'.
++           05  EC-DEBARRED             PIC X(04) VALUE 'E205'.
++      *    MVS CURRENT-DATE IS 'MM/DD/YY'; YYDDD IS DERIVED FROM IT
++      *    (ACCEPT ... FROM DAY IS NOT IN THE V2 COMPILER).
++       01  WS-CUR-DATE-RAW.
++           05  WS-RAW-MM               PIC 9(02).
++           05  FILLER                  PIC X(01).
++           05  WS-RAW-DD               PIC 9(02).
++           05  FILLER                  PIC X(01).
++           05  WS-RAW-YY               PIC 9(02).
++       01  WS-CUM-DAYS-TBL.
++           05  FILLER                  PIC 9(03) VALUE 000.
++           05  FILLER                  PIC 9(03) VALUE 031.
++           05  FILLER                  PIC 9(03) VALUE 059.
++           05  FILLER                  PIC 9(03) VALUE 090.
++           05  FILLER                  PIC 9(03) VALUE 120.
++           05  FILLER                  PIC 9(03) VALUE 151.
++           05  FILLER                  PIC 9(03) VALUE 181.
++           05  FILLER                  PIC 9(03) VALUE 212.
++           05  FILLER                  PIC 9(03) VALUE 243.
++           05  FILLER                  PIC 9(03) VALUE 273.
++           05  FILLER                  PIC 9(03) VALUE 304.
++           05  FILLER                  PIC 9(03) VALUE 334.
++       01  WS-CUM-DAYS REDEFINES WS-CUM-DAYS-TBL.
++           05  WS-CUM                  PIC 9(03) OCCURS 12 TIMES.
++       01  WS-LEAP-WORK.
++           05  WS-LEAP-Q               PIC 9(03).
++           05  WS-LEAP-R               PIC 9(03).
++       01  WS-DDD                      PIC 9(03).   4
+@@ -60,0 +165,3 @@
++           05  WS-TODAY-JUL-R REDEFINES WS-TODAY-JUL.
++               10  WS-TJ-YY            PIC 9(02).
++               10  WS-TJ-DDD           PIC 9(03).
+@@ -66 +172,0 @@
+-
+@@ -74 +179,0 @@
+-
+@@ -76 +180,0 @@
+-
+@@ -79,10 +183,10 @@
+-           MOVE 'PRVTMS01' TO WS-PROGRAM-ID
+-           ACCEPT WS-TODAY-JUL FROM DAY
+-           MOVE WS-TODAY-JUL (1:2) TO WS-TODAY-YY
+-           MOVE WS-TODAY-JUL (3:3) TO WS-TODAY-DDD
+-           OPEN INPUT  PRV-MASTER-FILE
+-           OPEN OUTPUT TMSIS-OUT-FILE
+-           MOVE 'N' TO WS-END-OF-FILE-FLAG
+-           PERFORM EXTRACT-NEXT UNTIL WS-END-OF-FILE
+-           CLOSE PRV-MASTER-FILE TMSIS-OUT-FILE
+-           DISPLAY 'PRVTMS01: T-MSIS PROVIDER ROWS=' WS-OUT-COUNT
++           MOVE 'PRVTMS01' TO WS-PROGRAM-ID.
++           PERFORM GET-TODAY-JULIAN.
++           MOVE WS-TJ-YY  TO WS-TODAY-YY.
++           MOVE WS-TJ-DDD TO WS-TODAY-DDD.
++           OPEN INPUT  PRV-MASTER-FILE.
++           OPEN OUTPUT TMSIS-OUT-FILE.
++           MOVE 'N' TO WS-END-OF-FILE-FLAG.
++           PERFORM EXTRACT-NEXT UNTIL WS-END-OF-FILE.
++           CLOSE PRV-MASTER-FILE TMSIS-OUT-FILE.
++           DISPLAY 'PRVTMS01: T-MSIS PROVIDER ROWS=' WS-OUT-COUNT.
+@@ -90 +194,10 @@
+-
++       GET-TODAY-JULIAN.
++           MOVE CURRENT-DATE TO WS-CUR-DATE-RAW.
++           MOVE WS-CUM (WS-RAW-MM) TO WS-DDD.
++           ADD WS-RAW-DD TO WS-DDD.
++           DIVIDE WS-RAW-YY BY 4 GIVING WS-LEAP-Q
++                                 REMAINDER WS-LEAP-R.
++           IF WS-LEAP-R = 0 AND WS-RAW-MM > 2
++               ADD 1 TO WS-DDD.
++           MOVE WS-RAW-YY TO WS-TJ-YY.
++           MOVE WS-DDD    TO WS-TJ-DDD.
+@@ -92,2 +205,3 @@
+-           READ PRV-MASTER-FILE NEXT RECORD
+-           MOVE WS-PRV-STATUS TO WS-FILE-STATUS
++           MOVE '00' TO WS-FILE-STATUS.
++           READ PRV-MASTER-FILE
++               AT END MOVE '10' TO WS-FILE-STATUS.
+@@ -95 +209 @@
+-               SET WS-END-OF-FILE TO TRUE
++               MOVE 'Y' TO WS-END-OF-FILE-FLAG
+@@ -98,4 +212 @@
+-                   PERFORM WRITE-TMSIS-ROW
+-               END-IF
+-           END-IF.
+-
++                   PERFORM WRITE-TMSIS-ROW.   5
+@@ -104,2 +215 @@
+-           MOVE PRV-EFFECTIVE-DATE OF PRV-MASTER-RECORD (3:2)
+-                                              TO WS-ENROLL-YY
++           MOVE PRV-EFF-YY OF PRV-MASTER-RECORD TO WS-ENROLL-YY.
+@@ -109,9 +219,8 @@
+-                       PRV-NPI OF PRV-MASTER-RECORD
+-           END-IF
+-           MOVE PRV-MEDICAID-ID OF PRV-MASTER-RECORD TO WS-T-PROVID
+-           MOVE PRV-NPI OF PRV-MASTER-RECORD         TO WS-T-NPI
+-           MOVE 'A'                                  TO WS-T-STATUS
+-           MOVE WS-TODAY-JUL                         TO WS-T-PERIOD-YYDD
+-           MOVE WS-TMSIS-DETAIL                      TO TMSIS-OUT-RECORD
+-           WRITE TMSIS-OUT-RECORD
+-           ADD 1 TO WS-OUT-COUNT.
++                       PRV-NPI OF PRV-MASTER-RECORD.
++           MOVE PRV-MEDICAID-ID OF PRV-MASTER-RECORD TO WS-T-PROVID.
++           MOVE PRV-NPI OF PRV-MASTER-RECORD         TO WS-T-NPI.
++           MOVE 'A'                                  TO WS-T-STATUS.
++           MOVE WS-TODAY-JUL                  TO WS-T-PERIOD-YYDDD.
++           MOVE WS-TMSIS-DETAIL               TO TMSIS-OUT-RECORD.
++           WRITE TMSIS-OUT-RECORD.
++           ADD 1 TO WS-OUT-COUNT.   6

@@ -1,0 +1,57 @@
+{
+  "story": "MAM-42",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/BadInputTest.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/DataLayoutsDoc.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/DateFieldsTest.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/FieldTypesTest.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/LayoutFilesTest.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/LibraryGateTest.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/ProviderMasterLayoutTest.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/ProviderVariantTest.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/RoundTripTest.java",
+    "modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/Samples.java"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [
+      "ProviderMasterLayoutTest: PASSED"
+    ],
+    "AC-3": [
+      "ProviderVariantTest: PASSED"
+    ],
+    "AC-4": [
+      "DateFieldsTest: PASSED",
+      "FieldTypesTest: PASSED"
+    ],
+    "AC-5": [
+      "RoundTripTest: PASSED"
+    ],
+    "AC-6": [
+      "BadInputTest: PASSED"
+    ],
+    "AC-7": [
+      "LibraryGateTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/libs/fixed-width/src/main/java/gov/medicaid/pem/fixedwidth/FieldDef.java",
+    "modern/libs/fixed-width/src/main/java/gov/medicaid/pem/fixedwidth/FieldType.java",
+    "modern/libs/fixed-width/src/main/java/gov/medicaid/pem/fixedwidth/FixedRecord.java",
+    "modern/libs/fixed-width/src/main/java/gov/medicaid/pem/fixedwidth/FixedWidthCodec.java",
+    "modern/libs/fixed-width/src/main/java/gov/medicaid/pem/fixedwidth/FixedWidthException.java",
+    "modern/libs/fixed-width/src/main/java/gov/medicaid/pem/fixedwidth/RecordLayout.java",
+    "modern/libs/fixed-width/src/main/resources/layouts/*.json",
+    "modern/tools/data/export_layouts.py"
+  ],
+  "rules": []
+}

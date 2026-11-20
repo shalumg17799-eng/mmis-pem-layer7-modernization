@@ -1,0 +1,29 @@
+{
+  "name": "ssa-dmf slow: X-Pem-Stub: slow answers clean after 6000 ms",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/ssa-dmf/deaths",
+    "headers": {
+      "X-Pem-Stub": {
+        "equalTo": "slow"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "SSADMF",
+      "npi": "{{request.query.npi}}",
+      "deceased": false
+    },
+    "fixedDelayMilliseconds": 6000
+  },
+  "metadata": {
+    "source": "ssa-dmf",
+    "answer": "slow"
+  }
+}

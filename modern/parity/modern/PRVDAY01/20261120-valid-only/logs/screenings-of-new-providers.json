@@ -1,0 +1,149 @@
+{
+  "1006133288": {
+    "http": 200,
+    "screenings": {
+      "total": 1,
+      "size": 20,
+      "items": [
+        {
+          "screeningId": "c4b1a958-7718-49a8-abdc-cf97c97d4bfd",
+          "npi": "1006133288",
+          "reason": "INITIAL",
+          "status": "COMPLETED",
+          "result": "FAIL",
+          "results": [
+            {
+              "source": "LICBOARD",
+              "result": "F",
+              "verdictAt": "2026-11-20T11:21:13.937957Z",
+              "detail": "LICENCE NOT FOUND",
+              "errorCode": null
+            },
+            {
+              "source": "OIGLEIE",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.937949Z",
+              "detail": "NOT EXCLUDED",
+              "errorCode": null
+            },
+            {
+              "source": "SAMGOV",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.937954Z",
+              "detail": "NOT DEBARRED",
+              "errorCode": null
+            },
+            {
+              "source": "SSADMF",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.937948Z",
+              "detail": "NOT DECEASED",
+              "errorCode": null
+            }
+          ],
+          "startedAt": "2026-11-20T11:21:13.924395Z",
+          "completedAt": "2026-11-20T11:21:13.938032Z"
+        }
+      ],
+      "page": 0
+    }
+  },
+  "1006144350": {
+    "http": 200,
+    "screenings": {
+      "total": 1,
+      "size": 20,
+      "items": [
+        {
+          "screeningId": "59b28017-da26-475e-bb28-30a2f5981872",
+          "npi": "1006144350",
+          "reason": "INITIAL",
+          "status": "COMPLETED",
+          "result": "PASS",
+          "results": [
+            {
+              "source": "LICBOARD",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.956783Z",
+              "detail": "NOT APPLICABLE",
+              "errorCode": null
+            },
+            {
+              "source": "OIGLEIE",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.959936Z",
+              "detail": "NOT EXCLUDED",
+              "errorCode": null
+            },
+            {
+              "source": "SAMGOV",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.959932Z",
+              "detail": "NOT DEBARRED",
+              "errorCode": null
+            },
+            {
+              "source": "SSADMF",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.959934Z",
+              "detail": "NOT DECEASED",
+              "errorCode": null
+            }
+          ],
+          "startedAt": "2026-11-20T11:21:13.950854Z",
+          "completedAt": "2026-11-20T11:21:13.959994Z"
+        }
+      ],
+      "page": 0
+    }
+  },
+  "1006153716": {
+    "http": 200,
+    "screenings": {
+      "total": 1,
+      "size": 20,
+      "items": [
+        {
+          "screeningId": "0a12f3b8-37ae-42cc-ae94-7cd2728fa02e",
+          "npi": "1006153716",
+          "reason": "INITIAL",
+          "status": "COMPLETED",
+          "result": "PASS",
+          "results": [
+            {
+              "source": "LICBOARD",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.975580Z",
+              "detail": "NOT APPLICABLE",
+              "errorCode": null
+            },
+            {
+              "source": "OIGLEIE",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.979196Z",
+              "detail": "NOT EXCLUDED",
+              "errorCode": null
+            },
+            {
+              "source": "SAMGOV",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.979080Z",
+              "detail": "NOT DEBARRED",
+              "errorCode": null
+            },
+            {
+              "source": "SSADMF",
+              "result": "P",
+              "verdictAt": "2026-11-20T11:21:13.979092Z",
+              "detail": "NOT DECEASED",
+              "errorCode": null
+            }
+          ],
+          "startedAt": "2026-11-20T11:21:13.969565Z",
+          "completedAt": "2026-11-20T11:21:13.979261Z"
+        }
+      ],
+      "page": 0
+    }
+  }
+}

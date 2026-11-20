@@ -1,0 +1,5 @@
+    Error: provider 1003000444 screened with flag F
+    Expected: "F"
+    Received: "P"
+    > 96 |       .toBe('F');
+Red for the right reason: the owner (1990000111, on the mocked LEIE) is not screened yet, so the group screens PASS (MAM-22 not built). Also needs MAM-80 detail screening panel (UI agent).

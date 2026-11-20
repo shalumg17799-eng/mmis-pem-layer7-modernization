@@ -1,0 +1,29 @@
+/* A key-value list (definition list) in place of a two-column table: one row per field, the name above the value on a narrow
+   screen and beside it from the tablet width on. */
+.pem-summary-list {
+  margin: 0;
+}
+.pem-summary-list__row {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #dfe1e2;
+}
+.pem-summary-list__row dt {
+  flex: 0 0 100%;
+  font-weight: 700;
+}
+.pem-summary-list__row dd {
+  flex: 1 1 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 40em) {
+  .pem-summary-list__row dt {
+    flex: 0 0 14rem;
+    padding-right: 1rem;
+  }
+  .pem-summary-list__row dd {
+    flex: 1 1 0;
+  }
+}

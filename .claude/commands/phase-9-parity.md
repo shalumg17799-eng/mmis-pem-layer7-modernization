@@ -28,7 +28,7 @@ an approved decision explains.
    - **Legacy is wrong and we keep the modern behaviour:** record a new decision D-0xx in
      the defect register; kag-curator reloads; the difference becomes INTENDED.
 4. Re-run parity until there are zero UNEXPLAINED differences.
-5. Commit: `test(phase-9): parity <jobs>`.
+5. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Exit checks
 - [ ] Zero UNEXPLAINED differences for every captured job.

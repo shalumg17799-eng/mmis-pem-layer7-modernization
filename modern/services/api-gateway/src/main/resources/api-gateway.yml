@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: classpath:pem-common.yml
+  mvc:
+    problemdetails:
+      enabled: true
+  # The gateway has no database, Kafka, batch or token checks of its own (it relays the token). These exclusions matter
+  # in the local run mode (ADR-011), where the libraries of every service share one class path.
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+      - org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration
+      - org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
+server:
+  port: ${PEM_GATEWAY_PORT:8080}
+  error:
+    include-stacktrace: never
+    include-message: never
+pem:
+  security:
+    enabled: false
+  outbox:
+    enabled: false
+  gateway:
+    cors-origins: ${PEM_CORS_ORIGINS:http://localhost:5173}
+    services:
+      provider: http://${PEM_SERVICE_HOST:localhost}:${PEM_PROVIDER_PORT:8081}
+      enrollment: http://${PEM_SERVICE_HOST:localhost}:${PEM_ENROLLMENT_PORT:8082}
+      screening: http://${PEM_SERVICE_HOST:localhost}:${PEM_SCREENING_PORT:8083}
+      risk: http://${PEM_SERVICE_HOST:localhost}:${PEM_RISK_PORT:8084}
+      revalidation: http://${PEM_SERVICE_HOST:localhost}:${PEM_REVALIDATION_PORT:8085}
+      sanctions: http://${PEM_SERVICE_HOST:localhost}:${PEM_SANCTIONS_PORT:8086}
+      notification: http://${PEM_SERVICE_HOST:localhost}:${PEM_NOTIFICATION_PORT:8087}
+      directory: http://${PEM_SERVICE_HOST:localhost}:${PEM_DIRECTORY_PORT:8088}
+      tmsis: http://${PEM_SERVICE_HOST:localhost}:${PEM_TMSIS_PORT:8089}
+# MAM-84 AC-7 / Q-121: the gateway relays tokens and has no token check of its own, so it serves nothing of the actuator
+# but health (the kit's pem-common.yml exposes health, info and metrics; an exclude always wins over that include).
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: info,metrics

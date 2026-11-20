@@ -43,13 +43,13 @@ Phase 3 is `APPROVED`.
    - `jira-map.csv` has one row per drafted item
    - `modern/specs/` has one file per story
    - spot-check 2 stories in Jira against the draft
-7. **Load.** kag-curator runs the Phase 4 loader. Run the "rules not covered by any
-   story" query: it must be empty.
+7. **Trace.** Run `python modern/tools/trace/build_rule_trace.py`: every non-dropped rule must have a story in
+   `modern/docs/traceability/rule-trace.csv` (the graph holds the legacy context only).
 8. **Build order.** Fill the PROGRESS services table (order, service, NOT STARTED).
-9. Commit: `docs(phase-4): backlog, jira map, spec baselines`.
+9. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Exit checks
-- [ ] Every non-dropped rule is DERIVED_FROM a story (graph query empty).
+- [ ] Every non-dropped rule has a story in `modern/docs/traceability/rule-trace.csv`.
 - [ ] Every story has an AC list with stable IDs and a `specs/<KEY>.md`.
 - [ ] No duplicate issues in Jira (compare the map with a JQL search on `labels = agentic`).
 

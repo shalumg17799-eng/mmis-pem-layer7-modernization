@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: risk-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/risk_db
+    username: risk_svc
+    password: ${PG_RISK_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/risk
+server:
+  port: ${PEM_RISK_PORT:8084}

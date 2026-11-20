@@ -1,0 +1,46 @@
+MAM-33 red run (2026-11-19), provider-service
+
+1) Acceptance (feature + StatusChangeSteps, before the unit tests were added):
+   ./gradlew --no-daemon :services:provider-service:test -> 107 tests completed, 8 failed (all 8 = MAM-33 scenarios; 99 existing tests passed)
+   CucumberSuiteTest > Cucumber > Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE) > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.Terminate sets TERMINATED and counts it FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 200
+        but was: 404
+   CucumberSuiteTest > Cucumber > Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE) > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.Suspend sets SUSPENDED, not DENIED FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 200
+        but was: 404
+   CucumberSuiteTest > Cucumber > Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE) > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.Reinstate sets ACTIVE FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 200
+        but was: 404
+   CucumberSuiteTest > Cucumber > Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE) > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.The change applies whatever the current status is FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 200
+        but was: 404
+   CucumberSuiteTest > Cucumber > Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE) > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.The new status is saved and announced FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 200
+        but was: 404
+   CucumberSuiteTest > Cucumber > Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE) > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.An unknown action or an incomplete request is refused FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 422
+        but was: 404
+   CucumberSuiteTest > Cucumber > Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE) > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.An unknown provider gives 404 and changes nothing FAILED
+       java.lang.AssertionError: 
+       Expecting actual not to be null
+           at gov.medicaid.pem.provider.acceptance.StatusChangeSteps.problem(StatusChangeSteps.java:108)
+   CucumberSuiteTest > Cucumber > Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE) > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.Only SYSTEM and SUPERVISOR can change the status FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 403
+        but was: 404
+
+2) Unit tests (StatusActionTest, ChangeProviderStatusTest): ./gradlew --no-daemon :services:provider-service:compileTestJava -> compilation failed, 42 errors, only missing production symbols:
+         2     symbol:   class ChangeProviderStatus
+         2     symbol:   class StatusChangeCommand
+        10     symbol:   variable StatusAction
+         2   symbol:   class ChangeProviderStatus
+         2   symbol:   class StatusChangeCommand
+        10   symbol:   variable StatusAction
+
+Reason: the endpoint POST /api/v1/providers/{npi}/status-changes (404) and the classes StatusAction, ChangeProviderStatus, StatusChangeCommand do not exist yet.

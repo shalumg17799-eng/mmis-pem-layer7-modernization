@@ -36,4 +36,5 @@ def build() -> GraphData:
 
 
 if __name__ == "__main__":
-    common.run(__file__, build)
+    sys.exit("load_06_test_plan is DISABLED: Neo4j holds the legacy context only (user decision 2026-11-19). "
+             "Traceability lives in modern/docs/traceability/ (rule-trace.csv) and in each Jira story's Legacy trace.")

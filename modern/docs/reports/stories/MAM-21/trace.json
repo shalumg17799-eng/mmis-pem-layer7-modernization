@@ -1,0 +1,58 @@
+{
+  "story": "MAM-21",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/VerdictAndTierSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/RecordVerdictsTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ScreenVerdictTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-21.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-21.feature 'A passed screening sets the screen flag to P': PASSED",
+      "RecordVerdictsTest: PASSED",
+      "ScreenVerdictTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-21.feature 'A failed screening sets the screen flag to F': PASSED",
+      "RecordVerdictsTest: PASSED",
+      "ScreenVerdictTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-21.feature 'Screening never activates a provider': PASSED"
+    ],
+    "AC-4": [
+      "MAM-21.feature 'Every verdict is saved': PASSED"
+    ],
+    "AC-5": [
+      "MAM-21.feature 'A re-screening records its verdict the same way and never changes the status': PASSED"
+    ],
+    "AC-6": [
+      "MAM-21.feature 'A redelivered verdict is applied once': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/ProviderChanges.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/RecordVerdicts.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/ScreenFlag.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/JpaProviderChanges.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/VerdictEventsListener.java"
+  ],
+  "rules": [
+    "R-PRVSCR01-ADD-03",
+    "R-PRVSCR01-cbl-00011",
+    "R-PRVSCR01-cbl-00046",
+    "R-PRVSCR01-cbl-00047",
+    "R-PRVSCR01-cbl-00049",
+    "R-PRVSCR01-cbl-00050",
+    "R-PRVSCR01-cbl-00051",
+    "R-PRVSCR01-cbl-00052"
+  ]
+}

@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My enrolment - PEM wireframe</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uswds/uswds@3.8.0/dist/css/uswds.min.css"></head>
+<body><a class="usa-skipnav" href="#main">Skip to main content</a>
+<header class="usa-header usa-header--basic"><div class="usa-nav-container"><div class="usa-navbar"><div class="usa-logo"><em class="usa-logo__text">PEM portal</em></div></div></div></header>
+<main id="main" class="grid-container margin-y-4"><h1>My enrolment</h1>
+<p class="usa-intro">The provider&#x27;s applications and current enrolment status.</p>
+<table class="usa-table usa-table--borderless"><caption>My applications</caption><thead><tr><th scope="col">Submitted</th><th scope="col">NPI</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead><tbody><tr><td>03/01/2026</td><td>1003000111</td><td><span class="usa-tag">Validated</span></td><td><a class="usa-link" href="portal-application-status.html">View</a></td></tr></tbody></table><table class="usa-table usa-table--borderless"><caption>My provider record</caption><thead><tr><th scope="col">Field</th><th scope="col">Value</th></tr></thead><tbody><tr><td>NPI</td><td>1003000111</td></tr><tr><td>Medicaid ID</td><td>TX0000111</td></tr><tr><td>Provider type</td><td>Individual (IN)</td></tr><tr><td>Taxonomy</td><td>207Q00000X</td></tr><tr><td>Enrolment status</td><td>Active (A)</td></tr><tr><td>Screen flag</td><td>Pass (P)</td></tr></tbody></table><button class="usa-button" type="button">Apply for enrolment</button>
+<section class="margin-top-6 border-top-1px padding-top-2" aria-label="Wireframe notes"><h2>Wireframe notes (low fidelity, synthetic data)</h2>
+<dl><dt>Route</dt><dd><code>/portal</code></dd><dt>Roles</dt><dd>PROVIDER</dd>
+<dt>API calls</dt><dd><ul><li><code>GET /api/v1/applications</code></li><li><code>GET /api/v1/providers/{npi}</code></li></ul></dd><dt>Serves</dt><dd>D-019 (status after approval); journeys 1 and 2</dd></dl></section>
+<p><a class="usa-link" href="index.html">All wireframes</a></p></main></body></html>

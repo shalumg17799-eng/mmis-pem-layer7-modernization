@@ -1,0 +1,290 @@
+--- source-code/BATCH/PRVSCR01.cbl (cols 1-72)
++++ lab PRVSCR01 (compiled, PRVBLD01 job 154)
+@@ -2 +2 @@
+-      * PROGRAM:  PRVSCR01                                             *
++      * PROGRAM:  PRVSCR01  (TK5 / OS ANS COBOL V2 LAB PORT)           *
+@@ -6 +6,3 @@
+-      * CALLED BY: PRVDAY01 JOB (STEP030)                             *
++      * CALLED BY: PRVDAY01 JOB (STEP030)                              *
++      * ORIGINAL: source-code/BATCH/PRVSCR01.cbl (SEE README.md FOR    *
++      * THE LIST OF V2 PORT CHANGES).  CONTROL FLOW UNCHANGED.         *
+@@ -8,7 +10,4 @@
+-      * ANTI-PATTERN: DEAD CODE (FLAG NEVER SET)                      *
+-      *   WS-RECIPROCITY-ENABLED is initialized to 'N' and never        
+-      *   changed anywhere in the estate. The CHECK-MEDICARE-RECIPROCITY
+-      *   paragraph - which would let the state rely on PECOS screening 
+-      *   (42 CFR 455.410) and skip duplicate work - is therefore NEVER 
+-      *   reached. The reciprocity feature was specified in 2014 but    
+-      *   the enabling flag was never wired up. CAST flags the dead path
++      * ANTI-PATTERN: DEAD CODE (FLAG NEVER SET)                       *
++      *   WS-RECIPROCITY-ENABLED is initialized to 'N' and never       *
++      *   changed anywhere in the estate. CHECK-MEDICARE-RECIPROCITY   *
++      *   is therefore NEVER reached.                                  *
+@@ -20 +18,0 @@
+-
+@@ -23,3 +21,2 @@
+-       SOURCE-COMPUTER. IBM-3090.
+-       OBJECT-COMPUTER. IBM-3090.
+-
++       SOURCE-COMPUTER. IBM-370.
++       OBJECT-COMPUTER. IBM-370.
+@@ -29,6 +26,3 @@
+-               ASSIGN TO PRVMSTR
+-               ORGANIZATION IS INDEXED
+-               ACCESS MODE IS DYNAMIC
+-               RECORD KEY IS PRV-NPI
+-               FILE STATUS IS WS-PRV-STATUS.
+-
++               ASSIGN TO DA-I-PRVMSTR
++               ACCESS MODE IS SEQUENTIAL
++               RECORD KEY IS PRV-NPI OF PRV-MASTER-RECORD.
+@@ -36,5 +30 @@
+-               ASSIGN TO SCRNOUT
+-               ORGANIZATION IS SEQUENTIAL
+-               ACCESS MODE IS SEQUENTIAL
+-               FILE STATUS IS WS-SCR-STATUS.
+-
++               ASSIGN TO UT-S-SCRNOUT.
+@@ -44 +34,4 @@
+-           RECORD CONTAINS 121 CHARACTERS.
++           RECORDING MODE IS F
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 10 RECORDS
++           RECORD CONTAINS 130 CHARACTERS.
+@@ -46,2 +39,48 @@
+-           COPY PRVRECRD.
+-
++      *    PRVRECRD - PROVIDER MASTER RECORD (130 BYTES) - FLATTENED.
++      *    (LEGACY RECORD CONTAINS 121 IS WRONG: THIS LAYOUT IS 130.)
++           05  PRV-NPI                 PIC X(10).
++           05  PRV-MEDICAID-ID         PIC X(09).
++           05  PRV-TYPE-CODE           PIC X(02).
++               88  PRV-INDIVIDUAL      VALUE 'IN'.
++               88  PRV-GROUP           VALUE 'GR'.
++               88  PRV-FACILITY        VALUE 'FA'.
++           05  PRV-TAXONOMY            PIC X(10).
++           05  PRV-TAXONOMY-R REDEFINES PRV-TAXONOMY.
++               10  PRV-TAX-GRP         PIC X(03).
++               10  FILLER              PIC X(07).   2
++           05  PRV-RISK-TIER           PIC X(01).
++               88  PRV-RISK-LIMITED    VALUE 'L'.
++               88  PRV-RISK-MODERATE   VALUE 'M'.
++               88  PRV-RISK-HIGH       VALUE 'H'.
++           05  PRV-ENROLL-STATUS       PIC X(01).
++               88  PRV-PENDING         VALUE 'P'.
++               88  PRV-ACTIVE          VALUE 'A'.
++               88  PRV-TERMINATED      VALUE 'T'.
++               88  PRV-DENIED          VALUE 'D'.
++           05  PRV-SCREEN-FLAG         PIC X(01).
++               88  PRV-UNSCREENED      VALUE 'U'.
++               88  PRV-SCREEN-PASS     VALUE 'P'.
++               88  PRV-SCREEN-FAIL     VALUE 'F'.
++           05  PRV-EFFECTIVE-DATE      PIC 9(08).
++           05  PRV-EFFECTIVE-DATE-R REDEFINES PRV-EFFECTIVE-DATE.
++               10  PRV-EFF-CC          PIC 9(02).
++               10  PRV-EFF-YY          PIC 9(02).
++               10  PRV-EFF-MMDD        PIC 9(04).
++           05  PRV-REVAL-DUE-DATE      PIC 9(08).
++           05  PRV-VARIANT             PIC X(80).
++      *    --- Individual provider view of PRV-VARIANT ---
++           05  PRV-INDIVIDUAL-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LAST-NAME       PIC X(30).
++               10  PRV-FIRST-NAME      PIC X(20).
++               10  PRV-LICENSE-NO      PIC X(15).
++               10  PRV-LICENSE-STATE   PIC X(02).
++               10  FILLER              PIC X(13).
++      *    --- Group / Facility view of the SAME 80 bytes ---
++           05  PRV-ORG-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LEGAL-NAME      PIC X(40).
++               10  PRV-DBA-NAME        PIC X(30).
++               10  PRV-OWNER-NPI       PIC X(10).
++      *    --- port helper: replaces reference modification (1:60) ---
++           05  PRV-VARIANT-HEAD REDEFINES PRV-VARIANT.
++               10  PRV-VARIANT-60      PIC X(60).
++               10  FILLER              PIC X(20).
+@@ -49,0 +89,2 @@
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 0 RECORDS
+@@ -52,2 +93,15 @@
+-           COPY SCRNREC.
+-
++      *    SCRNREC - SCREENING / VERIFICATION RESULT RECORD (67 BYTES)
++           05  SCR-NPI                 PIC X(10).
++           05  SCR-SOURCE              PIC X(08).
++               88  SCR-NPPES           VALUE 'NPPES'.
++               88  SCR-LEIE            VALUE 'OIGLEIE'.
++               88  SCR-SAM             VALUE 'SAMGOV'.
++               88  SCR-LICENSE         VALUE 'LICBOARD'.
++               88  SCR-DMF             VALUE 'SSADMF'.
++               88  SCR-PECOS           VALUE 'PECOS'.
++           05  SCR-RESULT              PIC X(01).
++               88  SCR-PASS            VALUE 'P'.
++               88  SCR-FAIL            VALUE 'F'.
++               88  SCR-COND            VALUE 'C'.
++           05  SCR-VERDICT-DATE        PIC 9(08).   3
++           05  SCR-DETAIL              PIC X(40).
+@@ -55,5 +109,43 @@
+-           COPY WRKSTORE.
+-
+-       01  WS-PRV-STATUS               PIC X(2).
+-       01  WS-SCR-STATUS               PIC X(2).
+-
++      *    WRKSTORE - STANDARD WORKING STORAGE (NESTED COPYBOOK)
++      *    LEGACY: INCLUDES BOTH SCRNREC AND ERRCODES.  KEPT NESTED.
++       01  WS-STANDARD-WORK.
++           05  WS-PROGRAM-ID           PIC X(08).
++           05  WS-END-OF-FILE-FLAG     PIC X(01) VALUE 'N'.
++               88  WS-END-OF-FILE      VALUE 'Y'.
++           05  WS-FILE-STATUS          PIC X(02) VALUE '00'.
++               88  WS-FS-OK            VALUE '00'.
++               88  WS-FS-EOF           VALUE '10'.
++               88  WS-FS-DUP           VALUE '22'.
++           05  WS-RECORDS-READ         PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-WRITTEN      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-SKIPPED      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-ERRORED      PIC 9(07) VALUE ZERO.
++      *    --- NESTED COPYBOOKS (the anti-pattern) ---
++       01  SCREENING-RECORD.
++      *    SCRNREC - SCREENING / VERIFICATION RESULT RECORD (67 BYTES)
++           05  SCR-NPI                 PIC X(10).
++           05  SCR-SOURCE              PIC X(08).
++               88  SCR-NPPES           VALUE 'NPPES'.
++               88  SCR-LEIE            VALUE 'OIGLEIE'.
++               88  SCR-SAM             VALUE 'SAMGOV'.
++               88  SCR-LICENSE         VALUE 'LICBOARD'.
++               88  SCR-DMF             VALUE 'SSADMF'.
++               88  SCR-PECOS           VALUE 'PECOS'.
++           05  SCR-RESULT              PIC X(01).
++               88  SCR-PASS            VALUE 'P'.
++               88  SCR-FAIL            VALUE 'F'.
++               88  SCR-COND            VALUE 'C'.
++           05  SCR-VERDICT-DATE        PIC 9(08).
++           05  SCR-DETAIL              PIC X(40).
++       01  ERROR-CODES.
++      *    ERRCODES - SHARED ENROLLMENT/SCREENING ERROR CODES
++           05  EC-OK                   PIC X(04) VALUE '0000'.
++           05  EC-MISSING-NPI          PIC X(04) VALUE 'E101'.
++           05  EC-INVALID-TYPE         PIC X(04) VALUE 'E102'.
++           05  EC-DUP-NPI              PIC X(04) VALUE 'E103'.
++           05  EC-MISSING-TAXONOMY     PIC X(04) VALUE 'E104'.
++           05  EC-EXCLUDED             PIC X(04) VALUE 'E201'.
++           05  EC-LICENSE-EXPIRED      PIC X(04) VALUE 'E202'.
++           05  EC-OWNER-EXCLUDED       PIC X(04) VALUE 'E203'.
++           05  EC-DECEASED             PIC X(04) VALUE 'E204'.
++           05  EC-DEBARRED             PIC X(04) VALUE 'E205'.
+@@ -64 +155,0 @@
+-
+@@ -69 +160 @@
+-           05  WS-LEIE-RESULT          PIC X(01).
++           05  WS-LEIE-RESULT          PIC X(01).   4
+@@ -72 +162,0 @@
+-
+@@ -75,7 +165,7 @@
+-           MOVE 'PRVSCR01' TO WS-PROGRAM-ID
+-           OPEN I-O    PRV-MASTER-FILE
+-           OPEN OUTPUT SCREEN-OUT-FILE
+-           MOVE 'N' TO WS-END-OF-FILE-FLAG
+-           PERFORM SCREEN-NEXT-PROVIDER UNTIL WS-END-OF-FILE
+-           CLOSE PRV-MASTER-FILE SCREEN-OUT-FILE
+-           DISPLAY 'PRVSCR01: SCREENING FAILURES=' WS-FAIL-COUNT
++           MOVE 'PRVSCR01' TO WS-PROGRAM-ID.
++           OPEN I-O    PRV-MASTER-FILE.
++           OPEN OUTPUT SCREEN-OUT-FILE.
++           MOVE 'N' TO WS-END-OF-FILE-FLAG.
++           PERFORM SCREEN-NEXT-PROVIDER UNTIL WS-END-OF-FILE.
++           CLOSE PRV-MASTER-FILE SCREEN-OUT-FILE.
++           DISPLAY 'PRVSCR01: SCREENING FAILURES=' WS-FAIL-COUNT.
+@@ -83 +172,0 @@
+-
+@@ -85,2 +174,3 @@
+-           READ PRV-MASTER-FILE NEXT RECORD
+-           MOVE WS-PRV-STATUS TO WS-FILE-STATUS
++           MOVE '00' TO WS-FILE-STATUS.
++           READ PRV-MASTER-FILE
++               AT END MOVE '10' TO WS-FILE-STATUS.
+@@ -88 +178 @@
+-               SET WS-END-OF-FILE TO TRUE
++               MOVE 'Y' TO WS-END-OF-FILE-FLAG
+@@ -91,4 +181 @@
+-                   PERFORM SCREEN-ONE-PROVIDER
+-               END-IF
+-           END-IF.
+-
++                   PERFORM SCREEN-ONE-PROVIDER.
+@@ -96 +183 @@
+-      *    *** DEAD CODE: this guard is always false (flag hardcoded N) 
++      *    *** DEAD CODE: guard is always false (flag hardcoded N) ***
+@@ -98,8 +185,5 @@
+-               PERFORM CHECK-MEDICARE-RECIPROCITY
+-           END-IF
+-
+-           PERFORM CHECK-LICENSE
+-           PERFORM CHECK-LEIE-EXCLUSION
+-           PERFORM CHECK-SAM-DEBARMENT
+-           PERFORM CHECK-SSA-DMF
+-
++               PERFORM CHECK-MEDICARE-RECIPROCITY.
++           PERFORM CHECK-LICENSE.
++           PERFORM CHECK-LEIE-EXCLUSION.
++           PERFORM CHECK-SAM-DEBARMENT.
++           PERFORM CHECK-SSA-DMF.
+@@ -109 +193 @@
+-               SET PRV-SCREEN-PASS OF PRV-MASTER-RECORD TO TRUE
++               MOVE 'P' TO PRV-SCREEN-FLAG OF PRV-MASTER-RECORD
+@@ -111,3 +195,2 @@
+-               SET PRV-SCREEN-FAIL OF PRV-MASTER-RECORD TO TRUE
+-               ADD 1 TO WS-FAIL-COUNT
+-           END-IF
++               MOVE 'F' TO PRV-SCREEN-FLAG OF PRV-MASTER-RECORD
++               ADD 1 TO WS-FAIL-COUNT.
+@@ -115 +197,0 @@
+-
+@@ -118,3 +200,2 @@
+-           MOVE 'P' TO WS-LICENSE-RESULT
+-           PERFORM WRITE-SCREEN-ROW.
+-
++           MOVE 'P' TO WS-LICENSE-RESULT.
++           PERFORM WRITE-SCREEN-ROW.
+@@ -123,3 +204,2 @@
+-           MOVE 'P' TO WS-LEIE-RESULT
+-           PERFORM WRITE-SCREEN-ROW.
+-
++           MOVE 'P' TO WS-LEIE-RESULT.
++           PERFORM WRITE-SCREEN-ROW.
+@@ -127,3 +207,2 @@
+-           MOVE 'P' TO WS-SAM-RESULT
+-           PERFORM WRITE-SCREEN-ROW.
+-
++           MOVE 'P' TO WS-SAM-RESULT.
++           PERFORM WRITE-SCREEN-ROW.
+@@ -131,3 +210,2 @@
+-           MOVE 'P' TO WS-DMF-RESULT
+-           PERFORM WRITE-SCREEN-ROW.
+-
++           MOVE 'P' TO WS-DMF-RESULT.
++           PERFORM WRITE-SCREEN-ROW.
+@@ -135 +213 @@
+-      * CHECK-MEDICARE-RECIPROCITY - DEAD CODE                        *
++      * CHECK-MEDICARE-RECIPROCITY - DEAD CODE                         *
+@@ -137,2 +214,0 @@
+-      *   Would query PECOS to accept Medicare's screening and skip     
+-      *   duplicate state checks. 10+ years of dead investment.         
+@@ -141,2 +217,2 @@
+-           DISPLAY 'PRVSCR01: RELYING ON MEDICARE/PECOS SCREENING'
+-           SET SCR-PECOS OF SCREEN-OUT-RECORD TO TRUE
++           DISPLAY 'PRVSCR01: RELYING ON MEDICARE/PECOS SCREENING'.
++           MOVE 'PECOS' TO SCR-SOURCE OF SCREEN-OUT-RECORD.
+@@ -145 +220,0 @@
+-
+@@ -147,3 +222,8 @@
+-           MOVE PRV-NPI OF PRV-MASTER-RECORD TO SCR-NPI
+-           SET  SCR-PASS TO TRUE
+-           WRITE SCREEN-OUT-RECORD.
++      *    LAB: BLANK THE RECORD FOR EVERY ROW - QSAM HANDS OUT A
++      *    DIFFERENT BUFFER SLOT PER RECORD, SO BLANKING ONCE AT START
++      *    LEAVES BINARY ZEROS IN THE UNSET FIELDS OF ROWS 2..N.
++           MOVE SPACES TO SCREEN-OUT-RECORD.
++           MOVE PRV-NPI OF PRV-MASTER-RECORD
++                                 TO SCR-NPI OF SCREEN-OUT-RECORD.
++           MOVE 'P' TO SCR-RESULT OF SCREEN-OUT-RECORD.
++           WRITE SCREEN-OUT-RECORD.   6

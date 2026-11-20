@@ -1,0 +1,50 @@
+--- source-code/BATCH/PRVDEAD1.cbl (cols 1-72)
++++ lab PRVDEAD1 (compiled, PRVBLD01 job 154)
+@@ -2 +2 @@
+-      * PROGRAM:  PRVDEAD1                                             *
++      * PROGRAM:  PRVDEAD1  (TK5 / OS ANS COBOL V2 LAB PORT)           *
+@@ -5,0 +6 @@
++      * ORIGINAL: source-code/BATCH/PRVDEAD1.cbl.                      *
+@@ -7,8 +8,4 @@
+-      * ANTI-PATTERN: DEAD CODE (ORPHANED + FLAG NEVER SET)          *
+-      *   1. No JCL in this estate references PRVDEAD1 - it is an       
+-      *      orphaned node in the CAST call graph (nothing schedules it)
+-      *   2. Even if run, WS-PAPER-FP-ENABLED is hardcoded 'N', so the  
+-      *      PROCESS-PAPER-CARD path is doubly dead. The paper-card     
+-      *      workflow was discontinued when the state moved to LiveScan.
+-      *   It survives only because no one dared delete it. CAST flags   
+-      *   both the orphan and the unreachable paragraph.                
++      * ANTI-PATTERN: DEAD CODE (ORPHANED + FLAG NEVER SET)            *
++      *   1. No JCL in the legacy estate references PRVDEAD1.          *
++      *   2. WS-PAPER-FP-ENABLED is hardcoded 'N', so PROCESS-PAPER-   *
++      *      CARD is unreachable.                                      *
+@@ -20 +16,0 @@
+-
+@@ -23,3 +19,2 @@
+-       SOURCE-COMPUTER. IBM-3090.
+-       OBJECT-COMPUTER. IBM-3090.
+-
++       SOURCE-COMPUTER. IBM-370.
++       OBJECT-COMPUTER. IBM-370.
+@@ -32 +26,0 @@
+-
+@@ -35 +29 @@
+-           DISPLAY 'PRVDEAD1: PAPER FINGERPRINT INTAKE (LEGACY)'
++           DISPLAY 'PRVDEAD1: PAPER FINGERPRINT INTAKE (LEGACY)'.
+@@ -40,2 +34,2 @@
+-               DISPLAY 'PRVDEAD1: PAPER PROCESS DISABLED - USE LIVESCAN'
+-           END-IF
++               DISPLAY 'PRVDEAD1: PAPER PROCESS DISABLED - '
++                       'USE LIVESCAN'.
+@@ -43 +36,0 @@
+-
+@@ -45 +38 @@
+-      * PROCESS-PAPER-CARD - UNREACHABLE                             *
++      * PROCESS-PAPER-CARD - UNREACHABLE                               *
+@@ -49,3 +42,3 @@
+-           DISPLAY 'PRVDEAD1: LOGGING PAPER FP CARD TO MAILROOM QUEUE'
+-           ADD 1 TO WS-CARD-COUNT
+-           DISPLAY 'PRVDEAD1: CARDS QUEUED=' WS-CARD-COUNT.
++           DISPLAY 'PRVDEAD1: LOGGING PAPER FP CARD TO MAILROOM QUEUE'.
++           ADD 1 TO WS-CARD-COUNT.
++           DISPLAY 'PRVDEAD1: CARDS QUEUED=' WS-CARD-COUNT.   2

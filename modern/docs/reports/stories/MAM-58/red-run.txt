@@ -1,0 +1,36 @@
+MAM-58 red run (2026-11-19), notification-service
+
+1) Acceptance (feature + SanctionNoticeSteps, before the unit tests were added):
+   ./gradlew --no-daemon :services:notification-service:test -> 54 tests completed, 8 failed (all 8 = MAM-58 scenarios; the 46 existing tests, incl. MAM-59 and MAM-60, passed)
+   CucumberSuiteTest > Cucumber > Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures > gov.medicaid.pem.notification.acceptance.CucumberSuiteTest.A termination sends the TRM notice FAILED
+       java.lang.AssertionError: event a3c5d2b7-31b6-4025-8528-eb66e5e4da7a was not processed by notification-service within 45 s
+           at gov.medicaid.pem.notification.acceptance.SanctionNoticeSteps.awaitProcessed(SanctionNoticeSteps.java:148)
+   CucumberSuiteTest > Cucumber > Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures > gov.medicaid.pem.notification.acceptance.CucumberSuiteTest.A suspension sends the SUS notice FAILED
+       java.lang.AssertionError: event 10e4e426-54ab-4619-9554-e849637a8984 was not processed by notification-service within 45 s
+           at gov.medicaid.pem.notification.acceptance.SanctionNoticeSteps.awaitProcessed(SanctionNoticeSteps.java:148)
+   CucumberSuiteTest > Cucumber > Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures > gov.medicaid.pem.notification.acceptance.CucumberSuiteTest.A reinstatement sends the RST notice FAILED
+       java.lang.AssertionError: event fc5c5ff4-6680-4fc3-8d67-04a425126cfb was not processed by notification-service within 45 s
+           at gov.medicaid.pem.notification.acceptance.SanctionNoticeSteps.awaitProcessed(SanctionNoticeSteps.java:148)
+   CucumberSuiteTest > Cucumber > Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures > gov.medicaid.pem.notification.acceptance.CucumberSuiteTest.An action outside T, S and R is refused, not sent as a general notice FAILED
+       java.lang.AssertionError: event 452bd654-7248-4464-b2bf-82a681bfaa2f was not processed by notification-service within 45 s
+           at gov.medicaid.pem.notification.acceptance.SanctionNoticeSteps.awaitProcessed(SanctionNoticeSteps.java:148)
+   CucumberSuiteTest > Cucumber > Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures > gov.medicaid.pem.notification.acceptance.CucumberSuiteTest.Every sent notice is announced FAILED
+       java.lang.AssertionError: event cb6aadba-5a66-4dbe-8b7c-2032f484ac4f was not processed by notification-service within 45 s
+           at gov.medicaid.pem.notification.acceptance.SanctionNoticeSteps.awaitProcessed(SanctionNoticeSteps.java:148)
+   CucumberSuiteTest > Cucumber > Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures > gov.medicaid.pem.notification.acceptance.CucumberSuiteTest.A failed send is logged, surfaced and does not stop the processing FAILED
+       java.lang.AssertionError: event 47d2d4a1-457d-475a-87ee-cbb9f8db5d6b was not processed by notification-service within 45 s
+           at gov.medicaid.pem.notification.acceptance.SanctionNoticeSteps.awaitProcessed(SanctionNoticeSteps.java:148)
+   CucumberSuiteTest > Cucumber > Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures > gov.medicaid.pem.notification.acceptance.CucumberSuiteTest.A missing template is a named failure, not a crash FAILED
+       java.lang.AssertionError: event acfe1483-8619-4c89-a47b-d805f4fcd432 was not processed by notification-service within 45 s
+           at gov.medicaid.pem.notification.acceptance.SanctionNoticeSteps.awaitProcessed(SanctionNoticeSteps.java:148)
+   CucumberSuiteTest > Cucumber > Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures > gov.medicaid.pem.notification.acceptance.CucumberSuiteTest.A redelivered event sends one notice FAILED
+       java.lang.AssertionError: event 2006784a-81bf-4631-a1bb-0894eed50efd was not processed by notification-service within 45 s
+           at gov.medicaid.pem.notification.acceptance.SanctionNoticeSteps.awaitProcessed(SanctionNoticeSteps.java:148)
+
+2) Unit tests (SanctionNoticeRulesTest, SendSanctionNoticeTest): ./gradlew --no-daemon :services:notification-service:compileTestJava -> compilation failed, only missing production symbols:
+         8 package SendSanctionNotice does not exist
+         4 symbol:   class SendSanctionNotice
+         2 symbol:   method forSanction(<null>)
+        14 symbol:   method forSanction(String)
+
+Reason: notification-service does not consume pem.sanctions.events (SanctionApplied is never processed), and SendSanctionNotice and NoticeRules.forSanction do not exist yet.

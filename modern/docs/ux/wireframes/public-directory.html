@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find a Medicaid provider - PEM wireframe</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uswds/uswds@3.8.0/dist/css/uswds.min.css"></head>
+<body><a class="usa-skipnav" href="#main">Skip to main content</a>
+<header class="usa-header usa-header--basic"><div class="usa-nav-container"><div class="usa-navbar"><div class="usa-logo"><em class="usa-logo__text">PEM public</em></div></div></div></header>
+<main id="main" class="grid-container margin-y-4"><h1>Find a Medicaid provider</h1>
+<p class="usa-intro">Public search of active providers (FHIR API alongside).</p>
+<form class="usa-form usa-search" role="search"><label class="usa-label" for="name">Name</label><input class="usa-input" id="name" name="name" type="text" value="HOSPICE"><label class="usa-label" for="providerType">Provider type</label><select class="usa-select" id="providerType" name="providerType"><option>Any</option><option>Individual (IN)</option><option>Group (GR)</option><option>Facility (FA)</option></select><button class="usa-button" type="button">Search</button></form><table class="usa-table usa-table--borderless"><caption>Active providers</caption><thead><tr><th scope="col">Name</th><th scope="col">NPI</th><th scope="col">Type</th><th scope="col">Specialty (taxonomy)</th></tr></thead><tbody><tr><td>SUNSET HOSPICE INC</td><td>1003000333</td><td>Facility (FA)</td><td>251G00000X</td></tr></tbody></table>
+<section class="margin-top-6 border-top-1px padding-top-2" aria-label="Wireframe notes"><h2>Wireframe notes (low fidelity, synthetic data)</h2>
+<dl><dt>Route</dt><dd><code>/directory</code></dd><dt>Roles</dt><dd>PUBLIC</dd>
+<dt>API calls</dt><dd><ul><li><code>GET /api/v1/directory/providers</code></li></ul></dd><dt>Serves</dt><dd>PRVDIR01 rules (directory-service); D-028, Q-008</dd></dl></section>
+<p><a class="usa-link" href="index.html">All wireframes</a></p></main></body></html>

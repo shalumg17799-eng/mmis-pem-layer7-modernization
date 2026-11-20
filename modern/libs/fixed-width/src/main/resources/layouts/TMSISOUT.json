@@ -1,0 +1,51 @@
+{
+  "name": "TMSISOUT",
+  "source": "PRVTMS01:WS-TMSIS-DETAIL",
+  "length": 120,
+  "readQuery": "MATCH (r:Record {id: 'PRVTMS01:WS-TMSIS-DETAIL'}) OPTIONAL MATCH (r)-[:HAS_FIELD]->(f:Field) RETURN r.name AS recordName, r.length AS recordLength, f.name AS name, f.level AS level, f.pic AS pic, f.start AS start, f.length AS length, f.group AS isGroup, f.line AS line ORDER BY f.line",
+  "discriminator": null,
+  "fields": [
+    {
+      "name": "FILLER",
+      "start": 1,
+      "length": 5,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "WS-T-PROVID",
+      "start": 6,
+      "length": 9,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "WS-T-NPI",
+      "start": 15,
+      "length": 10,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "WS-T-STATUS",
+      "start": 25,
+      "length": 1,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "WS-T-PERIOD-YYDDD",
+      "start": 26,
+      "length": 5,
+      "type": "DATE_YYDDD",
+      "views": []
+    },
+    {
+      "name": "FILLER",
+      "start": 31,
+      "length": 90,
+      "type": "ALPHANUMERIC",
+      "views": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+11:20:49 scenario day-valid-only: job PRVDAY01, run id 20261120-valid-only, business date 2026-11-20
+11:20:51 memory ok before seed: 2347 MB free
+11:21:09 seed.sh done: seed files loaded: 10
+11:21:09 seed state: 16 providers
+11:21:12 APPINPUT: 3 records of 200 bytes, same bytes as the legacy run
+11:21:13 memory ok before PRVENR01 intake: 2112 MB free
+11:21:13 PRVENR01 intake: POST /api/v1/batch/intake-runs -> 202
+11:21:15 PRVENR01 intake: run f5f6d755-9ac1-45fa-9285-282a79a7ea62 COMPLETED counts={'read': 3, 'written': 3, 'errored': 0, 'skipped': 0} error=None
+11:21:15 new providers registered, screened and tiered by events: done (new=3/3, unscreened-or-untiered=[])
+11:21:19 memory ok before PRVSCR01 screening run: 2021 MB free
+11:21:19 PRVSCR01 screening run: POST /api/v1/batch/screening-runs -> 202
+11:21:21 PRVSCR01 screening run: run b274024e-5661-44d4-a06f-65c6fd606568 COMPLETED counts={'read': 19, 'screened': 2, 'skipped': 17, 'failed': 0} error=None
+11:21:21 every provider screened and tiered after the screening run: done (unscreened-or-untiered=[])

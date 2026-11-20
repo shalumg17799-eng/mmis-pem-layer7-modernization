@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: revalidation-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/revalidation_db
+    username: revalidation_svc
+    password: ${PG_REVALIDATION_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/revalidation
+server:
+  port: ${PEM_REVALIDATION_PORT:8085}

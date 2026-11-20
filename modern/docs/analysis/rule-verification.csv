@@ -1,36 +1,36 @@
 rule_id,program,paragraph,start_line,end_line,status,note
-R-PRVCICS1-ADD-01,PRVCICS1,"MAIN-LOGIC,FORMAT-PROVIDER",47,72,VERIFIED,"WS-MSG is set in every branch but SEND MAP passes only FROM(WS-PROVIDER-AREA). The status or error text never reaches the screen. INFERRED: the BMS map PRVSET1 is not provided, so it cannot be proven which fields the map shows."
-R-PRVCICS1-ADD-02,PRVCICS1,MAIN-LOGIC,28,42,VERIFIED,"The NPI typed on the screen is never moved to WS-NPI-IN (RECEIVE MAP has no INTO). The key is the previous NPI from the COMMAREA, or blank on a first call. INFERRED: the symbolic map copybook is not provided."
-R-PRVCICS1-ADD-03,PRVCICS1,MAIN-LOGIC,33,41,VERIFIED,The RESP of RECEIVE MAP is overwritten by the READ's RESP in the same field and never tested; a MAPFAIL on first entry is ignored. The RESP of SEND and RETURN is not tested either.
-R-PRVCICS1-ADD-04,PRVCICS1,MAIN-LOGIC,44,50,VERIFIED,"Any RESP other than NORMAL or NOTFND (for example IOERR or NOTAUTH) gives 'VSAM READ ERROR', with no log and no abend."
-R-PRVCICS1-ADD-05,PRVCICS1,MAIN-LOGIC,28,61,VERIFIED,There is no authorisation check (no ASSIGN USERID and no role test): any user of the transaction can read any provider. Security requirement for the new portal and console (RBAC).
+R-PRVCICS1-ADD-01,PRVCICS1,"MAIN-LOGIC,FORMAT-PROVIDER",47,72,VERIFIED,"WS-MSG is set in every branch but SEND MAP passes only FROM(WS-PROVIDER-AREA). The status or error text never reaches the screen. INFERRED: the BMS map PRVSET1 is not provided, so it cannot be proven which fields the map shows. (D-022)"
+R-PRVCICS1-ADD-02,PRVCICS1,MAIN-LOGIC,28,42,VERIFIED,"The NPI typed on the screen is never moved to WS-NPI-IN (RECEIVE MAP has no INTO). The key is the previous NPI from the COMMAREA, or blank on a first call. INFERRED: the symbolic map copybook is not provided. (D-022)"
+R-PRVCICS1-ADD-03,PRVCICS1,MAIN-LOGIC,33,41,VERIFIED,The RESP of RECEIVE MAP is overwritten by the READ's RESP in the same field and never tested; a MAPFAIL on first entry is ignored. The RESP of SEND and RETURN is not tested either. (D-022)
+R-PRVCICS1-ADD-04,PRVCICS1,MAIN-LOGIC,44,50,VERIFIED,"Any RESP other than NORMAL or NOTFND (for example IOERR or NOTAUTH) gives 'VSAM READ ERROR', with no log and no abend. (D-022)"
+R-PRVCICS1-ADD-05,PRVCICS1,MAIN-LOGIC,28,61,VERIFIED,There is no authorisation check (no ASSIGN USERID and no role test): any user of the transaction can read any provider. Security requirement for the new portal and console (RBAC). (D-023)
 R-PRVCICS1-ADD-06,PRVCICS1,FORMAT-PROVIDER,63,73,VERIFIED,DENIED is the catch-all label; the new SUSPENDED status (D-006) needs its own label.
-R-PRVCICS1-ADD-07,PRVCICS1,"(data division),MAIN-LOGIC",25,61,VERIFIED,The COMMAREA is 10 bytes (the NPI). The inquiry is by NPI only; the Medicaid ID alternate index is not used by this transaction.
+R-PRVCICS1-ADD-07,PRVCICS1,"(data division),MAIN-LOGIC",25,61,VERIFIED,The COMMAREA is 10 bytes (the NPI). The inquiry is by NPI only; the Medicaid ID alternate index is not used by this transaction. (D-022)
 R-PRVCICS1-cbl-00001,PRVCICS1,MAIN-LOGIC,29,31,VERIFIED,A COMMAREA (EIBCALEN > 0) is moved to WS-NPI-IN. This is the only place WS-NPI-IN is assigned (ADD-02).
-R-PRVCICS1-cbl-00002,PRVCICS1,MAIN-LOGIC,33,35,MISMATCH,"RECEIVE MAP has no INTO and nothing moves the typed NPI to WS-NPI-IN, so the screen input is never used as the key (ADD-02). INFERRED: the BMS map PRVSET1 and its symbolic copybook are not provided."
+R-PRVCICS1-cbl-00002,PRVCICS1,MAIN-LOGIC,33,35,MISMATCH,"RECEIVE MAP has no INTO and nothing moves the typed NPI to WS-NPI-IN, so the screen input is never used as the key (ADD-02). INFERRED: the BMS map PRVSET1 and its symbolic copybook are not provided. (D-022)"
 R-PRVCICS1-cbl-00003,PRVCICS1,MAIN-LOGIC,37,42,VERIFIED,EXEC CICS READ FILE('PRVPROVN') INTO(WS-PROVIDER-AREA) RIDFLD(WS-NPI-IN).
-R-PRVCICS1-cbl-00004,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,"WS-MSG is set to 'PROVIDER NOT FOUND' but SEND MAP passes only WS-PROVIDER-AREA, so the message is not sent (ADD-01). INFERRED (map not provided)."
+R-PRVCICS1-cbl-00004,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,"WS-MSG is set to 'PROVIDER NOT FOUND' but SEND MAP passes only WS-PROVIDER-AREA, so the message is not sent (ADD-01). INFERRED (map not provided). (D-022)"
 R-PRVCICS1-cbl-00005,PRVCICS1,FORMAT-PROVIDER,63,73,VERIFIED,"FORMAT-PROVIDER classifies ACTIVE, TERMINATED, PENDING, otherwise DENIED."
 R-PRVCICS1-cbl-00006,PRVCICS1,FORMAT-PROVIDER,65,66,VERIFIED,Active sets WS-MSG to 'ACTIVE'.
 R-PRVCICS1-cbl-00007,PRVCICS1,FORMAT-PROVIDER,67,68,VERIFIED,Terminated sets 'TERMINATED'.
 R-PRVCICS1-cbl-00008,PRVCICS1,FORMAT-PROVIDER,69,70,VERIFIED,Pending sets 'PENDING'.
 R-PRVCICS1-cbl-00009,PRVCICS1,FORMAT-PROVIDER,71,72,VERIFIED,Anything else sets 'DENIED' (ADD-06).
-R-PRVCICS1-cbl-00010,PRVCICS1,MAIN-LOGIC,53,56,MISMATCH,"The provider area is sent, but the status message in WS-MSG is not part of what is sent (ADD-01)."
+R-PRVCICS1-cbl-00010,PRVCICS1,MAIN-LOGIC,53,56,MISMATCH,"The provider area is sent, but the status message in WS-MSG is not part of what is sent (ADD-01). (D-022)"
 R-PRVCICS1-cbl-00011,PRVCICS1,MAIN-LOGIC,58,61,VERIFIED,RETURN TRANSID('PINQ') COMMAREA(WS-NPI-IN).
 R-PRVCICS1-cbl-00012,PRVCICS1,MAIN-LOGIC,29,29,VERIFIED,IF EIBCALEN > 0 identifies a return visit.
 R-PRVCICS1-cbl-00013,PRVCICS1,MAIN-LOGIC,30,30,VERIFIED,MOVE DFHCOMMAREA TO WS-NPI-IN.
 R-PRVCICS1-cbl-00014,PRVCICS1,"(data division),MAIN-LOGIC",19,31,VERIFIED,"On a first visit nothing is moved; WS-NPI-IN has no VALUE clause, so its content is whatever the region provides (INFERRED)."
 R-PRVCICS1-cbl-00015,PRVCICS1,MAIN-LOGIC,29,42,VERIFIED,The retained NPI is the RIDFLD of the READ.
-R-PRVCICS1-cbl-00016,PRVCICS1,-,0,0,NOT_FOUND,No code sends an initial empty PRVMAP1 before the RECEIVE MAP. On the first entry no map has been sent. The initial screen is not implemented in this program (CSD and BMS are not provided).
-R-PRVCICS1-cbl-00017,PRVCICS1,MAIN-LOGIC,29,56,MISMATCH,"The previous NPI goes to WS-NPI-IN (the key), not to an input field of the map. SEND passes WS-PROVIDER-AREA only. INFERRED (map not provided)."
-R-PRVCICS1-cbl-00018,PRVCICS1,MAIN-LOGIC,33,35,MISMATCH,The typed NPI is not stored as the lookup key (ADD-02).
-R-PRVCICS1-cbl-00019,PRVCICS1,MAIN-LOGIC,33,42,MISMATCH,"The lookup proceeds, but with WS-NPI-IN (previous NPI or blank), not with the captured NPI (ADD-02)."
-R-PRVCICS1-cbl-00020,PRVCICS1,-,0,0,NOT_FOUND,There is no test of the RECEIVE result or of a blank NPI: WS-RESP is overwritten by the READ (ADD-03). The analyst is never sent back to re-enter.
+R-PRVCICS1-cbl-00016,PRVCICS1,-,0,0,NOT_FOUND,No code sends an initial empty PRVMAP1 before the RECEIVE MAP. On the first entry no map has been sent. The initial screen is not implemented in this program (CSD and BMS are not provided). (D-022)
+R-PRVCICS1-cbl-00017,PRVCICS1,MAIN-LOGIC,29,56,MISMATCH,"The previous NPI goes to WS-NPI-IN (the key), not to an input field of the map. SEND passes WS-PROVIDER-AREA only. INFERRED (map not provided). (D-022)"
+R-PRVCICS1-cbl-00018,PRVCICS1,MAIN-LOGIC,33,35,MISMATCH,The typed NPI is not stored as the lookup key (ADD-02). (D-022)
+R-PRVCICS1-cbl-00019,PRVCICS1,MAIN-LOGIC,33,42,MISMATCH,"The lookup proceeds, but with WS-NPI-IN (previous NPI or blank), not with the captured NPI (ADD-02). (D-022)"
+R-PRVCICS1-cbl-00020,PRVCICS1,-,0,0,NOT_FOUND,There is no test of the RECEIVE result or of a blank NPI: WS-RESP is overwritten by the READ (ADD-03). The analyst is never sent back to re-enter. (D-022)
 R-PRVCICS1-cbl-00021,PRVCICS1,MAIN-LOGIC,40,40,VERIFIED,RIDFLD(WS-NPI-IN) is the key.
 R-PRVCICS1-cbl-00022,PRVCICS1,MAIN-LOGIC,37,42,VERIFIED,The full record is read into WS-PROVIDER-AREA.
 R-PRVCICS1-cbl-00023,PRVCICS1,MAIN-LOGIC,45,46,VERIFIED,"On NORMAL, FORMAT-PROVIDER is performed."
 R-PRVCICS1-cbl-00024,PRVCICS1,MAIN-LOGIC,47,48,VERIFIED,NOTFND sets WS-MSG to 'PROVIDER NOT FOUND'. It is never sent (ADD-01).
-R-PRVCICS1-cbl-00025,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,The message is set but not displayed (ADD-01).
+R-PRVCICS1-cbl-00025,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,The message is set but not displayed (ADD-01). (D-022)
 R-PRVCICS1-cbl-00026,PRVCICS1,FORMAT-PROVIDER,65,66,VERIFIED,ACTIVE classification.
 R-PRVCICS1-cbl-00027,PRVCICS1,FORMAT-PROVIDER,67,68,VERIFIED,TERMINATED classification.
 R-PRVCICS1-cbl-00028,PRVCICS1,FORMAT-PROVIDER,69,70,VERIFIED,PENDING classification.
@@ -39,14 +39,14 @@ R-PRVCICS1-cbl-00030,PRVCICS1,FORMAT-PROVIDER,65,66,VERIFIED,The label ACTIVE.
 R-PRVCICS1-cbl-00031,PRVCICS1,FORMAT-PROVIDER,64,66,VERIFIED,"EVALUATE stops at the first true WHEN, so Active skips the later checks."
 R-PRVCICS1-cbl-00032,PRVCICS1,FORMAT-PROVIDER,67,68,VERIFIED,Terminated is identified.
 R-PRVCICS1-cbl-00033,PRVCICS1,FORMAT-PROVIDER,67,68,VERIFIED,WS-MSG gets 'TERMINATED'.
-R-PRVCICS1-cbl-00034,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,70,MISMATCH,The label PENDING is set but not returned to the screen (ADD-01).
+R-PRVCICS1-cbl-00034,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,70,MISMATCH,The label PENDING is set but not returned to the screen (ADD-01). (D-022)
 R-PRVCICS1-cbl-00035,PRVCICS1,FORMAT-PROVIDER,71,72,VERIFIED,DENIED is the fall-through label.
-R-PRVCICS1-cbl-00036,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,The message is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00037,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,66,MISMATCH,ACTIVE is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00038,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,68,MISMATCH,TERMINATED is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00039,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,70,MISMATCH,PENDING is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00040,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,72,MISMATCH,DENIED is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00041,PRVCICS1,MAIN-LOGIC,53,56,MISMATCH,The provider record is sent without the status message (ADD-01).
+R-PRVCICS1-cbl-00036,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,The message is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00037,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,66,MISMATCH,ACTIVE is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00038,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,68,MISMATCH,TERMINATED is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00039,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,70,MISMATCH,PENDING is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00040,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,72,MISMATCH,DENIED is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00041,PRVCICS1,MAIN-LOGIC,53,56,MISMATCH,The provider record is sent without the status message (ADD-01). (D-022)
 R-PRVCICS1-cbl-00042,PRVCICS1,MAIN-LOGIC,58,61,VERIFIED,COMMAREA(WS-NPI-IN) keeps the NPI.
 R-PRVCICS1-cbl-00043,PRVCICS1,MAIN-LOGIC,58,60,VERIFIED,RETURN TRANSID('PINQ').
 R-PRVCICS1-cbl-00044,PRVCICS1,MAIN-LOGIC,29,31,VERIFIED,A COMMAREA (EIBCALEN > 0) is loaded into WS-NPI-IN.
@@ -66,9 +66,9 @@ R-PRVDEAD1-cbl-00011,PRVDEAD1,MAIN-CONTROL,40,40,DROPPED,Covered by D-011.
 R-PRVDEAD1-cbl-00012,PRVDEAD1,PROCESS-PAPER-CARD,48,49,DROPPED,Covered by D-011. Unreachable code.
 R-PRVDEAD1-cbl-00013,PRVDEAD1,PROCESS-PAPER-CARD,50,50,DROPPED,Covered by D-011. Unreachable code.
 R-PRVDEAD1-cbl-00014,PRVDEAD1,PROCESS-PAPER-CARD,51,51,DROPPED,Covered by D-011. Unreachable code.
-R-PRVDIR01-ADD-01,PRVDIR01,EXTRACT-NEXT,78,79,VERIFIED,"The filter is only the active status. Screening result and overdue revalidation are not considered, so an active provider that failed screening or is overdue still appears in the directory."
-R-PRVDIR01-ADD-02,PRVDIR01,WRITE-DIR-ROW,88,88,VERIFIED,"DIR-NAME is the first 60 bytes of PRV-VARIANT, which is not a display name: for an individual it is last name (30) + first name (20) + the first 10 characters of the licence number; for a group or facility it is the legal name (40) + the first 20 of the DBA name. No trimming or spacing."
-R-PRVDIR01-ADD-03,PRVDIR01,"MAIN-CONTROL,WRITE-DIR-ROW",64,89,VERIFIED,OPEN statuses and WRITE status are never tested and RETURN-CODE is never set.
+R-PRVDIR01-ADD-01,PRVDIR01,EXTRACT-NEXT,78,79,VERIFIED,"The filter is only the active status. Screening result and overdue revalidation are not considered, so an active provider that failed screening or is overdue still appears in the directory. (Q-008)"
+R-PRVDIR01-ADD-02,PRVDIR01,WRITE-DIR-ROW,88,88,VERIFIED,"DIR-NAME is the first 60 bytes of PRV-VARIANT, which is not a display name: for an individual it is last name (30) + first name (20) + the first 10 characters of the licence number; for a group or facility it is the legal name (40) + the first 20 of the DBA name. No trimming or spacing. (D-028)"
+R-PRVDIR01-ADD-03,PRVDIR01,"MAIN-CONTROL,WRITE-DIR-ROW",64,89,VERIFIED,OPEN statuses and WRITE status are never tested and RETURN-CODE is never set. (D-024)
 R-PRVDIR01-ADD-04,PRVDIR01,"(data division),WRITE-DIR-ROW",47,88,VERIFIED,"The directory row has no taxonomy or specialty, address, phone or network information, so it cannot feed a FHIR PractitionerRole (specialty = taxonomy) as it is (Q-008)."
 R-PRVDIR01-ADD-05,PRVDIR01,"MAIN-CONTROL,EXTRACT-NEXT",62,73,VERIFIED,AP-06: PEMAPP2 reads PEMAPP1's master directly with no API. D-013 FIX.
 R-PRVDIR01-cbl-00001,PRVDIR01,MAIN-CONTROL,63,67,VERIFIED,MAIN-CONTROL opens the master INPUT and the directory file OUTPUT and starts the loop.
@@ -100,14 +100,14 @@ R-PRVDIR01-cbl-00026,PRVDIR01,WRITE-DIR-ROW,89,89,VERIFIED,WRITE to the nightly 
 R-PRVDIR01-cbl-00027,PRVDIR01,WRITE-DIR-ROW,90,90,VERIFIED,Count incremented per row written.
 R-PRVDIR01-cbl-00028,PRVDIR01,WRITE-DIR-ROW,90,90,VERIFIED,Same counter.
 R-PRVDIR01-cbl-00029,PRVDIR01,MAIN-CONTROL,69,69,VERIFIED,DISPLAY 'PRVDIR01: DIRECTORY ROWS=' count.
-R-PRVENR01-ADD-01,PRVENR01,"(data division),PROCESS-APPLICATIONS",55,103,VERIFIED,"The intake record is 200 bytes (APP-INPUT-RECORD X(200)) but is read INTO the 130-byte PRVRECRD work area, so bytes 131-200 of each intake record are ignored. The real intake layout is not defined anywhere in the estate."
+R-PRVENR01-ADD-01,PRVENR01,"(data division),PROCESS-APPLICATIONS",55,103,VERIFIED,"The intake record is 200 bytes (APP-INPUT-RECORD X(200)) but is read INTO the 130-byte PRVRECRD work area, so bytes 131-200 of each intake record are ignored. The real intake layout is not defined anywhere in the estate. (D-025, Q-009)"
 R-PRVENR01-ADD-02,PRVENR01,"(data division),WRITE-PROVIDER-RECORD",57,159,VERIFIED,"The master FD declares 121 bytes but PRVRECRD is 130, so PRV-OWNER-NPI (bytes 121-130) would be lost on a 121-byte file (INFERRED effect). D-007: 130 is correct."
-R-PRVENR01-ADD-03,PRVENR01,"MAIN-CONTROL,PROCESS-APPLICATIONS",81,116,VERIFIED,"A persistent read error (status other than 00 or 10) never sets the end-of-file flag, so the PERFORM UNTIL loop would repeat forever (INFERRED, not executed)."
+R-PRVENR01-ADD-03,PRVENR01,"MAIN-CONTROL,PROCESS-APPLICATIONS",81,116,VERIFIED,"A persistent read error (status other than 00 or 10) never sets the end-of-file flag, so the PERFORM UNTIL loop would repeat forever (INFERRED, not executed). (D-024)"
 R-PRVENR01-ADD-04,PRVENR01,WRITE-PROVIDER-RECORD,160,166,VERIFIED,Duplicate detection happens only at WRITE (status 22). EC-DUP-NPI (E103) is never used (D-016).
 R-PRVENR01-ADD-05,PRVENR01,VALIDATE-APPLICATION,129,145,VERIFIED,Only the missing-NPI branch moves an error code (cut to 2 bytes); E102 and E104 are never assigned (D-016).
-R-PRVENR01-ADD-06,PRVENR01,"(data division),WRITE-ERROR-RECORD",75,179,VERIFIED,"WS-ERR-DETAIL (X(250)) has no VALUE and STRING does not clear it, so bytes 41-250 of every error row are undefined (INFERRED)."
-R-PRVENR01-ADD-07,PRVENR01,"PROCESS-APPLICATIONS,WRITE-PROVIDER-RECORD,TERMINATE-PROGRAM",114,189,VERIFIED,"RC 4 at termination overwrites an earlier RC 8, so a hard error is reported to the job as a warning (D-017 area)."
-R-PRVENR01-ADD-08,PRVENR01,"PROCESS-APPLICATIONS,VALIDATE-APPLICATION,WRITE-PROVIDER-RECORD",109,166,VERIFIED,"Counters are not exclusive: an invalid application is counted as read, as errored and then as written or skipped."
+R-PRVENR01-ADD-06,PRVENR01,"(data division),WRITE-ERROR-RECORD",75,179,VERIFIED,"WS-ERR-DETAIL (X(250)) has no VALUE and STRING does not clear it, so bytes 41-250 of every error row are undefined (INFERRED). (D-016)"
+R-PRVENR01-ADD-07,PRVENR01,"PROCESS-APPLICATIONS,WRITE-PROVIDER-RECORD,TERMINATE-PROGRAM",114,189,VERIFIED,"RC 4 at termination overwrites an earlier RC 8, so a hard error is reported to the job as a warning (D-024)."
+R-PRVENR01-ADD-08,PRVENR01,"PROCESS-APPLICATIONS,VALIDATE-APPLICATION,WRITE-PROVIDER-RECORD",109,166,VERIFIED,"Counters are not exclusive: an invalid application is counted as read, as errored and then as written or skipped. (D-024)"
 R-PRVENR01-cbl-00001,PRVENR01,INITIALIZE-PROGRAM,85,100,VERIFIED,INITIALIZE-PROGRAM sets the batch id (default DEFBATCH) and displays the start message.
 R-PRVENR01-cbl-00002,PRVENR01,PROCESS-APPLICATIONS,102,116,VERIFIED,"READ, EOF test and read counter in PROCESS-APPLICATIONS."
 R-PRVENR01-cbl-00003,PRVENR01,VALIDATE-APPLICATION,128,133,MISMATCH,"Error counted and error row written (130-131), but GO TO INVALID-APP (132) falls through to WRITE-PROVIDER-RECORD (157-159): the application is NOT rejected from the master. AWS states the corrected behaviour. Decision D-001 FIX."
@@ -177,9 +177,9 @@ R-PRVENR01-cbl-00066,PRVENR01,TERMINATE-PROGRAM,188,188,VERIFIED,"MOVE 4 TO RETU
 R-PRVENR01-cbl-00067,PRVENR01,TERMINATE-PROGRAM,187,189,VERIFIED,With no errors RETURN-CODE is left unset (default 0).
 R-PRVENR01-cbl-00068,PRVENR01,TERMINATE-PROGRAM,187,189,VERIFIED,RC 4 when any error was counted.
 R-PRVREV01-ADD-01,PRVREV01,CHECK-NEXT,81,84,VERIFIED,"The due date compared here is the one PRVRSK01 resets to today + 5 years on every daily run, so no provider processed by PRVRSK01 can ever be due: the queue stays (almost) empty. INFERRED combination (not executed). D-003 FIX."
-R-PRVREV01-ADD-02,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",81,94,VERIFIED,"No state is kept: a provider that stays overdue is queued again at every month end, and the queue row has no sweep date."
-R-PRVREV01-ADD-03,PRVREV01,CHECK-NEXT,81,84,VERIFIED,An active provider whose due date is zero (never classified by PRVRSK01) is <= today and is queued.
-R-PRVREV01-ADD-04,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",76,93,VERIFIED,"READ and WRITE statuses are not tested beyond end of file, and RETURN-CODE is never set."
+R-PRVREV01-ADD-02,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",81,94,VERIFIED,"No state is kept: a provider that stays overdue is queued again at every month end, and the queue row has no sweep date. (D-029)"
+R-PRVREV01-ADD-03,PRVREV01,CHECK-NEXT,81,84,VERIFIED,An active provider whose due date is zero (never classified by PRVRSK01) is <= today and is queued. (D-029)
+R-PRVREV01-ADD-04,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",76,93,VERIFIED,"READ and WRITE statuses are not tested beyond end of file, and RETURN-CODE is never set. (D-024)"
 R-PRVREV01-cbl-00001,PRVREV01,MAIN-CONTROL,64,65,VERIFIED,ACCEPT WS-TODAY FROM DATE YYYYMMDD at start.
 R-PRVREV01-cbl-00002,PRVREV01,MAIN-CONTROL,66,67,VERIFIED,Master opened INPUT and the queue file OUTPUT.
 R-PRVREV01-cbl-00003,PRVREV01,CHECK-NEXT,81,81,VERIFIED,Only PRV-ACTIVE records are considered.
@@ -187,7 +187,7 @@ R-PRVREV01-cbl-00004,PRVREV01,CHECK-NEXT,81,84,VERIFIED,"Due date <= today queue
 R-PRVREV01-cbl-00005,PRVREV01,QUEUE-FOR-REVAL,89,93,VERIFIED,"The queue row holds NPI, due date and 'RESCREEN-REQUIRED'."
 R-PRVREV01-cbl-00006,PRVREV01,QUEUE-FOR-REVAL,94,94,VERIFIED,ADD 1 TO WS-REVAL-COUNT.
 R-PRVREV01-cbl-00007,PRVREV01,MAIN-CONTROL,71,72,VERIFIED,DISPLAY with the final count.
-R-PRVREV01-cbl-00008,PRVREV01,MAIN-CONTROL,65,65,MISMATCH,"The date is held as YYYYMMDD (PIC 9(08)), not YYYY-MM-DD as the rule says. Format difference only."
+R-PRVREV01-cbl-00008,PRVREV01,MAIN-CONTROL,65,65,MISMATCH,"The date is held as YYYYMMDD (PIC 9(08)), not YYYY-MM-DD as the rule says. Format difference only. (D-004: ISO dates internally)"
 R-PRVREV01-cbl-00009,PRVREV01,MAIN-CONTROL,64,64,VERIFIED,MOVE 'PRVREV01' TO WS-PROGRAM-ID.
 R-PRVREV01-cbl-00010,PRVREV01,"(data division),MAIN-CONTROL",59,65,VERIFIED,WS-TODAY is set once and never changed.
 R-PRVREV01-cbl-00011,PRVREV01,CHECK-NEXT,76,76,VERIFIED,READ NEXT.
@@ -206,11 +206,11 @@ R-PRVREV01-cbl-00023,PRVREV01,MAIN-CONTROL,70,72,VERIFIED,Files closed then the 
 R-PRVREV01-cbl-00024,PRVREV01,MAIN-CONTROL,71,72,VERIFIED,Summary message with the count.
 R-PRVRSK01-ADD-01,PRVRSK01,"CLASSIFY-NEXT,CLASSIFY-ONE",70,97,VERIFIED,"There is no status filter: every provider (active, terminated, denied) is re-tiered on every run, and the due date is reset to today + 5 years each time. D-003 FIX."
 R-PRVRSK01-ADD-02,PRVRSK01,SET-REVALIDATION-DATE,129,136,VERIFIED,"The month and day are copied unchanged, so a run on Feb 29 produces an impossible due date such as 20290229 (no leap-year handling). D-004 area."
-R-PRVRSK01-ADD-03,PRVRSK01,CLASSIFY-ONE,83,92,VERIFIED,There is no validation of the taxonomy: a blank or invalid value silently becomes LIMITED.
+R-PRVRSK01-ADD-03,PRVRSK01,CLASSIFY-ONE,83,92,VERIFIED,There is no validation of the taxonomy: a blank or invalid value silently becomes LIMITED. (Q-005)
 R-PRVRSK01-ADD-04,PRVRSK01,"CLASSIFY-ONE,APPLY-TIER-PARA,TIER-DONE",95,116,VERIFIED,"AP-03. APPLY-TIER-PARA ends in an ALTERed GO TO; TIER-DONE EXIT (115-116) is outside the PERFORM range, so control INFERRED (not executed) continues into SET-REVALIDATION-DATE and off the end of the program: the REWRITE at 97 is likely never reached and only the first record is touched. D-002 FIX."
-R-PRVRSK01-ADD-05,PRVRSK01,CLASSIFY-NEXT,70,76,VERIFIED,READ NEXT tests only for end of file; any other status is not handled (INFERRED effect).
-R-PRVRSK01-ADD-06,PRVRSK01,CLASSIFY-ONE,97,97,VERIFIED,The REWRITE status is never tested.
-R-PRVRSK01-ADD-07,PRVRSK01,MAIN-CONTROL,61,67,VERIFIED,"No counters, no summary DISPLAY and no RETURN-CODE: the job cannot tell how many providers were classified."
+R-PRVRSK01-ADD-05,PRVRSK01,CLASSIFY-NEXT,70,76,VERIFIED,READ NEXT tests only for end of file; any other status is not handled (INFERRED effect). (D-024)
+R-PRVRSK01-ADD-06,PRVRSK01,CLASSIFY-ONE,97,97,VERIFIED,The REWRITE status is never tested. (D-024)
+R-PRVRSK01-ADD-07,PRVRSK01,MAIN-CONTROL,61,67,VERIFIED,"No counters, no summary DISPLAY and no RETURN-CODE: the job cannot tell how many providers were classified. (D-024)"
 R-PRVRSK01-cbl-00001,PRVRSK01,MAIN-CONTROL,62,64,VERIFIED,Master opened I-O and the EOF flag set to N.
 R-PRVRSK01-cbl-00002,PRVRSK01,CLASSIFY-NEXT,70,76,VERIFIED,"READ NEXT; a record goes on to CLASSIFY-ONE, EOF ends the loop."
 R-PRVRSK01-cbl-00003,PRVRSK01,CLASSIFY-ONE,79,80,VERIFIED,First 3 characters of PRV-TAXONOMY go to WS-TAXONOMY-GROUP.
@@ -259,12 +259,12 @@ R-PRVRSK01-cbl-00045,PRVRSK01,SET-REVALIDATION-DATE,136,136,VERIFIED,Due date = 
 R-PRVRSK01-cbl-00046,PRVRSK01,SET-REVALIDATION-DATE,129,136,VERIFIED,"The month and day of today are kept, but a Feb 29 start date gives an invalid date in a non-leap year (ADD-02)."
 R-PRVRSK01-cbl-00047,PRVRSK01,SET-REVALIDATION-DATE,137,137,VERIFIED,Stored in PRV-REVAL-DUE-DATE.
 R-PRVRSK01-cbl-00048,PRVRSK01,CLASSIFY-ONE,97,97,VERIFIED,"REWRITE persists the tier and the date. INFERRED (not executed): may never be reached (ADD-04, D-002)."
-R-PRVSAN01-ADD-01,PRVSAN01,PROCESS-SANCTION,90,101,VERIFIED,"Any READ status other than 00 on the master (including I/O errors) prints 'NPI NOT FOUND', and any sanction-file read status other than EOF is not handled."
-R-PRVSAN01-ADD-02,PRVSAN01,"APPLY-SANCTION,GENERATE-NOTICE",104,129,VERIFIED,"An action code that is not T, S or R is not rejected: no status changes, but the master is REWRITTEN and PRVNTGEN is called."
+R-PRVSAN01-ADD-01,PRVSAN01,PROCESS-SANCTION,90,101,VERIFIED,"Any READ status other than 00 on the master (including I/O errors) prints 'NPI NOT FOUND', and any sanction-file read status other than EOF is not handled. (D-024)"
+R-PRVSAN01-ADD-02,PRVSAN01,"APPLY-SANCTION,GENERATE-NOTICE",104,129,VERIFIED,"An action code that is not T, S or R is not rejected: no status changes, but the master is REWRITTEN and PRVNTGEN is called. (D-026)"
 R-PRVSAN01-ADD-03,PRVSAN01,"(data division),APPLY-SANCTION",57,116,VERIFIED,SAN-REASON and SAN-EFF-DATE are never used: no sanction history is kept anywhere (the SANCTION KSDS and the DB2 table are unused). D-018 FIX.
-R-PRVSAN01-ADD-04,PRVSAN01,APPLY-SANCTION,107,112,VERIFIED,A terminate or reinstate is applied whatever the current status or screening result is: a reinstate can make a DENIED or PENDING provider ACTIVE. Business question (Q-006).
-R-PRVSAN01-ADD-05,PRVSAN01,APPLY-SANCTION,115,115,VERIFIED,The REWRITE status is not tested.
-R-PRVSAN01-ADD-06,PRVSAN01,MAIN-CONTROL,80,87,VERIFIED,Not-found NPIs are not counted and RETURN-CODE is never set.
+R-PRVSAN01-ADD-04,PRVSAN01,APPLY-SANCTION,107,112,VERIFIED,A terminate or reinstate is applied whatever the current status or screening result is: a reinstate can make a DENIED or PENDING provider ACTIVE. Business question (Q-006). (D-027)
+R-PRVSAN01-ADD-05,PRVSAN01,APPLY-SANCTION,115,115,VERIFIED,The REWRITE status is not tested. (D-024)
+R-PRVSAN01-ADD-06,PRVSAN01,MAIN-CONTROL,80,87,VERIFIED,Not-found NPIs are not counted and RETURN-CODE is never set. (D-024)
 R-PRVSAN01-ADD-07,PRVSAN01,"MAIN-CONTROL,PROCESS-SANCTION,APPLY-SANCTION",81,115,VERIFIED,AP-06: PEMAPP2 opens PEMAPP1's master I-O and rewrites it with no API. D-013 FIX.
 R-PRVSAN01-cbl-00001,PRVSAN01,PROCESS-SANCTION,90,95,VERIFIED,The sanction record is read; its NPI is moved to the master key.
 R-PRVSAN01-cbl-00002,PRVSAN01,PROCESS-SANCTION,96,98,VERIFIED,READ of the master by key; status 00 leads to APPLY-SANCTION.
@@ -327,9 +327,9 @@ R-PRVSAN01-cbl-00058,PRVSAN01,MAIN-CONTROL,86,86,VERIFIED,Final count displayed.
 R-PRVSCR01-ADD-01,PRVSCR01,"CHECK-LICENSE,CHECK-LEIE-EXCLUSION,CHECK-SAM-DEBARMENT,CHECK-SSA-DMF",118,131,VERIFIED,"All four checks hard-code P: nothing is looked up (no CALL or MQ), so the fail branch (110-112) is unreachable. D-005."
 R-PRVSCR01-ADD-02,PRVSCR01,WRITE-SCREEN-ROW,147,149,VERIFIED,"Each screening row sets only SCR-NPI and SCR-PASS. SCR-SOURCE, SCR-VERDICT-DATE and SCR-DETAIL are never set, so the four rows of a provider look identical and the 42 CFR 455 audit trail is empty. D-005."
 R-PRVSCR01-ADD-03,PRVSCR01,"SCREEN-NEXT-PROVIDER,SCREEN-ONE-PROVIDER",90,111,VERIFIED,The program sets only the screen flag; it never sets the enrolment status to ACTIVE. Nothing in this estate does (D-019).
-R-PRVSCR01-ADD-04,PRVSCR01,SCREEN-NEXT-PROVIDER,85,93,VERIFIED,"READ NEXT only tests for end of file. Any other read status is ignored and the previous record area is screened again (INFERRED, not executed)."
-R-PRVSCR01-ADD-05,PRVSCR01,"SCREEN-ONE-PROVIDER,WRITE-SCREEN-ROW",114,149,VERIFIED,"The status of REWRITE (114) and of the screening WRITE (149) is never tested, so failures are silent."
-R-PRVSCR01-ADD-06,PRVSCR01,MAIN-CONTROL,75,82,VERIFIED,"RETURN-CODE is never set, even when providers fail screening: the job cannot see failures."
+R-PRVSCR01-ADD-04,PRVSCR01,SCREEN-NEXT-PROVIDER,85,93,VERIFIED,"READ NEXT only tests for end of file. Any other read status is ignored and the previous record area is screened again (INFERRED, not executed). (D-024)"
+R-PRVSCR01-ADD-05,PRVSCR01,"SCREEN-ONE-PROVIDER,WRITE-SCREEN-ROW",114,149,VERIFIED,"The status of REWRITE (114) and of the screening WRITE (149) is never tested, so failures are silent. (D-024)"
+R-PRVSCR01-ADD-06,PRVSCR01,MAIN-CONTROL,75,82,VERIFIED,"RETURN-CODE is never set, even when providers fail screening: the job cannot see failures. (D-024)"
 R-PRVSCR01-cbl-00001,PRVSCR01,MAIN-CONTROL,74,80,VERIFIED,MAIN-CONTROL opens the master I-O and the screening file for output (76-77).
 R-PRVSCR01-cbl-00002,PRVSCR01,SCREEN-NEXT-PROVIDER,85,88,VERIFIED,READ NEXT; end of file sets the flag.
 R-PRVSCR01-cbl-00003,PRVSCR01,SCREEN-NEXT-PROVIDER,90,92,VERIFIED,Only records with the unscreened flag are passed on.
@@ -392,13 +392,13 @@ R-PRVSCR01-cbl-00059,PRVSCR01,CHECK-SAM-DEBARMENT,127,128,VERIFIED,Returns after
 R-PRVSCR01-cbl-00060,PRVSCR01,CHECK-SSA-DMF,131,132,VERIFIED,Returns after the DMF row.
 R-PRVSCR01-cbl-00061,PRVSCR01,SCREEN-ONE-PROVIDER,112,112,VERIFIED,Counter incremented once per failed provider.
 R-PRVSCR01-cbl-00062,PRVSCR01,MAIN-CONTROL,81,81,VERIFIED,DISPLAY 'PRVSCR01: SCREENING FAILURES=' count.
-R-PRVTMS01-ADD-01,PRVTMS01,"WRITE-TMSIS-ROW,(data division)",72,114,VERIFIED,"The target WS-T-PERIOD-YYDDD ends in column 73 of line 114, and a COBOL compiler ignores columns 73-80. It would read the undefined name WS-T-PERIOD-YYDD, so the program likely does not compile as shipped (INFERRED, no compiler here). The only code line in the estate that crosses column 72."
+R-PRVTMS01-ADD-01,PRVTMS01,"WRITE-TMSIS-ROW,(data division)",72,114,VERIFIED,"The target WS-T-PERIOD-YYDDD ends in column 73 of line 114, and a COBOL compiler ignores columns 73-80. It would read the undefined name WS-T-PERIOD-YYDD, so the program likely does not compile as shipped (INFERRED, no compiler here). The only code line in the estate that crosses column 72. (D-021)"
 R-PRVTMS01-ADD-02,PRVTMS01,WRITE-TMSIS-ROW,104,110,VERIFIED,"Comparing 2-digit years flags every pre-2000 enrolment (YY 98 or 99 is greater than 26) as a future enrolment and could never flag a real future date after 2099. AP-07, D-015."
-R-PRVTMS01-ADD-03,PRVTMS01,"(data division),MAIN-CONTROL",62,82,VERIFIED,"WS-TODAY-DDD, WS-ENROLL-JUL and WS-AGE-DAYS are declared but never used: the 'enrolment age' described in the README is not implemented."
+R-PRVTMS01-ADD-03,PRVTMS01,"(data division),MAIN-CONTROL",62,82,VERIFIED,"WS-TODAY-DDD, WS-ENROLL-JUL and WS-AGE-DAYS are declared but never used: the 'enrolment age' described in the README is not implemented. (Q-007)"
 R-PRVTMS01-ADD-04,PRVTMS01,"EXTRACT-NEXT,WRITE-TMSIS-ROW",97,113,VERIFIED,"Only ACTIVE providers are reported and the status is hard-coded A, so terminated, suspended and denied providers never reach T-MSIS. Business question (Q-007)."
 R-PRVTMS01-ADD-05,PRVTMS01,"(data division),WRITE-TMSIS-ROW",67,115,VERIFIED,The 120-byte row carries only 30 meaningful bytes (5+9+10+1+5); the remaining 90 are spaces. Whether this matches the real CMS provider layout is not known (Q-007).
-R-PRVTMS01-ADD-06,PRVTMS01,"EXTRACT-NEXT,WRITE-TMSIS-ROW",92,116,VERIFIED,READ and WRITE statuses are not tested and RETURN-CODE is never set.
-R-PRVTMS01-ADD-07,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,VERIFIED,"The reporting period is the run date's Julian day, so the same month yields different values depending on the run date."
+R-PRVTMS01-ADD-06,PRVTMS01,"EXTRACT-NEXT,WRITE-TMSIS-ROW",92,116,VERIFIED,READ and WRITE statuses are not tested and RETURN-CODE is never set. (D-024)
+R-PRVTMS01-ADD-07,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,VERIFIED,"The reporting period is the run date's Julian day, so the same month yields different values depending on the run date. (Q-007)"
 R-PRVTMS01-cbl-00001,PRVTMS01,MAIN-CONTROL,80,80,VERIFIED,ACCEPT WS-TODAY-JUL FROM DAY gives the Julian date YYDDD.
 R-PRVTMS01-cbl-00002,PRVTMS01,MAIN-CONTROL,81,82,VERIFIED,YY from positions 1-2 and DDD from positions 3-5.
 R-PRVTMS01-cbl-00003,PRVTMS01,EXTRACT-NEXT,92,95,VERIFIED,READ NEXT with an end-of-file test.
@@ -440,8 +440,8 @@ R-PRVTMS01-cbl-00038,PRVTMS01,WRITE-TMSIS-ROW,111,111,VERIFIED,Copied as is.
 R-PRVTMS01-cbl-00039,PRVTMS01,WRITE-TMSIS-ROW,112,112,VERIFIED,Copied as is.
 R-PRVTMS01-cbl-00040,PRVTMS01,WRITE-TMSIS-ROW,113,113,VERIFIED,The status is the literal A (only active providers get here).
 R-PRVTMS01-cbl-00041,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,VERIFIED,The startup Julian date is the source.
-R-PRVTMS01-cbl-00042,PRVTMS01,WRITE-TMSIS-ROW,114,114,MISMATCH,"The rule names WS-T-PERIOD-YYDD, which is what a compiler sees because the real name WS-T-PERIOD-YYDDD ends in column 73 and is cut off (ADD-01). The move itself is as described."
-R-PRVTMS01-cbl-00043,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,MISMATCH,"The period is today's date in YYDDD form (a day), not a monthly identifier. The rule's claim about identifying the monthly CMS period is not implemented (ADD-07)."
+R-PRVTMS01-cbl-00042,PRVTMS01,WRITE-TMSIS-ROW,114,114,MISMATCH,"The rule names WS-T-PERIOD-YYDD, which is what a compiler sees because the real name WS-T-PERIOD-YYDDD ends in column 73 and is cut off (ADD-01). The move itself is as described. (D-021)"
+R-PRVTMS01-cbl-00043,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,MISMATCH,"The period is today's date in YYDDD form (a day), not a monthly identifier. The rule's claim about identifying the monthly CMS period is not implemented (ADD-07). (Q-007)"
 R-PRVTMS01-cbl-00044,PRVTMS01,(data division),68,68,VERIFIED,FILLER PIC X(05) VALUE 'PRV01' is the record type.
 R-PRVTMS01-cbl-00045,PRVTMS01,WRITE-TMSIS-ROW,111,111,VERIFIED,Provider ID from the Medicaid ID.
 R-PRVTMS01-cbl-00046,PRVTMS01,WRITE-TMSIS-ROW,112,112,VERIFIED,NPI.

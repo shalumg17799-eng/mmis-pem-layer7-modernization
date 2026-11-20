@@ -1,36 +1,36 @@
 rule_id,program,paragraph,start_line,end_line,status,note
-R-PRVCICS1-ADD-01,PRVCICS1,"MAIN-LOGIC,FORMAT-PROVIDER",47,72,VERIFIED,"WS-MSG is set in every branch but SEND MAP passes only FROM(WS-PROVIDER-AREA). The status or error text never reaches the screen. INFERRED: the BMS map PRVSET1 is not provided, so it cannot be proven which fields the map shows."
-R-PRVCICS1-ADD-02,PRVCICS1,MAIN-LOGIC,28,42,VERIFIED,"The NPI typed on the screen is never moved to WS-NPI-IN (RECEIVE MAP has no INTO). The key is the previous NPI from the COMMAREA, or blank on a first call. INFERRED: the symbolic map copybook is not provided."
-R-PRVCICS1-ADD-03,PRVCICS1,MAIN-LOGIC,33,41,VERIFIED,The RESP of RECEIVE MAP is overwritten by the READ's RESP in the same field and never tested; a MAPFAIL on first entry is ignored. The RESP of SEND and RETURN is not tested either.
-R-PRVCICS1-ADD-04,PRVCICS1,MAIN-LOGIC,44,50,VERIFIED,"Any RESP other than NORMAL or NOTFND (for example IOERR or NOTAUTH) gives 'VSAM READ ERROR', with no log and no abend."
-R-PRVCICS1-ADD-05,PRVCICS1,MAIN-LOGIC,28,61,VERIFIED,There is no authorisation check (no ASSIGN USERID and no role test): any user of the transaction can read any provider. Security requirement for the new portal and console (RBAC).
+R-PRVCICS1-ADD-01,PRVCICS1,"MAIN-LOGIC,FORMAT-PROVIDER",47,72,VERIFIED,"WS-MSG is set in every branch but SEND MAP passes only FROM(WS-PROVIDER-AREA). The status or error text never reaches the screen. INFERRED: the BMS map PRVSET1 is not provided, so it cannot be proven which fields the map shows. (D-022)"
+R-PRVCICS1-ADD-02,PRVCICS1,MAIN-LOGIC,28,42,VERIFIED,"The NPI typed on the screen is never moved to WS-NPI-IN (RECEIVE MAP has no INTO). The key is the previous NPI from the COMMAREA, or blank on a first call. INFERRED: the symbolic map copybook is not provided. (D-022)"
+R-PRVCICS1-ADD-03,PRVCICS1,MAIN-LOGIC,33,41,VERIFIED,The RESP of RECEIVE MAP is overwritten by the READ's RESP in the same field and never tested; a MAPFAIL on first entry is ignored. The RESP of SEND and RETURN is not tested either. (D-022)
+R-PRVCICS1-ADD-04,PRVCICS1,MAIN-LOGIC,44,50,VERIFIED,"Any RESP other than NORMAL or NOTFND (for example IOERR or NOTAUTH) gives 'VSAM READ ERROR', with no log and no abend. (D-022)"
+R-PRVCICS1-ADD-05,PRVCICS1,MAIN-LOGIC,28,61,VERIFIED,There is no authorisation check (no ASSIGN USERID and no role test): any user of the transaction can read any provider. Security requirement for the new portal and console (RBAC). (D-023)
 R-PRVCICS1-ADD-06,PRVCICS1,FORMAT-PROVIDER,63,73,VERIFIED,DENIED is the catch-all label; the new SUSPENDED status (D-006) needs its own label.
-R-PRVCICS1-ADD-07,PRVCICS1,"(data division),MAIN-LOGIC",25,61,VERIFIED,The COMMAREA is 10 bytes (the NPI). The inquiry is by NPI only; the Medicaid ID alternate index is not used by this transaction.
+R-PRVCICS1-ADD-07,PRVCICS1,"(data division),MAIN-LOGIC",25,61,VERIFIED,The COMMAREA is 10 bytes (the NPI). The inquiry is by NPI only; the Medicaid ID alternate index is not used by this transaction. (D-022)
 R-PRVCICS1-cbl-00001,PRVCICS1,MAIN-LOGIC,29,31,VERIFIED,A COMMAREA (EIBCALEN > 0) is moved to WS-NPI-IN. This is the only place WS-NPI-IN is assigned (ADD-02).
-R-PRVCICS1-cbl-00002,PRVCICS1,MAIN-LOGIC,33,35,MISMATCH,"RECEIVE MAP has no INTO and nothing moves the typed NPI to WS-NPI-IN, so the screen input is never used as the key (ADD-02). INFERRED: the BMS map PRVSET1 and its symbolic copybook are not provided."
+R-PRVCICS1-cbl-00002,PRVCICS1,MAIN-LOGIC,33,35,MISMATCH,"RECEIVE MAP has no INTO and nothing moves the typed NPI to WS-NPI-IN, so the screen input is never used as the key (ADD-02). INFERRED: the BMS map PRVSET1 and its symbolic copybook are not provided. (D-022)"
 R-PRVCICS1-cbl-00003,PRVCICS1,MAIN-LOGIC,37,42,VERIFIED,EXEC CICS READ FILE('PRVPROVN') INTO(WS-PROVIDER-AREA) RIDFLD(WS-NPI-IN).
-R-PRVCICS1-cbl-00004,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,"WS-MSG is set to 'PROVIDER NOT FOUND' but SEND MAP passes only WS-PROVIDER-AREA, so the message is not sent (ADD-01). INFERRED (map not provided)."
+R-PRVCICS1-cbl-00004,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,"WS-MSG is set to 'PROVIDER NOT FOUND' but SEND MAP passes only WS-PROVIDER-AREA, so the message is not sent (ADD-01). INFERRED (map not provided). (D-022)"
 R-PRVCICS1-cbl-00005,PRVCICS1,FORMAT-PROVIDER,63,73,VERIFIED,"FORMAT-PROVIDER classifies ACTIVE, TERMINATED, PENDING, otherwise DENIED."
 R-PRVCICS1-cbl-00006,PRVCICS1,FORMAT-PROVIDER,65,66,VERIFIED,Active sets WS-MSG to 'ACTIVE'.
 R-PRVCICS1-cbl-00007,PRVCICS1,FORMAT-PROVIDER,67,68,VERIFIED,Terminated sets 'TERMINATED'.
 R-PRVCICS1-cbl-00008,PRVCICS1,FORMAT-PROVIDER,69,70,VERIFIED,Pending sets 'PENDING'.
 R-PRVCICS1-cbl-00009,PRVCICS1,FORMAT-PROVIDER,71,72,VERIFIED,Anything else sets 'DENIED' (ADD-06).
-R-PRVCICS1-cbl-00010,PRVCICS1,MAIN-LOGIC,53,56,MISMATCH,"The provider area is sent, but the status message in WS-MSG is not part of what is sent (ADD-01)."
+R-PRVCICS1-cbl-00010,PRVCICS1,MAIN-LOGIC,53,56,MISMATCH,"The provider area is sent, but the status message in WS-MSG is not part of what is sent (ADD-01). (D-022)"
 R-PRVCICS1-cbl-00011,PRVCICS1,MAIN-LOGIC,58,61,VERIFIED,RETURN TRANSID('PINQ') COMMAREA(WS-NPI-IN).
 R-PRVCICS1-cbl-00012,PRVCICS1,MAIN-LOGIC,29,29,VERIFIED,IF EIBCALEN > 0 identifies a return visit.
 R-PRVCICS1-cbl-00013,PRVCICS1,MAIN-LOGIC,30,30,VERIFIED,MOVE DFHCOMMAREA TO WS-NPI-IN.
 R-PRVCICS1-cbl-00014,PRVCICS1,"(data division),MAIN-LOGIC",19,31,VERIFIED,"On a first visit nothing is moved; WS-NPI-IN has no VALUE clause, so its content is whatever the region provides (INFERRED)."
 R-PRVCICS1-cbl-00015,PRVCICS1,MAIN-LOGIC,29,42,VERIFIED,The retained NPI is the RIDFLD of the READ.
-R-PRVCICS1-cbl-00016,PRVCICS1,-,0,0,NOT_FOUND,No code sends an initial empty PRVMAP1 before the RECEIVE MAP. On the first entry no map has been sent. The initial screen is not implemented in this program (CSD and BMS are not provided).
-R-PRVCICS1-cbl-00017,PRVCICS1,MAIN-LOGIC,29,56,MISMATCH,"The previous NPI goes to WS-NPI-IN (the key), not to an input field of the map. SEND passes WS-PROVIDER-AREA only. INFERRED (map not provided)."
-R-PRVCICS1-cbl-00018,PRVCICS1,MAIN-LOGIC,33,35,MISMATCH,The typed NPI is not stored as the lookup key (ADD-02).
-R-PRVCICS1-cbl-00019,PRVCICS1,MAIN-LOGIC,33,42,MISMATCH,"The lookup proceeds, but with WS-NPI-IN (previous NPI or blank), not with the captured NPI (ADD-02)."
-R-PRVCICS1-cbl-00020,PRVCICS1,-,0,0,NOT_FOUND,There is no test of the RECEIVE result or of a blank NPI: WS-RESP is overwritten by the READ (ADD-03). The analyst is never sent back to re-enter.
+R-PRVCICS1-cbl-00016,PRVCICS1,-,0,0,NOT_FOUND,No code sends an initial empty PRVMAP1 before the RECEIVE MAP. On the first entry no map has been sent. The initial screen is not implemented in this program (CSD and BMS are not provided). (D-022)
+R-PRVCICS1-cbl-00017,PRVCICS1,MAIN-LOGIC,29,56,MISMATCH,"The previous NPI goes to WS-NPI-IN (the key), not to an input field of the map. SEND passes WS-PROVIDER-AREA only. INFERRED (map not provided). (D-022)"
+R-PRVCICS1-cbl-00018,PRVCICS1,MAIN-LOGIC,33,35,MISMATCH,The typed NPI is not stored as the lookup key (ADD-02). (D-022)
+R-PRVCICS1-cbl-00019,PRVCICS1,MAIN-LOGIC,33,42,MISMATCH,"The lookup proceeds, but with WS-NPI-IN (previous NPI or blank), not with the captured NPI (ADD-02). (D-022)"
+R-PRVCICS1-cbl-00020,PRVCICS1,-,0,0,NOT_FOUND,There is no test of the RECEIVE result or of a blank NPI: WS-RESP is overwritten by the READ (ADD-03). The analyst is never sent back to re-enter. (D-022)
 R-PRVCICS1-cbl-00021,PRVCICS1,MAIN-LOGIC,40,40,VERIFIED,RIDFLD(WS-NPI-IN) is the key.
 R-PRVCICS1-cbl-00022,PRVCICS1,MAIN-LOGIC,37,42,VERIFIED,The full record is read into WS-PROVIDER-AREA.
 R-PRVCICS1-cbl-00023,PRVCICS1,MAIN-LOGIC,45,46,VERIFIED,"On NORMAL, FORMAT-PROVIDER is performed."
 R-PRVCICS1-cbl-00024,PRVCICS1,MAIN-LOGIC,47,48,VERIFIED,NOTFND sets WS-MSG to 'PROVIDER NOT FOUND'. It is never sent (ADD-01).
-R-PRVCICS1-cbl-00025,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,The message is set but not displayed (ADD-01).
+R-PRVCICS1-cbl-00025,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,The message is set but not displayed (ADD-01). (D-022)
 R-PRVCICS1-cbl-00026,PRVCICS1,FORMAT-PROVIDER,65,66,VERIFIED,ACTIVE classification.
 R-PRVCICS1-cbl-00027,PRVCICS1,FORMAT-PROVIDER,67,68,VERIFIED,TERMINATED classification.
 R-PRVCICS1-cbl-00028,PRVCICS1,FORMAT-PROVIDER,69,70,VERIFIED,PENDING classification.
@@ -39,14 +39,14 @@ R-PRVCICS1-cbl-00030,PRVCICS1,FORMAT-PROVIDER,65,66,VERIFIED,The label ACTIVE.
 R-PRVCICS1-cbl-00031,PRVCICS1,FORMAT-PROVIDER,64,66,VERIFIED,"EVALUATE stops at the first true WHEN, so Active skips the later checks."
 R-PRVCICS1-cbl-00032,PRVCICS1,FORMAT-PROVIDER,67,68,VERIFIED,Terminated is identified.
 R-PRVCICS1-cbl-00033,PRVCICS1,FORMAT-PROVIDER,67,68,VERIFIED,WS-MSG gets 'TERMINATED'.
-R-PRVCICS1-cbl-00034,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,70,MISMATCH,The label PENDING is set but not returned to the screen (ADD-01).
+R-PRVCICS1-cbl-00034,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,70,MISMATCH,The label PENDING is set but not returned to the screen (ADD-01). (D-022)
 R-PRVCICS1-cbl-00035,PRVCICS1,FORMAT-PROVIDER,71,72,VERIFIED,DENIED is the fall-through label.
-R-PRVCICS1-cbl-00036,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,The message is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00037,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,66,MISMATCH,ACTIVE is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00038,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,68,MISMATCH,TERMINATED is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00039,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,70,MISMATCH,PENDING is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00040,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,72,MISMATCH,DENIED is prepared but not sent (ADD-01).
-R-PRVCICS1-cbl-00041,PRVCICS1,MAIN-LOGIC,53,56,MISMATCH,The provider record is sent without the status message (ADD-01).
+R-PRVCICS1-cbl-00036,PRVCICS1,MAIN-LOGIC,47,56,MISMATCH,The message is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00037,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,66,MISMATCH,ACTIVE is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00038,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,68,MISMATCH,TERMINATED is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00039,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,70,MISMATCH,PENDING is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00040,PRVCICS1,"FORMAT-PROVIDER,MAIN-LOGIC",53,72,MISMATCH,DENIED is prepared but not sent (ADD-01). (D-022)
+R-PRVCICS1-cbl-00041,PRVCICS1,MAIN-LOGIC,53,56,MISMATCH,The provider record is sent without the status message (ADD-01). (D-022)
 R-PRVCICS1-cbl-00042,PRVCICS1,MAIN-LOGIC,58,61,VERIFIED,COMMAREA(WS-NPI-IN) keeps the NPI.
 R-PRVCICS1-cbl-00043,PRVCICS1,MAIN-LOGIC,58,60,VERIFIED,RETURN TRANSID('PINQ').
 R-PRVCICS1-cbl-00044,PRVCICS1,MAIN-LOGIC,29,31,VERIFIED,A COMMAREA (EIBCALEN > 0) is loaded into WS-NPI-IN.

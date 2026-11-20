@@ -54,13 +54,13 @@ Phase 0 is `APPROVED` in `modern/docs/PROGRESS.md`. If not, stop.
 6. **Spot check (you, the orchestrator).** Pick 3 random rule IDs. Compare the graph
    (MCP read) with the BRE JSON: name, Given, When and Then must match exactly. Pick 1
    dataset and confirm its readers/writers match `program_to_dsn.csv`.
-7. Commit: `feat(phase-1): knowledge graph loaders and validation`.
+7. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Exit checks
 - [ ] Every count in kag-ontology section 6 matches, or the difference is explained.
 - [ ] The second load changed nothing.
 - [ ] The spot checks match.
-- [ ] No secret appears in any committed file (`git grep -n "NEO4J_PASSWORD="` finds only `.env.example`).
+- [ ] No secret appears in any tracked or untracked file (`git grep --untracked -n "NEO4J_PASSWORD="` finds only `.env.example`).
 
 ## Finish
 PROGRESS: phase 1 → `AWAITING APPROVAL`; add `Neo4j | 1 | MCP neo4j + loaders via env` to

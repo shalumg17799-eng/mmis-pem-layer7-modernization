@@ -1,0 +1,28 @@
+{
+  "name": "ssa-dmf clean: any other 10-digit NPI",
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPath": "/ssa-dmf/deaths",
+    "queryParameters": {
+      "npi": {
+        "matches": "^[0-9]{10}$"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "SSADMF",
+      "npi": "{{request.query.npi}}",
+      "deceased": false
+    }
+  },
+  "metadata": {
+    "source": "ssa-dmf",
+    "answer": "clean"
+  }
+}

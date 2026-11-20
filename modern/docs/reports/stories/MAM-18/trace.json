@@ -1,0 +1,89 @@
+{
+  "story": "MAM-18",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/IntegrationTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/PlatformChecksTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/TestSources.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/CucumberSpringConfig.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/CucumberSuiteTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/ScreeningSteps.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/ScreenProviderTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/domain/SourceRulesTest.java",
+    "modern/services/screening-service/src/test/resources/features/MAM-18.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-18.feature 'Screening starts when a provider is registered': PASSED",
+      "ScreenProviderTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-18.feature 'A clean provider passes all four sources': PASSED",
+      "SourceRulesTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-18.feature 'An expired licence fails the licence source (E202)': PASSED",
+      "SourceRulesTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-18.feature 'A provider on the OIG LEIE fails (E201)': PASSED",
+      "SourceRulesTest: PASSED"
+    ],
+    "AC-5": [
+      "MAM-18.feature 'A debarred provider fails SAM (E205)': PASSED",
+      "SourceRulesTest: PASSED"
+    ],
+    "AC-6": [
+      "MAM-18.feature 'A deceased provider fails SSA DMF (E204)': PASSED",
+      "SourceRulesTest: PASSED"
+    ],
+    "AC-7": [
+      "MAM-18.feature 'The same registration never creates two screenings': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/api/ScreeningController.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/EventOutbox.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFacts.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFactsSource.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ReadScreenings.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreenProvider.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/Screening.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningCompletedData.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningPage.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningSources.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningStore.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Source.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceResult.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceRules.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Verdict.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/HttpScreeningSources.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/JdbcScreeningStore.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/KitEventOutbox.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderEventsListener.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClient.java"
+  ],
+  "rules": [
+    "R-PRVSCR01-ADD-01",
+    "R-PRVSCR01-cbl-00006",
+    "R-PRVSCR01-cbl-00007",
+    "R-PRVSCR01-cbl-00008",
+    "R-PRVSCR01-cbl-00009",
+    "R-PRVSCR01-cbl-00020",
+    "R-PRVSCR01-cbl-00021",
+    "R-PRVSCR01-cbl-00029",
+    "R-PRVSCR01-cbl-00032",
+    "R-PRVSCR01-cbl-00034",
+    "R-PRVSCR01-cbl-00038",
+    "R-PRVSCR01-cbl-00039",
+    "R-PRVSCR01-cbl-00043"
+  ]
+}

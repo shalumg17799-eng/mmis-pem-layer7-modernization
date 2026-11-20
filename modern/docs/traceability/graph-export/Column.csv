@@ -1,0 +1,351 @@
+id,loadedAt,loader,name,source,type
+directory-service:directory_entry:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+directory-service:directory_entry:display_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,display_name,architect,VARCHAR(60) NOT
+directory-service:directory_entry:enroll_status,2026-11-18T13:32:37+00:00,load_10_architecture.py,enroll_status,architect,CHAR(1) NOT
+directory-service:directory_entry:first_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,first_name,architect,"VARCHAR(20),"
+directory-service:directory_entry:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+directory-service:directory_entry:last_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,last_name,architect,"VARCHAR(30),"
+directory-service:directory_entry:legal_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,legal_name,architect,"VARCHAR(60),"
+directory-service:directory_entry:license_no,2026-11-18T13:32:37+00:00,load_10_architecture.py,license_no,architect,"VARCHAR(15),"
+directory-service:directory_entry:license_state,2026-11-18T13:32:37+00:00,load_10_architecture.py,license_state,architect,"CHAR(2),"
+directory-service:directory_entry:medicaid_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,medicaid_id,architect,"CHAR(9),"
+directory-service:directory_entry:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10) NOT
+directory-service:directory_entry:provider_type,2026-11-18T13:32:37+00:00,load_10_architecture.py,provider_type,architect,CHAR(2) NOT
+directory-service:directory_entry:risk_tier,2026-11-18T13:32:37+00:00,load_10_architecture.py,risk_tier,architect,"CHAR(1),"
+directory-service:directory_entry:taxonomy,2026-11-18T13:32:37+00:00,load_10_architecture.py,taxonomy,architect,"CHAR(10),"
+directory-service:directory_entry:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+directory-service:directory_entry:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+directory-service:extract_run:business_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,business_date,architect,DATE NOT
+directory-service:extract_run:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+directory-service:extract_run:ended_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,ended_at,architect,"TIMESTAMPTZ,"
+directory-service:extract_run:extract_file,2026-11-18T13:32:37+00:00,load_10_architecture.py,extract_file,architect,"TEXT,"
+directory-service:extract_run:failure_reason,2026-11-18T13:32:37+00:00,load_10_architecture.py,failure_reason,architect,"VARCHAR(500),"
+directory-service:extract_run:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+directory-service:extract_run:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+directory-service:extract_run:row_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,row_count,architect,INTEGER NOT
+directory-service:extract_run:started_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,started_at,architect,TIMESTAMPTZ NOT
+directory-service:extract_run:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+directory-service:extract_run:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+directory-service:extract_run:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+directory-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+directory-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ
+enrollment-service:application:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+enrollment-service:application:dba_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,dba_name,architect,"VARCHAR(30),"
+enrollment-service:application:first_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,first_name,architect,"VARCHAR(20),"
+enrollment-service:application:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+enrollment-service:application:intake_run_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,intake_run_id,architect,BIGINT REFERENCES
+enrollment-service:application:last_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,last_name,architect,"VARCHAR(30),"
+enrollment-service:application:legal_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,legal_name,architect,"VARCHAR(60),"
+enrollment-service:application:license_no,2026-11-18T13:32:37+00:00,load_10_architecture.py,license_no,architect,"VARCHAR(15),"
+enrollment-service:application:license_state,2026-11-18T13:32:37+00:00,load_10_architecture.py,license_state,architect,"CHAR(2),"
+enrollment-service:application:medicaid_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,medicaid_id,architect,"CHAR(9),"
+enrollment-service:application:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,"CHAR(10),"
+enrollment-service:application:owner_npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,owner_npi,architect,"CHAR(10),"
+enrollment-service:application:provider_type,2026-11-18T13:32:37+00:00,load_10_architecture.py,provider_type,architect,"CHAR(2),"
+enrollment-service:application:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+enrollment-service:application:raw_record,2026-11-18T13:32:37+00:00,load_10_architecture.py,raw_record,architect,"CHAR(200),"
+enrollment-service:application:source,2026-11-18T13:32:37+00:00,load_10_architecture.py,source,architect,VARCHAR(12) NOT
+enrollment-service:application:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+enrollment-service:application:submitted_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,submitted_at,architect,TIMESTAMPTZ NOT
+enrollment-service:application:submitted_by,2026-11-18T13:32:37+00:00,load_10_architecture.py,submitted_by,architect,"VARCHAR(100),"
+enrollment-service:application:taxonomy,2026-11-18T13:32:37+00:00,load_10_architecture.py,taxonomy,architect,"CHAR(10),"
+enrollment-service:application:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+enrollment-service:application:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+enrollment-service:application_error:application_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,application_id,architect,BIGINT NOT
+enrollment-service:application_error:code,2026-11-18T13:32:37+00:00,load_10_architecture.py,code,architect,CHAR(4) NOT
+enrollment-service:application_error:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+enrollment-service:application_error:field,2026-11-18T13:32:37+00:00,load_10_architecture.py,field,architect,"VARCHAR(40),"
+enrollment-service:application_error:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+enrollment-service:application_error:message,2026-11-18T13:32:37+00:00,load_10_architecture.py,message,architect,"VARCHAR(200),"
+enrollment-service:application_error:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+enrollment-service:application_error:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+enrollment-service:intake_run:batch_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,batch_id,architect,VARCHAR(8) NOT
+enrollment-service:intake_run:business_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,business_date,architect,DATE NOT
+enrollment-service:intake_run:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+enrollment-service:intake_run:ended_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,ended_at,architect,"TIMESTAMPTZ,"
+enrollment-service:intake_run:error_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,error_count,architect,INTEGER NOT
+enrollment-service:intake_run:error_file,2026-11-18T13:32:37+00:00,load_10_architecture.py,error_file,architect,"TEXT,"
+enrollment-service:intake_run:failure_reason,2026-11-18T13:32:37+00:00,load_10_architecture.py,failure_reason,architect,"VARCHAR(500),"
+enrollment-service:intake_run:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+enrollment-service:intake_run:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+enrollment-service:intake_run:read_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,read_count,architect,INTEGER NOT
+enrollment-service:intake_run:skipped_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,skipped_count,architect,INTEGER NOT
+enrollment-service:intake_run:started_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,started_at,architect,TIMESTAMPTZ NOT
+enrollment-service:intake_run:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+enrollment-service:intake_run:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+enrollment-service:intake_run:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+enrollment-service:intake_run:written_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,written_count,architect,INTEGER NOT
+enrollment-service:outbox_event:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ
+enrollment-service:outbox_event:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,UUID
+enrollment-service:outbox_event:payload,2026-11-18T13:32:37+00:00,load_10_architecture.py,payload,architect,JSONB
+enrollment-service:outbox_event:published_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,published_at,architect,TIMESTAMPTZ
+enrollment-service:outbox_event:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,CHAR(10)
+enrollment-service:outbox_event:type,2026-11-18T13:32:37+00:00,load_10_architecture.py,type,architect,VARCHAR(60)
+enrollment-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+enrollment-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ
+enrollment-service:provider_type_mapping:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+enrollment-service:provider_type_mapping:description,2026-11-18T13:32:37+00:00,load_10_architecture.py,description,architect,"VARCHAR(60),"
+enrollment-service:provider_type_mapping:feed_code,2026-11-18T13:32:37+00:00,load_10_architecture.py,feed_code,architect,VARCHAR(4) NOT
+enrollment-service:provider_type_mapping:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+enrollment-service:provider_type_mapping:legacy_code,2026-11-18T13:32:37+00:00,load_10_architecture.py,legacy_code,architect,CHAR(2) NOT
+enrollment-service:provider_type_mapping:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+enrollment-service:provider_type_mapping:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+notification-service:notice:channel,2026-11-18T13:32:37+00:00,load_10_architecture.py,channel,architect,VARCHAR(10) NOT
+notification-service:notice:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+notification-service:notice:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID NOT
+notification-service:notice:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+notification-service:notice:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10) NOT
+notification-service:notice:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+notification-service:notice:recipient,2026-11-18T13:32:37+00:00,load_10_architecture.py,recipient,architect,"VARCHAR(200),"
+notification-service:notice:sent_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,sent_at,architect,"TIMESTAMPTZ,"
+notification-service:notice:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+notification-service:notice:template_code,2026-11-18T13:32:37+00:00,load_10_architecture.py,template_code,architect,VARCHAR(20) NOT
+notification-service:notice:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+notification-service:notice:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+notification-service:notice_template:body,2026-11-18T13:32:37+00:00,load_10_architecture.py,body,architect,TEXT NOT
+notification-service:notice_template:code,2026-11-18T13:32:37+00:00,load_10_architecture.py,code,architect,VARCHAR(20) NOT
+notification-service:notice_template:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+notification-service:notice_template:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+notification-service:notice_template:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,VARCHAR(120) NOT
+notification-service:notice_template:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+notification-service:notice_template:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+notification-service:outbox_event:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ
+notification-service:outbox_event:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,UUID
+notification-service:outbox_event:payload,2026-11-18T13:32:37+00:00,load_10_architecture.py,payload,architect,JSONB
+notification-service:outbox_event:published_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,published_at,architect,TIMESTAMPTZ
+notification-service:outbox_event:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,CHAR(10)
+notification-service:outbox_event:type,2026-11-18T13:32:37+00:00,load_10_architecture.py,type,architect,VARCHAR(60)
+notification-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+notification-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ
+provider-service:audit_log:action,2026-11-18T13:32:37+00:00,load_10_architecture.py,action,architect,VARCHAR(40)
+provider-service:audit_log:actor,2026-11-18T13:32:37+00:00,load_10_architecture.py,actor,architect,VARCHAR(100) NOT
+provider-service:audit_log:after_json,2026-11-18T13:32:37+00:00,load_10_architecture.py,after_json,architect,"JSONB,"
+provider-service:audit_log:at,2026-11-18T13:32:37+00:00,load_10_architecture.py,at,architect,TIMESTAMPTZ
+provider-service:audit_log:before_json,2026-11-18T13:32:37+00:00,load_10_architecture.py,before_json,architect,"JSONB,"
+provider-service:audit_log:correlation_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,correlation_id,architect,"UUID,"
+provider-service:audit_log:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT
+provider-service:audit_log:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10)
+provider-service:outbox_event:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ
+provider-service:outbox_event:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,UUID
+provider-service:outbox_event:payload,2026-11-18T13:32:37+00:00,load_10_architecture.py,payload,architect,JSONB
+provider-service:outbox_event:published_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,published_at,architect,TIMESTAMPTZ
+provider-service:outbox_event:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,CHAR(10)
+provider-service:outbox_event:type,2026-11-18T13:32:37+00:00,load_10_architecture.py,type,architect,VARCHAR(60)
+provider-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+provider-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ
+provider-service:provider:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+provider-service:provider:dba_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,dba_name,architect,"VARCHAR(30),"
+provider-service:provider:effective_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,effective_date,architect,DATE NOT
+provider-service:provider:end_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,end_date,architect,"DATE,"
+provider-service:provider:enroll_status,2026-11-18T13:32:37+00:00,load_10_architecture.py,enroll_status,architect,CHAR(1) NOT
+provider-service:provider:first_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,first_name,architect,"VARCHAR(20),"
+provider-service:provider:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+provider-service:provider:last_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,last_name,architect,"VARCHAR(30),"
+provider-service:provider:legal_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,legal_name,architect,"VARCHAR(60),"
+provider-service:provider:license_no,2026-11-18T13:32:37+00:00,load_10_architecture.py,license_no,architect,"VARCHAR(15),"
+provider-service:provider:license_state,2026-11-18T13:32:37+00:00,load_10_architecture.py,license_state,architect,"CHAR(2),"
+provider-service:provider:medicaid_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,medicaid_id,architect,CHAR(9) NOT
+provider-service:provider:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10) NOT
+provider-service:provider:owner_npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,owner_npi,architect,"CHAR(10),"
+provider-service:provider:provider_type,2026-11-18T13:32:37+00:00,load_10_architecture.py,provider_type,architect,CHAR(2) NOT
+provider-service:provider:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+provider-service:provider:reval_due_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,reval_due_date,architect,"DATE,"
+provider-service:provider:risk_tier,2026-11-18T13:32:37+00:00,load_10_architecture.py,risk_tier,architect,CHAR(1) CHECK
+provider-service:provider:screen_flag,2026-11-18T13:32:37+00:00,load_10_architecture.py,screen_flag,architect,CHAR(1) NOT
+provider-service:provider:taxonomy,2026-11-18T13:32:37+00:00,load_10_architecture.py,taxonomy,architect,CHAR(10) NOT
+provider-service:provider:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+provider-service:provider:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+provider-service:provider_owner:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+provider-service:provider_owner:disclosure_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,disclosure_date,architect,DATE NOT
+provider-service:provider_owner:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+provider-service:provider_owner:owner_name,2026-11-18T13:32:37+00:00,load_10_architecture.py,owner_name,architect,VARCHAR(60) NOT
+provider-service:provider_owner:owner_npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,owner_npi,architect,"CHAR(10),"
+provider-service:provider_owner:owner_pct,2026-11-18T13:32:37+00:00,load_10_architecture.py,owner_pct,architect,"NUMERIC(5,2),"
+provider-service:provider_owner:provider_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,provider_id,architect,BIGINT NOT
+provider-service:provider_owner:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+provider-service:provider_owner:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+revalidation-service:outbox_event:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ
+revalidation-service:outbox_event:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,UUID
+revalidation-service:outbox_event:payload,2026-11-18T13:32:37+00:00,load_10_architecture.py,payload,architect,JSONB
+revalidation-service:outbox_event:published_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,published_at,architect,TIMESTAMPTZ
+revalidation-service:outbox_event:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,CHAR(10)
+revalidation-service:outbox_event:type,2026-11-18T13:32:37+00:00,load_10_architecture.py,type,architect,VARCHAR(60)
+revalidation-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+revalidation-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ
+revalidation-service:revalidation_case:closed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,closed_at,architect,"TIMESTAMPTZ,"
+revalidation-service:revalidation_case:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+revalidation-service:revalidation_case:due_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,due_date,architect,DATE NOT
+revalidation-service:revalidation_case:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+revalidation-service:revalidation_case:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10) NOT
+revalidation-service:revalidation_case:opened_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,opened_at,architect,TIMESTAMPTZ NOT
+revalidation-service:revalidation_case:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+revalidation-service:revalidation_case:screening_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,screening_id,architect,"UUID,"
+revalidation-service:revalidation_case:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(12) NOT
+revalidation-service:revalidation_case:sweep_run_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,sweep_run_id,architect,BIGINT REFERENCES
+revalidation-service:revalidation_case:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+revalidation-service:revalidation_case:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+revalidation-service:sweep_run:business_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,business_date,architect,DATE NOT
+revalidation-service:sweep_run:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+revalidation-service:sweep_run:ended_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,ended_at,architect,"TIMESTAMPTZ,"
+revalidation-service:sweep_run:failure_reason,2026-11-18T13:32:37+00:00,load_10_architecture.py,failure_reason,architect,"VARCHAR(500),"
+revalidation-service:sweep_run:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+revalidation-service:sweep_run:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+revalidation-service:sweep_run:queue_file,2026-11-18T13:32:37+00:00,load_10_architecture.py,queue_file,architect,"TEXT,"
+revalidation-service:sweep_run:queued_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,queued_count,architect,INTEGER NOT
+revalidation-service:sweep_run:started_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,started_at,architect,TIMESTAMPTZ NOT
+revalidation-service:sweep_run:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+revalidation-service:sweep_run:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+revalidation-service:sweep_run:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+revalidation-service:tracked_provider:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+revalidation-service:tracked_provider:enroll_status,2026-11-18T13:32:37+00:00,load_10_architecture.py,enroll_status,architect,CHAR(1) NOT
+revalidation-service:tracked_provider:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+revalidation-service:tracked_provider:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10) NOT
+revalidation-service:tracked_provider:reval_due_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,reval_due_date,architect,"DATE,"
+revalidation-service:tracked_provider:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+revalidation-service:tracked_provider:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+risk-service:outbox_event:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ
+risk-service:outbox_event:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,UUID
+risk-service:outbox_event:payload,2026-11-18T13:32:37+00:00,load_10_architecture.py,payload,architect,JSONB
+risk-service:outbox_event:published_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,published_at,architect,TIMESTAMPTZ
+risk-service:outbox_event:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,CHAR(10)
+risk-service:outbox_event:type,2026-11-18T13:32:37+00:00,load_10_architecture.py,type,architect,VARCHAR(60)
+risk-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+risk-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ
+risk-service:risk_assessment:assessed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,assessed_at,architect,TIMESTAMPTZ NOT
+risk-service:risk_assessment:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+risk-service:risk_assessment:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+risk-service:risk_assessment:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,"CHAR(10),"
+risk-service:risk_assessment:rule_set_version,2026-11-18T13:32:37+00:00,load_10_architecture.py,rule_set_version,architect,INTEGER NOT
+risk-service:risk_assessment:taxonomy,2026-11-18T13:32:37+00:00,load_10_architecture.py,taxonomy,architect,CHAR(10) NOT
+risk-service:risk_assessment:tier,2026-11-18T13:32:37+00:00,load_10_architecture.py,tier,architect,CHAR(1) NOT
+risk-service:risk_assessment:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+risk-service:risk_assessment:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+risk-service:risk_rule:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+risk-service:risk_rule:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+risk-service:risk_rule:rule_set_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,rule_set_id,architect,BIGINT NOT
+risk-service:risk_rule:taxonomy_prefix,2026-11-18T13:32:37+00:00,load_10_architecture.py,taxonomy_prefix,architect,CHAR(3) NOT
+risk-service:risk_rule:tier,2026-11-18T13:32:37+00:00,load_10_architecture.py,tier,architect,CHAR(1) NOT
+risk-service:risk_rule:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+risk-service:risk_rule:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+risk-service:risk_rule_set:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+risk-service:risk_rule_set:default_tier,2026-11-18T13:32:37+00:00,load_10_architecture.py,default_tier,architect,CHAR(1) NOT
+risk-service:risk_rule_set:effective_from,2026-11-18T13:32:37+00:00,load_10_architecture.py,effective_from,architect,DATE NOT
+risk-service:risk_rule_set:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+risk-service:risk_rule_set:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+risk-service:risk_rule_set:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+sanctions-service:outbox_event:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ
+sanctions-service:outbox_event:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,UUID
+sanctions-service:outbox_event:payload,2026-11-18T13:32:37+00:00,load_10_architecture.py,payload,architect,JSONB
+sanctions-service:outbox_event:published_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,published_at,architect,TIMESTAMPTZ
+sanctions-service:outbox_event:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,CHAR(10)
+sanctions-service:outbox_event:type,2026-11-18T13:32:37+00:00,load_10_architecture.py,type,architect,VARCHAR(60)
+sanctions-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+sanctions-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ
+sanctions-service:sanction:action,2026-11-18T13:32:37+00:00,load_10_architecture.py,action,architect,CHAR(1) NOT
+sanctions-service:sanction:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+sanctions-service:sanction:effective_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,effective_date,architect,DATE NOT
+sanctions-service:sanction:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+sanctions-service:sanction:intake_run_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,intake_run_id,architect,BIGINT REFERENCES
+sanctions-service:sanction:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10) NOT
+sanctions-service:sanction:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+sanctions-service:sanction:reason,2026-11-18T13:32:37+00:00,load_10_architecture.py,reason,architect,"VARCHAR(60),"
+sanctions-service:sanction:recorded_by,2026-11-18T13:32:37+00:00,load_10_architecture.py,recorded_by,architect,VARCHAR(100) NOT
+sanctions-service:sanction:resulting_status,2026-11-18T13:32:37+00:00,load_10_architecture.py,resulting_status,architect,CHAR(1) CHECK
+sanctions-service:sanction:source_feed,2026-11-18T13:32:37+00:00,load_10_architecture.py,source_feed,architect,"VARCHAR(20),"
+sanctions-service:sanction:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+sanctions-service:sanction:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+sanctions-service:sanction_intake_run:applied_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,applied_count,architect,INTEGER NOT
+sanctions-service:sanction_intake_run:business_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,business_date,architect,DATE NOT
+sanctions-service:sanction_intake_run:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+sanctions-service:sanction_intake_run:ended_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,ended_at,architect,"TIMESTAMPTZ,"
+sanctions-service:sanction_intake_run:failure_reason,2026-11-18T13:32:37+00:00,load_10_architecture.py,failure_reason,architect,"VARCHAR(500),"
+sanctions-service:sanction_intake_run:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+sanctions-service:sanction_intake_run:not_found_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,not_found_count,architect,INTEGER NOT
+sanctions-service:sanction_intake_run:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+sanctions-service:sanction_intake_run:read_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,read_count,architect,INTEGER NOT
+sanctions-service:sanction_intake_run:rejected_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,rejected_count,architect,INTEGER NOT
+sanctions-service:sanction_intake_run:started_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,started_at,architect,TIMESTAMPTZ NOT
+sanctions-service:sanction_intake_run:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+sanctions-service:sanction_intake_run:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+sanctions-service:sanction_intake_run:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+screening-service:outbox_event:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ
+screening-service:outbox_event:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,UUID
+screening-service:outbox_event:payload,2026-11-18T13:32:37+00:00,load_10_architecture.py,payload,architect,JSONB
+screening-service:outbox_event:published_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,published_at,architect,TIMESTAMPTZ
+screening-service:outbox_event:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,CHAR(10)
+screening-service:outbox_event:type,2026-11-18T13:32:37+00:00,load_10_architecture.py,type,architect,VARCHAR(60)
+screening-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+screening-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ
+screening-service:screening:completed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,completed_at,architect,"TIMESTAMPTZ,"
+screening-service:screening:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+screening-service:screening:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+screening-service:screening:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10) NOT
+screening-service:screening:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+screening-service:screening:reason,2026-11-18T13:32:37+00:00,load_10_architecture.py,reason,architect,VARCHAR(12) NOT
+screening-service:screening:result,2026-11-18T13:32:37+00:00,load_10_architecture.py,result,architect,VARCHAR(4) CHECK
+screening-service:screening:run_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,run_id,architect,BIGINT REFERENCES
+screening-service:screening:started_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,started_at,architect,TIMESTAMPTZ NOT
+screening-service:screening:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+screening-service:screening:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+screening-service:screening:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+screening-service:screening_result:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+screening-service:screening_result:detail,2026-11-18T13:32:37+00:00,load_10_architecture.py,detail,architect,"VARCHAR(60),"
+screening-service:screening_result:error_code,2026-11-18T13:32:37+00:00,load_10_architecture.py,error_code,architect,CHAR(4) CHECK
+screening-service:screening_result:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+screening-service:screening_result:result,2026-11-18T13:32:37+00:00,load_10_architecture.py,result,architect,CHAR(1) NOT
+screening-service:screening_result:screening_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,screening_id,architect,BIGINT NOT
+screening-service:screening_result:source,2026-11-18T13:32:37+00:00,load_10_architecture.py,source,architect,VARCHAR(8) NOT
+screening-service:screening_result:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+screening-service:screening_result:verdict_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,verdict_at,architect,TIMESTAMPTZ NOT
+screening-service:screening_result:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+screening-service:screening_run:business_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,business_date,architect,DATE NOT
+screening-service:screening_run:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+screening-service:screening_run:ended_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,ended_at,architect,"TIMESTAMPTZ,"
+screening-service:screening_run:fail_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,fail_count,architect,INTEGER NOT
+screening-service:screening_run:failure_reason,2026-11-18T13:32:37+00:00,load_10_architecture.py,failure_reason,architect,"VARCHAR(500),"
+screening-service:screening_run:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+screening-service:screening_run:provider_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,provider_count,architect,INTEGER NOT
+screening-service:screening_run:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+screening-service:screening_run:results_file,2026-11-18T13:32:37+00:00,load_10_architecture.py,results_file,architect,"TEXT,"
+screening-service:screening_run:started_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,started_at,architect,TIMESTAMPTZ NOT
+screening-service:screening_run:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+screening-service:screening_run:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+screening-service:screening_run:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+tmsis-service:extract_archive:archived_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,archived_at,architect,TIMESTAMPTZ NOT
+tmsis-service:extract_archive:content,2026-11-18T13:32:37+00:00,load_10_architecture.py,content,architect,TEXT NOT
+tmsis-service:extract_archive:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+tmsis-service:extract_archive:extract_run_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,extract_run_id,architect,BIGINT NOT
+tmsis-service:extract_archive:generation,2026-11-18T13:32:37+00:00,load_10_architecture.py,generation,architect,INTEGER NOT
+tmsis-service:extract_archive:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+tmsis-service:extract_archive:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+tmsis-service:extract_archive:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+tmsis-service:extract_row:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+tmsis-service:extract_row:extract_run_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,extract_run_id,architect,BIGINT NOT
+tmsis-service:extract_row:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+tmsis-service:extract_row:medicaid_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,medicaid_id,architect,CHAR(9) NOT
+tmsis-service:extract_row:npi,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,architect,CHAR(10) NOT
+tmsis-service:extract_row:period_yyddd,2026-11-18T13:32:37+00:00,load_10_architecture.py,period_yyddd,architect,CHAR(5) NOT
+tmsis-service:extract_row:record_type,2026-11-18T13:32:37+00:00,load_10_architecture.py,record_type,architect,CHAR(5) NOT
+tmsis-service:extract_row:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,CHAR(1) NOT
+tmsis-service:extract_row:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+tmsis-service:extract_row:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+tmsis-service:extract_run:business_date,2026-11-18T13:32:37+00:00,load_10_architecture.py,business_date,architect,DATE NOT
+tmsis-service:extract_run:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ NOT
+tmsis-service:extract_run:ended_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,ended_at,architect,"TIMESTAMPTZ,"
+tmsis-service:extract_run:failure_reason,2026-11-18T13:32:37+00:00,load_10_architecture.py,failure_reason,architect,"VARCHAR(500),"
+tmsis-service:extract_run:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,BIGINT GENERATED
+tmsis-service:extract_run:period_yyddd,2026-11-18T13:32:37+00:00,load_10_architecture.py,period_yyddd,architect,CHAR(5) NOT
+tmsis-service:extract_run:public_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,public_id,architect,UUID NOT
+tmsis-service:extract_run:row_count,2026-11-18T13:32:37+00:00,load_10_architecture.py,row_count,architect,INTEGER NOT
+tmsis-service:extract_run:started_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,started_at,architect,TIMESTAMPTZ NOT
+tmsis-service:extract_run:status,2026-11-18T13:32:37+00:00,load_10_architecture.py,status,architect,VARCHAR(10) NOT
+tmsis-service:extract_run:updated_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,updated_at,architect,TIMESTAMPTZ NOT
+tmsis-service:extract_run:version,2026-11-18T13:32:37+00:00,load_10_architecture.py,version,architect,INTEGER
+tmsis-service:outbox_event:created_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,created_at,architect,TIMESTAMPTZ
+tmsis-service:outbox_event:id,2026-11-18T13:32:37+00:00,load_10_architecture.py,id,architect,UUID
+tmsis-service:outbox_event:payload,2026-11-18T13:32:37+00:00,load_10_architecture.py,payload,architect,JSONB
+tmsis-service:outbox_event:published_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,published_at,architect,TIMESTAMPTZ
+tmsis-service:outbox_event:subject,2026-11-18T13:32:37+00:00,load_10_architecture.py,subject,architect,CHAR(10)
+tmsis-service:outbox_event:type,2026-11-18T13:32:37+00:00,load_10_architecture.py,type,architect,VARCHAR(60)
+tmsis-service:processed_event:event_id,2026-11-18T13:32:37+00:00,load_10_architecture.py,event_id,architect,UUID
+tmsis-service:processed_event:processed_at,2026-11-18T13:32:37+00:00,load_10_architecture.py,processed_at,architect,TIMESTAMPTZ

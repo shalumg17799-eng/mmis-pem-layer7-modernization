@@ -1,0 +1,30 @@
+{
+  "name": "nppes hit: fabricated deactivated NPI",
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/nppes/providers",
+    "queryParameters": {
+      "npi": {
+        "equalTo": "1005999036"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "NPPES",
+      "npi": "1005999036",
+      "found": true,
+      "active": false,
+      "deactivationDate": "2024-06-30"
+    }
+  },
+  "metadata": {
+    "source": "nppes",
+    "answer": "hit"
+  }
+}

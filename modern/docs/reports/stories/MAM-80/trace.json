@@ -1,0 +1,17 @@
+{
+  "story": "MAM-80",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "tests": [
+    "modern/web-ui/tests/console/provider-detail.test.tsx",
+    "modern/web-ui/tests/support/detail.ts",
+    "modern/web-ui/e2e/console-detail.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/features/console/providers/ProviderDetail.tsx",
+    "modern/web-ui/src/features/console/providers/ProviderLoader.tsx",
+    "modern/web-ui/src/features/portal/provider/ProviderRecord.tsx",
+    "modern/web-ui/src/shared/ui/ProviderRecordTable.tsx",
+    "modern/web-ui/src/shared/format/format.ts"
+  ],
+  "rules": []
+}

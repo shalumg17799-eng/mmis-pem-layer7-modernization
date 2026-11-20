@@ -1,0 +1,46 @@
+{
+  "story": "MAM-47",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/tools/checks/tests/test_wiremock_stubs.py"
+  ],
+  "testIds": {
+    "AC-1": [
+      "test_wiremock_stubs: PASSED"
+    ],
+    "AC-2": [
+      "test_wiremock_stubs: PASSED"
+    ],
+    "AC-3": [
+      "test_wiremock_stubs: PASSED"
+    ],
+    "AC-4": [
+      "test_wiremock_stubs: PASSED"
+    ],
+    "AC-5": [
+      "test_wiremock_stubs: PASSED"
+    ],
+    "AC-6": [
+      "test_wiremock_stubs: PASSED"
+    ],
+    "AC-7": [
+      "test_wiremock_stubs: PASSED"
+    ],
+    "AC-8": [
+      "test_wiremock_stubs: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/infra/wiremock/mappings/**/*.json"
+  ],
+  "rules": []
+}

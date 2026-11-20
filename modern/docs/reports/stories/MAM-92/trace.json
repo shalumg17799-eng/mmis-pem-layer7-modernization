@@ -1,0 +1,15 @@
+{
+  "story": "MAM-92",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7"],
+  "tests": [
+    "modern/web-ui/tests/admin/risk-rules.test.tsx",
+    "modern/web-ui/tests/support/risk.ts",
+    "modern/web-ui/e2e/admin-risk.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/app/screens.tsx",
+    "modern/web-ui/src/features/console/admin/risk/RiskRulesPage.tsx",
+    "modern/web-ui/src/shared/api/client.ts"
+  ],
+  "rules": []
+}

@@ -1,0 +1,865 @@
+****A  START  JOB  193  PRVDAY01  DAILY ENROLLMENT      ROOM       11.27.06 AM 20 NOV 26  PRINTER1  SYS TK5R  JOB  193  START  A****
+****A  START  JOB  193  PRVDAY01  DAILY ENROLLMENT      ROOM       11.27.06 AM 20 NOV 26  PRINTER1  SYS TK5R  JOB  193  START  A****
+****A  START  JOB  193  PRVDAY01  DAILY ENROLLMENT      ROOM       11.27.06 AM 20 NOV 26  PRINTER1  SYS TK5R  JOB  193  START  A****
+****A  START  JOB  193  PRVDAY01  DAILY ENROLLMENT      ROOM       11.27.06 AM 20 NOV 26  PRINTER1  SYS TK5R  JOB  193  START  A****
+                                                J E S 2   J O B   L O G
+
+
+11.27.04 JOB  193  $HASP373 PRVDAY01 STARTED - INIT  1 - CLASS A - SYS TK5R
+11.27.04 JOB  193  IEF403I PRVDAY01 - STARTED - TIME=11.27.04
+11.27.05 JOB  193  IEFACTRT - Stepname  Procstep  Program   Retcode
+11.27.05 JOB  193  PRVDAY01   LOAD010             PRVSEED1  RC= 0000
+11.27.05 JOB  193  PRVDAY01   LOAD020             PRVLDAP1  RC= 0000
+11.27.05 JOB  193  PRVDAY01   LOAD030             PRVUNLD1  RC= 0000
+11.27.05 JOB  193  PRVDAY01   LOAD040             IDCAMS    RC= 0000
+11.27.06 JOB  193  PRVDAY01   STEP010             PRVENR01  RC= 0004
+11.27.06 JOB  193  PRVDAY01   CAP010              PRVUNLD1  RC= 0000
+11.27.06 JOB  193  PRVDAY01   CAP011              IDCAMS    RC= 0000
+11.27.06 JOB  193  PRVDAY01   STEP015             PRVUNLD1  *FLUSH*
+11.27.06 JOB  193  PRVDAY01   STEP020             SORT      *FLUSH*
+11.27.06 JOB  193  PRVDAY01   STEP030             PRVSCR01  *FLUSH*
+11.27.06 JOB  193  PRVDAY01   CAP030              PRVUNLD1  *FLUSH*
+11.27.06 JOB  193  PRVDAY01   STEP040             PRVRSK01  *FLUSH*
+11.27.06 JOB  193  PRVDAY01   CAP040              PRVUNLD1  *FLUSH*
+11.27.06 JOB  193  PRVDAY01   STEP099             IEFBR14   *FLUSH*
+11.27.06 JOB  193  PRVDAY01   CAP099              IDCAMS    *FLUSH*
+11.27.06 JOB  193  IEF404I PRVDAY01 - ENDED - TIME=11.27.06
+11.27.06 JOB  193  $HASP395 PRVDAY01 ENDED
+
+
+------ JES2 JOB STATISTICS ------
+
+
+ 20 NOV 26 JOB EXECUTION DATE
+
+
+       165 CARDS READ
+
+
+       736 SYSOUT PRINT RECORDS
+
+
+         0 SYSOUT PUNCH RECORDS
+
+
+      0.03 MINUTES EXECUTION TIME
+    1     //PRVDAY01 JOB (MMIS,PARITY),'DAILY ENROLLMENT',                        JOB  193
+          //             CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),
+          //             REGION=4096K
+          ***  PARITY RUN baseline: PRVDAY01 STEPS OF THE LAB DECK, TEMPORARY
+          ***  DATASETS ONLY (ANONYMOUS JOB), LOAD AND CAP STEPS ADDED
+    2     //JOBLIB   DD DSN=MMPRV.PROD.LOADLIB,DISP=SHR
+    3     //LOAD010  EXEC PGM=PRVSEED1,REGION=4096K
+    4     //SYSOUT   DD SYSOUT=A
+    5     //PRVMSTR  DD DSN=&&MSTR(PRIME),DISP=(NEW,PASS,DELETE),UNIT=SYSDA,
+          //             SPACE=(CYL,(5),,CONTIG),
+          //             DCB=(DSORG=IS,RECFM=FB,LRECL=130,BLKSIZE=1300,
+          //             KEYLEN=10,RKP=0,OPTCD=Y,CYLOFL=2)
+    6     //SEEDIN   DD *
+    7     //LOAD020  EXEC PGM=PRVLDAP1,REGION=4096K
+    8     //SYSOUT   DD SYSOUT=A
+    9     //APPOUT   DD DSN=&&APPS,DISP=(NEW,PASS,DELETE),UNIT=SYSDA,
+          //             SPACE=(TRK,(5,5)),
+          //             DCB=(RECFM=FB,LRECL=200,BLKSIZE=6000)
+   10     //APPCARD  DD *
+   11     //LOAD030  EXEC PGM=PRVUNLD1,REGION=4096K
+   12     //SYSOUT   DD SYSOUT=A
+   13     //PRVMSTR  DD DSN=&&MSTR,DISP=(OLD,PASS)
+   14     //FLATOUT  DD DSN=&&BEFORE,DISP=(NEW,PASS,DELETE),
+          //            UNIT=SYSDA,SPACE=(TRK,(5,5)),
+          //            DCB=(RECFM=FB,LRECL=130,BLKSIZE=1300)
+   15     //LOAD040  EXEC PGM=IDCAMS
+   16     //SYSPRINT DD SYSOUT=A
+   17     //DD01     DD DSN=&&APPS,DISP=(OLD,PASS)
+   18     //DD02     DD DSN=&&BEFORE,DISP=(OLD,PASS)
+   19     //SYSIN    DD *
+   20     //STEP010  EXEC PGM=PRVENR01,PARM='BATCH_ID=20261120'
+   21     //STEPLIB  DD DSN=MMPRV.PROD.LOADLIB,DISP=SHR
+   22     //APPINPUT DD DSN=&&APPS,DISP=(OLD,PASS)
+   23     //PRVMSTR  DD DSN=&&MSTR,DISP=(OLD,PASS)
+   24     //APPERROR DD DSN=&&APPERR,DISP=(NEW,PASS,DELETE),
+          //            UNIT=SYSDA,SPACE=(CYL,(5,2)),
+          //            DCB=(RECFM=FB,LRECL=250,BLKSIZE=25000)
+   25     //SYSOUT   DD SYSOUT=*
+   26     //SYSPRINT DD SYSOUT=*
+   27     //CAP010   EXEC PGM=PRVUNLD1,REGION=4096K
+   28     //SYSOUT   DD SYSOUT=A
+   29     //PRVMSTR  DD DSN=&&MSTR,DISP=(OLD,PASS)
+   30     //FLATOUT  DD DSN=&&AFT010,DISP=(NEW,PASS,DELETE),
+          //            UNIT=SYSDA,SPACE=(TRK,(5,5)),
+          //            DCB=(RECFM=FB,LRECL=130,BLKSIZE=1300)
+   31     //CAP011   EXEC PGM=IDCAMS
+   32     //SYSPRINT DD SYSOUT=A
+   33     //DD01     DD DSN=&&APPERR,DISP=(OLD,PASS)
+   34     //DD02     DD DSN=&&AFT010,DISP=(OLD,PASS)
+   35     //SYSIN    DD *
+   36     //STEP015  EXEC PGM=PRVUNLD1,COND=(0,LT,STEP010)
+   37     //PRVMSTR  DD DSN=&&MSTR,DISP=(OLD,PASS)
+   38     //FLATOUT  DD DSN=&&MSTFLAT,DISP=(NEW,PASS,DELETE),
+          //            UNIT=SYSDA,SPACE=(CYL,(5,2)),
+          //            DCB=(RECFM=FB,LRECL=130,BLKSIZE=1300)
+   39     //SYSOUT   DD SYSOUT=*
+   40     //STEP020  EXEC PGM=SORT,REGION=1024K,COND=(0,LT,STEP010)
+   41     //SORTLIB  DD DSN=SYS1.SORTLIB,DISP=SHR
+   42     //SORTIN   DD DSN=&&MSTFLAT,DISP=(OLD,DELETE)
+   43     //SORTOUT  DD DSN=&&PRVSORT,DISP=(NEW,PASS,DELETE),
+          //            UNIT=SYSDA,SPACE=(CYL,(20,5)),
+          //            DCB=(RECFM=FB,LRECL=130,BLKSIZE=1300)
+   44     //SORTWK01 DD UNIT=SYSDA,SPACE=(CYL,(5,2))
+   45     //SORTWK02 DD UNIT=SYSDA,SPACE=(CYL,(5,2))
+   46     //SORTWK03 DD UNIT=SYSDA,SPACE=(CYL,(5,2))
+   47     //SYSIN    DD *
+   48     //SYSOUT   DD SYSOUT=*
+   49     //SYSPRINT DD SYSOUT=*
+   50     //STEP030  EXEC PGM=PRVSCR01,COND=(0,LT,STEP010)
+   51     //PRVMSTR  DD DSN=&&MSTR,DISP=(OLD,PASS)
+   52     //SCRNOUT  DD DSN=&&SCRNOUT,DISP=(NEW,PASS,DELETE),
+          //            UNIT=SYSDA,SPACE=(CYL,(10,5)),
+          //            DCB=(RECFM=FB,LRECL=67,BLKSIZE=6700)
+   53     //SYSOUT   DD SYSOUT=*
+   54     //CAP030   EXEC PGM=PRVUNLD1,REGION=4096K,COND=(0,LT,STEP010)
+   55     //SYSOUT   DD SYSOUT=A
+   56     //PRVMSTR  DD DSN=&&MSTR,DISP=(OLD,PASS)
+   57     //FLATOUT  DD DSN=&&AFT030,DISP=(NEW,PASS,DELETE),
+          //            UNIT=SYSDA,SPACE=(TRK,(5,5)),
+          //            DCB=(RECFM=FB,LRECL=130,BLKSIZE=1300)
+   58     //STEP040  EXEC PGM=PRVRSK01,COND=(0,LT,STEP010)
+   59     //PRVMSTR  DD DSN=&&MSTR,DISP=(OLD,PASS)
+   60     //SYSOUT   DD SYSOUT=*
+   61     //CAP040   EXEC PGM=PRVUNLD1,REGION=4096K,COND=(0,LT,STEP010)
+   62     //SYSOUT   DD SYSOUT=A
+   63     //PRVMSTR  DD DSN=&&MSTR,DISP=(OLD,PASS)
+   64     //FLATOUT  DD DSN=&&AFT040,DISP=(NEW,PASS,DELETE),
+          //            UNIT=SYSDA,SPACE=(TRK,(5,5)),
+          //            DCB=(RECFM=FB,LRECL=130,BLKSIZE=1300)
+   65     //STEP099  EXEC PGM=IEFBR14,COND=(0,LT)
+   66     //SYSOUT   DD SYSOUT=*
+   67     //CAP099   EXEC PGM=IDCAMS,COND=(0,LT,STEP010)
+   68     //SYSPRINT DD SYSOUT=A
+   69     //DD01     DD DSN=&&SCRNOUT,DISP=(OLD,PASS)
+   70     //DD02     DD DSN=&&AFT030,DISP=(OLD,PASS)
+   71     //DD03     DD DSN=&&AFT040,DISP=(OLD,PASS)
+   72     //SYSIN    DD *
+          //
+IEF236I ALLOC. FOR PRVDAY01 LOAD010
+IEF237I 191  ALLOCATED TO JOBLIB
+IEF237I JES2 ALLOCATED TO SYSOUT
+IEF237I 293  ALLOCATED TO PRVMSTR
+IEF237I JES2 ALLOCATED TO SEEDIN
+IEF142I PRVDAY01 LOAD010 - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   MMPRV.PROD.LOADLIB                           PASSED        *--------0
+IEF285I   VOL SER NOS= TSO002.
+IEF285I   JES2.JOB00193.SO0107                         SYSOUT
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.MSTR         PASSED        *-------35
+IEF285I   VOL SER NOS= WORK04.
+IEF285I   JES2.JOB00193.SI0101                         SYSIN
+IEF373I STEP /LOAD010 / START 26324.1127
+IEF374I STEP /LOAD010 / STOP  26324.1127 CPU    0MIN 00.06SEC SRB    0MIN 00.01SEC VIRT    16K SYS   292K
+************************************************************************************************************************************
+*     1. Jobstep of job: PRVDAY01    Stepname: LOAD010     Program name: PRVSEED1   Executed on 20.11.26 from 11.27.04 to 11.27.05 *
+*         elapsed time  00:00:00,25                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,07               Virtual Storage used:     16K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,07   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:     32                                                                           *
+*     191.......0 DMY.......0 293......35 DMY.......0                                                                              *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,11                                             *
+************************************************************************************************************************************
+IEF236I ALLOC. FOR PRVDAY01 LOAD020
+IEF237I 191  ALLOCATED TO JOBLIB
+IEF237I JES2 ALLOCATED TO SYSOUT
+IEF237I 292  ALLOCATED TO APPOUT
+IEF237I JES2 ALLOCATED TO APPCARD
+IEF142I PRVDAY01 LOAD020 - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   MMPRV.PROD.LOADLIB                           PASSED        *--------0
+IEF285I   VOL SER NOS= TSO002.
+IEF285I   JES2.JOB00193.SO0108                         SYSOUT
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.APPS         PASSED        *--------1
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   JES2.JOB00193.SI0102                         SYSIN
+IEF373I STEP /LOAD020 / START 26324.1127
+IEF374I STEP /LOAD020 / STOP  26324.1127 CPU    0MIN 00.03SEC SRB    0MIN 00.00SEC VIRT    40K SYS   260K
+************************************************************************************************************************************
+*     2. Jobstep of job: PRVDAY01    Stepname: LOAD020     Program name: PRVLDAP1   Executed on 20.11.26 from 11.27.05 to 11.27.05 *
+*         elapsed time  00:00:00,08                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,03               Virtual Storage used:     40K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,03   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:     16                                                                           *
+*     191.......0 DMY.......0 292.......1 DMY.......0                                                                              *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,05                                             *
+************************************************************************************************************************************
+IEF236I ALLOC. FOR PRVDAY01 LOAD030
+IEF237I 191  ALLOCATED TO JOBLIB
+IEF237I JES2 ALLOCATED TO SYSOUT
+IEF237I 293  ALLOCATED TO PRVMSTR
+IEF237I 292  ALLOCATED TO FLATOUT
+IEF142I PRVDAY01 LOAD030 - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   MMPRV.PROD.LOADLIB                           PASSED        *--------0
+IEF285I   VOL SER NOS= TSO002.
+IEF285I   JES2.JOB00193.SO0109                         SYSOUT
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.MSTR         PASSED        *--------3
+IEF285I   VOL SER NOS= WORK04.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.BEFORE       PASSED        *--------2
+IEF285I   VOL SER NOS= WORK03.
+IEF373I STEP /LOAD030 / START 26324.1127
+IEF374I STEP /LOAD030 / STOP  26324.1127 CPU    0MIN 00.06SEC SRB    0MIN 00.00SEC VIRT    16K SYS   268K
+************************************************************************************************************************************
+*     3. Jobstep of job: PRVDAY01    Stepname: LOAD030     Program name: PRVUNLD1   Executed on 20.11.26 from 11.27.05 to 11.27.05 *
+*         elapsed time  00:00:00,14                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,06               Virtual Storage used:     16K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,06   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:      0                                                                           *
+*     191.......0 DMY.......0 293.......3 292.......2                                                                              *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,10                                             *
+************************************************************************************************************************************
+IEF236I ALLOC. FOR PRVDAY01 LOAD040
+IEF237I 191  ALLOCATED TO JOBLIB
+IEF237I JES2 ALLOCATED TO SYSPRINT
+IEF237I 292  ALLOCATED TO DD01
+IEF237I 292  ALLOCATED TO DD02
+IEF237I JES2 ALLOCATED TO SYSIN
+IEF142I PRVDAY01 LOAD040 - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   MMPRV.PROD.LOADLIB                           PASSED        *--------0
+IEF285I   VOL SER NOS= TSO002.
+IEF285I   JES2.JOB00193.SO0110                         SYSOUT
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.APPS         PASSED        *--------2
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.BEFORE       PASSED        *--------3
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   JES2.JOB00193.SI0103                         SYSIN
+IEF373I STEP /LOAD040 / START 26324.1127
+IEF374I STEP /LOAD040 / STOP  26324.1127 CPU    0MIN 00.16SEC SRB    0MIN 00.01SEC VIRT   216K SYS   272K
+************************************************************************************************************************************
+*     4. Jobstep of job: PRVDAY01    Stepname: LOAD040     Program name: IDCAMS     Executed on 20.11.26 from 11.27.05 to 11.27.05 *
+*         elapsed time  00:00:00,48                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,17               Virtual Storage used:    216K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,17   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:      2                                                                           *
+*     191.......0 DMY.......0 292.......2 292.......3 DMY.......0                                                                  *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,28                                             *
+************************************************************************************************************************************
+IEF236I ALLOC. FOR PRVDAY01 STEP010
+IEF237I 191  ALLOCATED TO JOBLIB
+IEF237I 191  ALLOCATED TO STEPLIB
+IEF237I 292  ALLOCATED TO APPINPUT
+IEF237I 293  ALLOCATED TO PRVMSTR
+IEF237I 290  ALLOCATED TO APPERROR
+IEF237I JES2 ALLOCATED TO SYSOUT
+IEF237I JES2 ALLOCATED TO SYSPRINT
+IEF142I PRVDAY01 STEP010 - STEP WAS EXECUTED - COND CODE 0004
+IEF285I   MMPRV.PROD.LOADLIB                           PASSED        *--------0
+IEF285I   VOL SER NOS= TSO002.
+IEF285I   MMPRV.PROD.LOADLIB                           KEPT          *--------0
+IEF285I   VOL SER NOS= TSO002.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.APPS         PASSED        *--------2
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.MSTR         PASSED        *-------26
+IEF285I   VOL SER NOS= WORK04.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.APPERR       PASSED        *--------1
+IEF285I   VOL SER NOS= WORK01.
+IEF285I   JES2.JOB00193.SO0111                         SYSOUT
+IEF285I   JES2.JOB00193.SO0112                         SYSOUT
+IEF373I STEP /STEP010 / START 26324.1127
+IEF374I STEP /STEP010 / STOP  26324.1127 CPU    0MIN 00.05SEC SRB    0MIN 00.01SEC VIRT   168K SYS   264K
+************************************************************************************************************************************
+*     5. Jobstep of job: PRVDAY01    Stepname: STEP010     Program name: PRVENR01   Executed on 20.11.26 from 11.27.05 to 11.27.06 *
+*         elapsed time  00:00:00,25                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,06               Virtual Storage used:    168K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,06   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:      0                                                                           *
+*     191.......0 191.......0 292.......2 293......26 290.......1 DMY.......0 DMY.......0                                          *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,10                                             *
+************************************************************************************************************************************
+IEF236I ALLOC. FOR PRVDAY01 CAP010
+IEF237I 191  ALLOCATED TO JOBLIB
+IEF237I JES2 ALLOCATED TO SYSOUT
+IEF237I 293  ALLOCATED TO PRVMSTR
+IEF237I 292  ALLOCATED TO FLATOUT
+IEF142I PRVDAY01 CAP010 - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   MMPRV.PROD.LOADLIB                           PASSED        *--------0
+IEF285I   VOL SER NOS= TSO002.
+IEF285I   JES2.JOB00193.SO0113                         SYSOUT
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.MSTR         PASSED        *--------3
+IEF285I   VOL SER NOS= WORK04.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.AFT010       PASSED        *--------2
+IEF285I   VOL SER NOS= WORK03.
+IEF373I STEP /CAP010  / START 26324.1127
+IEF374I STEP /CAP010  / STOP  26324.1127 CPU    0MIN 00.05SEC SRB    0MIN 00.00SEC VIRT    16K SYS   268K
+************************************************************************************************************************************
+*     6. Jobstep of job: PRVDAY01    Stepname: CAP010      Program name: PRVUNLD1   Executed on 20.11.26 from 11.27.06 to 11.27.06 *
+*         elapsed time  00:00:00,13                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,05               Virtual Storage used:     16K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,05   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:      0                                                                           *
+*     191.......0 DMY.......0 293.......3 292.......2                                                                              *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,08                                             *
+************************************************************************************************************************************
+IEF236I ALLOC. FOR PRVDAY01 CAP011
+IEF237I 191  ALLOCATED TO JOBLIB
+IEF237I JES2 ALLOCATED TO SYSPRINT
+IEF237I 290  ALLOCATED TO DD01
+IEF237I 292  ALLOCATED TO DD02
+IEF237I JES2 ALLOCATED TO SYSIN
+IEF142I PRVDAY01 CAP011 - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   MMPRV.PROD.LOADLIB                           PASSED        *--------0
+IEF285I   VOL SER NOS= TSO002.
+IEF285I   JES2.JOB00193.SO0114                         SYSOUT
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.APPERR       PASSED        *--------2
+IEF285I   VOL SER NOS= WORK01.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.AFT010       PASSED        *--------3
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   JES2.JOB00193.SI0104                         SYSIN
+IEF373I STEP /CAP011  / START 26324.1127
+IEF374I STEP /CAP011  / STOP  26324.1127 CPU    0MIN 00.22SEC SRB    0MIN 00.01SEC VIRT   308K SYS   324K
+************************************************************************************************************************************
+*     7. Jobstep of job: PRVDAY01    Stepname: CAP011      Program name: IDCAMS     Executed on 20.11.26 from 11.27.06 to 11.27.06 *
+*         elapsed time  00:00:00,52                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,23               Virtual Storage used:    308K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,23   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:      2                                                                           *
+*     191.......0 DMY.......0 290.......2 292.......3 DMY.......0                                                                  *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,38                                             *
+************************************************************************************************************************************
+IEF202I PRVDAY01 STEP015 - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I PRVDAY01 STEP015 - STEP WAS NOT EXECUTED.
+IEF373I STEP /STEP015 / START 26324.1127
+IEF374I STEP /STEP015 / STOP  26324.1127 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF202I PRVDAY01 STEP020 - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I PRVDAY01 STEP020 - STEP WAS NOT EXECUTED.
+IEF373I STEP /STEP020 / START 26324.1127
+IEF374I STEP /STEP020 / STOP  26324.1127 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF202I PRVDAY01 STEP030 - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I PRVDAY01 STEP030 - STEP WAS NOT EXECUTED.
+IEF373I STEP /STEP030 / START 26324.1127
+IEF374I STEP /STEP030 / STOP  26324.1127 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF202I PRVDAY01 CAP030 - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I PRVDAY01 CAP030 - STEP WAS NOT EXECUTED.
+IEF373I STEP /CAP030  / START 26324.1127
+IEF374I STEP /CAP030  / STOP  26324.1127 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF202I PRVDAY01 STEP040 - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I PRVDAY01 STEP040 - STEP WAS NOT EXECUTED.
+IEF373I STEP /STEP040 / START 26324.1127
+IEF374I STEP /STEP040 / STOP  26324.1127 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF202I PRVDAY01 CAP040 - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I PRVDAY01 CAP040 - STEP WAS NOT EXECUTED.
+IEF373I STEP /CAP040  / START 26324.1127
+IEF374I STEP /CAP040  / STOP  26324.1127 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF202I PRVDAY01 STEP099 - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I PRVDAY01 STEP099 - STEP WAS NOT EXECUTED.
+IEF373I STEP /STEP099 / START 26324.1127
+IEF374I STEP /STEP099 / STOP  26324.1127 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF202I PRVDAY01 CAP099 - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I PRVDAY01 CAP099 - STEP WAS NOT EXECUTED.
+IEF373I STEP /CAP099  / START 26324.1127
+IEF374I STEP /CAP099  / STOP  26324.1127 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF285I   MMPRV.PROD.LOADLIB                           KEPT
+IEF285I   VOL SER NOS= TSO002.
+IEF237I 293  ALLOCATED TO SYS00001
+IEF285I   SYS26324.T112706.RA000.PRVDAY01.R0000001     KEPT          *--------0
+IEF285I   VOL SER NOS= WORK04.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.MSTR         DELETED
+IEF285I   VOL SER NOS= WORK04.
+IEF237I 292  ALLOCATED TO SYS00003
+IEF285I   SYS26324.T112706.RA000.PRVDAY01.R0000003     KEPT          *--------0
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.APPS         DELETED
+IEF285I   VOL SER NOS= WORK03.
+IEF237I 292  ALLOCATED TO SYS00005
+IEF285I   SYS26324.T112706.RA000.PRVDAY01.R0000005     KEPT          *--------0
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.BEFORE       DELETED
+IEF285I   VOL SER NOS= WORK03.
+IEF237I 290  ALLOCATED TO SYS00007
+IEF285I   SYS26324.T112706.RA000.PRVDAY01.R0000007     KEPT          *--------0
+IEF285I   VOL SER NOS= WORK01.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.APPERR       DELETED
+IEF285I   VOL SER NOS= WORK01.
+IEF237I 292  ALLOCATED TO SYS00009
+IEF285I   SYS26324.T112706.RA000.PRVDAY01.R0000009     KEPT          *--------0
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   SYS26324.T112704.RA000.PRVDAY01.AFT010       DELETED
+IEF285I   VOL SER NOS= WORK03.
+IEF375I  JOB /PRVDAY01/ START 26324.1127
+IEF376I  JOB /PRVDAY01/ STOP  26324.1127 CPU    0MIN 00.63SEC SRB    0MIN 00.04SEC
+
+PRVSEED1: PROVIDERS LOADED=00016
+
+
+PRVLDAP1: APPLICATIONS LOADED=00008
+
+
+PRVUNLD1: RECORDS UNLOADED=0000016
+
+IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:05        11/20/26     PAGE   1
+
+
+ PRINT INFILE(DD01) DUMPIDCAMS  SYSTEM SERVICES                                           TIME: 11:27:05        11/20/26     PAGE   2
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.APPS
+
+RECORD SEQUENCE NUMBER - 1
+000000  F1F0F0F6 F1F3F3F2 F8F8F9F8 F0F2F3F8   F0F2F5C9 D5F2F0F7 D8F0F0F0 F0F0E740   *1006133288980238025IN207Q00000X *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1C9D5 E3C1D2C5 40D6D5C5 40404040   *  2026011599991231INTAKE ONE    *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F2F0 F0F0F140 40404040   404040E3 E7404040 40404040 40404040   *    SD20001        TX           *
+000080  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040                                                           *                                *
+
+RECORD SEQUENCE NUMBER - 2
+000000  F1F0F0F6 F1F4F4F3 F5F0F9F0 F5F8F9F7   F9F1F1C7 D9F1F9F3 F2F0F0F0 F0F0E740   *1006144350905897911GR193200000X *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40C9D5E3 C1D2C540   *  2026011599991231SAMPLE INTAKE *
+000040  C7D9D6E4 D740F0F1 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *GROUP 01                  SAMPLE*
+000060  40C9D5E3 C1D2C540 C3D3C9D5 C9C340F0   F1404040 40404040 F1F0F0F5 F9F4F0F8   * INTAKE CLINIC 01       10059408*
+000080  F6F54040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *65                              *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040                                                           *                                *
+
+RECORD SEQUENCE NUMBER - 3
+000000  F1F0F0F6 F1F5F3F7 F1F6F9F9 F4F5F9F7   F8F5F5C6 C1F2F8F2 D5F0F0F0 F0F0E740   *1006153716994597855FA282N00000X *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40C9D5E3 C1D2C540   *  2026011599991231SAMPLE INTAKE *
+000040  C8D6E2D7 C9E3C1D3 40F0F140 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *HOSPITAL 01               SAMPLE*
+000060  40C9D5E3 C1D2C540 C3C1D9C5 40F0F140   40404040 40404040 F1F0F0F5 F9F8F9F2   * INTAKE CARE 01         10059892*
+000080  F7F64040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *76                              *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040                                                           *                                *
+
+RECORD SEQUENCE NUMBER - 4
+000000  40404040 40404040 4040F9F0 F0F0F2F6   F4F5F4C9 D5F2F0F7 D8F0F0F0 F0F0E740   *          900026454IN207Q00000X *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1D4C9 E2E2C9D5 C740D5D7 C9404040   *  2026011599991231MISSING NPI   *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F2F0 F0F0F440 40404040   404040E3 E7404040 40404040 40404040   *    SD20004        TX           *
+000080  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040                                                           *                                *
+
+RECORD SEQUENCE NUMBER - 5
+000000  F1F0F0F6 F1F1F3F7 F0F2F9F5 F3F8F4F3   F8F6F3E9 E9F2F0F7 D8F0F0F0 F0F0E740   *1006113702953843863ZZ207Q00000X *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1C2C1 C440E3E8 D7C54040 40404040   *  2026011599991231BAD TYPE      *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F2F0 F0F0F540 40404040   404040E3 E7404040 40404040 40404040   *    SD20005        TX           *
+000080  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040                                                           *                                *
+
+RECORD SEQUENCE NUMBER - 6
+000000  F1F0F0F6 F1F5F3F3 F3F6F9F4 F0F2F2F2   F8F6F1C9 D5404040 40404040 40404040   *1006153336940222861IN           *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1D5D6 40E3C1E7 D6D5D6D4 E8404040   *  2026011599991231NO TAXONOMY   *IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:05        11/20/26     PAGE   3
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.APPS
+
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F2F0 F0F0F640 40404040   404040E3 E7404040 40404040 40404040   *    SD20006        TX           *
+000080  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040                                                           *                                *
+
+RECORD SEQUENCE NUMBER - 7
+000000  F1F0F0F6 F1F3F3F2 F8F8F9F4 F0F6F1F6   F6F2F8C9 D5F2F0F7 D8F0F0F0 F0F0E740   *1006133288940616628IN207Q00000X *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1C9D5 E3C1D2C5 40D6D5C5 40C4E4D7   *  2026011599991231INTAKE ONE DUP*
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F2F0 F0F0F740 40404040   404040E3 E7404040 40404040 40404040   *    SD20007        TX           *
+000080  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040                                                           *                                *
+
+RECORD SEQUENCE NUMBER - 8
+000000  F1F0F0F6 F1F4F4F3 F5F0F9F6 F4F1F1F3   F7F7F6E9 E9F1F9F3 F2F0F0F0 F0F0E740   *1006144350964113776ZZ193200000X *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40C9D5E3 C1D2C540   *  2026011599991231SAMPLE INTAKE *
+000040  C7D9D6E4 D740F0F1 40C4E4D7 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *GROUP 01 DUP              SAMPLE*
+000060  40C9D5E3 C1D2C540 C3D3C9D5 C9C340F0   F1404040 40404040 F1F0F0F5 F9F4F0F8   * INTAKE CLINIC 01       10059408*
+000080  F6F54040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *65                              *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040                                                           *                                *
+
+IDC0005I NUMBER OF RECORDS PROCESSED WAS 8
+
+IDC0001I FUNCTION COMPLETED, HIGHEST CONDITION CODE WAS 0IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:05        11/20/26     PAGE   4
+
+
+ PRINT INFILE(DD02) DUMPIDCAMS  SYSTEM SERVICES                                           TIME: 11:27:05        11/20/26     PAGE   5
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.BEFORE
+
+RECORD SEQUENCE NUMBER - 1
+000000  F1F0F0F5 F9F1F2F7 F6F5F9F1 F3F2F1F8   F9F0F0C7 D9F1F9F3 F2F0F0F0 F0F0E7D3   *1005912765913218900GR193200000XL*
+000020  C1D7F2F0 F2F3F0F4 F0F1F2F0 F2F8F0F4   F0F1E2C1 D4D7D3C5 40C3D3C9 D5C9C340   *AP2023040120280401SAMPLE CLINIC *
+000040  F0F14040 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *01                        SAMPLE*
+000060  40C3D3C9 D5C9C340 C7D9D6E4 D740F0F1   40404040 40404040 F1F0F0F5 F9F4F0F8   * CLINIC GROUP 01        10059408*
+000080  F6F5                                                                        *65                              *
+
+RECORD SEQUENCE NUMBER - 2
+000000  F1F0F0F5 F9F1F4F0 F3F5F9F6 F7F8F7F5   F8F4F5C6 C1F2F9F1 E4F0F0F0 F0F0E740   *1005914035967875845FA291U00000X *
+000020  C4C6F2F0 F2F5F1F2 F0F1F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40D3C1C2 40F0F140   *DF2025120199991231SAMPLE LAB 01 *
+000040  40404040 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *                          SAMPLE*
+000060  40D3C1C2 D6D9C1E3 D6D9E840 F0F14040   40404040 40404040 F1F0F0F5 F9F8F9F2   * LABORATORY 01          10059892*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 3
+000000  F1F0F0F5 F9F1F8F5 F0F7F9F8 F7F8F0F4   F4F4F8C9 D5F2F0F7 D8F0F0F0 F0F0E7D3   *1005918507987804448IN207Q00000XL*
+000020  E3D7F2F0 F1F9F0F2 F0F1F2F0 F2F4F0F2   F0F1C7D6 D3C64040 40404040 40404040   *TP2019020120240201GOLF          *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F740 40404040   404040E3 E7404040 40404040 40404040   *    SD10007        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 4
+000000  F1F0F0F5 F9F1F9F1 F0F9F9F0 F1F0F0F3   F6F7F8C7 D9F2F2F5 F1F0F0F0 F0F0E7D4   *1005919109901003678GR225100000XM*
+000020  E2D7F2F0 F2F2F0F9 F0F1F2F0 F2F7F0F9   F0F1E2C1 D4D7D3C5 40E3C8C5 D9C1D7E8   *SP2022090120270901SAMPLE THERAPY*
+000040  40C7D9D6 E4D740F0 F1404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   * GROUP 01                 SAMPLE*
+000060  40D9C5C8 C1C240F0 F1404040 40404040   40404040 40404040 F1F0F0F5 F9F5F1F2   * REHAB 01               10059512*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 5
+000000  F1F0F0F5 F9F2F3F9 F8F6F9F7 F7F8F1F5   F2F3F9C6 C1F3F4F1 F6F0F0F0 F0F0E7D4   *1005923986977815239FA341600000XM*
+000020  C1D7F2F0 F2F1F0F3 F3F1F2F0 F2F6F0F3   F3F1E2C1 D4D7D3C5 40C1D4C2 E4D3C1D5   *AP2021033120260331SAMPLE AMBULAN*
+000040  C3C540F0 F1404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *CE 01                     SAMPLE*
+000060  40E3D9C1 D5E2D7D6 D9E340F0 F1404040   40404040 40404040 F1F0F0F5 F9F5F1F2   * TRANSPORT 01           10059512*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 6
+000000  F1F0F0F5 F9F2F5F2 F1F3F9F2 F2F4F9F0   F1F8F6C9 D5F2F0F7 D8F0F0F0 F0F0E740   *1005925213922490186IN207Q00000X *
+000020  D7E4F2F0 F2F6F0F1 F1F0F9F9 F9F9F1F2   F3F1C4C5 D3E3C140 40404040 40404040   *PU2026011099991231DELTA         *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F440 40404040   404040E3 E7404040 40404040 40404040   *    SD10004        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 7
+000000  F1F0F0F5 F9F3F2F9 F4F6F9F2 F4F5F8F9   F6F7F7C6 C1F2F5F1 C7F0F0F0 F0F0E7C8   *1005932946924589677FA251G00000XH*
+000020  E3D7F2F0 F2F0F0F3 F0F1F2F0 F2F5F0F3   F0F1E2C1 D4D7D3C5 40C8D6E2 D7C9C3C5   *TP2020030120250301SAMPLE HOSPICE*
+000040  40F0F240 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   * 02                       SAMPLE*
+000060  40C8D6E2 D7C9C3C5 40C3C1D9 C540F0F2   40404040 40404040 F1F0F0F5 F9F1F8F5   * HOSPICE CARE 02        10059185*
+000080  F0F7                                                                        *07                              *IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:05        11/20/26     PAGE   6
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.BEFORE
+
+RECORD SEQUENCE NUMBER - 8
+000000  F1F0F0F5 F9F3F3F0 F6F8F9F5 F6F5F5F4   F9F9F8C6 C1F2F5F1 C5F0F0F0 F0F0E740   *1005933068956554998FA251E00000X *
+000020  D7E4F2F0 F2F6F0F1 F1F2F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40C8D6D4 C540C8C5   *PU2026011299991231SAMPLE HOME HE*
+000040  C1D3E3C8 40F0F140 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *ALTH 01                   SAMPLE*
+000060  40C8D6D4 C540C3C1 D9C540F0 F1404040   40404040 40404040 F1F0F0F5 F9F4F0F8   * HOME CARE 01           10059408*
+000080  F6F5                                                                        *65                              *
+
+RECORD SEQUENCE NUMBER - 9
+000000  F1F0F0F5 F9F4F0F8 F6F5F9F8 F9F4F5F5   F9F2F7C9 D5F2F0F7 D8F0F0F0 F0F0E7D3   *1005940865989455927IN207Q00000XL*
+000020  C1D7F2F0 F2F1F0F3 F0F1F2F0 F3F0F0F6   F0F1C1D3 D7C8C140 40404040 40404040   *AP2021030120300601ALPHA         *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F140 40404040   404040E3 E7404040 40404040 40404040   *    SD10001        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 10
+000000  F1F0F0F5 F9F4F3F1 F4F1F9F8 F8F9F2F3   F4F7F7C6 C1F3F3F2 C2F0F0F0 F0F0E7C8   *1005943141988923477FA332B00000XH*
+000020  C1D7F2F0 F2F4F0F8 F0F1F2F0 F2F9F0F8   F0F1E2C1 D4D7D3C5 40D4C5C4 C9C3C1D3   *AP2024080120290801SAMPLE MEDICAL*
+000040  40E2E4D7 D7D3E840 F0F14040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   * SUPPLY 01                SAMPLE*
+000060  40C4D4C5 40F0F140 40404040 40404040   40404040 40404040 F1F0F0F5 F9F5F1F2   * DME 01                 10059512*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 11
+000000  F1F0F0F5 F9F4F7F8 F1F1F9F5 F9F1F9F5   F7F4F6C6 C1F2F5F1 C7F0F0F0 F0F0E7C8   *1005947811959195746FA251G00000XH*
+000020  C1D7F2F0 F2F1F0F2 F1F5F2F0 F2F6F0F2   F1F5E2C1 D4D7D3C5 40C8D6E2 D7C9C3C5   *AP2021021520260215SAMPLE HOSPICE*
+000040  40F0F140 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   * 01                       SAMPLE*
+000060  40C8D6E2 D7C9C3C5 40C3C1D9 C540F0F1   40404040 40404040 F1F0F0F5 F9F8F9F2   * HOSPICE CARE 01        10059892*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 12
+000000  F1F0F0F5 F9F5F1F2 F7F6F9F1 F5F1F1F4   F1F3F5C9 D5F2F2F5 F1F0F0F0 F0F0E7D4   *1005951276915114135IN225100000XM*
+000020  C1D7F2F0 F2F1F0F1 F1F5F2F0 F2F6F0F1   F1F5C2D9 C1E5D640 40404040 40404040   *AP2021011520260115BRAVO         *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F240 40404040   404040E3 E7404040 40404040 40404040   *    SD10002        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 13
+000000  F1F0F0F5 F9F6F0F0 F4F6F9F1 F0F0F1F3   F3F2F7C9 D5F2F2F5 F1F0F0F0 F0F0E740   *1005960046910013327IN225100000X *
+000020  C4C6F2F0 F2F5F1F1 F0F1F9F9 F9F9F1F2   F3F1C5C3 C8D64040 40404040 40404040   *DF2025110199991231ECHO          *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F540 40404040   404040E3 E7404040 40404040 40404040   *    SD10005        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 14
+000000  F1F0F0F5 F9F8F8F1 F7F9F9F7 F6F5F2F5   F1F6F8C9 D5F2F0F7 D8F0F0F0 F0F0E7D3   *1005988179976525168IN207Q00000XL*
+000020  E2D7F2F0 F2F2F0F5 F0F1F2F0 F2F7F0F5   F0F1C6D6 E7E3D9D6 E3404040 40404040   *SP2022050120270501FOXTROT       *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F640 40404040   404040E3 E7404040 40404040 40404040   *    SD10006        TX           *
+000080  4040                                                                        *                                *IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:05        11/20/26     PAGE   7
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.BEFORE
+
+RECORD SEQUENCE NUMBER - 15
+000000  F1F0F0F5 F9F8F9F2 F7F6F9F1 F9F1F1F0   F8F5F8C9 D5F2F0F7 D8F0F0F0 F0F0E7D3   *1005989276919110858IN207Q00000XL*
+000020  C1D7F2F0 F2F0F1F2 F0F1F2F0 F2F5F1F2   F0F1C3C8 C1D9D3C9 C5404040 40404040   *AP2020120120251201CHARLIE       *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F340 40404040   404040E3 E7404040 40404040 40404040   *    SD10003        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 16
+000000  F1F0F0F5 F9F9F2F3 F1F2F9F7 F7F5F2F0   F7F1F2C6 C1F2F8F2 D5F0F0F0 F0F0E7D3   *1005992312977520712FA282N00000XL*
+000020  C1D7F2F0 F2F5F0F1 F0F1F2F0 F3F0F0F1   F0F1E2C1 D4D7D3C5 40C8D6E2 D7C9E3C1   *AP2025010120300101SAMPLE HOSPITA*
+000040  D340F0F1 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *L 01                      SAMPLE*
+000060  40D4C5C4 C9C3C1D3 40C3C5D5 E3C5D940   F0F14040 40404040 F1F0F0F5 F9F4F0F8   * MEDICAL CENTER 01      10059408*
+000080  F6F5                                                                        *65                              *
+
+IDC0005I NUMBER OF RECORDS PROCESSED WAS 16
+
+IDC0001I FUNCTION COMPLETED, HIGHEST CONDITION CODE WAS 0IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:05        11/20/26     PAGE   8
+
+
+
+IDC0002I IDCAMS PROCESSING COMPLETE. MAXIMUM CONDITION CODE WAS 0
+
+PRVENR01: STARTING ENROLLMENT LOAD - BATCH 20261120
+PRVENR01: READ=0000004
+PRVENR01: WRITTEN=0000004
+PRVENR01: ERRORS=0000001
+PRVENR01: SKIPPED=0000000
+
+
+PRVUNLD1: RECORDS UNLOADED=0000020
+
+IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:06        11/20/26     PAGE   1
+
+
+ PRINT INFILE(DD01) DUMPIDCAMS  SYSTEM SERVICES                                           TIME: 11:27:06        11/20/26     PAGE   2
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.APPERR
+
+RECORD SEQUENCE NUMBER - 1
+000000  40404040 40404040 404040E3 E8D7C57A   C9D540C5 D9D97AE5 C1D3C9C4 C1E3C9D6   *           TYPE:IN ERR:VALIDATIO*
+000020  D560C6C1 C9D3C5C4 40404040 40404040   40404040 40404040 40404040 40404040   *N-FAILED                        *
+000040  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+000060  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+000080  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000E0  40404040 40404040 40404040 40404040   40404040 40404040 4040                *                                *
+
+RECORD SEQUENCE NUMBER - 2
+000000  40404040 40404040 404040E3 E8D7C57A   C9D540C5 D9D97AE5 C1D3C9C4 C1E3C9D6   *           TYPE:IN ERR:VALIDATIO*
+000020  D560C6C1 C9D3C5C4 40404040 40404040   40404040 40404040 40404040 40404040   *N-FAILED                        *
+000040  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+000060  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+000080  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000A0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000C0  40404040 40404040 40404040 40404040   40404040 40404040 40404040 40404040   *                                *
+0000E0  40404040 40404040 40404040 40404040   40404040 40404040 4040                *                                *
+
+IDC0005I NUMBER OF RECORDS PROCESSED WAS 2
+
+IDC0001I FUNCTION COMPLETED, HIGHEST CONDITION CODE WAS 0IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:06        11/20/26     PAGE   3
+
+
+ PRINT INFILE(DD02) DUMPIDCAMS  SYSTEM SERVICES                                           TIME: 11:27:06        11/20/26     PAGE   4
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.AFT010
+
+RECORD SEQUENCE NUMBER - 1
+000000  40404040 40404040 4040F9F0 F0F0F2F6   F4F5F4C9 D5F2F0F7 D8F0F0F0 F0F0E740   *          900026454IN207Q00000X *
+000020  4040F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1D4C9 E2E2C9D5 C740D5D7 C9404040   *  2026011599991231MISSING NPI   *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F2F0 F0F0F440 40404040   404040E3 E7404040 40404040 40404040   *    SD20004        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 2
+000000  F1F0F0F5 F9F1F2F7 F6F5F9F1 F3F2F1F8   F9F0F0C7 D9F1F9F3 F2F0F0F0 F0F0E7D3   *1005912765913218900GR193200000XL*
+000020  C1D7F2F0 F2F3F0F4 F0F1F2F0 F2F8F0F4   F0F1E2C1 D4D7D3C5 40C3D3C9 D5C9C340   *AP2023040120280401SAMPLE CLINIC *
+000040  F0F14040 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *01                        SAMPLE*
+000060  40C3D3C9 D5C9C340 C7D9D6E4 D740F0F1   40404040 40404040 F1F0F0F5 F9F4F0F8   * CLINIC GROUP 01        10059408*
+000080  F6F5                                                                        *65                              *
+
+RECORD SEQUENCE NUMBER - 3
+000000  F1F0F0F5 F9F1F4F0 F3F5F9F6 F7F8F7F5   F8F4F5C6 C1F2F9F1 E4F0F0F0 F0F0E740   *1005914035967875845FA291U00000X *
+000020  C4C6F2F0 F2F5F1F2 F0F1F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40D3C1C2 40F0F140   *DF2025120199991231SAMPLE LAB 01 *
+000040  40404040 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *                          SAMPLE*
+000060  40D3C1C2 D6D9C1E3 D6D9E840 F0F14040   40404040 40404040 F1F0F0F5 F9F8F9F2   * LABORATORY 01          10059892*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 4
+000000  F1F0F0F5 F9F1F8F5 F0F7F9F8 F7F8F0F4   F4F4F8C9 D5F2F0F7 D8F0F0F0 F0F0E7D3   *1005918507987804448IN207Q00000XL*
+000020  E3D7F2F0 F1F9F0F2 F0F1F2F0 F2F4F0F2   F0F1C7D6 D3C64040 40404040 40404040   *TP2019020120240201GOLF          *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F740 40404040   404040E3 E7404040 40404040 40404040   *    SD10007        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 5
+000000  F1F0F0F5 F9F1F9F1 F0F9F9F0 F1F0F0F3   F6F7F8C7 D9F2F2F5 F1F0F0F0 F0F0E7D4   *1005919109901003678GR225100000XM*
+000020  E2D7F2F0 F2F2F0F9 F0F1F2F0 F2F7F0F9   F0F1E2C1 D4D7D3C5 40E3C8C5 D9C1D7E8   *SP2022090120270901SAMPLE THERAPY*
+000040  40C7D9D6 E4D740F0 F1404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   * GROUP 01                 SAMPLE*
+000060  40D9C5C8 C1C240F0 F1404040 40404040   40404040 40404040 F1F0F0F5 F9F5F1F2   * REHAB 01               10059512*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 6
+000000  F1F0F0F5 F9F2F3F9 F8F6F9F7 F7F8F1F5   F2F3F9C6 C1F3F4F1 F6F0F0F0 F0F0E7D4   *1005923986977815239FA341600000XM*
+000020  C1D7F2F0 F2F1F0F3 F3F1F2F0 F2F6F0F3   F3F1E2C1 D4D7D3C5 40C1D4C2 E4D3C1D5   *AP2021033120260331SAMPLE AMBULAN*
+000040  C3C540F0 F1404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *CE 01                     SAMPLE*
+000060  40E3D9C1 D5E2D7D6 D9E340F0 F1404040   40404040 40404040 F1F0F0F5 F9F5F1F2   * TRANSPORT 01           10059512*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 7
+000000  F1F0F0F5 F9F2F5F2 F1F3F9F2 F2F4F9F0   F1F8F6C9 D5F2F0F7 D8F0F0F0 F0F0E740   *1005925213922490186IN207Q00000X *
+000020  D7E4F2F0 F2F6F0F1 F1F0F9F9 F9F9F1F2   F3F1C4C5 D3E3C140 40404040 40404040   *PU2026011099991231DELTA         *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F440 40404040   404040E3 E7404040 40404040 40404040   *    SD10004        TX           *
+000080  4040                                                                        *                                *IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:06        11/20/26     PAGE   5
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.AFT010
+
+RECORD SEQUENCE NUMBER - 8
+000000  F1F0F0F5 F9F3F2F9 F4F6F9F2 F4F5F8F9   F6F7F7C6 C1F2F5F1 C7F0F0F0 F0F0E7C8   *1005932946924589677FA251G00000XH*
+000020  E3D7F2F0 F2F0F0F3 F0F1F2F0 F2F5F0F3   F0F1E2C1 D4D7D3C5 40C8D6E2 D7C9C3C5   *TP2020030120250301SAMPLE HOSPICE*
+000040  40F0F240 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   * 02                       SAMPLE*
+000060  40C8D6E2 D7C9C3C5 40C3C1D9 C540F0F2   40404040 40404040 F1F0F0F5 F9F1F8F5   * HOSPICE CARE 02        10059185*
+000080  F0F7                                                                        *07                              *
+
+RECORD SEQUENCE NUMBER - 9
+000000  F1F0F0F5 F9F3F3F0 F6F8F9F5 F6F5F5F4   F9F9F8C6 C1F2F5F1 C5F0F0F0 F0F0E740   *1005933068956554998FA251E00000X *
+000020  D7E4F2F0 F2F6F0F1 F1F2F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40C8D6D4 C540C8C5   *PU2026011299991231SAMPLE HOME HE*
+000040  C1D3E3C8 40F0F140 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *ALTH 01                   SAMPLE*
+000060  40C8D6D4 C540C3C1 D9C540F0 F1404040   40404040 40404040 F1F0F0F5 F9F4F0F8   * HOME CARE 01           10059408*
+000080  F6F5                                                                        *65                              *
+
+RECORD SEQUENCE NUMBER - 10
+000000  F1F0F0F5 F9F4F0F8 F6F5F9F8 F9F4F5F5   F9F2F7C9 D5F2F0F7 D8F0F0F0 F0F0E7D3   *1005940865989455927IN207Q00000XL*
+000020  C1D7F2F0 F2F1F0F3 F0F1F2F0 F3F0F0F6   F0F1C1D3 D7C8C140 40404040 40404040   *AP2021030120300601ALPHA         *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F140 40404040   404040E3 E7404040 40404040 40404040   *    SD10001        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 11
+000000  F1F0F0F5 F9F4F3F1 F4F1F9F8 F8F9F2F3   F4F7F7C6 C1F3F3F2 C2F0F0F0 F0F0E7C8   *1005943141988923477FA332B00000XH*
+000020  C1D7F2F0 F2F4F0F8 F0F1F2F0 F2F9F0F8   F0F1E2C1 D4D7D3C5 40D4C5C4 C9C3C1D3   *AP2024080120290801SAMPLE MEDICAL*
+000040  40E2E4D7 D7D3E840 F0F14040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   * SUPPLY 01                SAMPLE*
+000060  40C4D4C5 40F0F140 40404040 40404040   40404040 40404040 F1F0F0F5 F9F5F1F2   * DME 01                 10059512*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 12
+000000  F1F0F0F5 F9F4F7F8 F1F1F9F5 F9F1F9F5   F7F4F6C6 C1F2F5F1 C7F0F0F0 F0F0E7C8   *1005947811959195746FA251G00000XH*
+000020  C1D7F2F0 F2F1F0F2 F1F5F2F0 F2F6F0F2   F1F5E2C1 D4D7D3C5 40C8D6E2 D7C9C3C5   *AP2021021520260215SAMPLE HOSPICE*
+000040  40F0F140 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   * 01                       SAMPLE*
+000060  40C8D6E2 D7C9C3C5 40C3C1D9 C540F0F1   40404040 40404040 F1F0F0F5 F9F8F9F2   * HOSPICE CARE 01        10059892*
+000080  F7F6                                                                        *76                              *
+
+RECORD SEQUENCE NUMBER - 13
+000000  F1F0F0F5 F9F5F1F2 F7F6F9F1 F5F1F1F4   F1F3F5C9 D5F2F2F5 F1F0F0F0 F0F0E7D4   *1005951276915114135IN225100000XM*
+000020  C1D7F2F0 F2F1F0F1 F1F5F2F0 F2F6F0F1   F1F5C2D9 C1E5D640 40404040 40404040   *AP2021011520260115BRAVO         *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F240 40404040   404040E3 E7404040 40404040 40404040   *    SD10002        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 14
+000000  F1F0F0F5 F9F6F0F0 F4F6F9F1 F0F0F1F3   F3F2F7C9 D5F2F2F5 F1F0F0F0 F0F0E740   *1005960046910013327IN225100000X *
+000020  C4C6F2F0 F2F5F1F1 F0F1F9F9 F9F9F1F2   F3F1C5C3 C8D64040 40404040 40404040   *DF2025110199991231ECHO          *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F540 40404040   404040E3 E7404040 40404040 40404040   *    SD10005        TX           *
+000080  4040                                                                        *                                *IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:06        11/20/26     PAGE   6
+
+
+LISTING OF DATA SET -SYS26324.T112704.RA000.PRVDAY01.AFT010
+
+RECORD SEQUENCE NUMBER - 15
+000000  F1F0F0F5 F9F8F8F1 F7F9F9F7 F6F5F2F5   F1F6F8C9 D5F2F0F7 D8F0F0F0 F0F0E7D3   *1005988179976525168IN207Q00000XL*
+000020  E2D7F2F0 F2F2F0F5 F0F1F2F0 F2F7F0F5   F0F1C6D6 E7E3D9D6 E3404040 40404040   *SP2022050120270501FOXTROT       *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F640 40404040   404040E3 E7404040 40404040 40404040   *    SD10006        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 16
+000000  F1F0F0F5 F9F8F9F2 F7F6F9F1 F9F1F1F0   F8F5F8C9 D5F2F0F7 D8F0F0F0 F0F0E7D3   *1005989276919110858IN207Q00000XL*
+000020  C1D7F2F0 F2F0F1F2 F0F1F2F0 F2F5F1F2   F0F1C3C8 C1D9D3C9 C5404040 40404040   *AP2020120120251201CHARLIE       *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F1F0 F0F0F340 40404040   404040E3 E7404040 40404040 40404040   *    SD10003        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 17
+000000  F1F0F0F5 F9F9F2F3 F1F2F9F7 F7F5F2F0   F7F1F2C6 C1F2F8F2 D5F0F0F0 F0F0E7D3   *1005992312977520712FA282N00000XL*
+000020  C1D7F2F0 F2F5F0F1 F0F1F2F0 F3F0F0F1   F0F1E2C1 D4D7D3C5 40C8D6E2 D7C9E3C1   *AP2025010120300101SAMPLE HOSPITA*
+000040  D340F0F1 40404040 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *L 01                      SAMPLE*
+000060  40D4C5C4 C9C3C1D3 40C3C5D5 E3C5D940   F0F14040 40404040 F1F0F0F5 F9F4F0F8   * MEDICAL CENTER 01      10059408*
+000080  F6F5                                                                        *65                              *
+
+RECORD SEQUENCE NUMBER - 18
+000000  F1F0F0F6 F1F3F3F2 F8F8F9F8 F0F2F3F8   F0F2F5C9 D5F2F0F7 D8F0F0F0 F0F0E740   *1006133288980238025IN207Q00000X *
+000020  D7E4F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1C9D5 E3C1D2C5 40D6D5C5 40404040   *PU2026011599991231INTAKE ONE    *
+000040  40404040 40404040 40404040 40404040   E3C5E2E3 D7D9D6E5 40404040 40404040   *                TESTPROV        *
+000060  40404040 E2C4F2F0 F0F0F140 40404040   404040E3 E7404040 40404040 40404040   *    SD20001        TX           *
+000080  4040                                                                        *                                *
+
+RECORD SEQUENCE NUMBER - 19
+000000  F1F0F0F6 F1F4F4F3 F5F0F9F0 F5F8F9F7   F9F1F1C7 D9F1F9F3 F2F0F0F0 F0F0E740   *1006144350905897911GR193200000X *
+000020  D7E4F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40C9D5E3 C1D2C540   *PU2026011599991231SAMPLE INTAKE *
+000040  C7D9D6E4 D740F0F1 40404040 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *GROUP 01                  SAMPLE*
+000060  40C9D5E3 C1D2C540 C3D3C9D5 C9C340F0   F1404040 40404040 F1F0F0F5 F9F4F0F8   * INTAKE CLINIC 01       10059408*
+000080  F6F5                                                                        *65                              *
+
+RECORD SEQUENCE NUMBER - 20
+000000  F1F0F0F6 F1F5F3F7 F1F6F9F9 F4F5F9F7   F8F5F5C6 C1F2F8F2 D5F0F0F0 F0F0E740   *1006153716994597855FA282N00000X *
+000020  D7E4F2F0 F2F6F0F1 F1F5F9F9 F9F9F1F2   F3F1E2C1 D4D7D3C5 40C9D5E3 C1D2C540   *PU2026011599991231SAMPLE INTAKE *
+000040  C8D6E2D7 C9E3C1D3 40F0F140 40404040   40404040 40404040 4040E2C1 D4D7D3C5   *HOSPITAL 01               SAMPLE*
+000060  40C9D5E3 C1D2C540 C3C1D9C5 40F0F140   40404040 40404040 F1F0F0F5 F9F8F9F2   * INTAKE CARE 01         10059892*
+000080  F7F6                                                                        *76                              *
+
+IDC0005I NUMBER OF RECORDS PROCESSED WAS 20
+
+IDC0001I FUNCTION COMPLETED, HIGHEST CONDITION CODE WAS 0IDCAMS  SYSTEM SERVICES                                           TIME: 11:27:06        11/20/26     PAGE   7
+
+
+
+IDC0002I IDCAMS PROCESSING COMPLETE. MAXIMUM CONDITION CODE WAS 0
+                 PPPPPPPPPPP   RRRRRRRRRRR   VV        VV  DDDDDDDDD      AAAAAAAAAA   YY        YY    00000000         11
+                PPPPPPPPPPPP  RRRRRRRRRRRR  VV        VV  DDDDDDDDDD    AAAAAAAAAAAA  YY        YY   0000000000       111
+               PP        PP  RR        RR  VV        VV  DD       DD   AA        AA   YY      YY   00      0000     1111
+              PP        PP  RR        RR  VV        VV  DD        DD  AA        AA    YY    YY    00     00 00       11
+             PP        PP  RR        RR  VV        VV  DD        DD  AA        AA     YY  YY     00    00  00       11
+            PPPPPPPPPPPP  RRRRRRRRRRRR  VV        VV  DD        DD  AAAAAAAAAAAA      YYYY      00   00   00       11
+           PPPPPPPPPPP   RRRRRRRRRRR   VV        VV  DD        DD  AAAAAAAAAAAA       YY       00  00    00       11
+          PP            RR    RR       VV      VV   DD        DD  AA        AA       YY       00 00     00       11
+         PP            RR     RR       VV    VV    DD        DD  AA        AA       YY       0000      00       11
+        PP            RR      RR       VV  VV     DD       DD   AA        AA       YY       000       00       11
+       PP            RR       RR       VVVV      DDDDDDDDDD    AA        AA       YY        0000000000    1111111111
+      PP            RR        RR       VV       DDDDDDDDD     AA        AA       YY         00000000     1111111111
+
+
+
+                    JJJJJJJJJJ       11        9999999999    3333333333                                AAAAAAAAAA
+                    JJJJJJJJJJ      111       999999999999  333333333333                              AAAAAAAAAAAA
+                        JJ         1111       99        99  33        33                              AA        AA
+                        JJ           11       99        99            33                              AA        AA
+                        JJ           11       99        99            33                              AA        AA
+                        JJ           11       999999999999         3333                               AAAAAAAAAAAA
+                        JJ           11       999999999999         3333                               AAAAAAAAAAAA
+                        JJ           11                 99            33                              AA        AA
+                  JJ    JJ           11                 99            33                              AA        AA
+                  JJ    JJ           11       99        99  33        33                              AA        AA
+                  JJJJJJJJ       1111111111   999999999999  333333333333                              AA        AA
+                   JJJJJJ        1111111111    9999999999    3333333333                               AA        AA
+
+
+****A   END   JOB  193  PRVDAY01  DAILY ENROLLMENT      ROOM       11.27.07 AM 20 NOV 26  PRINTER1  SYS TK5R  JOB  193   END   A****
+****A   END   JOB  193  PRVDAY01  DAILY ENROLLMENT      ROOM       11.27.07 AM 20 NOV 26  PRINTER1  SYS TK5R  JOB  193   END   A****
+****A   END   JOB  193  PRVDAY01  DAILY ENROLLMENT      ROOM       11.27.07 AM 20 NOV 26  PRINTER1  SYS TK5R  JOB  193   END   A****
+****A   END   JOB  193  PRVDAY01  DAILY ENROLLMENT      ROOM       11.27.07 AM 20 NOV 26  PRINTER1  SYS TK5R  JOB  193   END   A****

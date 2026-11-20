@@ -1,8 +1,8 @@
 rule_id,program,paragraph,start_line,end_line,status,note
 R-PRVREV01-ADD-01,PRVREV01,CHECK-NEXT,81,84,VERIFIED,"The due date compared here is the one PRVRSK01 resets to today + 5 years on every daily run, so no provider processed by PRVRSK01 can ever be due: the queue stays (almost) empty. INFERRED combination (not executed). D-003 FIX."
-R-PRVREV01-ADD-02,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",81,94,VERIFIED,"No state is kept: a provider that stays overdue is queued again at every month end, and the queue row has no sweep date."
-R-PRVREV01-ADD-03,PRVREV01,CHECK-NEXT,81,84,VERIFIED,An active provider whose due date is zero (never classified by PRVRSK01) is <= today and is queued.
-R-PRVREV01-ADD-04,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",76,93,VERIFIED,"READ and WRITE statuses are not tested beyond end of file, and RETURN-CODE is never set."
+R-PRVREV01-ADD-02,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",81,94,VERIFIED,"No state is kept: a provider that stays overdue is queued again at every month end, and the queue row has no sweep date. (D-029)"
+R-PRVREV01-ADD-03,PRVREV01,CHECK-NEXT,81,84,VERIFIED,An active provider whose due date is zero (never classified by PRVRSK01) is <= today and is queued. (D-029)
+R-PRVREV01-ADD-04,PRVREV01,"CHECK-NEXT,QUEUE-FOR-REVAL",76,93,VERIFIED,"READ and WRITE statuses are not tested beyond end of file, and RETURN-CODE is never set. (D-024)"
 R-PRVREV01-cbl-00001,PRVREV01,MAIN-CONTROL,64,65,VERIFIED,ACCEPT WS-TODAY FROM DATE YYYYMMDD at start.
 R-PRVREV01-cbl-00002,PRVREV01,MAIN-CONTROL,66,67,VERIFIED,Master opened INPUT and the queue file OUTPUT.
 R-PRVREV01-cbl-00003,PRVREV01,CHECK-NEXT,81,81,VERIFIED,Only PRV-ACTIVE records are considered.
@@ -10,7 +10,7 @@ R-PRVREV01-cbl-00004,PRVREV01,CHECK-NEXT,81,84,VERIFIED,"Due date <= today queue
 R-PRVREV01-cbl-00005,PRVREV01,QUEUE-FOR-REVAL,89,93,VERIFIED,"The queue row holds NPI, due date and 'RESCREEN-REQUIRED'."
 R-PRVREV01-cbl-00006,PRVREV01,QUEUE-FOR-REVAL,94,94,VERIFIED,ADD 1 TO WS-REVAL-COUNT.
 R-PRVREV01-cbl-00007,PRVREV01,MAIN-CONTROL,71,72,VERIFIED,DISPLAY with the final count.
-R-PRVREV01-cbl-00008,PRVREV01,MAIN-CONTROL,65,65,MISMATCH,"The date is held as YYYYMMDD (PIC 9(08)), not YYYY-MM-DD as the rule says. Format difference only."
+R-PRVREV01-cbl-00008,PRVREV01,MAIN-CONTROL,65,65,MISMATCH,"The date is held as YYYYMMDD (PIC 9(08)), not YYYY-MM-DD as the rule says. Format difference only. (D-004: ISO dates internally)"
 R-PRVREV01-cbl-00009,PRVREV01,MAIN-CONTROL,64,64,VERIFIED,MOVE 'PRVREV01' TO WS-PROGRAM-ID.
 R-PRVREV01-cbl-00010,PRVREV01,"(data division),MAIN-CONTROL",59,65,VERIFIED,WS-TODAY is set once and never changed.
 R-PRVREV01-cbl-00011,PRVREV01,CHECK-NEXT,76,76,VERIFIED,READ NEXT.

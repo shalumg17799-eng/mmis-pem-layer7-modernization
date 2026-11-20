@@ -1,0 +1,37 @@
+{
+  "name": "REVALQ",
+  "source": "PRVREV01:REVAL-OUT-RECORD",
+  "length": 80,
+  "readQuery": "MATCH (r:Record {id: 'PRVREV01:REVAL-OUT-RECORD'}) OPTIONAL MATCH (r)-[:HAS_FIELD]->(f:Field) RETURN r.name AS recordName, r.length AS recordLength, f.name AS name, f.level AS level, f.pic AS pic, f.start AS start, f.length AS length, f.group AS isGroup, f.line AS line ORDER BY f.line",
+  "discriminator": null,
+  "fields": [
+    {
+      "name": "REV-NPI",
+      "start": 1,
+      "length": 10,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "REV-DUE-DATE",
+      "start": 11,
+      "length": 8,
+      "type": "DATE_CCYYMMDD",
+      "views": []
+    },
+    {
+      "name": "REV-ACTION",
+      "start": 19,
+      "length": 20,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "FILLER",
+      "start": 39,
+      "length": 42,
+      "type": "ALPHANUMERIC",
+      "views": []
+    }
+  ]
+}

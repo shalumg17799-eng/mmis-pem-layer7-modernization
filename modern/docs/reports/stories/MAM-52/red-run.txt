@@ -1,0 +1,59 @@
+MAM-52 red run (2026-11-19), sanctions-service
+
+1) Acceptance (feature + SanctionSteps + scaffolding, before the unit tests were added):
+   ./gradlew --no-daemon :services:sanctions-service:test -> 10 tests completed, 10 failed (the Spring context started; every scenario failed on the missing endpoints)
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.A termination sets the provider to TERMINATED FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 201
+        but was: 404
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.A suspension sets the provider to SUSPENDED, not DENIED FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 201
+        but was: 404
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.A reinstatement sets the provider to ACTIVE FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 201
+        but was: 404
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.A sanction is applied whatever the current status FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 201
+        but was: 404
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > An unknown action code is rejected > Examples > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.An unknown action code is rejected FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 200
+        but was: 404
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > An unknown action code is rejected > Examples > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.An unknown action code is rejected FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 200
+        but was: 404
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.A sanction for an unknown provider is not found FAILED
+       java.lang.AssertionError: 
+       Expecting actual not to be null
+           at gov.medicaid.pem.sanctions.acceptance.SanctionSteps.problemNamingNpi(SanctionSteps.java:183)
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > A failure to apply is never reported as not found or as applied > Examples > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.A failure to apply is never reported as not found or as applied FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 503
+        but was: 404
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > A failure to apply is never reported as not found or as applied > Examples > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.A failure to apply is never reported as not found or as applied FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 503
+        but was: 404
+   CucumberSuiteTest > Cucumber > Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service > gov.medicaid.pem.sanctions.acceptance.CucumberSuiteTest.The sanction history is readable, and roles are enforced FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: 201
+        but was: 404
+
+2) Unit tests (SanctionActionTest, RecordSanctionTest): ./gradlew --no-daemon :services:sanctions-service:compileTestJava -> compilation failed, only missing production symbols:
+         8 package ProviderStatusPort does not exist
+        12 package SanctionAction does not exist
+         4 symbol:   class RecordSanction
+        10 symbol:   class Sanction
+         2 symbol:   class SanctionAction
+         2 symbol:   class SanctionAppliedData
+         4 symbol:   class SanctionCommand
+         4 symbol:   class SanctionHistory
+        24 symbol:   variable SanctionAction
+         2 symbol: class Sanction
+         4 symbol: class SanctionPage
+
+Reason: POST/GET /api/v1/sanctions (404) and SanctionAction, Sanction, RecordSanction, SanctionCommand, SanctionHistory, SanctionPage, SanctionAppliedData, ProviderStatusPort do not exist yet.

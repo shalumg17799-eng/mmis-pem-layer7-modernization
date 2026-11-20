@@ -20,9 +20,13 @@ Ontology: `.claude/skills/kag-ontology/SKILL.md`. The graph is only ever written
 | `load_03_lineage` | READS / WRITES / REWRITES between steps, programs and datasets; dataset record layouts |
 | `load_04_data_dictionary` | business definitions on fields and records (update-only) |
 | `load_05_business_rules` | the 403 AWS rules (UNVERIFIED) and 84 key functionalities |
-| `load_06_test_plan` | the 4 AWS test cases (ontology extension: `level='aws-plan'`, `COVERS` to the job) |
+| `load_06_test_plan` | **DISABLED 2026-11-19 (Neo4j = legacy context only).** the 4 AWS test cases (ontology extension: `level='aws-plan'`, `COVERS` to the job) |
 | `load_07_anti_patterns` | the 12 seeded anti-patterns, line numbers found by regex in the source |
 | `load_08_missing` | missing programs (with the dynamic CALLS), CICS / BMS / dataset gaps |
+| `load_12_trace` | **DISABLED 2026-11-19 (Neo4j = legacy context only).** After each story: TestCase (from JUnit XML, Cucumber features with @AC-n, Vitest results; level and pass/fail) VERIFIES AcceptanceCriterion; Story IMPLEMENTED_BY CodeUnit (from the story's trace.json) |
+| `load_11_backlog` | **DISABLED 2026-11-19 (Neo4j = legacy context only).** Phase 4: epics, stories/tasks and acceptance criteria from `modern/specs` and `backlog-draft.md`; story DERIVED_FROM rule (primary or related), epic CONTAINS story |
+| `load_10_architecture` | **DISABLED 2026-11-19 (Neo4j = legacy context only).** Phase 3: services, endpoints (with roles), events, tables and columns, ADRs, screens; rule OWNED_BY service, field MAPS_TO column, screen CALLS endpoint |
+| `load_09_analysis` | Phase 2: verification status and evidence on every rule, the added rules, defects (AFFECTS), questions (ABOUT), regulations (GOVERNED_BY) |
 
 Ontology extensions (additive): `INCLUDES` also from a Copybook to a Copybook; `HAS_ANTIPATTERN` also from a Copybook, Job or Dataset;
 Job has `role` (pipeline, vsam-definition, proc); `TestCase.level='aws-plan'` with `COVERS`. Provenance (`source`, `loader`, `loadedAt`) is set on create only.

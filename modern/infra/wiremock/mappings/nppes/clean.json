@@ -1,0 +1,29 @@
+{
+  "name": "nppes clean: any other 10-digit NPI",
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPath": "/nppes/providers",
+    "queryParameters": {
+      "npi": {
+        "matches": "^[0-9]{10}$"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "NPPES",
+      "npi": "{{request.query.npi}}",
+      "found": true,
+      "active": true
+    }
+  },
+  "metadata": {
+    "source": "nppes",
+    "answer": "clean"
+  }
+}

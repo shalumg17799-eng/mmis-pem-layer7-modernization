@@ -1,7 +1,7 @@
 rule_id,program,paragraph,start_line,end_line,status,note
-R-PRVDIR01-ADD-01,PRVDIR01,EXTRACT-NEXT,78,79,VERIFIED,"The filter is only the active status. Screening result and overdue revalidation are not considered, so an active provider that failed screening or is overdue still appears in the directory."
-R-PRVDIR01-ADD-02,PRVDIR01,WRITE-DIR-ROW,88,88,VERIFIED,"DIR-NAME is the first 60 bytes of PRV-VARIANT, which is not a display name: for an individual it is last name (30) + first name (20) + the first 10 characters of the licence number; for a group or facility it is the legal name (40) + the first 20 of the DBA name. No trimming or spacing."
-R-PRVDIR01-ADD-03,PRVDIR01,"MAIN-CONTROL,WRITE-DIR-ROW",64,89,VERIFIED,OPEN statuses and WRITE status are never tested and RETURN-CODE is never set.
+R-PRVDIR01-ADD-01,PRVDIR01,EXTRACT-NEXT,78,79,VERIFIED,"The filter is only the active status. Screening result and overdue revalidation are not considered, so an active provider that failed screening or is overdue still appears in the directory. (Q-008)"
+R-PRVDIR01-ADD-02,PRVDIR01,WRITE-DIR-ROW,88,88,VERIFIED,"DIR-NAME is the first 60 bytes of PRV-VARIANT, which is not a display name: for an individual it is last name (30) + first name (20) + the first 10 characters of the licence number; for a group or facility it is the legal name (40) + the first 20 of the DBA name. No trimming or spacing. (D-028)"
+R-PRVDIR01-ADD-03,PRVDIR01,"MAIN-CONTROL,WRITE-DIR-ROW",64,89,VERIFIED,OPEN statuses and WRITE status are never tested and RETURN-CODE is never set. (D-024)
 R-PRVDIR01-ADD-04,PRVDIR01,"(data division),WRITE-DIR-ROW",47,88,VERIFIED,"The directory row has no taxonomy or specialty, address, phone or network information, so it cannot feed a FHIR PractitionerRole (specialty = taxonomy) as it is (Q-008)."
 R-PRVDIR01-ADD-05,PRVDIR01,"MAIN-CONTROL,EXTRACT-NEXT",62,73,VERIFIED,AP-06: PEMAPP2 reads PEMAPP1's master directly with no API. D-013 FIX.
 R-PRVDIR01-cbl-00001,PRVDIR01,MAIN-CONTROL,63,67,VERIFIED,MAIN-CONTROL opens the master INPUT and the directory file OUTPUT and starts the loop.

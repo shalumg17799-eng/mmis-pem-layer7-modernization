@@ -1,0 +1,119 @@
+{
+  "job": "PRVDIR01",
+  "runId": "20261120-seed",
+  "side": "modern",
+  "scenario": "dir-seed",
+  "businessDate": "2026-11-20",
+  "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
+  "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
+  "startedUtc": "2026-11-20T11:21:49Z",
+  "finishedUtc": "2026-11-20T11:22:09Z",
+  "gateway": "http://localhost:8080",
+  "user": "admin1 (ADMIN)",
+  "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
+  "modernBuild": {
+    "gitHead": "6763144",
+    "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
+    "workingTree": "uncommitted changes of the lead (no commit in this task)"
+  },
+  "memoryPauseSeconds": 0,
+  "runs": [
+    {
+      "step": "PRVDIR01 directory extract",
+      "startPath": "/api/v1/batch/directory-extracts",
+      "startHttpStatus": 202,
+      "runId": "d119ac41-1a42-49c2-9778-8da2b640099b",
+      "status": "COMPLETED",
+      "businessDate": "2026-11-20",
+      "counts": {
+        "rows": 8
+      },
+      "error": null,
+      "startedAt": "2026-11-20T11:22:06.321733Z",
+      "endedAt": "2026-11-20T11:22:06.361590Z",
+      "job": "PRVDIR01"
+    }
+  ],
+  "flowNotes": [
+    "Run on the seed state, like the legacy PRVDIR01 (ad-hoc lab deck).",
+    "SEED PREMISE: the SQL seed holds NULL where provider-master-seed.dat has the due date 99991231 for four providers (1005914035, 1005925213, 1005933068, 1005960046); the export writes an unset date as 00000000, so bytes 43-50 of those four records differ between the modern and the legacy BEFORE file (the other 12 records and all other bytes are equal)."
+  ],
+  "problems": [],
+  "normalised": [
+    "record separator only: the API returns one record per line (LF); the .ascii file holds the same records back to back like the converted golden files; no field is changed"
+  ],
+  "files": [
+    {
+      "path": "before/provider-master.delivered",
+      "role": "provider master export BEFORE (seed state) (as delivered by the API, one record per line)",
+      "bytes": 2095,
+      "sha256": "bd8064301c7cbc40f6c1efdf14ebea7589a1e9d89c89a512366e6ee18e6f2d74"
+    },
+    {
+      "path": "before/provider-master.ascii",
+      "role": "provider master export BEFORE (seed state) (record stream, records back to back)",
+      "bytes": 2080,
+      "sha256": "1544f0905b402d70782793f94fcf3a4f9432f52ca7cf4bdbd599c203dd4ec526",
+      "recordLength": 130,
+      "records": 16,
+      "goldenCounterpart": "before/provider-master.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "inputs/provider-master-seed-sorted.dat",
+      "role": "input as sent to the legacy run (same bytes)",
+      "bytes": 2096,
+      "sha256": "3febd267db27375183df9859f57776ed0d9c986b7a9fe08c3480dcefe741563c",
+      "records": 16,
+      "recordLength": 130,
+      "lineEnds": "LF after every record"
+    },
+    {
+      "path": "after/dirout.delivered",
+      "role": "DIROUT written by the extract (as delivered by the API, one record per line)",
+      "bytes": 800,
+      "sha256": "e0afb391af396400815aeb5bb3061d10a65c891a71a12f9e7de3d64624e4c438"
+    },
+    {
+      "path": "after/dirout.ascii",
+      "role": "DIROUT written by the extract (record stream, records back to back)",
+      "bytes": 800,
+      "sha256": "e0afb391af396400815aeb5bb3061d10a65c891a71a12f9e7de3d64624e4c438",
+      "recordLength": 100,
+      "records": 8,
+      "goldenCounterpart": "after/dirout.ebcdic.ascii",
+      "deliveredLineEnds": "none (records back to back)",
+      "badRecordLengths": []
+    },
+    {
+      "path": "after/provider-master-after.delivered",
+      "role": "provider master export AFTER (as delivered by the API, one record per line)",
+      "bytes": 2095,
+      "sha256": "bd8064301c7cbc40f6c1efdf14ebea7589a1e9d89c89a512366e6ee18e6f2d74"
+    },
+    {
+      "path": "after/provider-master-after.ascii",
+      "role": "provider master export AFTER (record stream, records back to back)",
+      "bytes": 2080,
+      "sha256": "1544f0905b402d70782793f94fcf3a4f9432f52ca7cf4bdbd599c203dd4ec526",
+      "recordLength": 130,
+      "records": 16,
+      "goldenCounterpart": "after/provider-master-after.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "logs/modern-job-lines.txt",
+      "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
+      "bytes": 1792,
+      "sha256": "265cc48510b2c4e57625d0428c4dfc00b5b94bcaeec8bc0dd81909854094a0b8"
+    },
+    {
+      "path": "logs/run-log.txt",
+      "role": "log of this script",
+      "bytes": 480,
+      "sha256": "c30c582bcbfae4e139172a38d615b3985f52911ab5edf96305e2b0eee8592c93"
+    }
+  ]
+}

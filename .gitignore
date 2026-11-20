@@ -6,3 +6,7 @@ __pycache__/
 **/.gradle/
 **/node_modules/
 modern/web-ui/dist/
+# Phase 5: random local-only passwords (Keycloak test users, Postgres), generated, never committed
+modern/infra/.env.local
+# pytest JUnit XML of the tool tests (read by tools/trace/build_rule_trace.py)
+modern/tools/checks/test-results/

@@ -1,0 +1,36 @@
+{
+  "story": "MAM-26",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "tests": [
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/HelpersTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/client/ServiceTokenProviderTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/config/PemKitAutoConfigurationTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/security/SecurityKitTest.java"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [
+      "SecurityKitTest: PASSED"
+    ],
+    "AC-3": [],
+    "AC-4": [],
+    "AC-5": [
+      "HelpersTest: PASSED",
+      "PemKitAutoConfigurationTest: PASSED",
+      "ServiceTokenProviderTest: PASSED"
+    ],
+    "AC-6": []
+  },
+  "codeUnits": [
+    "modern/infra/keycloak/realm-pem.json",
+    "modern/libs/service-kit/src/main/java/gov/medicaid/pem/kit/client/ServiceTokenProvider.java"
+  ],
+  "rules": []
+}

@@ -1,0 +1,187 @@
+{
+  "job": "PRVDAY01",
+  "runId": "20261120-valid-only",
+  "attempt": 1,
+  "mvsJobNumber": 194,
+  "businessDate": "2026-11-20",
+  "businessDateNote": "MVS system date of the run (CURRENT-DATE special register, no PARM or control card exists in the lab programs); the frozen date 2026-01-15 could not be used because the MVS system date must not be changed",
+  "batchIdParm": "20261120",
+  "submittedUtc": "2026-11-20T10:29:40Z",
+  "codePage": "1047",
+  "codePageProof": "card with [ ] ^ loaded through the reader came back as AD BD 5F (037 would give BA BB B0); | came back as 6A (Hercules table; CP1047 has 4F) - the character does not occur in the data",
+  "method": "IDCAMS PRINT INFILE(DDnn) DUMP printed in the job itself; bytes rebuilt from the hex (parse_dump.py); master captured through lab program PRVUNLD1 (IDCAMS cannot open ISAM)",
+  "user": "none (anonymous job: the lab account password is not available; permanent datasets are refused)",
+  "stepReturnCodes": [
+    "PRVDAY01 LOAD010 PRVSEED1 RC= 0000",
+    "PRVDAY01 LOAD020 PRVLDAP1 RC= 0000",
+    "PRVDAY01 LOAD030 PRVUNLD1 RC= 0000",
+    "PRVDAY01 LOAD040 IDCAMS RC= 0000",
+    "PRVDAY01 STEP010 PRVENR01 RC= 0000",
+    "PRVDAY01 CAP010 PRVUNLD1 RC= 0000",
+    "PRVDAY01 CAP011 IDCAMS RC= 0000",
+    "PRVDAY01 STEP015 PRVUNLD1 RC= 0000",
+    "PRVDAY01 STEP020 SORT RC= 0000",
+    "PRVDAY01 STEP030 PRVSCR01 RC= 0000",
+    "PRVDAY01 CAP030 PRVUNLD1 RC= 0000",
+    "PRVDAY01 STEP040 PRVRSK01 RC= 0000",
+    "PRVDAY01 CAP040 PRVUNLD1 RC= 0000",
+    "PRVDAY01 STEP099 IEFBR14 RC= 0000",
+    "PRVDAY01 CAP099 IDCAMS RC= 0000",
+    "11.29.42 JOB  194  IEF404I PRVDAY01 - ENDED - TIME=11.29.42"
+  ],
+  "files": [
+    {
+      "path": "inputs/provider-master-seed-sorted.dat",
+      "role": "input as sent (ASCII, one record per line, LF)",
+      "recordLength": 130,
+      "records": 16,
+      "bytes": 2096,
+      "sha256": "3febd267db27375183df9859f57776ed0d9c986b7a9fe08c3480dcefe741563c"
+    },
+    {
+      "path": "inputs/appinput.dat",
+      "role": "input as sent (ASCII, one record per line, LF)",
+      "recordLength": 200,
+      "records": 3,
+      "bytes": 603,
+      "sha256": "f42a9af137205bde766bc977922e2af75606145a44391228ed432bc348086617"
+    },
+    {
+      "path": "before/appinput.ebcdic",
+      "role": "APPINPUT as loaded (PRVLDAP1)",
+      "recordLength": 200,
+      "records": 3,
+      "bytes": 600,
+      "sha256": "4daf893fb71dcee7a1531898d5f87f510ccf1bfad0f1f0a39029ef3031f00518",
+      "codePage": "1047",
+      "equalsLoadedInput": true,
+      "ascii": {
+        "path": "before/appinput.ebcdic.ascii",
+        "sha256": "2f4dc25a833f195b374bc935b2808a766a6ef9a2f88b40c44870f604ef017399"
+      }
+    },
+    {
+      "path": "before/provider-master.ebcdic",
+      "role": "provider master as loaded (PRVSEED1, unloaded by PRVUNLD1)",
+      "recordLength": 130,
+      "records": 16,
+      "bytes": 2080,
+      "sha256": "f87732f7a20e0b89f7aa9cc33a6c351fac1dd67f02029c59310e2c530c4ee90a",
+      "codePage": "1047",
+      "equalsLoadedInput": true,
+      "ascii": {
+        "path": "before/provider-master.ebcdic.ascii",
+        "sha256": "2062175f6cd1aaa1860b5ad2bdf717e191fb046d4445b4499503c9f1888fce00"
+      }
+    },
+    {
+      "path": "after/apperror.ebcdic",
+      "role": "APPERROR written by STEP010 PRVENR01",
+      "recordLength": 250,
+      "records": 0,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "codePage": "1047",
+      "ascii": {
+        "path": "after/apperror.ebcdic.ascii",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "note": "empty file"
+      }
+    },
+    {
+      "path": "after/provider-master-after-step010.ebcdic",
+      "role": "master after STEP010 PRVENR01",
+      "recordLength": 130,
+      "records": 19,
+      "bytes": 2470,
+      "sha256": "5f14fc59826e696aa7e0ffe6b71dda16a952d4eafc8e479dd9a11606471f5013",
+      "codePage": "1047",
+      "ascii": {
+        "path": "after/provider-master-after-step010.ebcdic.ascii",
+        "sha256": "50a996ac763df05f4108d755829767fc4b14c090bb72c383316144ecfa6497b3"
+      }
+    },
+    {
+      "path": "after/scrnout.ebcdic",
+      "role": "SCRNOUT written by STEP030 PRVSCR01",
+      "recordLength": 67,
+      "records": 20,
+      "bytes": 1340,
+      "sha256": "19e1522a615ba7b61c8b058a93ca079013b9d1aaeb8e761bad437a3cede4d537",
+      "codePage": "1047",
+      "ascii": {
+        "path": "after/scrnout.ebcdic.ascii",
+        "sha256": "451873019ac1f2f7a56597243719b7e65d23a22b27f917a8e1f25cc06174a7d1"
+      }
+    },
+    {
+      "path": "after/provider-master-after-step030.ebcdic",
+      "role": "master after STEP030 PRVSCR01",
+      "recordLength": 130,
+      "records": 19,
+      "bytes": 2470,
+      "sha256": "bd7dba3360f68c17da4d2d81837cb96e3b928111ffe6b0685c0667d81d311471",
+      "codePage": "1047",
+      "ascii": {
+        "path": "after/provider-master-after-step030.ebcdic.ascii",
+        "sha256": "0e3e18e3ac186c07d44ffa42338979df38b2470a5a3e0b69c9fa7ea5be3bdf43"
+      }
+    },
+    {
+      "path": "after/provider-master-after-step040.ebcdic",
+      "role": "master after STEP040 PRVRSK01 (final)",
+      "recordLength": 130,
+      "records": 19,
+      "bytes": 2470,
+      "sha256": "91315ea6044d2cf9458fe453cfcf344b3d6bdda0e280eb56b94c243da9c84810",
+      "codePage": "1047",
+      "ascii": {
+        "path": "after/provider-master-after-step040.ebcdic.ascii",
+        "sha256": "9a8367877fa9c34d37a15515fe78d76cd83a2281bac1c47cc40877f05d7fca18"
+      }
+    }
+  ],
+  "notProducedByLegacy": [],
+  "problems": [],
+  "blocked": [],
+  "mvsDateNote": "the golden business date 2026-01-15 needs the MVS system date to be changed (forbidden); the jobs ran on the real date",
+  "labDifferences": {
+    "jcl": [
+      "JOB card: lab removes NOTIFY=&SYSUID and REGION=0M and adds USER=HERC01,PASSWORD (lab JCL comment); THIS RUN has no USER/PASSWORD (see parityRunAdditions)",
+      "PRVDAY01: IF (STEP010.RC = 0) THEN / ENDIF does not exist in 3.8j JCL; STEPs 015-040 carry COND=(0,LT,STEP010) (lab, same meaning)",
+      "&DATE and &BATCH_DATE are undefined in the legacy decks (D-020); the lab fills them (hercjob.py --set); this run uses PARM BATCH_ID=<run date> and temporary dataset names, so no date appears in a dataset name",
+      "PRVMSTR: VSAM KSDS MMPRV.PROVIDER.MASTER.KSDS -> ISAM dataset, 130-byte records, 10-byte key at offset 0 (the 1972 COBOL cannot use VSAM; record length 130 not 121, D-007)",
+      "PRVDAY01 STEP005 added by the lab for reruns (scratch the day's outputs); dropped in this run (temporary datasets)",
+      "PRVDAY01 STEP015 PRVUNLD1 added by the lab: unloads the ISAM master to a flat file for the SORT (the OS/360 SORT and IDCAMS cannot open ISAM)",
+      "PRVDAY01 STEP020 SORT: the legacy INCLUDE COND=(23,1,CH,EQ,C'U') card is not supported by the OS/360 SORT (IER005A) and its offset 23 is inside the taxonomy (flag is at 34); lab control cards: SORT FIELDS=(1,10,CH,A), RECORD TYPE=F,LENGTH=(130); SORTLIB, SORTWKnn, DCBs added; SORTOUT never read (D-009 DROP)",
+      "PRVMTH01 STEP030: UNIT=TAPE,LABEL=(1,SL) -> UNIT=SYSDA, GDG MMPRV.TMSIS.ARCHIVE(+1) with a model DCB (lab); NOT reproducible in this run (BLOCKED, anonymous job)",
+      "PRVSAN01 and PRVDIR01: the legacy estate has no JCL; the lab decks follow the DD names of the programs"
+    ],
+    "cobol": [
+      "all programs are the lab port 'TK5 / OS ANS COBOL V2 LAB PORT' compiled by IKFCBL00 (job PRVBLD01); per-program line diffs against source-code/BATCH are in parity/golden/lab-cobol-diff/ (copybooks are flattened into the source, so the raw diffs are large)",
+      "PRVENR01: VSAM KSDS -> ISAM, FILE STATUS -> INVALID KEY / AT END, EVALUATE / END-IF / SET TO TRUE / STRING rewritten, BATCH_ID taken from the JCL PARM instead of an environment variable; paragraph order and GO TO flow unchanged (lab header)",
+      "PRVRSK01: EVALUATE / FUNCTION MOD / ACCEPT FROM DATE / reference modification rewritten for the V2 compiler; the lab states ALTER, flow and the 2-digit-year arithmetic are unchanged",
+      "PRVREV01, PRVRSK01, PRVTMS01: ACCEPT ... FROM DATE YYYYMMDD / FROM DAY (not in V2) replaced by the MVS CURRENT-DATE register (MM/DD/YY, 2-digit year only): the business date is the MVS system date",
+      "PRVSAN01: V2 only allows CALL 'literal', so the dynamic CALL WS-NOTICE-PGM is dispatched on the action code to CALL 'PRVNTTRM' / 'PRVNTSUS' / 'PRVNTRST' / 'PRVNTGEN'; the four PRVNT* programs never existed in the estate and exist in the lab as stubs that DISPLAY a line",
+      "PRVDIR01, PRVREV01, PRVSCR01: the lab blanks the output record for every row (QSAM buffer slots)",
+      "PRVTMS01 line 114 (MOVE WS-TODAY-JUL TO WS-T-PERIOD-YYDDD, 73 columns, identifier past column 72, D-021): the lab port re-spaces the statement so the identifier ends inside column 72; source-code/ is unchanged",
+      "PRVSCR01: control flow unchanged, the four checks are still the stubs that return P (D-005)",
+      "lab-only helper programs (not in the legacy estate): PRVSEED1 (master loader), PRVLDAP1 (application loader), PRVUNLD1 (master unloader), PRVDUMP1 (list), PRVNTTRM/SUS/RST/GEN (notice stubs)"
+    ],
+    "parityRunAdditions": [
+      "no USER/PASSWORD on the job card: the lab account password is not available to the parity checker (a blank password was rejected: IEF722I INVALID PASSWORD GIVEN, job 185); an anonymous job cannot create a permanent dataset (IEF197I SYSTEM ERROR DURING ALLOCATION, jobs 186-191)",
+      "therefore ONE job per run, every dataset temporary (&&name), inputs as in-stream cards through the lab loaders PRVSEED1 / PRVLDAP1 (two cards per record), outputs printed by IDCAMS PRINT DUMP in the same job; the lab's own MMPRV datasets were not touched",
+      "added read-only steps LOADnnn (load + capture BEFORE) and CAPnnn (capture after steps); the lab steps keep their names, programs, DD names and DCBs",
+      "the ISAM master is loaded in ascending NPI order (the lab loader needs it): inputs/provider-master-seed-sorted.dat is the seed file sorted by NPI, same 16 records"
+    ]
+  },
+  "beforeEqualsLoaded": {
+    "APPS": true,
+    "BEFORE": true
+  },
+  "labJcl": {
+    "file": "logs/submitted-PRVDAY01.jcl",
+    "sha256": "99e0994c9fd1b26b7486b98f41237b2d5d96eb98d8eedb5f3a8dd6e329cb7cba",
+    "derivedFrom": "JES2 JCL listing of the lab job of 2026-11-19 in the printer spool (the *-LAB.jcl stubs are not in the container or the repository)"
+  }
+}

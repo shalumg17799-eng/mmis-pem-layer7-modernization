@@ -21,6 +21,9 @@ Phase 4 is `APPROVED`.
    - "Passwords for the 4 Keycloak test users": put them in `.env` as
      `KC_PROVIDER_PASSWORD`, `KC_ANALYST_PASSWORD`, `KC_SUPERVISOR_PASSWORD` and
      `KC_ADMIN_PASSWORD`, plus `KC_BOOTSTRAP_ADMIN_PASSWORD` for the Keycloak admin.
+     (User decision 2026-11-18: instead, generate random local-only passwords into
+     `modern/infra/.env.local`, which is git-ignored; give the user its path, never the
+     values. Test users: provider1, analyst1, supervisor1, admin1.)
 2. **Platform.** Delegate to devops-engineer: all of its Phase 5 deliverables.
    - Gradle wrapper: if Gradle is not installed locally, generate the wrapper with a
      pinned Docker image, e.g.
@@ -47,8 +50,8 @@ Phase 4 is `APPROVED`.
    - the walking-skeleton Playwright test passes
    - The JaCoCo and PIT gates are active. Prove it: temporarily lower a threshold check,
      or show the build configuration lines.
-   - `git grep` finds no committed secrets.
-6. Commit: `feat(phase-5): platform, data, walking skeleton`.
+   - `git grep --untracked` finds no secrets, and `modern/infra/.env.local` is git-ignored.
+6. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Exit checks
 - [ ] `make up` is healthy, and `make seed` loads the data.

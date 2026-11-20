@@ -1,0 +1,12 @@
+11:21:25 scenario month-seed: job PRVMTH01, run id 20261120-seed, business date 2026-11-20
+11:21:26 memory ok before seed: 2061 MB free
+11:21:36 seed.sh done: seed files loaded: 10
+11:21:36 seed state: 16 providers
+11:21:40 memory ok before PRVREV01 revalidation sweep: 1995 MB free
+11:21:40 PRVREV01 revalidation sweep: POST /api/v1/batch/revalidation-sweeps -> 202
+11:21:42 PRVREV01 revalidation sweep: run b95a2698-b1ce-41b6-8fd7-96cc48f26665 COMPLETED counts={'queued': 4, 'noDueDate': 0} error=None
+11:21:43 memory ok before PRVTMS01 T-MSIS extract: 2091 MB free
+11:21:43 PRVTMS01 T-MSIS extract: POST /api/v1/batch/tmsis-extracts -> 202
+11:21:43 PRVTMS01 T-MSIS extract: run c39fa96e-1ff9-4ea6-8454-73fe0a7981c1 RUNNING counts={'rows': 0, 'futureEnrolments': 0} error=None
+11:21:45 T-MSIS run listed as finished: done (COMPLETED)
+11:21:45 T-MSIS run c39fa96e-1ff9-4ea6-8454-73fe0a7981c1 COMPLETED counts={'rows': 8, 'futureEnrolments': 0, 'archiveGeneration': 16} error=None

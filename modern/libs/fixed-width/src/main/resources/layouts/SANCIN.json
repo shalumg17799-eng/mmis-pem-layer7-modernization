@@ -1,0 +1,44 @@
+{
+  "name": "SANCIN",
+  "source": "PRVSAN01:SANCTION-IN-RECORD",
+  "length": 80,
+  "readQuery": "MATCH (r:Record {id: 'PRVSAN01:SANCTION-IN-RECORD'}) OPTIONAL MATCH (r)-[:HAS_FIELD]->(f:Field) RETURN r.name AS recordName, r.length AS recordLength, f.name AS name, f.level AS level, f.pic AS pic, f.start AS start, f.length AS length, f.group AS isGroup, f.line AS line ORDER BY f.line",
+  "discriminator": null,
+  "fields": [
+    {
+      "name": "SAN-NPI",
+      "start": 1,
+      "length": 10,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "SAN-ACTION",
+      "start": 11,
+      "length": 1,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "SAN-REASON",
+      "start": 12,
+      "length": 40,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "SAN-EFF-DATE",
+      "start": 52,
+      "length": 8,
+      "type": "DATE_CCYYMMDD",
+      "views": []
+    },
+    {
+      "name": "FILLER",
+      "start": 60,
+      "length": 21,
+      "type": "ALPHANUMERIC",
+      "views": []
+    }
+  ]
+}

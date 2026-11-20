@@ -39,7 +39,7 @@ Phase 2 is `APPROVED`.
    result again.
 6. **On approval:** set every ADR's status to `ACCEPTED`, and tag the contracts as
    version `1.0.0` in their `info.version`.
-7. Commit: `docs(phase-3): architecture, contracts, ADRs, UX`.
+7. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Exit checks
 - [ ] Rule coverage and field coverage show zero gaps.

@@ -1,0 +1,28 @@
+{
+  "name": "sam clean: any other 10-digit NPI",
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPath": "/sam/debarments",
+    "queryParameters": {
+      "npi": {
+        "matches": "^[0-9]{10}$"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "SAMGOV",
+      "npi": "{{request.query.npi}}",
+      "debarred": false
+    }
+  },
+  "metadata": {
+    "source": "sam",
+    "answer": "clean"
+  }
+}

@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: sanctions-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/sanctions_db
+    username: sanctions_svc
+    password: ${PG_SANCTIONS_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/sanctions
+server:
+  port: ${PEM_SANCTIONS_PORT:8086}
+pem:
+  services:
+    provider-url: http://${PEM_SERVICE_HOST:localhost}:${PEM_PROVIDER_PORT:8081}
+    provider-timeout: ${PEM_PROVIDER_TIMEOUT:5s}

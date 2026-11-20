@@ -1,0 +1,9 @@
+8ee095fac49f03b03abe1e9f37cd0cd644104cbfa1f19ff6f33299cb4c3c9b90  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/IntegrationTest.java
+ab7647c677c7646add0e9d3b3aec73b07ce5e0eeaaf7ba6a905550f0936b881f  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/PlatformChecksTest.java
+422fa6c5082b22c5a84854ebea5affc57bf53b073c0307722cd1a6e3b943da85  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/CucumberSpringConfig.java
+5e4c06fed9908aa94afb3d21cf325b184ee960865367abb9c6784bd3a3182c5f  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/CucumberSuiteTest.java
+ac2ff6137db4f657ad9be871649f5d9f85a64637c9b150b60b28cb2f5c512fe7  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/RiskSteps.java
+14b3bc590f6e3302e88b1ae4b157f6f77ad35174416b0eb7af5a476d4551cf18  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/application/AssessRiskTest.java
+1923f58f20cd7ee6593484e8b02ec3accb16a43bf6466f272aa10098e0c26748  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/domain/RuleSetTest.java
+9f20506db4629c04cb34fd97654c85d9f50261d818e39c3406a8ed9875e0e7b3  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/infrastructure/ScreeningEventsCorrelationIdTest.java
+733d22a4c195d446673a83453830b107d5623bc2c7c59a8e893056104bf27795  modern/services/risk-service/src/test/resources/features/MAM-35.feature

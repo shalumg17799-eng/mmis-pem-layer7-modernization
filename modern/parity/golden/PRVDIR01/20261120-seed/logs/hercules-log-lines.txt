@@ -1,0 +1,60 @@
+07:04:50 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:04:50 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:04:50 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:04:50 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:04:56 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:04:56 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:05:32 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:05:32 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:12:05 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:12:05 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:12:06 HHC01037E 0:000C COMM: client <unknown>, IP 172.29.0.1 connection to device 3505 rejected: device busy or interrupt pending
+07:16:00 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:16:00 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:16:46 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:16:46 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:17:20 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:17:20 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:17:21 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:17:21 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:18:17 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:18:17 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:32:45 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:32:45 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+07:32:46 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+07:32:46 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+09:56:55 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+09:56:55 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+09:58:02 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+09:58:02 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+09:59:26 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+09:59:26 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:01:08 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:01:08 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:01:09 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:01:09 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:01:10 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:01:10 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:02:31 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:02:31 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:02:35 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:02:35 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:03:23 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:03:23 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:27:04 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:27:04 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:29:41 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:29:41 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:29:56 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:29:56 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:30:06 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:30:06 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505
+10:30:06 /11.30.06 JOB  196  $HASP100 PRVDIR01 ON READER1     PROVIDER DIRECTORY
+10:30:07 /11.30.06 JOB  196  $HASP373 PRVDIR01 STARTED - INIT  1 - CLASS A - SYS TK5R
+10:30:07 /11.30.06 JOB  196  IEF403I PRVDIR01 - STARTED - TIME=11.30.06
+10:30:08 /11.30.08 JOB  196  IEF404I PRVDIR01 - ENDED - TIME=11.30.08
+10:30:08 /11.30.08 JOB  196  $HASP395 PRVDIR01 ENDED
+10:30:08 /11.30.08 JOB  196  $HASP150 PRVDIR01 ON PRINTER1       524 LINES
+10:30:08 /11.30.08 JOB  196  $HASP250 PRVDIR01 IS PURGED
+10:33:22 HHC01040I 0:000C COMM: client <unknown>, IP 172.29.0.1 connected to device 3505
+10:33:22 HHC01206I 0:000C Card: client <unknown>, IP 172.29.0.1 disconnected from device 3505

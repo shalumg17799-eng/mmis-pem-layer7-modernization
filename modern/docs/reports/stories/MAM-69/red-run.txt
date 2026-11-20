@@ -1,0 +1,7 @@
+    Error: expect(locator).toHaveCount(expected) failed
+    Expected: 1
+    Received: 0
+      - waiting for locator('section').filter({ has: getByRole('heading', { name: /^Pending approval/ }) }).getByRole('row').filter({ hasText: '1003000111' })
+        at C:\Users\ks519\Downloads\Medco-Transform\modern\web-ui\e2e\journeys\j1-enrolment.spec.ts:152:69
+    Error Context: test-results\journeys-j1-enrolment-MAM--084ef-er-approve-directory-notice-chromium\error-context.md
+AC-1..AC-3 passed live before this failure (apply -> Validated, screening P on 4 sources, tier L).

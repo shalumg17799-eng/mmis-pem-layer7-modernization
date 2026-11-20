@@ -1,0 +1,38 @@
+{
+  "story": "MAM-53",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "tests": [
+    "modern/tools/checks/tests/test_ebcdic_to_ascii.py"
+  ],
+  "testIds": {
+    "AC-1": [
+      "test_ebcdic_to_ascii: PASSED"
+    ],
+    "AC-2": [
+      "test_ebcdic_to_ascii: PASSED"
+    ],
+    "AC-3": [
+      "test_ebcdic_to_ascii: PASSED"
+    ],
+    "AC-4": [
+      "test_ebcdic_to_ascii: PASSED"
+    ],
+    "AC-5": [
+      "test_ebcdic_to_ascii: PASSED"
+    ],
+    "AC-6": [
+      "test_ebcdic_to_ascii: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/tools/data/ebcdic_to_ascii.py"
+  ],
+  "rules": []
+}

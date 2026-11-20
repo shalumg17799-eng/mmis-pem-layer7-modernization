@@ -1,0 +1,30 @@
+{
+  "name": "sam hit: fabricated debarred entity SAMPLE DEBARRED SUPPLY 01",
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/sam/debarments",
+    "queryParameters": {
+      "npi": {
+        "equalTo": "1005999010"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "SAMGOV",
+      "npi": "1005999010",
+      "debarred": true,
+      "entityName": "SAMPLE DEBARRED SUPPLY 01",
+      "debarredFrom": "2025-06-01"
+    }
+  },
+  "metadata": {
+    "source": "sam",
+    "answer": "hit"
+  }
+}

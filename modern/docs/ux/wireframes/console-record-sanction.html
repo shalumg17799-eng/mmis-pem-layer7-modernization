@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record a sanction - PEM wireframe</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uswds/uswds@3.8.0/dist/css/uswds.min.css"></head>
+<body><a class="usa-skipnav" href="#main">Skip to main content</a>
+<header class="usa-header usa-header--basic"><div class="usa-nav-container"><div class="usa-navbar"><div class="usa-logo"><em class="usa-logo__text">PEM console</em></div></div></div></header>
+<main id="main" class="grid-container margin-y-4"><h1>Record a sanction</h1>
+<p class="usa-intro">Terminate, suspend or reinstate a provider with reason and effective date; history kept.</p>
+<form class="usa-form"><label class="usa-label" for="npi">NPI</label><input class="usa-input" id="npi" name="npi" type="text" value="1003000444"><label class="usa-label" for="action">Action</label><select class="usa-select" id="action" name="action"><option>Terminate (T)</option><option>Suspend (S)</option><option>Reinstate (R)</option></select><label class="usa-label" for="reason">Reason</label><input class="usa-input" id="reason" name="reason" type="text" value="OIG LEIE exclusion of an owner"><label class="usa-label" for="effectiveDate">Effective date (MM/DD/YYYY)</label><input class="usa-input" id="effectiveDate" name="effectiveDate" type="text" value="03/10/2026"><button class="usa-button" type="button">Record sanction</button></form><table class="usa-table usa-table--borderless"><caption>Sanction history</caption><thead><tr><th scope="col">Effective</th><th scope="col">Action</th><th scope="col">Reason</th><th scope="col">By</th></tr></thead><tbody><tr><td>-</td><td>-</td><td>None</td><td>-</td></tr></tbody></table>
+<section class="margin-top-6 border-top-1px padding-top-2" aria-label="Wireframe notes"><h2>Wireframe notes (low fidelity, synthetic data)</h2>
+<dl><dt>Route</dt><dd><code>/console/providers/:npi/sanctions/new</code></dd><dt>Roles</dt><dd>SUPERVISOR</dd>
+<dt>API calls</dt><dd><ul><li><code>POST /api/v1/sanctions</code></li><li><code>GET /api/v1/sanctions</code></li></ul></dd><dt>Serves</dt><dd>PRVSAN01 rules (sanctions-service, provider-service); D-006, D-018, D-026, D-027</dd></dl></section>
+<p><a class="usa-link" href="index.html">All wireframes</a></p></main></body></html>

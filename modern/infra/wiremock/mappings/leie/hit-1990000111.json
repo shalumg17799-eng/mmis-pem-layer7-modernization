@@ -1,0 +1,31 @@
+{
+  "name": "leie hit: LEIE exclusion of the owner of 1003000444 (aws-transform/test-data/leie.txt)",
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/leie/exclusions",
+    "queryParameters": {
+      "npi": {
+        "equalTo": "1990000111"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "OIGLEIE",
+      "npi": "1990000111",
+      "excluded": true,
+      "exclusionType": "1128(a)(1)",
+      "description": "PROGRAM-RELATED FRAUD",
+      "exclusionDate": "2023-01-15"
+    }
+  },
+  "metadata": {
+    "source": "leie",
+    "answer": "hit"
+  }
+}

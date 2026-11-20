@@ -14,6 +14,6 @@ if [ "$ARG" != "--dry-run" ]; then
   done
 fi
 "$PY" -W ignore loaders/load_00_constraints.py $ARG
-for f in loaders/load_0[1-8]_*.py; do
+for f in $("$PY" -c "import sys; sys.path.insert(0, 'loaders'); import common; print(' '.join('loaders/' + m + '.py' for m in common.LOADERS))"); do  # enabled loaders only (legacy context)
   "$PY" -W ignore "$f" $ARG
 done

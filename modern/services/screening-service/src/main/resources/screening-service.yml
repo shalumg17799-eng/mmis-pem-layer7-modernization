@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: screening-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/screening_db
+    username: screening_svc
+    password: ${PG_SCREENING_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/screening
+server:
+  port: ${PEM_SCREENING_PORT:8083}
+pem:
+  sources-url: ${PEM_SOURCES_URL:http://localhost:8280}
+  services:
+    provider-url: http://${PEM_SERVICE_HOST:localhost}:${PEM_PROVIDER_PORT:8081}
+  screening:
+    source-timeout: 2s
+    source-retries: 1

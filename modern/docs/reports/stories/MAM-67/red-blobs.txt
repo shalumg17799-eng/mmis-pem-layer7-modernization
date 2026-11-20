@@ -1,0 +1,15 @@
+6e33857562585d87edb297f29fd06e4099497717  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/ContractFile.java
+2045c1aa17479ca592041cea40bbfe418e68d70b  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/DirectoryFixtures.java
+a516076d2500f8ccbd0010514f5c938474c88176  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/Dirout.java
+ad367b6eb0fd2e124aa1910baee777da9dad6e9f  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/acceptance/DirectoryExtractSteps.java
+ba8e3de3cca079954c60c41e97d8137064ced8bf  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/adapter/legacy/DiroutFileTest.java
+d6d5b46623b4e929e4816a22a7ca5690a611e520  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/DirectoryExtractApiTest.java
+ccff0ccc9148b6c829423feb3739820dbf9c6e2c  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/DirectoryExtractContractTest.java
+192bffc14898dd8237a060affa6ebe83549839f6  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/DirectoryExtractRolesTest.java
+9ce99ad558a34aa6444ac64315f3afdfd94e9307  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/application/DirectoryPageTest.java
+06c667860a0fab817dd38cbc069778a9e28e21b3  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/application/RunDirectoryExtractTest.java
+19aedc63115387b086375ee2ba7ffcacd7e67b19  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/application/StartDirectoryExtractTest.java
+37292ae301735f14eb17f93de3b5cc99eba5e9cd  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/domain/DirectoryNameCompositionTest.java
+443c4b0373e498cf0f20e06bbb27c32363c24310  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/infrastructure/DirectoryExtractJobTest.java
+5ba7026cc3da4576c5da50f2024bd261bb9dde2e  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/infrastructure/JdbcDirectoryExtractsTest.java
+80946cb5ff595705d82384c29067e633e3185e65  modern/services/directory-service/src/test/resources/features/MAM-67.feature

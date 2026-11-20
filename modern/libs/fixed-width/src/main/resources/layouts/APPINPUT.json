@@ -1,0 +1,161 @@
+{
+  "name": "APPINPUT",
+  "source": "PRVENR01:APP-INPUT-RECORD",
+  "length": 200,
+  "readQuery": "MATCH (a:Record {id: 'PRVENR01:APP-INPUT-RECORD'}) MATCH (r:Record {id: 'PRVRECRD:PROVIDER-RECORD'})-[:HAS_FIELD]->(f:Field) RETURN a.name AS recordName, a.length AS recordLength, r.length AS carriedLength, f.name AS name, f.level AS level, f.pic AS pic, f.start AS start, f.length AS length, f.group AS isGroup, f.line AS line ORDER BY f.line",
+  "discriminator": "PRV-TYPE-CODE",
+  "fields": [
+    {
+      "name": "PRV-NPI",
+      "start": 1,
+      "length": 10,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "PRV-MEDICAID-ID",
+      "start": 11,
+      "length": 9,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "PRV-TYPE-CODE",
+      "start": 20,
+      "length": 2,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "PRV-TAXONOMY",
+      "start": 22,
+      "length": 10,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "PRV-RISK-TIER",
+      "start": 32,
+      "length": 1,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "PRV-ENROLL-STATUS",
+      "start": 33,
+      "length": 1,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "PRV-SCREEN-FLAG",
+      "start": 34,
+      "length": 1,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "PRV-EFFECTIVE-DATE",
+      "start": 35,
+      "length": 8,
+      "type": "DATE_CCYYMMDD",
+      "views": []
+    },
+    {
+      "name": "PRV-REVAL-DUE-DATE",
+      "start": 43,
+      "length": 8,
+      "type": "DATE_CCYYMMDD",
+      "views": []
+    },
+    {
+      "name": "PRV-VARIANT",
+      "start": 51,
+      "length": 80,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "PRV-LAST-NAME",
+      "start": 51,
+      "length": 30,
+      "type": "ALPHANUMERIC",
+      "views": [
+        "IN"
+      ]
+    },
+    {
+      "name": "PRV-FIRST-NAME",
+      "start": 81,
+      "length": 20,
+      "type": "ALPHANUMERIC",
+      "views": [
+        "IN"
+      ]
+    },
+    {
+      "name": "PRV-LICENSE-NO",
+      "start": 101,
+      "length": 15,
+      "type": "ALPHANUMERIC",
+      "views": [
+        "IN"
+      ]
+    },
+    {
+      "name": "PRV-LICENSE-STATE",
+      "start": 116,
+      "length": 2,
+      "type": "ALPHANUMERIC",
+      "views": [
+        "IN"
+      ]
+    },
+    {
+      "name": "FILLER",
+      "start": 118,
+      "length": 13,
+      "type": "ALPHANUMERIC",
+      "views": [
+        "IN"
+      ]
+    },
+    {
+      "name": "PRV-LEGAL-NAME",
+      "start": 51,
+      "length": 40,
+      "type": "ALPHANUMERIC",
+      "views": [
+        "GR",
+        "FA"
+      ]
+    },
+    {
+      "name": "PRV-DBA-NAME",
+      "start": 91,
+      "length": 30,
+      "type": "ALPHANUMERIC",
+      "views": [
+        "GR",
+        "FA"
+      ]
+    },
+    {
+      "name": "PRV-OWNER-NPI",
+      "start": 121,
+      "length": 10,
+      "type": "ALPHANUMERIC",
+      "views": [
+        "GR",
+        "FA"
+      ]
+    },
+    {
+      "name": "RESERVED",
+      "start": 131,
+      "length": 70,
+      "type": "ALPHANUMERIC",
+      "views": []
+    }
+  ]
+}

@@ -35,7 +35,7 @@ component and Playwright tests, and has zero accessibility violations.
      data
 4. Write `modern/docs/reports/ui-$ARGUMENTS.md`, plus screenshots of each screen
    (Playwright) in `modern/docs/reports/ui-$ARGUMENTS/`.
-5. Commit: `feat(web-ui): $ARGUMENTS complete for review`.
+5. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Gate
 Show the report and ask for `approve ui $ARGUMENTS`. On approval: move the stories to

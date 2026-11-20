@@ -1,0 +1,94 @@
+local_id,jira_key,type,title,epic_key
+L-E01,MAM-1,Epic,PEM: Platform and CI,
+L-E02,MAM-2,Epic,PEM: Synthetic data and legacy formats,
+L-E03,MAM-3,Epic,PEM: provider-service,
+L-E04,MAM-4,Epic,PEM: enrollment-service,
+L-E05,MAM-5,Epic,PEM: screening-service,
+L-E06,MAM-6,Epic,PEM: risk-service,
+L-E07,MAM-7,Epic,PEM: revalidation-service,
+L-E08,MAM-8,Epic,PEM: sanctions-service,
+L-E09,MAM-9,Epic,PEM: notification-service,
+L-E10,MAM-10,Epic,PEM: directory-service,
+L-E11,MAM-11,Epic,PEM: tmsis-service,
+L-E12,MAM-12,Epic,PEM: Web UI portal,
+L-E13,MAM-13,Epic,PEM: Web UI console,
+L-E14,MAM-14,Epic,PEM: End-to-end and hardening,
+L-E15,MAM-15,Epic,PEM: Parity (deferred),
+L-S001,MAM-16,Task,"Gradle multi-project build with quality gates (JaCoCo, PIT, ArchUnit, Spotless)",MAM-1
+L-S002,MAM-19,Task,"Web UI toolchain scaffold: React, TypeScript, Vite, USWDS, Vitest, Playwright with axe, clients generated from the contracts",MAM-1
+L-S003,MAM-24,Task,"One-command local stack: docker compose, health checks, make up/down/logs/seed/reset",MAM-1
+L-S004,MAM-26,Task,"Keycloak realm pem with the PROVIDER, ANALYST, SUPERVISOR, ADMIN roles, one test user per role and a SYSTEM service account",MAM-1
+L-S005,MAM-29,Task,"API gateway: routing to every service, CORS for the web UI, token relay",MAM-1
+L-S006,MAM-31,Task,"Event backbone: CloudEvents-style envelope, transactional outbox, idempotent consumers",MAM-1
+L-S007,MAM-34,Task,"Walking skeleton: provider lookup by NPI (console -> gateway -> provider-service -> Postgres, with login)",MAM-1
+L-S008,MAM-36,Story,"Health, structured logs and correlation IDs across services (NFR)",MAM-1
+L-S009,MAM-39,Task,"CI pipeline: build, check, contract lint, web-ui tests, compose smoke test",MAM-1
+L-S010,MAM-42,Task,Fixed-width codec with layouts exported from the graph (PRVRECRD 130 bytes and every legacy file),MAM-2
+L-S011,MAM-44,Task,Deterministic synthetic datasets covering at least 95% of the verified rules,MAM-2
+L-S012,MAM-47,Task,"WireMock stubs for the external screening sources (NPPES, LEIE, SAM, licence board, SSA DMF): hit, clean, error, slow",MAM-2
+L-S013,MAM-50,Task,Seed data for the local stack (make seed): the provider seed,MAM-2
+L-S014,MAM-51,Task,"Seed data for the local stack: screening results, sanction history and read models in each service",MAM-2
+L-S015,MAM-53,Task,EBCDIC to ASCII converter for the Phase 9 parity run,MAM-2
+L-S016,MAM-17,Story,"Register a validated application as a PENDING, UNSCREENED provider",MAM-3
+L-S017,MAM-21,Story,Record the screening verdict (screen flag) on the provider,MAM-3
+L-S018,MAM-23,Story,Record the assigned risk tier on the provider,MAM-3
+L-S019,MAM-27,Story,Analyst approves or denies an enrolment; approval sets ACTIVE and the revalidation due date,MAM-3
+L-S020,MAM-30,Story,"Revalidation due date: five years, four-digit years, leap day and each completed revalidation",MAM-3
+L-S021,MAM-33,Story,"Apply a sanction status change to the provider (TERMINATED, SUSPENDED, ACTIVE)",MAM-3
+L-S022,MAM-37,Story,"Search and read providers by NPI or Medicaid ID, role-checked (PINQ replacement back end)",MAM-3
+L-S023,MAM-40,Story,Provider history: every change and every notice sent is audited and readable,MAM-3
+L-S024,MAM-43,Story,Export the provider master in the legacy 130-byte PRVRECRD layout,MAM-3
+L-S025,MAM-46,Story,Submit an enrolment application online and validate it (E101 to E104),MAM-4
+L-S026,MAM-54,Story,Read application status (a provider sees their own; an analyst sees all),MAM-4
+L-S027,MAM-56,Story,Run the legacy APPINPUT intake as a batch job with one error row per rejected application,MAM-4
+L-S028,MAM-57,Story,"Report the result of an intake run: exclusive counts, completion, failures and safe re-runs",MAM-4
+L-S029,MAM-18,Story,"Screen a newly registered provider against the licence board, OIG LEIE, SAM and SSA DMF (mocked sources)",MAM-5
+L-S030,MAM-20,Story,"Handle unknown licences, organisation providers and sources that fail or are slow",MAM-5
+L-S031,MAM-22,Story,Screen the owner of a group or facility (E203 owner excluded),MAM-5
+L-S032,MAM-25,Story,"Decide the screening verdict, store the results per source and publish ScreeningCompleted",MAM-5
+L-S033,MAM-28,Story,Rescreen a provider on request or when revalidation is due,MAM-5
+L-S034,MAM-32,Story,Run screening as a batch job and produce the legacy SCRNOUT file,MAM-5
+L-S035,MAM-35,Story,Assign the risk tier from the taxonomy prefix after a passed screening,MAM-6
+L-S036,MAM-38,Story,View and change the taxonomy-prefix risk table (admin),MAM-6
+L-S037,MAM-41,Story,Assess a risk tier on request (risk assessment API),MAM-6
+L-S038,MAM-45,Story,"Monthly revalidation sweep: open a case for every ACTIVE provider that is due, with the legacy REVALQ file",MAM-7
+L-S039,MAM-48,Story,Revalidation cases: list them and complete one,MAM-7
+L-S040,MAM-49,Story,Revalidation case states: re-screening requested and provider no longer active,MAM-7
+L-S041,MAM-52,Story,"Record a sanction (terminate, suspend, reinstate) with history and apply it through provider-service",MAM-8
+L-S042,MAM-55,Story,Run the legacy SANCIN sanction intake as a batch job,MAM-8
+L-S043,MAM-58,Story,"Send sanction notices by email (TRM, SUS, RST), reject unknown actions and handle failures",MAM-9
+L-S044,MAM-59,Story,"Send notices by email for approvals, denials, rejections and revalidation",MAM-9
+L-S045,MAM-60,Story,List the notices sent and the notice templates,MAM-9
+L-S046,MAM-61,Story,Keep the directory of ACTIVE providers up to date from provider events,MAM-10
+L-S047,MAM-63,Story,Public provider directory search,MAM-10
+L-S048,MAM-65,Story,"FHIR R4 Practitioner, Organization and PractitionerRole (read-only, public)",MAM-10
+L-S049,MAM-67,Story,Directory extract as a batch job in the legacy DIROUT format,MAM-10
+L-S050,MAM-71,Story,Monthly T-MSIS provider extract in the legacy 120-byte layout (YYDDD period),MAM-11
+L-S051,MAM-75,Story,"T-MSIS extract run: archive every file, report counts, publish ExtractProduced",MAM-11
+L-S052,MAM-78,Story,Warn about providers whose enrolment year is later than the business year,MAM-11
+L-S053,MAM-62,Story,"Web UI shell: sign in with Keycloak, role-based navigation, portal home",MAM-12
+L-S054,MAM-64,Story,"Portal: apply for enrolment online, with field errors E101 to E104",MAM-12
+L-S055,MAM-66,Story,Portal: see my application status,MAM-12
+L-S056,MAM-68,Story,Portal: see my provider record,MAM-12
+L-S057,MAM-70,Story,Portal: see my notices,MAM-12
+L-S058,MAM-73,Story,Public directory page (no sign-in),MAM-12
+L-S059,MAM-77,Story,"Console: provider search by NPI, Medicaid ID or name (replaces CICS PINQ)",MAM-13
+L-S060,MAM-80,Story,Console: provider detail with every record field and the status shown as text and code,MAM-13
+L-S061,MAM-82,Story,"Console: provider detail panels for screening, sanctions, revalidation, notices and audit",MAM-13
+L-S062,MAM-85,Story,"Console: work queues (pending approval, failed screening, revalidation due, rejected applications)",MAM-13
+L-S063,MAM-87,Story,Console: approve or deny an enrolment,MAM-13
+L-S064,MAM-90,Story,Console: record a sanction (supervisor),MAM-13
+L-S065,MAM-92,Story,Console: view and change the risk rules (admin),MAM-13
+L-S066,MAM-93,Story,Console: run the batch jobs and download their legacy files (admin),MAM-13
+L-S067,MAM-69,Story,Journey J1 end to end: a provider applies and is enrolled (main journey),MAM-14
+L-S068,MAM-72,Story,Journey J2 end to end: an application is rejected,MAM-14
+L-S069,MAM-74,Story,Journey J3 end to end: screening fails and the analyst denies,MAM-14
+L-S070,MAM-76,Story,Journey J4 end to end: analyst inquiry (PINQ replacement),MAM-14
+L-S071,MAM-79,Story,Journey J5 end to end: a supervisor suspends and reinstates a provider,MAM-14
+L-S072,MAM-81,Story,Journey J6 end to end: monthly revalidation,MAM-14
+L-S073,MAM-83,Story,Journey J7 end to end: month-end extracts and the public directory,MAM-14
+L-S074,MAM-84,Story,"Security: role tests for every endpoint, dependency check, no secrets (NFR)",MAM-14
+L-S075,MAM-86,Story,"Accessibility: WCAG 2.1 AA on every page, zero axe violations, keyboard-only walk-through (NFR)",MAM-14
+L-S076,MAM-88,Story,"Performance smoke: 10,000 synthetic providers, batch jobs and search against the NFR targets (NFR)",MAM-14
+L-S077,MAM-89,Story,Traceability report (rule -> story -> AC -> test -> code) and runbooks,MAM-14
+L-S078,MAM-91,Story,Parity: run the legacy jobs on Hercules and compare their outputs with the modern system (deferred),MAM-15

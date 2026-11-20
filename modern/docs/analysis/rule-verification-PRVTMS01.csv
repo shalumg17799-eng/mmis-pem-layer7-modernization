@@ -1,11 +1,11 @@
 rule_id,program,paragraph,start_line,end_line,status,note
-R-PRVTMS01-ADD-01,PRVTMS01,"WRITE-TMSIS-ROW,(data division)",72,114,VERIFIED,"The target WS-T-PERIOD-YYDDD ends in column 73 of line 114, and a COBOL compiler ignores columns 73-80. It would read the undefined name WS-T-PERIOD-YYDD, so the program likely does not compile as shipped (INFERRED, no compiler here). The only code line in the estate that crosses column 72."
+R-PRVTMS01-ADD-01,PRVTMS01,"WRITE-TMSIS-ROW,(data division)",72,114,VERIFIED,"The target WS-T-PERIOD-YYDDD ends in column 73 of line 114, and a COBOL compiler ignores columns 73-80. It would read the undefined name WS-T-PERIOD-YYDD, so the program likely does not compile as shipped (INFERRED, no compiler here). The only code line in the estate that crosses column 72. (D-021)"
 R-PRVTMS01-ADD-02,PRVTMS01,WRITE-TMSIS-ROW,104,110,VERIFIED,"Comparing 2-digit years flags every pre-2000 enrolment (YY 98 or 99 is greater than 26) as a future enrolment and could never flag a real future date after 2099. AP-07, D-015."
-R-PRVTMS01-ADD-03,PRVTMS01,"(data division),MAIN-CONTROL",62,82,VERIFIED,"WS-TODAY-DDD, WS-ENROLL-JUL and WS-AGE-DAYS are declared but never used: the 'enrolment age' described in the README is not implemented."
+R-PRVTMS01-ADD-03,PRVTMS01,"(data division),MAIN-CONTROL",62,82,VERIFIED,"WS-TODAY-DDD, WS-ENROLL-JUL and WS-AGE-DAYS are declared but never used: the 'enrolment age' described in the README is not implemented. (Q-007)"
 R-PRVTMS01-ADD-04,PRVTMS01,"EXTRACT-NEXT,WRITE-TMSIS-ROW",97,113,VERIFIED,"Only ACTIVE providers are reported and the status is hard-coded A, so terminated, suspended and denied providers never reach T-MSIS. Business question (Q-007)."
 R-PRVTMS01-ADD-05,PRVTMS01,"(data division),WRITE-TMSIS-ROW",67,115,VERIFIED,The 120-byte row carries only 30 meaningful bytes (5+9+10+1+5); the remaining 90 are spaces. Whether this matches the real CMS provider layout is not known (Q-007).
-R-PRVTMS01-ADD-06,PRVTMS01,"EXTRACT-NEXT,WRITE-TMSIS-ROW",92,116,VERIFIED,READ and WRITE statuses are not tested and RETURN-CODE is never set.
-R-PRVTMS01-ADD-07,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,VERIFIED,"The reporting period is the run date's Julian day, so the same month yields different values depending on the run date."
+R-PRVTMS01-ADD-06,PRVTMS01,"EXTRACT-NEXT,WRITE-TMSIS-ROW",92,116,VERIFIED,READ and WRITE statuses are not tested and RETURN-CODE is never set. (D-024)
+R-PRVTMS01-ADD-07,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,VERIFIED,"The reporting period is the run date's Julian day, so the same month yields different values depending on the run date. (Q-007)"
 R-PRVTMS01-cbl-00001,PRVTMS01,MAIN-CONTROL,80,80,VERIFIED,ACCEPT WS-TODAY-JUL FROM DAY gives the Julian date YYDDD.
 R-PRVTMS01-cbl-00002,PRVTMS01,MAIN-CONTROL,81,82,VERIFIED,YY from positions 1-2 and DDD from positions 3-5.
 R-PRVTMS01-cbl-00003,PRVTMS01,EXTRACT-NEXT,92,95,VERIFIED,READ NEXT with an end-of-file test.
@@ -47,8 +47,8 @@ R-PRVTMS01-cbl-00038,PRVTMS01,WRITE-TMSIS-ROW,111,111,VERIFIED,Copied as is.
 R-PRVTMS01-cbl-00039,PRVTMS01,WRITE-TMSIS-ROW,112,112,VERIFIED,Copied as is.
 R-PRVTMS01-cbl-00040,PRVTMS01,WRITE-TMSIS-ROW,113,113,VERIFIED,The status is the literal A (only active providers get here).
 R-PRVTMS01-cbl-00041,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,VERIFIED,The startup Julian date is the source.
-R-PRVTMS01-cbl-00042,PRVTMS01,WRITE-TMSIS-ROW,114,114,MISMATCH,"The rule names WS-T-PERIOD-YYDD, which is what a compiler sees because the real name WS-T-PERIOD-YYDDD ends in column 73 and is cut off (ADD-01). The move itself is as described."
-R-PRVTMS01-cbl-00043,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,MISMATCH,"The period is today's date in YYDDD form (a day), not a monthly identifier. The rule's claim about identifying the monthly CMS period is not implemented (ADD-07)."
+R-PRVTMS01-cbl-00042,PRVTMS01,WRITE-TMSIS-ROW,114,114,MISMATCH,"The rule names WS-T-PERIOD-YYDD, which is what a compiler sees because the real name WS-T-PERIOD-YYDDD ends in column 73 and is cut off (ADD-01). The move itself is as described. (D-021)"
+R-PRVTMS01-cbl-00043,PRVTMS01,"MAIN-CONTROL,WRITE-TMSIS-ROW",80,114,MISMATCH,"The period is today's date in YYDDD form (a day), not a monthly identifier. The rule's claim about identifying the monthly CMS period is not implemented (ADD-07). (Q-007)"
 R-PRVTMS01-cbl-00044,PRVTMS01,(data division),68,68,VERIFIED,FILLER PIC X(05) VALUE 'PRV01' is the record type.
 R-PRVTMS01-cbl-00045,PRVTMS01,WRITE-TMSIS-ROW,111,111,VERIFIED,Provider ID from the Medicaid ID.
 R-PRVTMS01-cbl-00046,PRVTMS01,WRITE-TMSIS-ROW,112,112,VERIFIED,NPI.

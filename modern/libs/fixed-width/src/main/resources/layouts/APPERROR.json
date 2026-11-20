@@ -1,0 +1,16 @@
+{
+  "name": "APPERROR",
+  "source": "PRVENR01:APP-ERROR-RECORD",
+  "length": 250,
+  "readQuery": "MATCH (r:Record {id: 'PRVENR01:APP-ERROR-RECORD'}) OPTIONAL MATCH (r)-[:HAS_FIELD]->(f:Field) RETURN r.name AS recordName, r.length AS recordLength, f.name AS name, f.level AS level, f.pic AS pic, f.start AS start, f.length AS length, f.group AS isGroup, f.line AS line ORDER BY f.line",
+  "discriminator": null,
+  "fields": [
+    {
+      "name": "APP-ERROR-RECORD",
+      "start": 1,
+      "length": 250,
+      "type": "ALPHANUMERIC",
+      "views": []
+    }
+  ]
+}

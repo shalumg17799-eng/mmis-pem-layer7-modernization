@@ -1,0 +1,32 @@
+{
+  "name": "license-board not-found: any other licence / state is not found",
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPath": "/license-board/licenses",
+    "queryParameters": {
+      "licenseNo": {
+        "matches": ".+"
+      },
+      "state": {
+        "matches": ".+"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "LICBOARD",
+      "licenseNo": "{{request.query.licenseNo}}",
+      "state": "{{request.query.state}}",
+      "found": false
+    }
+  },
+  "metadata": {
+    "source": "license-board",
+    "answer": "not-found"
+  }
+}

@@ -1,0 +1,4 @@
+dafd56393e21586afce46e4159abc5115abbfdf5  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/ScreeningSteps.java
+05519214dddff0d921e8375bb7a4bbf9941d54cf  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/ScreenProviderTest.java
+ff741615592d666663d51b72b101d6dc578a0cde  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/domain/VerdictTest.java
+0502ad1202f202686820a20c2244007aa2760a49  modern/services/screening-service/src/test/resources/features/MAM-25.feature

@@ -1,0 +1,27 @@
+{
+  "name": "sam error: X-Pem-Stub: error answers 500",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/sam/debarments",
+    "headers": {
+      "X-Pem-Stub": {
+        "equalTo": "error"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "SAMGOV",
+      "error": "stubbed server error"
+    }
+  },
+  "metadata": {
+    "source": "sam",
+    "answer": "error"
+  }
+}

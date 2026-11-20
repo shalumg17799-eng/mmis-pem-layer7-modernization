@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: provider-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/provider_db
+    username: provider_svc
+    password: ${PG_PROVIDER_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/provider
+server:
+  port: ${PEM_PROVIDER_PORT:8081}

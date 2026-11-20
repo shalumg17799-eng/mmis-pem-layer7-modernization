@@ -1,0 +1,8 @@
+677dc9275d859cacebd3012236d6534783a3bddb21dcd6843b17a6a23fb2c563  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/RiskFixtures.java
+9dc23f8e0333f867c0a30c3002c50854b2aecbbed30b5792da226d0d71df81e9  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/AssessmentSteps.java
+8ea16a549d80849d1888ea2efa69a1005479eaf595b4881dd3c1779e09171b3a  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/RuleTableSteps.java
+9ae1bdbe08763e86a76527aef73560f2d59129b4c4fa481a2fef3a4e1f5873b9  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/api/RiskAssessmentsApiTest.java
+11b22b60d87f4908ae4d6385c7a18c941b42a6aa10a061d0aea423522b037a42  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/application/AssessOnRequestTest.java
+1084042a129937e20892b39ae728569c662076a35ec2042766397da763164619  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/domain/RuleSetPrefixTest.java
+ec0a96551e9e9ae390b39216bc00ed48645208c7e7be7aa383c51c213743dc24  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/infrastructure/JdbcRiskStoreTest.java
+e4fae73f0484c89792b70ae08d330f93724c0d29e6548b4ebb8f7df016444692  modern/services/risk-service/src/test/resources/features/MAM-41.feature

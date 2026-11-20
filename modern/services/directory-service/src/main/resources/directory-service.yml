@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: directory-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/directory_db
+    username: directory_svc
+    password: ${PG_DIRECTORY_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/directory
+server:
+  port: ${PEM_DIRECTORY_PORT:8088}
+pem:
+  fhir:
+    # base of every fullUrl in the FHIR Bundles (MAM-65 AC-7); never taken from the request or a forwarded header
+    public-base-url: ${PEM_PUBLIC_BASE_URL:http://localhost:8080}
+  services:
+    provider-url: http://${PEM_SERVICE_HOST:localhost}:${PEM_PROVIDER_PORT:8081}
+  outbox:
+    enabled: false   # directory-service publishes no events (it only consumes them)
+  kafka:
+    produces: false
+  security:
+    public-paths:
+      - /api/v1/directory/**
+      - /fhir/**

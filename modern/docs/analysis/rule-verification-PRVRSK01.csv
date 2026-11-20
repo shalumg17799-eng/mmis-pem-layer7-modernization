@@ -1,11 +1,11 @@
 rule_id,program,paragraph,start_line,end_line,status,note
 R-PRVRSK01-ADD-01,PRVRSK01,"CLASSIFY-NEXT,CLASSIFY-ONE",70,97,VERIFIED,"There is no status filter: every provider (active, terminated, denied) is re-tiered on every run, and the due date is reset to today + 5 years each time. D-003 FIX."
 R-PRVRSK01-ADD-02,PRVRSK01,SET-REVALIDATION-DATE,129,136,VERIFIED,"The month and day are copied unchanged, so a run on Feb 29 produces an impossible due date such as 20290229 (no leap-year handling). D-004 area."
-R-PRVRSK01-ADD-03,PRVRSK01,CLASSIFY-ONE,83,92,VERIFIED,There is no validation of the taxonomy: a blank or invalid value silently becomes LIMITED.
+R-PRVRSK01-ADD-03,PRVRSK01,CLASSIFY-ONE,83,92,VERIFIED,There is no validation of the taxonomy: a blank or invalid value silently becomes LIMITED. (Q-005)
 R-PRVRSK01-ADD-04,PRVRSK01,"CLASSIFY-ONE,APPLY-TIER-PARA,TIER-DONE",95,116,VERIFIED,"AP-03. APPLY-TIER-PARA ends in an ALTERed GO TO; TIER-DONE EXIT (115-116) is outside the PERFORM range, so control INFERRED (not executed) continues into SET-REVALIDATION-DATE and off the end of the program: the REWRITE at 97 is likely never reached and only the first record is touched. D-002 FIX."
-R-PRVRSK01-ADD-05,PRVRSK01,CLASSIFY-NEXT,70,76,VERIFIED,READ NEXT tests only for end of file; any other status is not handled (INFERRED effect).
-R-PRVRSK01-ADD-06,PRVRSK01,CLASSIFY-ONE,97,97,VERIFIED,The REWRITE status is never tested.
-R-PRVRSK01-ADD-07,PRVRSK01,MAIN-CONTROL,61,67,VERIFIED,"No counters, no summary DISPLAY and no RETURN-CODE: the job cannot tell how many providers were classified."
+R-PRVRSK01-ADD-05,PRVRSK01,CLASSIFY-NEXT,70,76,VERIFIED,READ NEXT tests only for end of file; any other status is not handled (INFERRED effect). (D-024)
+R-PRVRSK01-ADD-06,PRVRSK01,CLASSIFY-ONE,97,97,VERIFIED,The REWRITE status is never tested. (D-024)
+R-PRVRSK01-ADD-07,PRVRSK01,MAIN-CONTROL,61,67,VERIFIED,"No counters, no summary DISPLAY and no RETURN-CODE: the job cannot tell how many providers were classified. (D-024)"
 R-PRVRSK01-cbl-00001,PRVRSK01,MAIN-CONTROL,62,64,VERIFIED,Master opened I-O and the EOF flag set to N.
 R-PRVRSK01-cbl-00002,PRVRSK01,CLASSIFY-NEXT,70,76,VERIFIED,"READ NEXT; a record goes on to CLASSIFY-ONE, EOF ends the loop."
 R-PRVRSK01-cbl-00003,PRVRSK01,CLASSIFY-ONE,79,80,VERIFIED,First 3 characters of PRV-TAXONOMY go to WS-TAXONOMY-GROUP.

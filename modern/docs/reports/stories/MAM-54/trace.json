@@ -1,0 +1,55 @@
+{
+  "story": "MAM-54",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/ReadApplicationsSteps.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/ReadApplicationTest.java",
+    "modern/services/enrollment-service/src/test/resources/features/MAM-54.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-54.feature 'A provider lists only their own applications': PASSED"
+    ],
+    "AC-2": [
+      "MAM-54.feature 'A provider cannot open someone else's application': PASSED",
+      "ReadApplicationTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-54.feature 'A validated application shows its status': PASSED",
+      "ReadApplicationTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-54.feature 'A rejected application shows exactly one error per failed check': PASSED"
+    ],
+    "AC-5": [
+      "MAM-54.feature 'An analyst sees every application and can filter': PASSED",
+      "ReadApplicationTest: PASSED"
+    ],
+    "AC-6": [
+      "MAM-54.feature 'Paging and filter values are checked': PASSED"
+    ],
+    "AC-7": [
+      "MAM-54.feature 'An unknown application id is not found': PASSED",
+      "ReadApplicationTest: PASSED"
+    ],
+    "AC-8": [
+      "MAM-54.feature 'Only PROVIDER, ANALYST and SUPERVISOR may read applications': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/ApplicationReader.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/OwnedApplication.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/ReadApplication.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/infrastructure/JdbcApplicationStore.java"
+  ],
+  "rules": []
+}

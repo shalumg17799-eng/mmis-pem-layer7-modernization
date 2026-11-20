@@ -1,0 +1,456 @@
+rule_id,service,story_hint,note
+R-PRVCICS1-ADD-01,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified (D-022 REPLACE)
+R-PRVCICS1-ADD-02,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified (D-022 REPLACE)
+R-PRVCICS1-ADD-03,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified (D-022 REPLACE)
+R-PRVCICS1-ADD-04,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked",VERIFIED: build as verified (D-022 REPLACE)
+R-PRVCICS1-ADD-05,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked",VERIFIED: build as verified (D-023 FIX)
+R-PRVCICS1-ADD-06,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified (D-006 FIX)
+R-PRVCICS1-ADD-07,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked",VERIFIED: build as verified (D-022 REPLACE)
+R-PRVCICS1-cbl-00001,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00002,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00003,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked",VERIFIED: build as verified
+R-PRVCICS1-cbl-00004,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00005,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00006,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00007,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00008,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00009,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00010,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00011,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00012,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00013,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00014,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00015,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked",VERIFIED: build as verified
+R-PRVCICS1-cbl-00016,web-ui,Console provider search and detail screens (replace CICS PINQ),NOT_FOUND: build new (no legacy code) (D-022 REPLACE)
+R-PRVCICS1-cbl-00017,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00018,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00019,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked","MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00020,web-ui,Console provider search and detail screens (replace CICS PINQ),NOT_FOUND: build new (no legacy code) (D-022 REPLACE)
+R-PRVCICS1-cbl-00021,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked",VERIFIED: build as verified
+R-PRVCICS1-cbl-00022,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked",VERIFIED: build as verified
+R-PRVCICS1-cbl-00023,provider-service,"Provider search and read API by NPI or Medicaid ID, role-checked",VERIFIED: build as verified
+R-PRVCICS1-cbl-00024,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00025,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00026,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00027,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00028,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00029,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00030,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00031,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00032,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00033,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00034,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00035,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00036,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00037,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00038,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00039,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00040,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00041,web-ui,Console provider search and detail screens (replace CICS PINQ),"MISMATCH: build the decided behaviour, not the legacy one (D-022 REPLACE)"
+R-PRVCICS1-cbl-00042,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00043,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00044,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVCICS1-cbl-00045,web-ui,Console provider search and detail screens (replace CICS PINQ),VERIFIED: build as verified
+R-PRVDEAD1-ADD-01,DROPPED,-,VERIFIED: dropped by D-011
+R-PRVDEAD1-cbl-00001,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00002,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00003,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00004,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00005,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00006,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00007,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00008,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00009,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00010,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00011,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00012,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00013,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDEAD1-cbl-00014,DROPPED,-,DROPPED: dropped by D-011
+R-PRVDIR01-ADD-01,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified (Q-008)
+R-PRVDIR01-ADD-02,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified (D-028 FIX)
+R-PRVDIR01-ADD-03,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified (D-024 FIX)
+R-PRVDIR01-ADD-04,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified (Q-008)
+R-PRVDIR01-ADD-05,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified (D-013 FIX)
+R-PRVDIR01-cbl-00001,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00002,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00003,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00004,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00005,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00006,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00007,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00008,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00009,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00010,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00011,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00012,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00013,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00014,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00015,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00016,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00017,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00018,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00019,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00020,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00021,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00022,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00023,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00024,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00025,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00026,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00027,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00028,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVDIR01-cbl-00029,directory-service,Publish the provider directory (legacy DIROUT file and FHIR),VERIFIED: build as verified
+R-PRVENR01-ADD-01,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-025 PRESERVE; Q-009)
+R-PRVENR01-ADD-02,provider-service,Register a validated provider as PENDING / UNSCREENED,VERIFIED: build as verified (D-007 FIX)
+R-PRVENR01-ADD-03,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-024 FIX)
+R-PRVENR01-ADD-04,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-016 FIX)
+R-PRVENR01-ADD-05,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-016 FIX)
+R-PRVENR01-ADD-06,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-016 FIX)
+R-PRVENR01-ADD-07,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-024 FIX)
+R-PRVENR01-ADD-08,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-024 FIX)
+R-PRVENR01-cbl-00001,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00002,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00003,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00004,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00005,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00006,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00007,provider-service,Register a validated provider as PENDING / UNSCREENED,VERIFIED: build as verified
+R-PRVENR01-cbl-00008,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00009,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00010,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00011,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00012,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00013,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00014,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00015,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-017 FIX)
+R-PRVENR01-cbl-00016,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00017,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00018,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00019,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00020,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00021,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00022,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00023,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00024,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00025,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified (D-016 FIX)
+R-PRVENR01-cbl-00026,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00027,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00028,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00029,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00030,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00031,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00032,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00033,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00034,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00035,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00036,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00037,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00038,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00039,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00040,provider-service,Register a validated provider as PENDING / UNSCREENED,VERIFIED: build as verified
+R-PRVENR01-cbl-00041,provider-service,Register a validated provider as PENDING / UNSCREENED,VERIFIED: build as verified
+R-PRVENR01-cbl-00042,provider-service,Register a validated provider as PENDING / UNSCREENED,VERIFIED: build as verified
+R-PRVENR01-cbl-00043,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00044,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00045,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00046,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00047,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00048,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00049,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00050,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00051,provider-service,Register a validated provider as PENDING / UNSCREENED,VERIFIED: build as verified
+R-PRVENR01-cbl-00052,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX; D-019 FIX)"
+R-PRVENR01-cbl-00053,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00054,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00055,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,"MISMATCH: build the decided behaviour, not the legacy one (D-001 FIX)"
+R-PRVENR01-cbl-00056,provider-service,Register a validated provider as PENDING / UNSCREENED,VERIFIED: build as verified
+R-PRVENR01-cbl-00057,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00058,provider-service,Register a validated provider as PENDING / UNSCREENED,VERIFIED: build as verified
+R-PRVENR01-cbl-00059,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00060,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00061,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00062,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00063,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00064,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00065,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00066,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00067,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVENR01-cbl-00068,enrollment-service,Validate an enrolment application (E101-E104); legacy APPINPUT intake run,VERIFIED: build as verified
+R-PRVREV01-ADD-01,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified (D-003 FIX)
+R-PRVREV01-ADD-02,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified (D-029 FIX)
+R-PRVREV01-ADD-03,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified (D-029 FIX)
+R-PRVREV01-ADD-04,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified (D-024 FIX)
+R-PRVREV01-cbl-00001,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00002,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00003,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00004,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified (D-003 FIX)
+R-PRVREV01-cbl-00005,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00006,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00007,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00008,revalidation-service,Monthly revalidation sweep and revalidation cases,"MISMATCH: build the decided behaviour, not the legacy one (D-004 FIX)"
+R-PRVREV01-cbl-00009,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00010,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00011,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00012,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00013,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00014,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00015,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00016,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00017,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00018,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00019,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00020,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00021,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00022,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00023,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVREV01-cbl-00024,revalidation-service,Monthly revalidation sweep and revalidation cases,VERIFIED: build as verified
+R-PRVRSK01-ADD-01,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified (D-003 FIX)
+R-PRVRSK01-ADD-02,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified (D-004 FIX)
+R-PRVRSK01-ADD-03,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (Q-005)
+R-PRVRSK01-ADD-04,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (D-002 FIX)
+R-PRVRSK01-ADD-05,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (D-024 FIX)
+R-PRVRSK01-ADD-06,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (D-024 FIX)
+R-PRVRSK01-ADD-07,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (D-024 FIX)
+R-PRVRSK01-cbl-00001,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00002,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00003,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00004,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (D-002 FIX)
+R-PRVRSK01-cbl-00005,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (D-002 FIX)
+R-PRVRSK01-cbl-00006,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00007,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00008,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified (D-004 FIX)
+R-PRVRSK01-cbl-00009,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified
+R-PRVRSK01-cbl-00010,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified (D-002 FIX)
+R-PRVRSK01-cbl-00011,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00012,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00013,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00014,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00015,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00016,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00017,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (D-002 FIX)
+R-PRVRSK01-cbl-00018,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00019,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00020,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00021,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00022,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (Q-005)
+R-PRVRSK01-cbl-00023,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (Q-005)
+R-PRVRSK01-cbl-00024,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00025,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00026,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (Q-005)
+R-PRVRSK01-cbl-00027,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (Q-005)
+R-PRVRSK01-cbl-00028,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified (Q-005)
+R-PRVRSK01-cbl-00029,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00030,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00031,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00032,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00033,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00034,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00035,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00036,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00037,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00038,risk-service,Assign the risk tier from the taxonomy-prefix table,VERIFIED: build as verified
+R-PRVRSK01-cbl-00039,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified
+R-PRVRSK01-cbl-00040,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified
+R-PRVRSK01-cbl-00041,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified
+R-PRVRSK01-cbl-00042,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified (D-004 FIX)
+R-PRVRSK01-cbl-00043,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified
+R-PRVRSK01-cbl-00044,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified (D-004 FIX)
+R-PRVRSK01-cbl-00045,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified
+R-PRVRSK01-cbl-00046,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified
+R-PRVRSK01-cbl-00047,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified
+R-PRVRSK01-cbl-00048,provider-service,Set the revalidation due date at approval and at revalidation (4-digit dates),VERIFIED: build as verified (D-002 FIX)
+R-PRVSAN01-ADD-01,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified (D-024 FIX)
+R-PRVSAN01-ADD-02,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified (D-026 FIX)
+R-PRVSAN01-ADD-03,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified (D-018 FIX)
+R-PRVSAN01-ADD-04,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified (D-027 PRESERVE; Q-006)
+R-PRVSAN01-ADD-05,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified (D-024 FIX)
+R-PRVSAN01-ADD-06,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified (D-024 FIX)
+R-PRVSAN01-ADD-07,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified (D-013 FIX)
+R-PRVSAN01-cbl-00001,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00002,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00003,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00004,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00005,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified (D-006 FIX)
+R-PRVSAN01-cbl-00006,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00007,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00008,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified (D-012 REPLACE)
+R-PRVSAN01-cbl-00009,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00010,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00011,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00012,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00013,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00014,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00015,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified (D-006 FIX)
+R-PRVSAN01-cbl-00016,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00017,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00018,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00019,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00020,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00021,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00022,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00023,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00024,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00025,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00026,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00027,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00028,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00029,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00030,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified (D-006 FIX)
+R-PRVSAN01-cbl-00031,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00032,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified (D-012 REPLACE)
+R-PRVSAN01-cbl-00033,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00034,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00035,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00036,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00037,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00038,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00039,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",NOT_FOUND: build new (no legacy code) (D-012 REPLACE)
+R-PRVSAN01-cbl-00040,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00041,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified (D-006 FIX)
+R-PRVSAN01-cbl-00042,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00043,provider-service,"Apply a sanction status change (TERMINATED, SUSPENDED, ACTIVE)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00044,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00045,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00046,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00047,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00048,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00049,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00050,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00051,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00052,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00053,notification-service,"Send the sanction notice (TRM, SUS, RST, GEN templates)",VERIFIED: build as verified
+R-PRVSAN01-cbl-00054,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00055,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00056,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00057,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSAN01-cbl-00058,sanctions-service,Record a sanction with history; legacy SANCIN intake,VERIFIED: build as verified
+R-PRVSCR01-ADD-01,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified (D-005 REPLACE)
+R-PRVSCR01-ADD-02,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified (D-005 REPLACE)
+R-PRVSCR01-ADD-03,provider-service,Record the screening verdict (screen flag) on the provider,VERIFIED: build as verified (D-019 FIX)
+R-PRVSCR01-ADD-04,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified (D-024 FIX)
+R-PRVSCR01-ADD-05,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified (D-024 FIX)
+R-PRVSCR01-ADD-06,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified (D-024 FIX)
+R-PRVSCR01-cbl-00001,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00002,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00003,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00004,DROPPED,-,DROPPED: dropped by D-010
+R-PRVSCR01-cbl-00005,DROPPED,-,DROPPED: dropped by D-010
+R-PRVSCR01-cbl-00006,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)","MISMATCH: build the decided behaviour, not the legacy one (D-005 REPLACE)"
+R-PRVSCR01-cbl-00007,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)","MISMATCH: build the decided behaviour, not the legacy one (D-005 REPLACE)"
+R-PRVSCR01-cbl-00008,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)","MISMATCH: build the decided behaviour, not the legacy one (D-005 REPLACE)"
+R-PRVSCR01-cbl-00009,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)","MISMATCH: build the decided behaviour, not the legacy one (D-005 REPLACE)"
+R-PRVSCR01-cbl-00010,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00011,provider-service,Record the screening verdict (screen flag) on the provider,VERIFIED: build as verified
+R-PRVSCR01-cbl-00012,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00013,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00014,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00015,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00016,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00017,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00018,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00019,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00020,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00021,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00022,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00023,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00024,DROPPED,-,DROPPED: dropped by D-010
+R-PRVSCR01-cbl-00025,DROPPED,-,DROPPED: dropped by D-010
+R-PRVSCR01-cbl-00026,DROPPED,-,DROPPED: dropped by D-010
+R-PRVSCR01-cbl-00027,DROPPED,-,DROPPED: dropped by D-010
+R-PRVSCR01-cbl-00028,DROPPED,-,DROPPED: dropped by D-010
+R-PRVSCR01-cbl-00029,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00030,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00031,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00032,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00033,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)","MISMATCH: build the decided behaviour, not the legacy one (D-005 REPLACE)"
+R-PRVSCR01-cbl-00034,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified (D-005 REPLACE)
+R-PRVSCR01-cbl-00035,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00036,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00037,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00038,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)","MISMATCH: build the decided behaviour, not the legacy one (D-005 REPLACE)"
+R-PRVSCR01-cbl-00039,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00040,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00041,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00042,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00043,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00044,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00045,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00046,provider-service,Record the screening verdict (screen flag) on the provider,VERIFIED: build as verified
+R-PRVSCR01-cbl-00047,provider-service,Record the screening verdict (screen flag) on the provider,VERIFIED: build as verified
+R-PRVSCR01-cbl-00048,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00049,provider-service,Record the screening verdict (screen flag) on the provider,VERIFIED: build as verified
+R-PRVSCR01-cbl-00050,provider-service,Record the screening verdict (screen flag) on the provider,VERIFIED: build as verified
+R-PRVSCR01-cbl-00051,provider-service,Record the screening verdict (screen flag) on the provider,VERIFIED: build as verified
+R-PRVSCR01-cbl-00052,provider-service,Record the screening verdict (screen flag) on the provider,VERIFIED: build as verified
+R-PRVSCR01-cbl-00053,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00054,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00055,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00056,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00057,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00058,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00059,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00060,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00061,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVSCR01-cbl-00062,screening-service,"Screen a provider against licence, LEIE, SAM and SSA DMF (mocked sources)",VERIFIED: build as verified
+R-PRVTMS01-ADD-01,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified (D-021 FIX)
+R-PRVTMS01-ADD-02,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified (D-015 PRESERVE)
+R-PRVTMS01-ADD-03,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified (Q-007)
+R-PRVTMS01-ADD-04,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified (Q-007)
+R-PRVTMS01-ADD-05,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified (Q-007)
+R-PRVTMS01-ADD-06,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified (D-024 FIX)
+R-PRVTMS01-ADD-07,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified (Q-007)
+R-PRVTMS01-cbl-00001,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00002,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00003,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00004,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00005,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00006,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00007,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00008,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00009,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00010,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00011,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00012,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00013,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00014,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00015,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00016,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00017,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00018,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified (D-015 PRESERVE)
+R-PRVTMS01-cbl-00019,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00020,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00021,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00022,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00023,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00024,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00025,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00026,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00027,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00028,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00029,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00030,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00031,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00032,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00033,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00034,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00035,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00036,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00037,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00038,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00039,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00040,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00041,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00042,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive","MISMATCH: build the decided behaviour, not the legacy one (D-021 FIX)"
+R-PRVTMS01-cbl-00043,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive","MISMATCH: build the decided behaviour, not the legacy one (Q-007)"
+R-PRVTMS01-cbl-00044,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00045,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00046,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00047,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00048,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00049,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00050,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00051,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00052,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00053,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00054,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified
+R-PRVTMS01-cbl-00055,tmsis-service,"Monthly T-MSIS provider extract in the legacy format, with archive",VERIFIED: build as verified

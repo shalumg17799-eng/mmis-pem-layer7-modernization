@@ -1,0 +1,348 @@
+[
+  {
+    "program": "PRVDEAD1",
+    "originalLines": 51,
+    "labLines": 44,
+    "added": 1,
+    "removed": 3,
+    "changed": 19,
+    "originalLinesPastColumn72": [
+      [
+        8,
+        "      *   1. No JCL in this estate references PRVDEAD1 - it is an        *"
+      ],
+      [
+        9,
+        "      *      orphaned node in the CAST call graph (nothing schedules it).*"
+      ],
+      [
+        10,
+        "      *   2. Even if run, WS-PAPER-FP-ENABLED is hardcoded 'N', so the   *"
+      ],
+      [
+        11,
+        "      *      PROCESS-PAPER-CARD path is doubly dead. The paper-card      *"
+      ],
+      [
+        12,
+        "      *      workflow was discontinued when the state moved to LiveScan. *"
+      ],
+      [
+        13,
+        "      *   It survives only because no one dared delete it. CAST flags    *"
+      ],
+      [
+        14,
+        "      *   both the orphan and the unreachable paragraph.                *"
+      ]
+    ],
+    "labNotes": [
+      "* PROGRAM:  PRVDEAD1  (TK5 / OS ANS COBOL V2 LAB PORT)           *"
+    ]
+  },
+  {
+    "program": "PRVDIR01",
+    "originalLines": 90,
+    "labLines": 170,
+    "added": 3,
+    "removed": 4,
+    "changed": 137,
+    "originalLinesPastColumn72": [
+      [
+        10,
+        "      *   directly. The legacy directory is a batch flat file - the     *"
+      ]
+    ],
+    "labNotes": [
+      "* PROGRAM:  PRVDIR01  (TK5 / OS ANS COBOL V2 LAB PORT)           *",
+      "*    LAB: BLANK THE RECORD FOR EVERY ROW (QSAM BUFFER SLOTS)."
+    ]
+  },
+  {
+    "program": "PRVENR01",
+    "originalLines": 189,
+    "labLines": 312,
+    "added": 3,
+    "removed": 9,
+    "changed": 266,
+    "originalLinesPastColumn72": [
+      [
+        122,
+        "      *   But INVALID-APP has NO EXIT - control continues into          *"
+      ],
+      [
+        123,
+        "      *   WRITE-PROVIDER-RECORD, so the failed application is ALSO      *"
+      ],
+      [
+        124,
+        "      *   written to the provider master as PENDING. Two outcomes for   *"
+      ],
+      [
+        125,
+        "      *   one record; the bad provider is now enrollable.               *"
+      ]
+    ],
+    "labNotes": [
+      "* PROGRAM:  PRVENR01  (TK5 / OS ANS COBOL V2 LAB PORT)           *",
+      "* ORIGINAL: source-code/BATCH/PRVENR01.cbl.  PORTED ONLY WHERE   *"
+    ]
+  },
+  {
+    "program": "PRVREV01",
+    "originalLines": 94,
+    "labLines": 191,
+    "added": 6,
+    "removed": 3,
+    "changed": 158,
+    "originalLinesPastColumn72": [
+      [
+        8,
+        "      * NOTE: This is point-in-time, month-end only. It inherits the    *"
+      ],
+      [
+        9,
+        "      *   2-digit-year due-date defect from PRVRSK01 (a provider whose  *"
+      ],
+      [
+        10,
+        "      *   due year wrapped past 2070 mis-sorts here too). The modern     *"
+      ],
+      [
+        11,
+        "      *   revalidation service replaces this with CONTINUOUS monitoring  *"
+      ],
+      [
+        12,
+        "      *   (re-screen the day a new LEIE/licence event arrives, not at    *"
+      ],
+      [
+        13,
+        "      *   the next month-end batch).                                    *"
+      ]
+    ],
+    "labNotes": [
+      "* PROGRAM:  PRVREV01  (TK5 / OS ANS COBOL V2 LAB PORT)           *",
+      "*    LAB: REPLACES ACCEPT ... FROM DATE YYYYMMDD (NOT IN V2)",
+      "*    LAB: BLANK THE RECORD FOR EVERY ROW (QSAM BUFFER SLOTS)."
+    ]
+  },
+  {
+    "program": "PRVRSK01",
+    "originalLines": 137,
+    "labLines": 223,
+    "added": 0,
+    "removed": 6,
+    "changed": 183,
+    "originalLinesPastColumn72": [
+      [
+        10,
+        "      *   APPLY-TIER-PARA's GO TO target is rewritten at runtime via    *"
+      ],
+      [
+        11,
+        "      *   ALTER (limited vs high-risk routing). The branch destination  *"
+      ],
+      [
+        12,
+        "      *   is invisible to static analysis - CAST cannot resolve it.     *"
+      ],
+      [
+        14,
+        "      *   Revalidation due date is computed as WS-YY + 5 with a < 70    *"
+      ],
+      [
+        15,
+        "      *   pivot. A provider revalidated in 2068 gets a due year of 73   *"
+      ],
+      [
+        16,
+        "      *   which the pivot reads as 1973 - the record sorts as decades   *"
+      ],
+      [
+        17,
+        "      *   overdue. Fails for any 5-year window crossing 2070.           *"
+      ],
+      [
+        123,
+        "      *   pivoted to 1973 - the provider looks 90+ years overdue and    *"
+      ],
+      [
+        124,
+        "      *   the revalidation sweep mis-sorts it.                          *"
+      ]
+    ],
+    "labNotes": [
+      "* PROGRAM:  PRVRSK01  (TK5 / OS ANS COBOL V2 LAB PORT)           *",
+      "*    PORT: V2 REJECTS ALTER OF A PARAGRAPH THAT IS ITSELF THE"
+    ]
+  },
+  {
+    "program": "PRVSAN01",
+    "originalLines": 138,
+    "labLines": 234,
+    "added": 9,
+    "removed": 4,
+    "changed": 182,
+    "originalLinesPastColumn72": [
+      [
+        4,
+        "      *           EXCLUSIONS AND TERMINATIONS TO PROVIDER RECORDS AND   *"
+      ],
+      [
+        5,
+        "      *           NOTIFIES DOWNSTREAM (CLAIMS, MCO).                    *"
+      ],
+      [
+        9,
+        "      *   PEMAPP2 opens PRVMSTR (PRVPROVN) - the Provider Master KSDS   *"
+      ],
+      [
+        10,
+        "      *   OWNED BY PEMAPP1 - directly via its DD statement and          *"
+      ],
+      [
+        11,
+        "      *   REWRITEs it. There is no API boundary. PEMAPP2 cannot be      *"
+      ],
+      [
+        12,
+        "      *   migrated to a cloud Sanctions service without either exposing *"
+      ],
+      [
+        13,
+        "      *   a Provider API from PEMAPP1 or migrating both at once. This   *"
+      ],
+      [
+        16,
+        "      *   The notice generator is invoked via CALL WS-NOTICE-PGM where  *"
+      ],
+      [
+        17,
+        "      *   the program name is built at runtime. CAST shows the call      *"
+      ],
+      [
+        18,
+        "      *   target as '?', breaking the call graph.                       *"
+      ],
+      [
+        121,
+        "      *   Program name assembled at runtime (PRVNT + action). CAST      *"
+      ],
+      [
+        122,
+        "      *   cannot resolve the CALL target - shows '?'.                   *"
+      ]
+    ],
+    "labNotes": [
+      "* PROGRAM:  PRVSAN01  (TK5 / OS ANS COBOL V2 LAB PORT)           *",
+      "*   LAB: V2 ONLY ALLOWS CALL 'LITERAL', SO THE CALL IS NOW       *",
+      "*    PORT: V2 SUPPORTS ONLY CALL 'LITERAL'.  THE LEGACY CODE DID"
+    ]
+  },
+  {
+    "program": "PRVSCR01",
+    "originalLines": 149,
+    "labLines": 229,
+    "added": 2,
+    "removed": 12,
+    "changed": 179,
+    "originalLinesPastColumn72": [
+      [
+        5,
+        "      *           OIG LEIE, SAM, SSA-DMF) AND POSTS A SCREENING VERDICT.*"
+      ],
+      [
+        9,
+        "      *   WS-RECIPROCITY-ENABLED is initialized to 'N' and never        *"
+      ],
+      [
+        10,
+        "      *   changed anywhere in the estate. The CHECK-MEDICARE-RECIPROCITY*"
+      ],
+      [
+        11,
+        "      *   paragraph - which would let the state rely on PECOS screening *"
+      ],
+      [
+        12,
+        "      *   (42 CFR 455.410) and skip duplicate work - is therefore NEVER *"
+      ],
+      [
+        13,
+        "      *   reached. The reciprocity feature was specified in 2014 but     *"
+      ],
+      [
+        14,
+        "      *   the enabling flag was never wired up. CAST flags the dead path.*"
+      ],
+      [
+        96,
+        "      *    *** DEAD CODE: this guard is always false (flag hardcoded N) ***"
+      ],
+      [
+        137,
+        "      *   Would query PECOS to accept Medicare's screening and skip     *"
+      ],
+      [
+        138,
+        "      *   duplicate state checks. 10+ years of dead investment.         *"
+      ]
+    ],
+    "labNotes": [
+      "* PROGRAM:  PRVSCR01  (TK5 / OS ANS COBOL V2 LAB PORT)           *",
+      "* THE LIST OF V2 PORT CHANGES).  CONTROL FLOW UNCHANGED.         *",
+      "*    LAB: BLANK THE RECORD FOR EVERY ROW - QSAM HANDS OUT A"
+    ]
+  },
+  {
+    "program": "PRVTMS01",
+    "originalLines": 117,
+    "labLines": 226,
+    "added": 5,
+    "removed": 5,
+    "changed": 186,
+    "originalLinesPastColumn72": [
+      [
+        3,
+        "      * PURPOSE:  T-MSIS PROVIDER FILE EXTRACT (PEM-10). EXTRACTS       *"
+      ],
+      [
+        4,
+        "      *           ACTIVE PROVIDERS INTO THE MONTHLY CMS T-MSIS          *"
+      ],
+      [
+        9,
+        "      *   Enrollment age and submission period use packed YYDDD Julian  *"
+      ],
+      [
+        10,
+        "      *   dates with a 2-digit year. Cross-year comparisons (e.g. a     *"
+      ],
+      [
+        11,
+        "      *   provider enrolled 99365 vs reporting period 00001) sort wrong *"
+      ],
+      [
+        12,
+        "      *   because 99 > 00 numerically. T-MSIS period math breaks across *"
+      ],
+      [
+        13,
+        "      *   the century and any year boundary. A known source of T-MSIS   *"
+      ],
+      [
+        14,
+        "      *   data-quality rejects.                                         *"
+      ],
+      [
+        114,
+        "           MOVE WS-TODAY-JUL                         TO WS-T-PERIOD-YYDDD"
+      ]
+    ],
+    "labNotes": [
+      "* PROGRAM:  PRVTMS01  (TK5 / OS ANS COBOL V2 LAB PORT)           *",
+      "*    (ACCEPT ... FROM DAY IS NOT IN THE V2 COMPILER)."
+    ]
+  }
+]

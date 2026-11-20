@@ -1,0 +1,51 @@
+{
+  "story": "MAM-44",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/tools/checks/tests/test_synthetic_datasets.py"
+  ],
+  "testIds": {
+    "AC-1": [
+      "test_synthetic_datasets: PASSED"
+    ],
+    "AC-2": [
+      "test_synthetic_datasets: PASSED"
+    ],
+    "AC-3": [
+      "test_synthetic_datasets: PASSED"
+    ],
+    "AC-4": [
+      "test_synthetic_datasets: PASSED"
+    ],
+    "AC-5": [
+      "test_synthetic_datasets: PASSED"
+    ],
+    "AC-6": [
+      "test_synthetic_datasets: PASSED"
+    ],
+    "AC-7": [
+      "test_synthetic_datasets: PASSED"
+    ],
+    "AC-8": [
+      "test_synthetic_datasets: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/tools/data/check_datasets.py",
+    "modern/tools/data/coverage_report.py",
+    "modern/tools/data/export_layouts.py",
+    "modern/tools/data/generate.py",
+    "modern/tools/data/pemdata.py",
+    "modern/tools/data/scan_no_real_data.py"
+  ],
+  "rules": []
+}

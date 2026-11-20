@@ -2,9 +2,9 @@ rule_id,program,paragraph,start_line,end_line,status,note
 R-PRVSCR01-ADD-01,PRVSCR01,"CHECK-LICENSE,CHECK-LEIE-EXCLUSION,CHECK-SAM-DEBARMENT,CHECK-SSA-DMF",118,131,VERIFIED,"All four checks hard-code P: nothing is looked up (no CALL or MQ), so the fail branch (110-112) is unreachable. D-005."
 R-PRVSCR01-ADD-02,PRVSCR01,WRITE-SCREEN-ROW,147,149,VERIFIED,"Each screening row sets only SCR-NPI and SCR-PASS. SCR-SOURCE, SCR-VERDICT-DATE and SCR-DETAIL are never set, so the four rows of a provider look identical and the 42 CFR 455 audit trail is empty. D-005."
 R-PRVSCR01-ADD-03,PRVSCR01,"SCREEN-NEXT-PROVIDER,SCREEN-ONE-PROVIDER",90,111,VERIFIED,The program sets only the screen flag; it never sets the enrolment status to ACTIVE. Nothing in this estate does (D-019).
-R-PRVSCR01-ADD-04,PRVSCR01,SCREEN-NEXT-PROVIDER,85,93,VERIFIED,"READ NEXT only tests for end of file. Any other read status is ignored and the previous record area is screened again (INFERRED, not executed)."
-R-PRVSCR01-ADD-05,PRVSCR01,"SCREEN-ONE-PROVIDER,WRITE-SCREEN-ROW",114,149,VERIFIED,"The status of REWRITE (114) and of the screening WRITE (149) is never tested, so failures are silent."
-R-PRVSCR01-ADD-06,PRVSCR01,MAIN-CONTROL,75,82,VERIFIED,"RETURN-CODE is never set, even when providers fail screening: the job cannot see failures."
+R-PRVSCR01-ADD-04,PRVSCR01,SCREEN-NEXT-PROVIDER,85,93,VERIFIED,"READ NEXT only tests for end of file. Any other read status is ignored and the previous record area is screened again (INFERRED, not executed). (D-024)"
+R-PRVSCR01-ADD-05,PRVSCR01,"SCREEN-ONE-PROVIDER,WRITE-SCREEN-ROW",114,149,VERIFIED,"The status of REWRITE (114) and of the screening WRITE (149) is never tested, so failures are silent. (D-024)"
+R-PRVSCR01-ADD-06,PRVSCR01,MAIN-CONTROL,75,82,VERIFIED,"RETURN-CODE is never set, even when providers fail screening: the job cannot see failures. (D-024)"
 R-PRVSCR01-cbl-00001,PRVSCR01,MAIN-CONTROL,74,80,VERIFIED,MAIN-CONTROL opens the master I-O and the screening file for output (76-77).
 R-PRVSCR01-cbl-00002,PRVSCR01,SCREEN-NEXT-PROVIDER,85,88,VERIFIED,READ NEXT; end of file sets the flag.
 R-PRVSCR01-cbl-00003,PRVSCR01,SCREEN-NEXT-PROVIDER,90,92,VERIFIED,Only records with the unscreened flag are passed on.

@@ -1,0 +1,66 @@
+{
+  "story": "MAM-59",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/IntegrationTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/PlatformChecksTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/TestMail.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/CucumberSpringConfig.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/CucumberSuiteTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/NoticeSteps.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/SendNoticeTest.java",
+    "modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/domain/NoticeRulesTest.java",
+    "modern/services/notification-service/src/test/resources/features/MAM-59.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-59.feature 'An approval sends the 'Enrolment approved' notice': PASSED",
+      "NoticeRulesTest: PASSED",
+      "SendNoticeTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-59.feature 'A denial sends the DENIED notice': PASSED",
+      "NoticeRulesTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-59.feature 'A sanction-driven status change sends no second notice': PASSED",
+      "NoticeRulesTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-59.feature 'A rejected application sends the 'Application rejected' notice': PASSED"
+    ],
+    "AC-5": [
+      "MAM-59.feature 'A rejected application without an NPI gets no notice': PASSED"
+    ],
+    "AC-6": [
+      "MAM-59.feature 'A revalidation due sends the REVALIDATION_DUE notice': PASSED"
+    ],
+    "AC-7": [
+      "MAM-59.feature 'An extract-produced event is consumed without a notice': PASSED"
+    ],
+    "AC-8": [
+      "MAM-59.feature 'A redelivered approval event sends one notice': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/Notice.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticePorts.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/NoticeSentData.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/SendNotice.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/application/Template.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/domain/NoticeRules.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/infrastructure/NoticeAdapters.java",
+    "modern/services/notification-service/src/main/java/gov/medicaid/pem/notification/infrastructure/NoticeEventsListener.java",
+    "modern/services/notification-service/src/main/resources/db/migration/notification/V2__notice_templates.sql"
+  ],
+  "rules": []
+}

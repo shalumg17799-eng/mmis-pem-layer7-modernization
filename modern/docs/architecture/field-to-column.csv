@@ -1,0 +1,127 @@
+record,field,service,table,column,type,transform
+DCLPROV:DCLPROVIDER,PRVT-NPI,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-MEDICAID-ID,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-PROVIDER-TYPE,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-TAXONOMY-CODE,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-RISK-TIER,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-ENROLL-STATUS,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-EFFECTIVE-DATE,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-REVAL-DUE-DATE,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-LEGAL-NAME,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-LEGAL-NAME-LEN,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+DCLPROV:DCLPROVIDER,PRVT-LEGAL-NAME-TEXT,DROP,,,,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+ERRCODES:ERROR-CODES,EC-OK,DROP,,,,success needs no error row
+ERRCODES:ERROR-CODES,EC-MISSING-NPI,enrollment-service,application_error,code,CHAR(4),value E101 (D-016)
+ERRCODES:ERROR-CODES,EC-INVALID-TYPE,enrollment-service,application_error,code,CHAR(4),value E102 (D-016)
+ERRCODES:ERROR-CODES,EC-DUP-NPI,enrollment-service,application_error,code,CHAR(4),value E103 (D-016)
+ERRCODES:ERROR-CODES,EC-MISSING-TAXONOMY,enrollment-service,application_error,code,CHAR(4),value E104 (D-016)
+ERRCODES:ERROR-CODES,EC-EXCLUDED,screening-service,screening_result,error_code,CHAR(4),value E201 (D-016)
+ERRCODES:ERROR-CODES,EC-LICENSE-EXPIRED,screening-service,screening_result,error_code,CHAR(4),value E202 (D-016)
+ERRCODES:ERROR-CODES,EC-OWNER-EXCLUDED,screening-service,screening_result,error_code,CHAR(4),value E203 (D-016)
+ERRCODES:ERROR-CODES,EC-DECEASED,screening-service,screening_result,error_code,CHAR(4),value E204 (D-016)
+ERRCODES:ERROR-CODES,EC-DEBARRED,screening-service,screening_result,error_code,CHAR(4),value E205 (D-016)
+PRVDDL01:MMPRV.PROVIDER,NPI,provider-service,provider,npi,CHAR(10),DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,MEDICAID_ID,provider-service,provider,medicaid_id,CHAR(9),DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,PROVIDER_TYPE,provider-service,provider,provider_type,CHAR(2),DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,TAXONOMY_CODE,provider-service,provider,taxonomy,CHAR(10),DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,RISK_TIER,provider-service,provider,risk_tier,CHAR(1),DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,ENROLL_STATUS,provider-service,provider,enroll_status,CHAR(1),DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,SCREEN_FLAG,provider-service,provider,screen_flag,CHAR(1),DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,EFFECTIVE_DATE,provider-service,provider,effective_date,DATE,DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,END_DATE,provider-service,provider,end_date,DATE,DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,REVAL_DUE_DATE,provider-service,provider,reval_due_date,DATE,DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER,LEGAL_NAME,provider-service,provider,legal_name,VARCHAR(60),DB2 copy merged into the single provider record (D-014)
+PRVDDL01:MMPRV.PROVIDER_OWNER,NPI,provider-service,provider_owner,provider_id,BIGINT,NPI resolved to provider.id
+PRVDDL01:MMPRV.PROVIDER_OWNER,OWNER_NPI,provider-service,provider_owner,owner_npi,CHAR(10),unchanged
+PRVDDL01:MMPRV.PROVIDER_OWNER,OWNER_NAME,provider-service,provider_owner,owner_name,VARCHAR(60),unchanged
+PRVDDL01:MMPRV.PROVIDER_OWNER,OWNER_PCT,provider-service,provider_owner,owner_pct,"NUMERIC(5,2)",unchanged
+PRVDDL01:MMPRV.PROVIDER_OWNER,DISCLOSURE_DATE,provider-service,provider_owner,disclosure_date,DATE,unchanged
+PRVDDL01:MMPRV.SANCTION,NPI,sanctions-service,sanction,npi,CHAR(10),unchanged (D-018)
+PRVDDL01:MMPRV.SANCTION,ACTION,sanctions-service,sanction,action,CHAR(1),unchanged (D-018)
+PRVDDL01:MMPRV.SANCTION,REASON,sanctions-service,sanction,reason,VARCHAR(60),unchanged (D-018)
+PRVDDL01:MMPRV.SANCTION,EFFECTIVE_DATE,sanctions-service,sanction,effective_date,DATE,unchanged (D-018)
+PRVDDL01:MMPRV.SANCTION,SOURCE_FEED,sanctions-service,sanction,source_feed,VARCHAR(20),unchanged (D-018)
+PRVDDL01:MMPRV.SCREENING,NPI,screening-service,screening,npi,CHAR(10),unchanged
+PRVDDL01:MMPRV.SCREENING,SOURCE,screening-service,screening_result,source,VARCHAR(8),unchanged
+PRVDDL01:MMPRV.SCREENING,RESULT,screening-service,screening_result,result,CHAR(1),unchanged
+PRVDDL01:MMPRV.SCREENING,VERDICT_TS,screening-service,screening_result,verdict_at,TIMESTAMPTZ,unchanged
+PRVDDL01:MMPRV.SCREENING,DETAIL,screening-service,screening_result,detail,VARCHAR(60),unchanged
+PRVDEAD1:WS-CONTROL,WS-PAPER-FP-ENABLED,DROP,,,,program dropped (D-011)
+PRVDEAD1:WS-CONTROL,WS-CARD-COUNT,DROP,,,,program dropped (D-011)
+PRVDIR01:DIR-OUT-RECORD,DIR-MEDICAID-ID,directory-service,directory_entry,medicaid_id,CHAR(9),unchanged
+PRVDIR01:DIR-OUT-RECORD,DIR-NPI,directory-service,directory_entry,npi,CHAR(10),unchanged
+PRVDIR01:DIR-OUT-RECORD,DIR-TYPE,directory-service,directory_entry,provider_type,CHAR(2),unchanged
+PRVDIR01:DIR-OUT-RECORD,DIR-RISK-TIER,directory-service,directory_entry,risk_tier,CHAR(1),unchanged
+PRVDIR01:DIR-OUT-RECORD,DIR-NAME,directory-service,directory_entry,display_name,VARCHAR(60),"composed from the name fields, not the raw first 60 bytes of PRV-VARIANT (D-028)"
+PRVDIR01:DIR-OUT-RECORD,FILLER@L53,DROP,,,,FILLER: no data
+PRVRECRD:PROVIDER-RECORD,PRV-NPI,provider-service,provider,npi,CHAR(10),unchanged
+PRVRECRD:PROVIDER-RECORD,PRV-MEDICAID-ID,provider-service,provider,medicaid_id,CHAR(9),unchanged; indexed (the legacy alternate index)
+PRVRECRD:PROVIDER-RECORD,PRV-TYPE-CODE,provider-service,provider,provider_type,CHAR(2),IN/GR/FA kept; feed codes mapped at intake (D-008)
+PRVRECRD:PROVIDER-RECORD,PRV-TAXONOMY,provider-service,provider,taxonomy,CHAR(10),unchanged
+PRVRECRD:PROVIDER-RECORD,PRV-RISK-TIER,provider-service,provider,risk_tier,CHAR(1),set from RiskTierAssigned (D-002)
+PRVRECRD:PROVIDER-RECORD,PRV-ENROLL-STATUS,provider-service,provider,enroll_status,CHAR(1),P/A/T/D plus new S suspended (D-006)
+PRVRECRD:PROVIDER-RECORD,PRV-SCREEN-FLAG,provider-service,provider,screen_flag,CHAR(1),set from ScreeningCompleted
+PRVRECRD:PROVIDER-RECORD,PRV-EFFECTIVE-DATE,provider-service,provider,effective_date,DATE,CCYYMMDD to DATE
+PRVRECRD:PROVIDER-RECORD,PRV-REVAL-DUE-DATE,provider-service,provider,reval_due_date,DATE,"CCYYMMDD to DATE; set at approval and at each completed revalidation (D-003, D-004)"
+PRVRECRD:PROVIDER-RECORD,PRV-VARIANT,DROP,,,,raw 80-byte area; mapped through its two REDEFINES views field by field (AP-10)
+PRVRECRD:PROVIDER-RECORD,PRV-INDIVIDUAL-DATA,DROP,,,,group view; its fields are mapped
+PRVRECRD:PROVIDER-RECORD,PRV-LAST-NAME,provider-service,provider,last_name,VARCHAR(30),trim trailing spaces
+PRVRECRD:PROVIDER-RECORD,PRV-FIRST-NAME,provider-service,provider,first_name,VARCHAR(20),trim
+PRVRECRD:PROVIDER-RECORD,PRV-LICENSE-NO,provider-service,provider,license_no,VARCHAR(15),trim
+PRVRECRD:PROVIDER-RECORD,PRV-LICENSE-STATE,provider-service,provider,license_state,CHAR(2),unchanged
+PRVRECRD:PROVIDER-RECORD,FILLER@L39,DROP,,,,FILLER: no data
+PRVRECRD:PROVIDER-RECORD,PRV-ORG-DATA,DROP,,,,group view; its fields are mapped
+PRVRECRD:PROVIDER-RECORD,PRV-LEGAL-NAME,provider-service,provider,legal_name,VARCHAR(60),trim; widened to the DB2 length 60
+PRVRECRD:PROVIDER-RECORD,PRV-DBA-NAME,provider-service,provider,dba_name,VARCHAR(30),trim
+PRVRECRD:PROVIDER-RECORD,PRV-OWNER-NPI,provider-service,provider,owner_npi,CHAR(10),bytes 121-130 kept: the record is 130 bytes (D-007)
+PRVREV01:REVAL-OUT-RECORD,REV-NPI,revalidation-service,revalidation_case,npi,CHAR(10),unchanged
+PRVREV01:REVAL-OUT-RECORD,REV-DUE-DATE,revalidation-service,revalidation_case,due_date,DATE,CCYYMMDD to DATE
+PRVREV01:REVAL-OUT-RECORD,REV-ACTION,revalidation-service,revalidation_case,status,VARCHAR(12),'RESCREEN-REQUIRED' becomes status DUE; one open case per provider (D-029)
+PRVREV01:REVAL-OUT-RECORD,FILLER@L53,DROP,,,,FILLER: no data
+PRVRSK01:WS-DATE-WORK,WS-CURR-DATE,DROP,,,,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+PRVRSK01:WS-DATE-WORK,WS-CURR-YY,DROP,,,,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+PRVRSK01:WS-DATE-WORK,WS-CURR-MMDD,DROP,,,,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+PRVRSK01:WS-DATE-WORK,WS-DUE-YY,DROP,,,,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+PRVRSK01:WS-DATE-WORK,WS-DUE-CCYY,DROP,,,,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+PRVRSK01:WS-DATE-WORK,WS-DUE-DATE,DROP,,,,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+PRVSAN01:SANCTION-IN-RECORD,SAN-NPI,sanctions-service,sanction,npi,CHAR(10),unchanged
+PRVSAN01:SANCTION-IN-RECORD,SAN-ACTION,sanctions-service,sanction,action,CHAR(1),T/S/R; any other code is rejected (D-026)
+PRVSAN01:SANCTION-IN-RECORD,SAN-REASON,sanctions-service,sanction,reason,VARCHAR(60),now stored (D-018)
+PRVSAN01:SANCTION-IN-RECORD,SAN-EFF-DATE,sanctions-service,sanction,effective_date,DATE,CCYYMMDD to DATE; now stored (D-018)
+PRVSAN01:SANCTION-IN-RECORD,FILLER@L64,DROP,,,,FILLER: no data
+PRVSAN01:WS-NOTICE-CONTROL,WS-NOTICE-PREFIX,DROP,,,,builds the dynamic CALL name; replaced by notice templates (D-012)
+PRVSAN01:WS-NOTICE-CONTROL,WS-NOTICE-SUFFIX,DROP,,,,builds the dynamic CALL name; replaced by notice templates (D-012)
+PRVSAN01:WS-NOTICE-CONTROL,WS-NOTICE-PGM,DROP,,,,builds the dynamic CALL name; replaced by notice templates (D-012)
+PRVSCR01:WS-CONTROL-FLAGS,WS-RECIPROCITY-ENABLED,DROP,,,,flag never set; reciprocity check dropped (D-010)
+PRVSCR01:WS-CONTROL-FLAGS,WS-FAIL-COUNT,screening-service,screening_run,fail_count,INTEGER,per-run counter
+PRVSCR01:WS-EXT-RESULTS,WS-LICENSE-RESULT,screening-service,screening_result,result,CHAR(1),one screening_result row per source (D-005)
+PRVSCR01:WS-EXT-RESULTS,WS-LEIE-RESULT,screening-service,screening_result,result,CHAR(1),one screening_result row per source (D-005)
+PRVSCR01:WS-EXT-RESULTS,WS-SAM-RESULT,screening-service,screening_result,result,CHAR(1),one screening_result row per source (D-005)
+PRVSCR01:WS-EXT-RESULTS,WS-DMF-RESULT,screening-service,screening_result,result,CHAR(1),one screening_result row per source (D-005)
+PRVTMS01:WS-JULIAN-WORK,WS-TODAY-JUL,tmsis-service,extract_run,period_yyddd,CHAR(5),"computed from the business date (D-015, D-020)"
+PRVTMS01:WS-JULIAN-WORK,WS-TODAY-YY,DROP,,,,Julian work field; unused or replaced by java.time (D-004)
+PRVTMS01:WS-JULIAN-WORK,WS-TODAY-DDD,DROP,,,,Julian work field; unused or replaced by java.time (D-004)
+PRVTMS01:WS-JULIAN-WORK,WS-ENROLL-JUL,DROP,,,,Julian work field; unused or replaced by java.time (D-004)
+PRVTMS01:WS-JULIAN-WORK,WS-ENROLL-YY,DROP,,,,Julian work field; unused or replaced by java.time (D-004)
+PRVTMS01:WS-JULIAN-WORK,WS-AGE-DAYS,DROP,,,,Julian work field; unused or replaced by java.time (D-004)
+PRVTMS01:WS-TMSIS-DETAIL,FILLER@L68,tmsis-service,extract_row,record_type,CHAR(5),constant PRV01
+PRVTMS01:WS-TMSIS-DETAIL,WS-T-PROVID,tmsis-service,extract_row,medicaid_id,CHAR(9),unchanged
+PRVTMS01:WS-TMSIS-DETAIL,WS-T-NPI,tmsis-service,extract_row,npi,CHAR(10),unchanged
+PRVTMS01:WS-TMSIS-DETAIL,WS-T-STATUS,tmsis-service,extract_row,status,CHAR(1),constant 'A': only active providers (Q-007)
+PRVTMS01:WS-TMSIS-DETAIL,WS-T-PERIOD-YYDDD,tmsis-service,extract_row,period_yyddd,CHAR(5),YYDDD kept in the legacy-format extract (D-015); ISO business_date in extract_run
+PRVTMS01:WS-TMSIS-DETAIL,FILLER@L73,DROP,,,,FILLER: no data
+SCRNREC:SCREENING-RECORD,SCR-NPI,screening-service,screening,npi,CHAR(10),one screening per provider run; results per source in screening_result
+SCRNREC:SCREENING-RECORD,SCR-SOURCE,screening-service,screening_result,source,VARCHAR(8),same codes; PECOS dropped with the reciprocity check (D-010)
+SCRNREC:SCREENING-RECORD,SCR-RESULT,screening-service,screening_result,result,CHAR(1),P/F/C; real results from mocked sources (D-005)
+SCRNREC:SCREENING-RECORD,SCR-VERDICT-DATE,screening-service,screening_result,verdict_at,TIMESTAMPTZ,CCYYMMDD to timestamp; now always set (D-005)
+SCRNREC:SCREENING-RECORD,SCR-DETAIL,screening-service,screening_result,detail,VARCHAR(60),widened to the DB2 length 60; now always set
+WRKSTORE:WS-STANDARD-WORK,WS-PROGRAM-ID,DROP,,,,program name; each service records its own runs
+WRKSTORE:WS-STANDARD-WORK,WS-END-OF-FILE-FLAG,DROP,,,,loop control
+WRKSTORE:WS-STANDARD-WORK,WS-FILE-STATUS,DROP,,,,I/O status; replaced by exceptions and run failure_reason (D-024)
+WRKSTORE:WS-STANDARD-WORK,WS-RECORDS-READ,enrollment-service,intake_run,read_count,INTEGER,per-run counter (PRVENR01's use; other jobs keep counts in their own run tables)
+WRKSTORE:WS-STANDARD-WORK,WS-RECORDS-WRITTEN,enrollment-service,intake_run,written_count,INTEGER,per-run counter (PRVENR01's use; other jobs keep counts in their own run tables)
+WRKSTORE:WS-STANDARD-WORK,WS-RECORDS-SKIPPED,enrollment-service,intake_run,skipped_count,INTEGER,per-run counter (PRVENR01's use; other jobs keep counts in their own run tables)
+WRKSTORE:WS-STANDARD-WORK,WS-RECORDS-ERRORED,enrollment-service,intake_run,error_count,INTEGER,per-run counter (PRVENR01's use; other jobs keep counts in their own run tables)
+PRVENR01:APP-INPUT-RECORD,APP-INPUT-RECORD,enrollment-service,application,raw_record,CHAR(200),"kept as received; bytes 1-130 parsed as PRVRECRD (D-025, Q-009)"
+PRVENR01:APP-ERROR-RECORD,APP-ERROR-RECORD,enrollment-service,intake_run,error_file,TEXT,"250-byte rows rebuilt from application_error, one per invalid application (D-001)"
+PRVTMS01:TMSIS-OUT-RECORD,TMSIS-OUT-RECORD,tmsis-service,extract_archive,content,TEXT,"120-byte rows of the run, archived per generation (GDG +1)"

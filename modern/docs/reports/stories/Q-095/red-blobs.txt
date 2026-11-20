@@ -1,0 +1,4 @@
+bb4c009185e4e6e383087b22c9307db85884c873  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/OwnNpiSteps.java
+b3857b54e1a841395abe0041cb4056e40138687b  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/SubmitOwnNpiTest.java
+5ef64ed7c84dee68d9f46a3b9ead5e1b4af6d91a  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/domain/OwnNpiRuleTest.java
+e02c2b1461179bcb8f3004d4d94c3aefcc440f68  modern/services/enrollment-service/src/test/resources/features/Q-095.feature

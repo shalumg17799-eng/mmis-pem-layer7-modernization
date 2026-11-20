@@ -1,0 +1,51 @@
+{
+  "name": "DIROUT",
+  "source": "PRVDIR01:DIR-OUT-RECORD",
+  "length": 100,
+  "readQuery": "MATCH (r:Record {id: 'PRVDIR01:DIR-OUT-RECORD'}) OPTIONAL MATCH (r)-[:HAS_FIELD]->(f:Field) RETURN r.name AS recordName, r.length AS recordLength, f.name AS name, f.level AS level, f.pic AS pic, f.start AS start, f.length AS length, f.group AS isGroup, f.line AS line ORDER BY f.line",
+  "discriminator": null,
+  "fields": [
+    {
+      "name": "DIR-MEDICAID-ID",
+      "start": 1,
+      "length": 9,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "DIR-NPI",
+      "start": 10,
+      "length": 10,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "DIR-TYPE",
+      "start": 20,
+      "length": 2,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "DIR-RISK-TIER",
+      "start": 22,
+      "length": 1,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "DIR-NAME",
+      "start": 23,
+      "length": 60,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "FILLER",
+      "start": 83,
+      "length": 18,
+      "type": "ALPHANUMERIC",
+      "views": []
+    }
+  ]
+}

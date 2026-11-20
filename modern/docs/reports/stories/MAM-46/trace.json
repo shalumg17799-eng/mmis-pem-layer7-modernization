@@ -1,0 +1,91 @@
+{
+  "story": "MAM-46",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/IntegrationTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/PlatformChecksTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/CucumberSpringConfig.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/CucumberSuiteTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/SubmitApplicationSteps.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/SubmitApplicationTest.java",
+    "modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/domain/ApplicationValidatorTest.java",
+    "modern/services/enrollment-service/src/test/resources/features/MAM-46.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ApplicationValidatorTest: PASSED",
+      "MAM-46.feature 'A valid application is accepted': PASSED",
+      "SubmitApplicationTest: PASSED"
+    ],
+    "AC-2": [
+      "ApplicationValidatorTest: PASSED",
+      "MAM-46.feature 'A missing or malformed NPI fails with E101 and announces nothing': PASSED",
+      "SubmitApplicationTest: PASSED"
+    ],
+    "AC-3": [
+      "ApplicationValidatorTest: PASSED",
+      "MAM-46.feature 'An invalid provider type fails with E102, and IN, GR and FA are accepted': PASSED",
+      "SubmitApplicationTest: PASSED"
+    ],
+    "AC-4": [
+      "ApplicationValidatorTest: PASSED",
+      "MAM-46.feature 'A missing taxonomy fails with E104 (journey J2)': PASSED"
+    ],
+    "AC-5": [
+      "ApplicationValidatorTest: PASSED",
+      "MAM-46.feature 'A duplicate NPI fails with E103; an earlier rejection is no duplicate': PASSED",
+      "SubmitApplicationTest: PASSED"
+    ],
+    "AC-6": [
+      "ApplicationValidatorTest: PASSED",
+      "MAM-46.feature 'Several failed checks give one error each, stored once and announced once': PASSED",
+      "SubmitApplicationTest: PASSED"
+    ],
+    "AC-7": [
+      "ApplicationValidatorTest: PASSED",
+      "MAM-46.feature 'Feed provider-type codes are mapped to IN, GR or FA': PASSED",
+      "SubmitApplicationTest: PASSED"
+    ],
+    "AC-8": [
+      "MAM-46.feature 'No token gives 401, a broken body gives 400 and nothing is stored': PASSED",
+      "MAM-46.feature 'Only PROVIDER and ANALYST may submit': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/ListApplications.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/application/SubmitApplication.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/domain/ApplicationValidator.java",
+    "modern/services/enrollment-service/src/main/java/gov/medicaid/pem/enrollment/domain/ProviderTypeMapping.java"
+  ],
+  "rules": [
+    "R-PRVENR01-ADD-04",
+    "R-PRVENR01-ADD-05",
+    "R-PRVENR01-cbl-00003",
+    "R-PRVENR01-cbl-00004",
+    "R-PRVENR01-cbl-00005",
+    "R-PRVENR01-cbl-00024",
+    "R-PRVENR01-cbl-00025",
+    "R-PRVENR01-cbl-00028",
+    "R-PRVENR01-cbl-00029",
+    "R-PRVENR01-cbl-00030",
+    "R-PRVENR01-cbl-00032",
+    "R-PRVENR01-cbl-00034",
+    "R-PRVENR01-cbl-00035",
+    "R-PRVENR01-cbl-00039",
+    "R-PRVENR01-cbl-00049",
+    "R-PRVENR01-cbl-00050",
+    "R-PRVENR01-cbl-00052",
+    "R-PRVENR01-cbl-00053",
+    "R-PRVENR01-cbl-00054",
+    "R-PRVENR01-cbl-00055"
+  ]
+}

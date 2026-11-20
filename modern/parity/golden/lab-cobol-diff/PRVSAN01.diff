@@ -1,0 +1,296 @@
+--- source-code/BATCH/PRVSAN01.cbl (cols 1-72)
++++ lab PRVSAN01 (compiled, PRVBLD01 job 154)
+@@ -2 +2 @@
+-      * PROGRAM:  PRVSAN01                                             *
++      * PROGRAM:  PRVSAN01  (TK5 / OS ANS COBOL V2 LAB PORT)           *
+@@ -4,2 +4,2 @@
+-      *           EXCLUSIONS AND TERMINATIONS TO PROVIDER RECORDS AND   
+-      *           NOTIFIES DOWNSTREAM (CLAIMS, MCO).                    
++      *           EXCLUSIONS AND TERMINATIONS TO PROVIDER RECORDS AND  *
++      *           NOTIFIES DOWNSTREAM (CLAIMS, MCO).                   *
+@@ -6,0 +7,2 @@
++      * ORIGINAL: source-code/BATCH/PRVSAN01.cbl.  CONTROL FLOW AND    *
++      * THE DYNAMIC CALL ARE UNCHANGED.                                *
+@@ -8,11 +10,9 @@
+-      * ANTI-PATTERN 1: CROSS-APP VSAM COUPLING                      *
+-      *   PEMAPP2 opens PRVMSTR (PRVPROVN) - the Provider Master KSDS   
+-      *   OWNED BY PEMAPP1 - directly via its DD statement and          
+-      *   REWRITEs it. There is no API boundary. PEMAPP2 cannot be      
+-      *   migrated to a cloud Sanctions service without either exposing 
+-      *   a Provider API from PEMAPP1 or migrating both at once. This   
+-      *   is THE modernization blocker (see estate README).            *
+-      * ANTI-PATTERN 2: DYNAMIC CALL (TARGET IN A VARIABLE)          *
+-      *   The notice generator is invoked via CALL WS-NOTICE-PGM where  
+-      *   the program name is built at runtime. CAST shows the call     
+-      *   target as '?', breaking the call graph.                       
++      * ANTI-PATTERN 1: CROSS-APP VSAM COUPLING                        *
++      *   PEMAPP2 opens PRVMSTR - the Provider Master OWNED BY         *
++      *   PEMAPP1 - directly via its DD statement and REWRITEs it.     *
++      * ANTI-PATTERN 2: DYNAMIC CALL (TARGET IN A VARIABLE)            *
++      *   CALL WS-NOTICE-PGM - the program name is built at run time.  *
++      *   LAB: V2 ONLY ALLOWS CALL 'LITERAL', SO THE CALL IS NOW       *
++      *   DISPATCHED ON THE ACTION CODE.  THE NOTICE PROGRAMS NEVER    *
++      *   EXISTED IN THE ESTATE, SO FOUR STUBS (PRVNTTRM/SUS/RST/GEN)  *
++      *   STAND IN.                                                    *
+@@ -24 +23,0 @@
+-
+@@ -27,3 +26,2 @@
+-       SOURCE-COMPUTER. IBM-3090.
+-       OBJECT-COMPUTER. IBM-3090.
+-
++       SOURCE-COMPUTER. IBM-370.
++       OBJECT-COMPUTER. IBM-370.
+@@ -34,6 +32,4 @@
+-               ASSIGN TO PRVMSTR
+-               ORGANIZATION IS INDEXED
+-               ACCESS MODE IS DYNAMIC
+-               RECORD KEY IS PRV-NPI
+-               FILE STATUS IS WS-PRV-STATUS.
+-
++               ASSIGN TO DA-I-PRVMSTR
++               ACCESS MODE IS RANDOM
++               RECORD KEY IS PRV-NPI OF PRV-MASTER-RECORD
++               NOMINAL KEY IS WS-NOM-KEY.
+@@ -41,5 +37 @@
+-               ASSIGN TO SANCIN
+-               ORGANIZATION IS SEQUENTIAL
+-               ACCESS MODE IS SEQUENTIAL
+-               FILE STATUS IS WS-SAN-STATUS.
+-
++               ASSIGN TO UT-S-SANCIN.
+@@ -49 +41,4 @@
+-           RECORD CONTAINS 121 CHARACTERS.
++           RECORDING MODE IS F
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 10 RECORDS
++           RECORD CONTAINS 130 CHARACTERS.
+@@ -51,2 +46,48 @@
+-           COPY PRVRECRD.
+-
++      *    PRVRECRD - PROVIDER MASTER RECORD (130 BYTES) - FLATTENED.
++      *    (LEGACY RECORD CONTAINS 121 IS WRONG: THIS LAYOUT IS 130.)
++           05  PRV-NPI                 PIC X(10).
++           05  PRV-MEDICAID-ID         PIC X(09).
++           05  PRV-TYPE-CODE           PIC X(02).   2
++               88  PRV-INDIVIDUAL      VALUE 'IN'.
++               88  PRV-GROUP           VALUE 'GR'.
++               88  PRV-FACILITY        VALUE 'FA'.
++           05  PRV-TAXONOMY            PIC X(10).
++           05  PRV-TAXONOMY-R REDEFINES PRV-TAXONOMY.
++               10  PRV-TAX-GRP         PIC X(03).
++               10  FILLER              PIC X(07).
++           05  PRV-RISK-TIER           PIC X(01).
++               88  PRV-RISK-LIMITED    VALUE 'L'.
++               88  PRV-RISK-MODERATE   VALUE 'M'.
++               88  PRV-RISK-HIGH       VALUE 'H'.
++           05  PRV-ENROLL-STATUS       PIC X(01).
++               88  PRV-PENDING         VALUE 'P'.
++               88  PRV-ACTIVE          VALUE 'A'.
++               88  PRV-TERMINATED      VALUE 'T'.
++               88  PRV-DENIED          VALUE 'D'.
++           05  PRV-SCREEN-FLAG         PIC X(01).
++               88  PRV-UNSCREENED      VALUE 'U'.
++               88  PRV-SCREEN-PASS     VALUE 'P'.
++               88  PRV-SCREEN-FAIL     VALUE 'F'.
++           05  PRV-EFFECTIVE-DATE      PIC 9(08).
++           05  PRV-EFFECTIVE-DATE-R REDEFINES PRV-EFFECTIVE-DATE.
++               10  PRV-EFF-CC          PIC 9(02).
++               10  PRV-EFF-YY          PIC 9(02).
++               10  PRV-EFF-MMDD        PIC 9(04).
++           05  PRV-REVAL-DUE-DATE      PIC 9(08).
++           05  PRV-VARIANT             PIC X(80).
++      *    --- Individual provider view of PRV-VARIANT ---
++           05  PRV-INDIVIDUAL-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LAST-NAME       PIC X(30).
++               10  PRV-FIRST-NAME      PIC X(20).
++               10  PRV-LICENSE-NO      PIC X(15).
++               10  PRV-LICENSE-STATE   PIC X(02).
++               10  FILLER              PIC X(13).
++      *    --- Group / Facility view of the SAME 80 bytes ---
++           05  PRV-ORG-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LEGAL-NAME      PIC X(40).
++               10  PRV-DBA-NAME        PIC X(30).
++               10  PRV-OWNER-NPI       PIC X(10).
++      *    --- port helper: replaces reference modification (1:60) ---
++           05  PRV-VARIANT-HEAD REDEFINES PRV-VARIANT.
++               10  PRV-VARIANT-60      PIC X(60).
++               10  FILLER              PIC X(20).
+@@ -54,0 +96,2 @@
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 0 RECORDS
+@@ -63 +106 @@
+-           05  SAN-EFF-DATE            PIC 9(08).
++           05  SAN-EFF-DATE            PIC 9(08).   3
+@@ -65 +107,0 @@
+-
+@@ -67,2 +109,43 @@
+-           COPY WRKSTORE.
+-
++      *    WRKSTORE - STANDARD WORKING STORAGE (NESTED COPYBOOK)
++      *    LEGACY: INCLUDES BOTH SCRNREC AND ERRCODES.  KEPT NESTED.
++       01  WS-STANDARD-WORK.
++           05  WS-PROGRAM-ID           PIC X(08).
++           05  WS-END-OF-FILE-FLAG     PIC X(01) VALUE 'N'.
++               88  WS-END-OF-FILE      VALUE 'Y'.
++           05  WS-FILE-STATUS          PIC X(02) VALUE '00'.
++               88  WS-FS-OK            VALUE '00'.
++               88  WS-FS-EOF           VALUE '10'.
++               88  WS-FS-DUP           VALUE '22'.
++           05  WS-RECORDS-READ         PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-WRITTEN      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-SKIPPED      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-ERRORED      PIC 9(07) VALUE ZERO.
++      *    --- NESTED COPYBOOKS (the anti-pattern) ---
++       01  SCREENING-RECORD.
++      *    SCRNREC - SCREENING / VERIFICATION RESULT RECORD (67 BYTES)
++           05  SCR-NPI                 PIC X(10).
++           05  SCR-SOURCE              PIC X(08).
++               88  SCR-NPPES           VALUE 'NPPES'.
++               88  SCR-LEIE            VALUE 'OIGLEIE'.
++               88  SCR-SAM             VALUE 'SAMGOV'.
++               88  SCR-LICENSE         VALUE 'LICBOARD'.
++               88  SCR-DMF             VALUE 'SSADMF'.
++               88  SCR-PECOS           VALUE 'PECOS'.
++           05  SCR-RESULT              PIC X(01).
++               88  SCR-PASS            VALUE 'P'.
++               88  SCR-FAIL            VALUE 'F'.
++               88  SCR-COND            VALUE 'C'.
++           05  SCR-VERDICT-DATE        PIC 9(08).
++           05  SCR-DETAIL              PIC X(40).
++       01  ERROR-CODES.
++      *    ERRCODES - SHARED ENROLLMENT/SCREENING ERROR CODES
++           05  EC-OK                   PIC X(04) VALUE '0000'.
++           05  EC-MISSING-NPI          PIC X(04) VALUE 'E101'.
++           05  EC-INVALID-TYPE         PIC X(04) VALUE 'E102'.
++           05  EC-DUP-NPI              PIC X(04) VALUE 'E103'.
++           05  EC-MISSING-TAXONOMY     PIC X(04) VALUE 'E104'.
++           05  EC-EXCLUDED             PIC X(04) VALUE 'E201'.
++           05  EC-LICENSE-EXPIRED      PIC X(04) VALUE 'E202'.
++           05  EC-OWNER-EXCLUDED       PIC X(04) VALUE 'E203'.
++           05  EC-DECEASED             PIC X(04) VALUE 'E204'.
++           05  EC-DEBARRED             PIC X(04) VALUE 'E205'.
+@@ -70,2 +153 @@
+-       01  WS-SAN-STATUS               PIC X(2).
+-
++       01  WS-NOM-KEY                  PIC X(10).
+@@ -74,0 +157 @@
++       01  WS-NOTICE-NAME REDEFINES WS-NOTICE-CONTROL.
+@@ -77 +159,0 @@
+-
+@@ -80,7 +162,7 @@
+-           MOVE 'PRVSAN01' TO WS-PROGRAM-ID
+-           OPEN I-O    PRV-MASTER-FILE
+-           OPEN INPUT  SANCTION-IN-FILE
+-           MOVE 'N' TO WS-END-OF-FILE-FLAG
+-           PERFORM PROCESS-SANCTION UNTIL WS-END-OF-FILE
+-           CLOSE PRV-MASTER-FILE SANCTION-IN-FILE
+-           DISPLAY 'PRVSAN01: PROVIDERS TERMINATED=' WS-TERM-COUNT
++           MOVE 'PRVSAN01' TO WS-PROGRAM-ID.
++           OPEN I-O    PRV-MASTER-FILE.
++           OPEN INPUT  SANCTION-IN-FILE.
++           MOVE 'N' TO WS-END-OF-FILE-FLAG.
++           PERFORM PROCESS-SANCTION UNTIL WS-END-OF-FILE.
++           CLOSE PRV-MASTER-FILE SANCTION-IN-FILE.
++           DISPLAY 'PRVSAN01: PROVIDERS TERMINATED=' WS-TERM-COUNT.
+@@ -88 +169,0 @@
+-
+@@ -89,0 +171 @@
++           MOVE '00' TO WS-FILE-STATUS.
+@@ -91 +173 @@
+-           MOVE WS-SAN-STATUS TO WS-FILE-STATUS
++               AT END MOVE '10' TO WS-FILE-STATUS.
+@@ -93,4 +175,4 @@
+-               SET WS-END-OF-FILE TO TRUE
+-           ELSE
+-               MOVE SAN-NPI TO PRV-NPI OF PRV-MASTER-RECORD
+-               READ PRV-MASTER-FILE
++               MOVE 'Y' TO WS-END-OF-FILE-FLAG
++           ELSE
++               MOVE SAN-NPI TO WS-NOM-KEY
++               PERFORM READ-MASTER-BY-NPI
+@@ -100,4 +182,5 @@
+-                   DISPLAY 'PRVSAN01: NPI NOT FOUND ' SAN-NPI
+-               END-IF
+-           END-IF.
+-
++                   DISPLAY 'PRVSAN01: NPI NOT FOUND ' SAN-NPI.
++       READ-MASTER-BY-NPI.
++           MOVE '00' TO WS-PRV-STATUS.
++           READ PRV-MASTER-FILE
++               INVALID KEY MOVE '23' TO WS-PRV-STATUS.
+@@ -105,9 +188,10 @@
+-           EVALUATE TRUE
+-               WHEN SAN-TERMINATE
+-                   SET PRV-TERMINATED OF PRV-MASTER-RECORD TO TRUE
+-                   ADD 1 TO WS-TERM-COUNT
+-               WHEN SAN-SUSPEND
+-                   SET PRV-DENIED OF PRV-MASTER-RECORD TO TRUE
+-               WHEN SAN-REINSTATE
+-                   SET PRV-ACTIVE OF PRV-MASTER-RECORD TO TRUE
+-           END-EVALUATE
++           IF SAN-TERMINATE
++               MOVE 'T' TO PRV-ENROLL-STATUS OF PRV-MASTER-RECORD
++               ADD 1 TO WS-TERM-COUNT
++           ELSE
++               IF SAN-SUSPEND
++                   MOVE 'D' TO PRV-ENROLL-STATUS OF PRV-MASTER-RECORD
++               ELSE
++                   IF SAN-REINSTATE
++                       MOVE 'A' TO PRV-ENROLL-STATUS
++                                        OF PRV-MASTER-RECORD.
+@@ -114,0 +199,3 @@
++           PERFORM REWRITE-MASTER.
++           PERFORM GENERATE-NOTICE.
++       REWRITE-MASTER.
+@@ -116,2 +203,2 @@
+-           PERFORM GENERATE-NOTICE.
+-
++               INVALID KEY DISPLAY 'PRVSAN01: REWRITE FAILED '
++                                   SAN-NPI.
+@@ -119,4 +206,3 @@
+-      * GENERATE-NOTICE                                               *
+-      * ANTI-PATTERN: DYNAMIC CALL                                   *
+-      *   Program name assembled at runtime (PRVNT + action). CAST      
+-      *   cannot resolve the CALL target - shows '?'.                   
++      * GENERATE-NOTICE                                                *
++      * ANTI-PATTERN: DYNAMIC CALL                                     *
++      *   Program name assembled at runtime (PRVNT + action).          *
+@@ -125,14 +211,24 @@
+-           EVALUATE TRUE
+-               WHEN SAN-TERMINATE  MOVE 'TRM' TO WS-NOTICE-SUFFIX
+-               WHEN SAN-SUSPEND    MOVE 'SUS' TO WS-NOTICE-SUFFIX
+-               WHEN SAN-REINSTATE  MOVE 'RST' TO WS-NOTICE-SUFFIX
+-               WHEN OTHER          MOVE 'GEN' TO WS-NOTICE-SUFFIX
+-           END-EVALUATE
+-           STRING WS-NOTICE-PREFIX DELIMITED SIZE
+-                  WS-NOTICE-SUFFIX DELIMITED SIZE
+-               INTO WS-NOTICE-PGM
+-           CALL WS-NOTICE-PGM USING PRV-MASTER-RECORD
+-               ON EXCEPTION
+-                   DISPLAY 'PRVSAN01: NOTICE PGM NOT FOUND '
+-                           WS-NOTICE-PGM
+-           END-CALL.
++           IF SAN-TERMINATE   5
++               MOVE 'TRM' TO WS-NOTICE-SUFFIX
++           ELSE
++               IF SAN-SUSPEND
++                   MOVE 'SUS' TO WS-NOTICE-SUFFIX
++               ELSE
++                   IF SAN-REINSTATE
++                       MOVE 'RST' TO WS-NOTICE-SUFFIX
++                   ELSE
++                       MOVE 'GEN' TO WS-NOTICE-SUFFIX.
++      *    PORT: V2 SUPPORTS ONLY CALL 'LITERAL'.  THE LEGACY CODE DID
++      *    CALL WS-NOTICE-PGM USING PRV-MASTER-RECORD (NAME IN A
++      *    VARIABLE).  THE NAME IS STILL BUILT ABOVE; THE CALL IS NOW
++      *    DISPATCHED ON THE SUFFIX.
++           IF WS-NOTICE-SUFFIX = 'TRM'
++               CALL 'PRVNTTRM' USING PRV-MASTER-RECORD
++           ELSE
++               IF WS-NOTICE-SUFFIX = 'SUS'
++                   CALL 'PRVNTSUS' USING PRV-MASTER-RECORD
++               ELSE
++                   IF WS-NOTICE-SUFFIX = 'RST'
++                       CALL 'PRVNTRST' USING PRV-MASTER-RECORD
++                   ELSE
++                       CALL 'PRVNTGEN' USING PRV-MASTER-RECORD.   6

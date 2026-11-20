@@ -1,0 +1,34 @@
+{
+  "name": "license-board clean: HP30300 / TX ACTIVE (license_board.txt)",
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/license-board/licenses",
+    "queryParameters": {
+      "licenseNo": {
+        "equalTo": "HP30300"
+      },
+      "state": {
+        "equalTo": "TX"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "LICBOARD",
+      "licenseNo": "HP30300",
+      "state": "TX",
+      "found": true,
+      "status": "ACTIVE",
+      "expiry": "2029-11"
+    }
+  },
+  "metadata": {
+    "source": "license-board",
+    "answer": "clean"
+  }
+}

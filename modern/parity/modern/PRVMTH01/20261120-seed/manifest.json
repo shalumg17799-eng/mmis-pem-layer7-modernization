@@ -1,0 +1,161 @@
+{
+  "job": "PRVMTH01",
+  "runId": "20261120-seed",
+  "side": "modern",
+  "scenario": "month-seed",
+  "businessDate": "2026-11-20",
+  "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
+  "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
+  "startedUtc": "2026-11-20T11:21:25Z",
+  "finishedUtc": "2026-11-20T11:21:48Z",
+  "gateway": "http://localhost:8080",
+  "user": "admin1 (ADMIN)",
+  "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
+  "modernBuild": {
+    "gitHead": "6763144",
+    "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
+    "workingTree": "uncommitted changes of the lead (no commit in this task)"
+  },
+  "memoryPauseSeconds": 0,
+  "runs": [
+    {
+      "step": "PRVREV01 revalidation sweep",
+      "startPath": "/api/v1/batch/revalidation-sweeps",
+      "startHttpStatus": 202,
+      "runId": "b95a2698-b1ce-41b6-8fd7-96cc48f26665",
+      "status": "COMPLETED",
+      "businessDate": "2026-11-20",
+      "counts": {
+        "queued": 4,
+        "noDueDate": 0
+      },
+      "error": null,
+      "startedAt": "2026-11-20T11:21:40.431625Z",
+      "endedAt": "2026-11-20T11:21:40.685183Z",
+      "job": "revalidation-sweep"
+    },
+    {
+      "step": "PRVTMS01 T-MSIS extract",
+      "startPath": "/api/v1/batch/tmsis-extracts",
+      "startHttpStatus": 202,
+      "runId": "c39fa96e-1ff9-4ea6-8454-73fe0a7981c1",
+      "status": "COMPLETED",
+      "businessDate": "2026-11-20",
+      "counts": {
+        "rows": 8,
+        "futureEnrolments": 0,
+        "archiveGeneration": 16
+      },
+      "error": null,
+      "startedAt": "2026-11-20T11:21:43.596193Z",
+      "endedAt": "2026-11-20T11:21:43.669768Z",
+      "job": "PRVTMS01"
+    }
+  ],
+  "flowNotes": [
+    "Run on the seed state, like the legacy PRVMTH01 (the legacy run did not run PRVDAY01 first).",
+    "The GDG generation MMPRV.TMSIS.ARCHIVE(+1) is BLOCKED on the legacy side; the modern archive generation is recorded in logs/tmsis-extract-list.json.",
+    "SEED PREMISE: the SQL seed holds NULL where provider-master-seed.dat has the due date 99991231 for four providers (1005914035, 1005925213, 1005933068, 1005960046); the export writes an unset date as 00000000, so bytes 43-50 of those four records differ between the modern and the legacy BEFORE file (the other 12 records and all other bytes are equal)."
+  ],
+  "problems": [],
+  "normalised": [
+    "record separator only: the API returns one record per line (LF); the .ascii file holds the same records back to back like the converted golden files; no field is changed"
+  ],
+  "files": [
+    {
+      "path": "before/provider-master.delivered",
+      "role": "provider master export BEFORE (seed state) (as delivered by the API, one record per line)",
+      "bytes": 2095,
+      "sha256": "bd8064301c7cbc40f6c1efdf14ebea7589a1e9d89c89a512366e6ee18e6f2d74"
+    },
+    {
+      "path": "before/provider-master.ascii",
+      "role": "provider master export BEFORE (seed state) (record stream, records back to back)",
+      "bytes": 2080,
+      "sha256": "1544f0905b402d70782793f94fcf3a4f9432f52ca7cf4bdbd599c203dd4ec526",
+      "recordLength": 130,
+      "records": 16,
+      "goldenCounterpart": "before/provider-master.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "inputs/provider-master-seed-sorted.dat",
+      "role": "input as sent to the legacy run (same bytes)",
+      "bytes": 2096,
+      "sha256": "3febd267db27375183df9859f57776ed0d9c986b7a9fe08c3480dcefe741563c",
+      "records": 16,
+      "recordLength": 130,
+      "lineEnds": "LF after every record"
+    },
+    {
+      "path": "after/revalq.delivered",
+      "role": "REVALQ written by the sweep (as delivered by the API, one record per line)",
+      "bytes": 320,
+      "sha256": "cdb95c53868afbeb8094d66cffd70345c32899f375f4bd06f81ee7a5232af8ff"
+    },
+    {
+      "path": "after/revalq.ascii",
+      "role": "REVALQ written by the sweep (record stream, records back to back)",
+      "bytes": 320,
+      "sha256": "cdb95c53868afbeb8094d66cffd70345c32899f375f4bd06f81ee7a5232af8ff",
+      "recordLength": 80,
+      "records": 4,
+      "goldenCounterpart": "after/revalq.ebcdic.ascii",
+      "deliveredLineEnds": "none (records back to back)",
+      "badRecordLengths": []
+    },
+    {
+      "path": "logs/tmsis-extract-list.json",
+      "role": "GET /api/v1/batch/tmsis-extracts after the run (runs and archive generations)",
+      "bytes": 5876,
+      "sha256": "a1cbbe3e7f85e0afbebebc58b0f0c43deea470337521dc0aaec4cd5fa673d5dd"
+    },
+    {
+      "path": "after/tmsisout.delivered",
+      "role": "TMSISOUT written by the extract (as delivered by the API, one record per line)",
+      "bytes": 960,
+      "sha256": "ff1b0d0a5e87e7d9caf1a1edc3b7ab7719cc64fd46899745828aa6a429fd0858"
+    },
+    {
+      "path": "after/tmsisout.ascii",
+      "role": "TMSISOUT written by the extract (record stream, records back to back)",
+      "bytes": 960,
+      "sha256": "ff1b0d0a5e87e7d9caf1a1edc3b7ab7719cc64fd46899745828aa6a429fd0858",
+      "recordLength": 120,
+      "records": 8,
+      "goldenCounterpart": "after/tmsisout.ebcdic.ascii",
+      "deliveredLineEnds": "none (records back to back)",
+      "badRecordLengths": []
+    },
+    {
+      "path": "after/provider-master-after.delivered",
+      "role": "provider master export AFTER (as delivered by the API, one record per line)",
+      "bytes": 2095,
+      "sha256": "20ddda136981a9f0979b297fd9d78f603d1e1f17c53c936a5aec048114e7b189"
+    },
+    {
+      "path": "after/provider-master-after.ascii",
+      "role": "provider master export AFTER (record stream, records back to back)",
+      "bytes": 2080,
+      "sha256": "a2c0d34cce4c2683ed192471795e50e5a18e1dc07dbb4e275eb72492cd1501aa",
+      "recordLength": 130,
+      "records": 16,
+      "goldenCounterpart": "after/provider-master-after.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "logs/modern-job-lines.txt",
+      "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
+      "bytes": 1525,
+      "sha256": "51037da91d06dca901076c10f5b8332a1a610f51fe84d5b2b62ff99bcaee63f8"
+    },
+    {
+      "path": "logs/run-log.txt",
+      "role": "log of this script",
+      "bytes": 981,
+      "sha256": "90500a0e9eb19f5047216e9db4ea3da96a4742b63fe182ae680f6f0d29707d82"
+    }
+  ]
+}

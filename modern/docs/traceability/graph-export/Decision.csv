@@ -1,0 +1,13 @@
+id,loadedAt,loader,path,source,status,title
+ADR-001,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-001-service-decomposition.md,architect,ACCEPTED,Service decomposition
+ADR-002,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-002-data-ownership-single-provider-record.md,architect,ACCEPTED,Data ownership and the single provider record
+ADR-003,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-003-events-and-outbox.md,architect,ACCEPTED,Events and the transactional outbox
+ADR-004,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-004-batch-and-scheduling.md,architect,ACCEPTED,Batch and scheduling
+ADR-005,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-005-legacy-format-adapters.md,architect,ACCEPTED,Legacy-format adapters for future parity
+ADR-006,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-006-fhir-scope.md,architect,ACCEPTED,FHIR scope
+ADR-007,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-007-authentication-and-roles.md,architect,ACCEPTED,Authentication and roles
+ADR-008,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-008-ui-stack-and-design-system.md,architect,ACCEPTED,UI stack and design system
+ADR-009,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-009-dates-codes-and-money.md,architect,ACCEPTED,"Dates, codes and money"
+ADR-010,2026-11-18T13:32:37+00:00,load_10_architecture.py,modern/docs/adr/ADR-010-versions.md,architect,ACCEPTED,Versions
+ADR-011,2026-11-18T18:05:28+00:00,load_10_architecture.py,modern/docs/adr/ADR-011-local-run-mode-shared-jvm.md,architect,ACCEPTED,Local run mode with the services in one JVM
+ADR-012,2026-11-18T18:05:28+00:00,load_10_architecture.py,modern/docs/adr/ADR-012-shared-service-kit-library.md,architect,ACCEPTED,Shared library libs/service-kit

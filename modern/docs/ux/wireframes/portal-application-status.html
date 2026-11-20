@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Application status - PEM wireframe</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uswds/uswds@3.8.0/dist/css/uswds.min.css"></head>
+<body><a class="usa-skipnav" href="#main">Skip to main content</a>
+<header class="usa-header usa-header--basic"><div class="usa-nav-container"><div class="usa-navbar"><div class="usa-logo"><em class="usa-logo__text">PEM portal</em></div></div></div></header>
+<main id="main" class="grid-container margin-y-4"><h1>Application status</h1>
+<p class="usa-intro">One application with every validation error (one per failed check).</p>
+<table class="usa-table usa-table--borderless"><caption>Application</caption><thead><tr><th scope="col">Field</th><th scope="col">Value</th></tr></thead><tbody><tr><td>Application</td><td>8f1c2e0a-...</td></tr><tr><td>Status</td><td><span class="usa-tag">Rejected</span></td></tr><tr><td>Submitted</td><td>03/01/2026</td></tr></tbody></table><table class="usa-table usa-table--borderless"><caption>Validation errors</caption><thead><tr><th scope="col">Code</th><th scope="col">Field</th><th scope="col">Message</th></tr></thead><tbody><tr><td>E104</td><td>taxonomy</td><td>Taxonomy code is required</td></tr></tbody></table>
+<section class="margin-top-6 border-top-1px padding-top-2" aria-label="Wireframe notes"><h2>Wireframe notes (low fidelity, synthetic data)</h2>
+<dl><dt>Route</dt><dd><code>/portal/applications/:applicationId</code></dd><dt>Roles</dt><dd>PROVIDER</dd>
+<dt>API calls</dt><dd><ul><li><code>GET /api/v1/applications/{applicationId}</code></li></ul></dd><dt>Serves</dt><dd>PRVENR01 00003-00006, 00043-00047; ApplicationRejected; D-001</dd></dl></section>
+<p><a class="usa-link" href="index.html">All wireframes</a></p></main></body></html>

@@ -1,0 +1,4 @@
+2eff8d08432d9ce3ca077e1a4d89eab10c104b19  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/VerdictAndTierSteps.java
+4b7c39db8314ba81f46fe202fa13a6f89463b756  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/RecordVerdictsTest.java
+dde87058b44fada1c3c8a779babacae883143fea  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ScreenVerdictTest.java
+d97fc1d5c81dde0bdaa0a6bacec399ccc82979b1  modern/services/provider-service/src/test/resources/features/MAM-21.feature

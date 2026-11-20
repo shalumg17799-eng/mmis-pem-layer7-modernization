@@ -20,6 +20,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "loaders"))
 import common  # noqa: E402
 from common import GraphData  # noqa: E402
+import csv  # noqa: E402
+import re  # noqa: E402
+
+ANALYSIS = common.REPO / "modern" / "docs" / "analysis"
 
 PER_PROGRAM = {"PRVENR01": 68, "PRVSCR01": 62, "PRVSAN01": 58, "PRVTMS01": 55, "PRVRSK01": 48,
                "PRVCICS1": 45, "PRVDIR01": 29, "PRVREV01": 24, "PRVDEAD1": 14}
@@ -50,9 +54,13 @@ def build_checks() -> list[dict]:
     c.append(nodes_where("Job nodes with role 'pipeline' (PRVDAY01, PRVMTH01)", 2, "Job", role="pipeline"))
     c.append(nodes_where("Job nodes that are a cataloged proc (PRVSCRPR)", 1, "Job", proc=True))
     c.append(nodes_where("Job nodes in total [explained: 2 pipeline + 1 proc + the 2 VSAM-definition jobs PRVVSM01/02, which the skill's '2 plus proc' leaves out]", 5, "Job"))
-    c.append(nodes_where("BusinessRule nodes", 403, "BusinessRule"))
+    c.append(dict(name="BusinessRule nodes from AWS (ruleId contains -cbl-)", expected=403,
+                  cypher="MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual",
+                  py=lambda N, R: sum(1 for (l, k) in N if l == "BusinessRule" and "-cbl-" in k)))
     for prog, n in PER_PROGRAM.items():
-        c.append(nodes_where(f"BusinessRule nodes for {prog}", n, "BusinessRule", program=prog))
+        c.append(dict(name=f"AWS BusinessRule nodes for {prog}", expected=n,
+                      cypher=f"MATCH (r:BusinessRule {{program: '{prog}'}}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual",
+                      py=lambda N, R, prog=prog: sum(1 for (l, k), p in N.items() if l == "BusinessRule" and "-cbl-" in k and p.get("program") == prog)))
     c.append(dict(name="BusinessRule nodes without IMPLEMENTED_IN", expected=0,
                   cypher="MATCH (r:BusinessRule) WHERE NOT (r)-[:IMPLEMENTED_IN]->(:Program) RETURN count(r) AS actual",
                   py=lambda N, R: sum(1 for (l, k) in N if l == "BusinessRule" and not any(r[0] == "IMPLEMENTED_IN" and r[2] == k for r in R))))
@@ -74,10 +82,9 @@ def build_checks() -> list[dict]:
     c.append(rels_of("REDEFINES relationships (PRVRECRD)", 2, "REDEFINES"))
     c.append(nodes_where("KeyFunctionality nodes [explained: AWS repeats the id PRVTMS01:t, so 85 become 84]", 84, "KeyFunctionality"))
     c.append(rels_of("PART_OF relationships [explained: 88 of 403 rules sit in no key functionality in the AWS output]", 315, "PART_OF"))
-    c.append(dict(name="BusinessRule nodes without PART_OF", expected=88,
-                  cypher="MATCH (r:BusinessRule) WHERE NOT (r)-[:PART_OF]->(:KeyFunctionality) RETURN count(r) AS actual",
-                  py=lambda N, R: sum(1 for (l, k) in N if l == "BusinessRule" and not any(r[0] == "PART_OF" and r[2] == k for r in R))))
-    c.append(nodes_where("TestCase nodes from the AWS plan", 4, "TestCase", level="aws-plan"))
+    c.append(dict(name="AWS BusinessRule nodes without PART_OF", expected=88,
+                  cypher="MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' AND NOT (r)-[:PART_OF]->(:KeyFunctionality) RETURN count(r) AS actual",
+                  py=lambda N, R: sum(1 for (l, k) in N if l == "BusinessRule" and "-cbl-" in k and not any(r[0] == "PART_OF" and r[2] == k for r in R))))
     c.append(dict(name="DB2 columns as Field nodes (the DDL defines 26; AWS's dictionary lists 22)", expected=26,
                   cypher="MATCH (f:Field) WHERE f.id STARTS WITH 'PRVDDL01:' RETURN count(f) AS actual",
                   py=lambda N, R: sum(1 for (l, k) in N if l == "Field" and k.startswith("PRVDDL01:"))))
@@ -87,7 +94,48 @@ def build_checks() -> list[dict]:
     c.append(dict(name="Transaction PINQ is flagged as missing its CICS definition", expected=True,
                   cypher="MATCH (t:Transaction {id: 'PINQ'}) RETURN t.missingDefinition AS actual",
                   py=lambda N, R: N[("Transaction", "PINQ")].get("missingDefinition")))
+    c += phase2_checks()
     return c
+
+
+def phase2_checks() -> list[dict]:
+    """Phase 2: the graph must say exactly what modern/docs/analysis says (expected values are read from those files)."""
+    rows = list(csv.DictReader(open(ANALYSIS / "rule-verification.csv", encoding="utf-8", newline="")))
+    aws = [r for r in rows if "-cbl-" in r["rule_id"]]
+    n_def = sum(1 for l in (ANALYSIS / "defect-register.md").read_text(encoding="utf-8").splitlines() if l.startswith("| D-0"))
+    n_q = len(re.findall(r"^## Q-\d{3}\.", (ANALYSIS / "questions.md").read_text(encoding="utf-8"), re.M))
+    c = []
+    for st in ("VERIFIED", "MISMATCH", "NOT_FOUND", "DROPPED"):
+        c.append(dict(name=f"AWS rules with verification {st} (as in rule-verification.csv)", expected=sum(1 for r in aws if r["status"] == st),
+                      cypher=f"MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' AND r.verification = '{st}' RETURN count(r) AS actual",
+                      py=lambda N, R, st=st: sum(1 for (l, k), p in N.items() if l == "BusinessRule" and "-cbl-" in k and p.get("verification") == st)))
+    c.append(dict(name="Rules still UNVERIFIED", expected=0,
+                  cypher="MATCH (r:BusinessRule {verification: 'UNVERIFIED'}) RETURN count(r) AS actual",
+                  py=lambda N, R: sum(1 for (l, _), p in N.items() if l == "BusinessRule" and p.get("verification") == "UNVERIFIED")))
+    c.append(dict(name="Added rules R-<PROGRAM>-ADD-nn (as in rule-verification.csv)", expected=len(rows) - len(aws),
+                  cypher="MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-ADD-' RETURN count(r) AS actual",
+                  py=lambda N, R: sum(1 for (l, k) in N if l == "BusinessRule" and "-ADD-" in k)))
+    c.append(dict(name="VERIFIED or MISMATCH rules without evidence", expected=0,
+                  cypher="MATCH (r:BusinessRule) WHERE r.verification IN ['VERIFIED','MISMATCH'] AND coalesce(r.evidence, '') = '' RETURN count(r) AS actual",
+                  py=lambda N, R: sum(1 for (l, _), p in N.items() if l == "BusinessRule" and p.get("verification") in ("VERIFIED", "MISMATCH") and not p.get("evidence"))))
+    c.append(dict(name="Defect nodes (as in defect-register.md)", expected=n_def, cypher="MATCH (d:Defect) RETURN count(d) AS actual",
+                  py=lambda N, R: sum(1 for (l, _) in N if l == "Defect")))
+    c.append(dict(name="Defects still OPEN", expected=0, cypher="MATCH (d:Defect {decision: 'OPEN'}) RETURN count(d) AS actual",
+                  py=lambda N, R: sum(1 for (l, _), p in N.items() if l == "Defect" and p.get("decision") == "OPEN")))
+    c.append(dict(name="Defects that AFFECT nothing", expected=0,
+                  cypher="MATCH (d:Defect) WHERE NOT (d)-[:AFFECTS]->() RETURN count(d) AS actual",
+                  py=lambda N, R: sum(1 for (l, k) in N if l == "Defect" and not any(r[0] == "AFFECTS" and r[2] == k for r in R))))
+    c.append(dict(name="MISMATCH or NOT_FOUND rules with no defect and no question", expected=0,
+                  cypher="MATCH (r:BusinessRule) WHERE r.verification IN ['MISMATCH','NOT_FOUND'] AND NOT (r)<-[:AFFECTS]-(:Defect) AND NOT (r)<-[:ABOUT]-(:Question) RETURN count(r) AS actual",
+                  py=lambda N, R: sum(1 for (l, k), p in N.items() if l == "BusinessRule" and p.get("verification") in ("MISMATCH", "NOT_FOUND")
+                                      and not any(r[0] in ("AFFECTS", "ABOUT") and r[4] == k for r in R))))
+    c.append(dict(name="Question nodes (as in questions.md)", expected=n_q, cypher="MATCH (q:Question) RETURN count(q) AS actual",
+                  py=lambda N, R: sum(1 for (l, _) in N if l == "Question")))
+    c.append(dict(name="Regulations cited by no rule", expected=0,
+                  cypher="MATCH (g:Regulation) WHERE NOT (g)<-[:GOVERNED_BY]-() RETURN count(g) AS actual",
+                  py=lambda N, R: sum(1 for (l, k) in N if l == "Regulation" and not any(r[0] == "GOVERNED_BY" and r[4] == k for r in R))))
+    return c
+
 
 
 def render_cypher() -> str:

@@ -90,7 +90,8 @@ descriptionSha256: <sha256 of the Jira description, normalised: LF line endings,
 jiraUpdated: <timestamp from Jira>
 rules: [<rule IDs>]
 decisions: [<D-0xx>]
-builtCommit:
+builtCommit:            # "pending-user-commit" once built (no commits until the user says "commit")
+testsSha256:            # sha256 of modern/docs/reports/stories/<KEY>.tests.sha256, set when built
 ---
 <the description exactly as written to Jira>
 ```

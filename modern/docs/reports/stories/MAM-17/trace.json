@@ -1,0 +1,64 @@
+{
+  "story": "MAM-17",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/RegistrationSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/RegisterProviderTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ProviderRegistrationTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-17.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-17.feature 'A validated individual application becomes a PENDING, UNSCREENED provider': PASSED",
+      "ProviderRegistrationTest: PASSED",
+      "RegisterProviderTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-17.feature 'Registration publishes ProviderRegistered': PASSED",
+      "ProviderRegistrationTest: PASSED",
+      "RegisterProviderTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-17.feature 'A group keeps every field, including the owner NPI': PASSED",
+      "ProviderRegistrationTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-17.feature 'A duplicate NPI never overwrites the existing provider': PASSED",
+      "RegisterProviderTest: PASSED"
+    ],
+    "AC-5": [
+      "MAM-17.feature 'A rejected application never creates a provider': PASSED"
+    ],
+    "AC-6": [
+      "MAM-17.feature 'A redelivered event registers once': PASSED"
+    ],
+    "AC-7": [
+      "MAM-17.feature 'The effective date is the registration date, in ISO form': PASSED",
+      "ProviderRegistrationTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/RegisterProvider.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/ProviderRegistration.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/EnrollmentEventsListener.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/JpaProviderRegistry.java"
+  ],
+  "rules": [
+    "R-PRVENR01-ADD-02",
+    "R-PRVENR01-cbl-00007",
+    "R-PRVENR01-cbl-00040",
+    "R-PRVENR01-cbl-00041",
+    "R-PRVENR01-cbl-00042",
+    "R-PRVENR01-cbl-00051",
+    "R-PRVENR01-cbl-00056",
+    "R-PRVENR01-cbl-00058"
+  ]
+}

@@ -1,0 +1,15 @@
+d149f95e3b18b1c75b43f2e7aed6bc010662033adc9647d82b5534f037e65d7f  modern/web-ui/e2e/support/gateway.ts
+18276a67d39d45b77479ad207ad99a86870ad02bed9210872b21206a3913f53e  modern/web-ui/e2e/support/keycloak.ts
+eab9e81084343dbd5739bb6ec06f3183069bd9ebde4f36a6bc77570a749c66ec  modern/web-ui/e2e/support/page.ts
+70116b0052965bf9fbca9ba97ce7303b21a89b48073ec09ee62fa26aa077b725  modern/web-ui/e2e/ui-shell.spec.ts
+c382d68bea9e8675ac9181e6a6005982d407f2b5bf1bf64cc1b1a04ad06b710c  modern/web-ui/tests/portal/home-applications.test.tsx
+504cc68dea472fc4f598587cef005272d751fe5a7d04740b0e47551eef1c65cf  modern/web-ui/tests/portal/home-provider-summary.test.tsx
+56228fc93a0f2c8a001087732658c299f93eab5aa5c843714beb6496b39e02ba  modern/web-ui/tests/shell/access-denied.test.tsx
+26d97469a0127eca8c272c76b2b7899a6496b44adc0ed1c76fbde601fd938afe  modern/web-ui/tests/shell/accessibility-structure.test.tsx
+3276ac9d132ae273f730b0a992c169242059c8d809069a91d9a4344818fbf95d  modern/web-ui/tests/shell/menu.test.tsx
+27345e17880aba3b05793cb440cd1a454033d91735d623df0e48796b2c3f27b2  modern/web-ui/tests/shell/sign-in.test.tsx
+48b1295a948ae373412bd656e3d902e95be32cf6fc69c89f1a66363b1c6933c3  modern/web-ui/tests/shell/sign-out-and-session.test.tsx
+23495e9cc129db866a5a3833ea5b240fc1f46f695fe75e759fdd23f9d4b96806  modern/web-ui/tests/support/fakeApi.ts
+37f32d3c6282768ee3fd03566b1a63f96739f865a1648e273ef846ca49301c7f  modern/web-ui/tests/support/fakeOidc.ts
+88dfd66fa6a94522da1b6ebc19dcc83786902298df612dcad64990f4d546bc1f  modern/web-ui/tests/support/fixtures.ts
+7b6640b8dcc84ffb0bfdf5517b61179f05738d87dfd3041eacddd2a70d66f357  modern/web-ui/tests/support/world.tsx

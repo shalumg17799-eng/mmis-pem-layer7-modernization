@@ -1,0 +1,30 @@
+{
+  "story": "MAM-19",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/web-ui/e2e/scaffold-a11y.spec.ts",
+    "modern/web-ui/tests/scaffold.test.tsx",
+    "modern/web-ui/tests/setup.ts"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [],
+    "AC-3": [],
+    "AC-4": [],
+    "AC-5": [],
+    "AC-6": [],
+    "AC-7": []
+  },
+  "codeUnits": [
+    "modern/web-ui/package.json"
+  ],
+  "rules": []
+}

@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: tmsis-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/tmsis_db
+    username: tmsis_svc
+    password: ${PG_TMSIS_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/tmsis
+server:
+  port: ${PEM_TMSIS_PORT:8089}
+pem:
+  services:
+    provider-url: http://${PEM_SERVICE_HOST:localhost}:${PEM_PROVIDER_PORT:8081}
+  tmsis:
+    # PRVMTH01 month-end run (ADR-004); "-" turns the schedule off. The business date is the Clock's date.
+    cron: ${PEM_TMSIS_CRON:0 0 22 L * *}
+    zone: UTC

@@ -1,0 +1,867 @@
+asyncapi: 3.1.0
+info:
+  title: PEM domain events
+  version: 1.1.0
+  description: 'Every event of the PEM microservices: producer (send) and consumers (receive). Envelope and key per the java-microservices skill
+    section 7. Status DRAFT until Phase 3 approval. 1.1.0 (2026-11-19, Q-061 / OQ-D8 answer B, user decision): ExtractProduced is
+    a run-level event, so its envelope subject and Kafka message key are the extract run id (uuid), not an NPI; every other event
+    keeps the NPI as subject and key. Envelope.subject now allows either form, ExtractProducedEnvelope requires the run id.'
+  license:
+    name: Proprietary
+defaultContentType: application/json
+servers:
+  local:
+    host: localhost:9092
+    protocol: kafka
+    description: Single-node Kafka (KRaft) in docker compose
+channels:
+  enrollmentEvents:
+    address: pem.enrollment.events
+    description: Topic of enrollment-service
+    messages:
+      ApplicationValidated:
+        $ref: '#/components/messages/ApplicationValidated'
+      ApplicationRejected:
+        $ref: '#/components/messages/ApplicationRejected'
+  providerEvents:
+    address: pem.provider.events
+    description: Topic of provider-service
+    messages:
+      ProviderRegistered:
+        $ref: '#/components/messages/ProviderRegistered'
+      ProviderStatusChanged:
+        $ref: '#/components/messages/ProviderStatusChanged'
+  screeningEvents:
+    address: pem.screening.events
+    description: Topic of screening-service
+    messages:
+      ScreeningCompleted:
+        $ref: '#/components/messages/ScreeningCompleted'
+  riskEvents:
+    address: pem.risk.events
+    description: Topic of risk-service
+    messages:
+      RiskTierAssigned:
+        $ref: '#/components/messages/RiskTierAssigned'
+  revalidationEvents:
+    address: pem.revalidation.events
+    description: Topic of revalidation-service
+    messages:
+      RevalidationDue:
+        $ref: '#/components/messages/RevalidationDue'
+  sanctionsEvents:
+    address: pem.sanctions.events
+    description: Topic of sanctions-service
+    messages:
+      SanctionApplied:
+        $ref: '#/components/messages/SanctionApplied'
+  notificationEvents:
+    address: pem.notification.events
+    description: Topic of notification-service
+    messages:
+      NoticeSent:
+        $ref: '#/components/messages/NoticeSent'
+  tmsisEvents:
+    address: pem.tmsis.events
+    description: Topic of tmsis-service
+    messages:
+      ExtractProduced:
+        $ref: '#/components/messages/ExtractProduced'
+operations:
+  enrollmentService_send_ApplicationValidated:
+    action: send
+    channel:
+      $ref: '#/channels/enrollmentEvents'
+    summary: enrollment-service publishes ApplicationValidated (transactional outbox)
+    messages:
+    - $ref: '#/channels/enrollmentEvents/messages/ApplicationValidated'
+    x-service: enrollment-service
+  providerService_receive_ApplicationValidated:
+    action: receive
+    channel:
+      $ref: '#/channels/enrollmentEvents'
+    summary: provider-service consumes ApplicationValidated (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/enrollmentEvents/messages/ApplicationValidated'
+    x-service: provider-service
+  enrollmentService_send_ApplicationRejected:
+    action: send
+    channel:
+      $ref: '#/channels/enrollmentEvents'
+    summary: enrollment-service publishes ApplicationRejected (transactional outbox)
+    messages:
+    - $ref: '#/channels/enrollmentEvents/messages/ApplicationRejected'
+    x-service: enrollment-service
+  notificationService_receive_ApplicationRejected:
+    action: receive
+    channel:
+      $ref: '#/channels/enrollmentEvents'
+    summary: notification-service consumes ApplicationRejected (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/enrollmentEvents/messages/ApplicationRejected'
+    x-service: notification-service
+  providerService_send_ProviderRegistered:
+    action: send
+    channel:
+      $ref: '#/channels/providerEvents'
+    summary: provider-service publishes ProviderRegistered (transactional outbox)
+    messages:
+    - $ref: '#/channels/providerEvents/messages/ProviderRegistered'
+    x-service: provider-service
+  screeningService_receive_ProviderRegistered:
+    action: receive
+    channel:
+      $ref: '#/channels/providerEvents'
+    summary: screening-service consumes ProviderRegistered (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/providerEvents/messages/ProviderRegistered'
+    x-service: screening-service
+  directoryService_receive_ProviderRegistered:
+    action: receive
+    channel:
+      $ref: '#/channels/providerEvents'
+    summary: directory-service consumes ProviderRegistered (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/providerEvents/messages/ProviderRegistered'
+    x-service: directory-service
+  screeningService_send_ScreeningCompleted:
+    action: send
+    channel:
+      $ref: '#/channels/screeningEvents'
+    summary: screening-service publishes ScreeningCompleted (transactional outbox)
+    messages:
+    - $ref: '#/channels/screeningEvents/messages/ScreeningCompleted'
+    x-service: screening-service
+  providerService_receive_ScreeningCompleted:
+    action: receive
+    channel:
+      $ref: '#/channels/screeningEvents'
+    summary: provider-service consumes ScreeningCompleted (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/screeningEvents/messages/ScreeningCompleted'
+    x-service: provider-service
+  riskService_receive_ScreeningCompleted:
+    action: receive
+    channel:
+      $ref: '#/channels/screeningEvents'
+    summary: risk-service consumes ScreeningCompleted (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/screeningEvents/messages/ScreeningCompleted'
+    x-service: risk-service
+  revalidationService_receive_ScreeningCompleted:
+    action: receive
+    channel:
+      $ref: '#/channels/screeningEvents'
+    summary: revalidation-service consumes ScreeningCompleted (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/screeningEvents/messages/ScreeningCompleted'
+    x-service: revalidation-service
+  riskService_send_RiskTierAssigned:
+    action: send
+    channel:
+      $ref: '#/channels/riskEvents'
+    summary: risk-service publishes RiskTierAssigned (transactional outbox)
+    messages:
+    - $ref: '#/channels/riskEvents/messages/RiskTierAssigned'
+    x-service: risk-service
+  providerService_receive_RiskTierAssigned:
+    action: receive
+    channel:
+      $ref: '#/channels/riskEvents'
+    summary: provider-service consumes RiskTierAssigned (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/riskEvents/messages/RiskTierAssigned'
+    x-service: provider-service
+  directoryService_receive_RiskTierAssigned:
+    action: receive
+    channel:
+      $ref: '#/channels/riskEvents'
+    summary: directory-service consumes RiskTierAssigned (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/riskEvents/messages/RiskTierAssigned'
+    x-service: directory-service
+  providerService_send_ProviderStatusChanged:
+    action: send
+    channel:
+      $ref: '#/channels/providerEvents'
+    summary: provider-service publishes ProviderStatusChanged (transactional outbox)
+    messages:
+    - $ref: '#/channels/providerEvents/messages/ProviderStatusChanged'
+    x-service: provider-service
+  directoryService_receive_ProviderStatusChanged:
+    action: receive
+    channel:
+      $ref: '#/channels/providerEvents'
+    summary: directory-service consumes ProviderStatusChanged (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/providerEvents/messages/ProviderStatusChanged'
+    x-service: directory-service
+  notificationService_receive_ProviderStatusChanged:
+    action: receive
+    channel:
+      $ref: '#/channels/providerEvents'
+    summary: notification-service consumes ProviderStatusChanged (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/providerEvents/messages/ProviderStatusChanged'
+    x-service: notification-service
+  revalidationService_receive_ProviderStatusChanged:
+    action: receive
+    channel:
+      $ref: '#/channels/providerEvents'
+    summary: revalidation-service consumes ProviderStatusChanged (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/providerEvents/messages/ProviderStatusChanged'
+    x-service: revalidation-service
+  revalidationService_send_RevalidationDue:
+    action: send
+    channel:
+      $ref: '#/channels/revalidationEvents'
+    summary: revalidation-service publishes RevalidationDue (transactional outbox)
+    messages:
+    - $ref: '#/channels/revalidationEvents/messages/RevalidationDue'
+    x-service: revalidation-service
+  screeningService_receive_RevalidationDue:
+    action: receive
+    channel:
+      $ref: '#/channels/revalidationEvents'
+    summary: screening-service consumes RevalidationDue (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/revalidationEvents/messages/RevalidationDue'
+    x-service: screening-service
+  notificationService_receive_RevalidationDue:
+    action: receive
+    channel:
+      $ref: '#/channels/revalidationEvents'
+    summary: notification-service consumes RevalidationDue (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/revalidationEvents/messages/RevalidationDue'
+    x-service: notification-service
+  sanctionsService_send_SanctionApplied:
+    action: send
+    channel:
+      $ref: '#/channels/sanctionsEvents'
+    summary: sanctions-service publishes SanctionApplied (transactional outbox)
+    messages:
+    - $ref: '#/channels/sanctionsEvents/messages/SanctionApplied'
+    x-service: sanctions-service
+  notificationService_receive_SanctionApplied:
+    action: receive
+    channel:
+      $ref: '#/channels/sanctionsEvents'
+    summary: notification-service consumes SanctionApplied (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/sanctionsEvents/messages/SanctionApplied'
+    x-service: notification-service
+  notificationService_send_NoticeSent:
+    action: send
+    channel:
+      $ref: '#/channels/notificationEvents'
+    summary: notification-service publishes NoticeSent (transactional outbox)
+    messages:
+    - $ref: '#/channels/notificationEvents/messages/NoticeSent'
+    x-service: notification-service
+  providerService_receive_NoticeSent:
+    action: receive
+    channel:
+      $ref: '#/channels/notificationEvents'
+    summary: provider-service consumes NoticeSent (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/notificationEvents/messages/NoticeSent'
+    x-service: provider-service
+  tmsisService_send_ExtractProduced:
+    action: send
+    channel:
+      $ref: '#/channels/tmsisEvents'
+    summary: tmsis-service publishes ExtractProduced (transactional outbox)
+    messages:
+    - $ref: '#/channels/tmsisEvents/messages/ExtractProduced'
+    x-service: tmsis-service
+  notificationService_receive_ExtractProduced:
+    action: receive
+    channel:
+      $ref: '#/channels/tmsisEvents'
+    summary: notification-service consumes ExtractProduced (idempotent, processed_event)
+    messages:
+    - $ref: '#/channels/tmsisEvents/messages/ExtractProduced'
+    x-service: notification-service
+components:
+  messages:
+    ApplicationValidated:
+      name: ApplicationValidated
+      title: ApplicationValidated
+      summary: An application passed E101-E104 (and E103 duplicate) checks
+      contentType: application/json
+      description: 'Producer: enrollment-service. Consumers: provider-service. Message key: NPI. Legacy / decisions: PRVENR01 valid path.'
+      payload:
+        $ref: '#/components/schemas/ApplicationValidatedEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: enrollment-service
+      x-consumers:
+      - provider-service
+      x-key: npi
+    ApplicationRejected:
+      name: ApplicationRejected
+      title: ApplicationRejected
+      summary: An application failed validation; one error per failed check
+      contentType: application/json
+      description: 'Producer: enrollment-service. Consumers: notification-service. Message key: NPI. Legacy / decisions: APPERROR; D-001.'
+      payload:
+        $ref: '#/components/schemas/ApplicationRejectedEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: enrollment-service
+      x-consumers:
+      - notification-service
+      x-key: npi
+    ProviderRegistered:
+      name: ProviderRegistered
+      title: ProviderRegistered
+      summary: A provider was registered PENDING / UNSCREENED
+      contentType: application/json
+      description: 'Producer: provider-service. Consumers: screening-service, directory-service. Message key: NPI. Legacy / decisions: PRVENR01
+        WRITE-PROVIDER-RECORD.'
+      payload:
+        $ref: '#/components/schemas/ProviderRegisteredEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: provider-service
+      x-consumers:
+      - screening-service
+      - directory-service
+      x-key: npi
+    ScreeningCompleted:
+      name: ScreeningCompleted
+      title: ScreeningCompleted
+      summary: A screening finished; any source FAIL means FAIL
+      contentType: application/json
+      description: 'Producer: screening-service. Consumers: provider-service, risk-service, revalidation-service. Message key: NPI. Legacy / decisions:
+        PRVSCR01 verdict; D-005.'
+      payload:
+        $ref: '#/components/schemas/ScreeningCompletedEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: screening-service
+      x-consumers:
+      - provider-service
+      - risk-service
+      - revalidation-service
+      x-key: npi
+    RiskTierAssigned:
+      name: RiskTierAssigned
+      title: RiskTierAssigned
+      summary: A risk tier was assigned after a PASS screening
+      contentType: application/json
+      description: 'Producer: risk-service. Consumers: provider-service, directory-service. Message key: NPI. Legacy / decisions: PRVRSK01; D-002.'
+      payload:
+        $ref: '#/components/schemas/RiskTierAssignedEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: risk-service
+      x-consumers:
+      - provider-service
+      - directory-service
+      x-key: npi
+    ProviderStatusChanged:
+      name: ProviderStatusChanged
+      title: ProviderStatusChanged
+      summary: Enrolment status changed (approval, denial, sanction)
+      contentType: application/json
+      description: 'Producer: provider-service. Consumers: directory-service, notification-service, revalidation-service. Message key: NPI. Legacy
+        / decisions: D-019, PRVSAN01; D-006.'
+      payload:
+        $ref: '#/components/schemas/ProviderStatusChangedEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: provider-service
+      x-consumers:
+      - directory-service
+      - notification-service
+      - revalidation-service
+      x-key: npi
+    RevalidationDue:
+      name: RevalidationDue
+      title: RevalidationDue
+      summary: A provider's revalidation is due; re-screening starts
+      contentType: application/json
+      description: 'Producer: revalidation-service. Consumers: screening-service, notification-service. Message key: NPI. Legacy / decisions:
+        PRVREV01; D-029.'
+      payload:
+        $ref: '#/components/schemas/RevalidationDueEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: revalidation-service
+      x-consumers:
+      - screening-service
+      - notification-service
+      x-key: npi
+    SanctionApplied:
+      name: SanctionApplied
+      title: SanctionApplied
+      summary: A sanction was recorded and applied
+      contentType: application/json
+      description: 'Producer: sanctions-service. Consumers: notification-service. Message key: NPI. Legacy / decisions: PRVSAN01; D-012.'
+      payload:
+        $ref: '#/components/schemas/SanctionAppliedEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: sanctions-service
+      x-consumers:
+      - notification-service
+      x-key: npi
+    NoticeSent:
+      name: NoticeSent
+      title: NoticeSent
+      summary: A notice was sent (recorded in the provider audit history)
+      contentType: application/json
+      description: 'Producer: notification-service. Consumers: provider-service. Message key: NPI. Legacy / decisions: PRVNT*; D-012.'
+      payload:
+        $ref: '#/components/schemas/NoticeSentEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: NPI (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: notification-service
+      x-consumers:
+      - provider-service
+      x-key: npi
+    ExtractProduced:
+      name: ExtractProduced
+      title: ExtractProduced
+      summary: A T-MSIS extract was produced and archived
+      contentType: application/json
+      description: 'Producer: tmsis-service. Consumers: notification-service. Message key: extract run id (1.1.0, Q-061 B). Legacy /
+        decisions: PRVTMS01; D-015.'
+      payload:
+        $ref: '#/components/schemas/ExtractProducedEnvelope'
+      bindings:
+        kafka:
+          key:
+            type: string
+            format: uuid
+            description: Extract run id (envelope subject)
+          bindingVersion: 0.5.0
+      x-producer: tmsis-service
+      x-consumers:
+      - notification-service
+      x-key: runId
+  schemas:
+    Envelope:
+      type: object
+      required:
+      - id
+      - type
+      - source
+      - time
+      - subject
+      - correlationId
+      - data
+      properties:
+        id: &id001
+          type: string
+          format: uuid
+        type:
+          type: string
+        source:
+          type: string
+        time:
+          type: string
+          format: date-time
+        subject:
+          type: string
+          description: 'The event key, also the Kafka message key: the National Provider Identifier (10 digits) for every
+            provider event; the extract run id (uuid) for ExtractProduced (1.1.0).'
+          anyOf:
+          - pattern: ^[0-9]{10}$
+          - format: uuid
+          examples:
+          - '1003000111'
+        correlationId: *id001
+        data:
+          type: object
+    ApplicationValidatedData:
+      type: object
+      required:
+      - applicationId
+      - npi
+      - providerType
+      - taxonomy
+      properties:
+        applicationId: *id001
+        npi: &id002
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+          examples:
+          - '1003000111'
+        medicaidId:
+          type: string
+        providerType:
+          type: string
+          enum:
+          - IN
+          - GR
+          - FA
+        taxonomy:
+          type: string
+        individual:
+          type: object
+        organization:
+          type: object
+    ApplicationValidatedEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: ApplicationValidated
+          source:
+            type: string
+            const: enrollment-service
+          data:
+            $ref: '#/components/schemas/ApplicationValidatedData'
+    ApplicationRejectedData:
+      type: object
+      required:
+      - applicationId
+      - errors
+      properties:
+        applicationId: *id001
+        npi:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              field:
+                type: string
+    ApplicationRejectedEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: ApplicationRejected
+          source:
+            type: string
+            const: enrollment-service
+          data:
+            $ref: '#/components/schemas/ApplicationRejectedData'
+    ProviderRegisteredData:
+      type: object
+      required:
+      - npi
+      - enrollStatus
+      - screenFlag
+      properties:
+        npi: *id002
+        medicaidId:
+          type: string
+        providerType:
+          type: string
+        taxonomy:
+          type: string
+        enrollStatus:
+          type: string
+          const: P
+        screenFlag:
+          type: string
+          const: U
+        displayName:
+          type: string
+    ProviderRegisteredEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: ProviderRegistered
+          source:
+            type: string
+            const: provider-service
+          data:
+            $ref: '#/components/schemas/ProviderRegisteredData'
+    ScreeningCompletedData:
+      type: object
+      required:
+      - screeningId
+      - npi
+      - result
+      - reason
+      properties:
+        screeningId: *id001
+        npi: *id002
+        reason:
+          type: string
+          enum:
+          - INITIAL
+          - REVALIDATION
+          - MANUAL
+        result:
+          type: string
+          enum:
+          - PASS
+          - FAIL
+        taxonomy:
+          type: string
+        sources:
+          type: array
+          items:
+            type: object
+            properties:
+              source:
+                type: string
+              result:
+                type: string
+              detail:
+                type: string
+    ScreeningCompletedEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: ScreeningCompleted
+          source:
+            type: string
+            const: screening-service
+          data:
+            $ref: '#/components/schemas/ScreeningCompletedData'
+    RiskTierAssignedData:
+      type: object
+      required:
+      - npi
+      - tier
+      - ruleSetVersion
+      properties:
+        npi: *id002
+        taxonomy:
+          type: string
+        tier:
+          type: string
+          enum:
+          - L
+          - M
+          - H
+        ruleSetVersion:
+          type: integer
+    RiskTierAssignedEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: RiskTierAssigned
+          source:
+            type: string
+            const: risk-service
+          data:
+            $ref: '#/components/schemas/RiskTierAssignedData'
+    ProviderStatusChangedData:
+      type: object
+      required:
+      - npi
+      - from
+      - to
+      properties:
+        npi: *id002
+        from:
+          type: string
+          enum:
+          - P
+          - A
+          - T
+          - D
+          - S
+        to:
+          type: string
+          enum:
+          - P
+          - A
+          - T
+          - D
+          - S
+        reason:
+          type: string
+        actor:
+          type: string
+        revalidationDueDate:
+          type:
+          - string
+          - 'null'
+          format: date
+        providerType:
+          type: string
+        displayName:
+          type: string
+        taxonomy:
+          type: string
+        medicaidId:
+          type: string
+    ProviderStatusChangedEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: ProviderStatusChanged
+          source:
+            type: string
+            const: provider-service
+          data:
+            $ref: '#/components/schemas/ProviderStatusChangedData'
+    RevalidationDueData:
+      type: object
+      required:
+      - caseId
+      - npi
+      - dueDate
+      properties:
+        caseId: *id001
+        npi: *id002
+        dueDate: &id003
+          type: string
+          format: date
+    RevalidationDueEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: RevalidationDue
+          source:
+            type: string
+            const: revalidation-service
+          data:
+            $ref: '#/components/schemas/RevalidationDueData'
+    SanctionAppliedData:
+      type: object
+      required:
+      - sanctionId
+      - npi
+      - action
+      - effectiveDate
+      properties:
+        sanctionId: *id001
+        npi: *id002
+        action:
+          type: string
+          enum:
+          - T
+          - S
+          - R
+        reason:
+          type: string
+        effectiveDate: *id003
+    SanctionAppliedEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: SanctionApplied
+          source:
+            type: string
+            const: sanctions-service
+          data:
+            $ref: '#/components/schemas/SanctionAppliedData'
+    NoticeSentData:
+      type: object
+      required:
+      - noticeId
+      - npi
+      - template
+      properties:
+        noticeId: *id001
+        npi: *id002
+        template:
+          type: string
+    NoticeSentEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: NoticeSent
+          source:
+            type: string
+            const: notification-service
+          data:
+            $ref: '#/components/schemas/NoticeSentData'
+    ExtractProducedData:
+      type: object
+      required:
+      - runId
+      - businessDate
+      - rowCount
+      properties:
+        runId: *id001
+        businessDate: *id003
+        periodYyddd:
+          type: string
+          pattern: ^[0-9]{5}$
+        rowCount:
+          type: integer
+    ExtractProducedEnvelope:
+      allOf:
+      - $ref: '#/components/schemas/Envelope'
+      - type: object
+        properties:
+          type:
+            type: string
+            const: ExtractProduced
+          source:
+            type: string
+            const: tmsis-service
+          subject:
+            type: string
+            format: uuid
+            description: The extract run id, equal to data.runId (1.1.0, Q-061 B)
+          data:
+            $ref: '#/components/schemas/ExtractProducedData'

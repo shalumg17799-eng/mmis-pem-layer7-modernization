@@ -1,0 +1,21 @@
+MAM-30 red run (2026-11-19), provider-service
+
+1) Acceptance (MAM-30.feature + RevalidationDueDateSteps; unit tests held back): ./gradlew --no-daemon :services:provider-service:test -> 132 tests completed, 2 failed
+   CucumberSuiteTest > Cucumber > Revalidation due date: five years, four-digit years, leap day and each completed revalidation > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.A passed revalidation sets the next due date and announces it FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: "2031-11-19"
+        but was: "2026-03-31"
+           at app//gov.medicaid.pem.provider.acceptance.ApprovalSteps.readApproved(ApprovalSteps.java:141)
+   CucumberSuiteTest > Cucumber > Revalidation due date: five years, four-digit years, leap day and each completed revalidation > gov.medicaid.pem.provider.acceptance.CucumberSuiteTest.A redelivered revalidation result is applied once FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: "2031-11-19"
+        but was: "2026-03-31"
+           at app//gov.medicaid.pem.provider.acceptance.ApprovalSteps.readApproved(ApprovalSteps.java:141)
+   AC-6 (failed re-screening) and AC-7 (INITIAL/MANUAL) pass already: they describe what the service does today.
+
+2) Unit tests (RevalidationDueDateTest, CompleteRevalidationTest): compileTestJava failed, only the missing production symbols:
+         4 symbol:   class CompleteRevalidation
+         4 symbol:   variable Revalidation
+
+Reason: a ScreeningCompleted REVALIDATION PASS only sets the screen flag; nothing moves the due date or announces it (no Revalidation rule, no CompleteRevalidation use case).
+AC-1 to AC-3 need a chosen clock date: covered by RevalidationDueDateTest (approval via the existing Approval rule), not by scenarios.

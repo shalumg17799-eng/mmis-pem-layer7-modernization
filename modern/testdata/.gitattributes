@@ -1,0 +1,3 @@
+# MAM-44: the fixed-width datasets are byte-exact (one record per line, LF). Never convert their line ends.
+*.dat -text
+*.csv text eol=lf

@@ -1,0 +1,11 @@
+type,loadedAt,loader,messageKey,producer,source,topic
+ApplicationRejected,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,enrollment-service,architect,pem.enrollment.events
+ApplicationValidated,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,enrollment-service,architect,pem.enrollment.events
+ExtractProduced,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,tmsis-service,architect,pem.tmsis.events
+NoticeSent,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,notification-service,architect,pem.notification.events
+ProviderRegistered,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,provider-service,architect,pem.provider.events
+ProviderStatusChanged,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,provider-service,architect,pem.provider.events
+RevalidationDue,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,revalidation-service,architect,pem.revalidation.events
+RiskTierAssigned,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,risk-service,architect,pem.risk.events
+SanctionApplied,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,sanctions-service,architect,pem.sanctions.events
+ScreeningCompleted,2026-11-18T13:32:37+00:00,load_10_architecture.py,npi,screening-service,architect,pem.screening.events

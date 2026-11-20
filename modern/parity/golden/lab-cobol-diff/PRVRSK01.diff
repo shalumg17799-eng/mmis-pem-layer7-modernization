@@ -1,0 +1,282 @@
+--- source-code/BATCH/PRVRSK01.cbl (cols 1-72)
++++ lab PRVRSK01 (compiled, PRVBLD01 job 154)
+@@ -2 +2 @@
+-      * PROGRAM:  PRVRSK01                                             *
++      * PROGRAM:  PRVRSK01  (TK5 / OS ANS COBOL V2 LAB PORT)           *
+@@ -7 +7,5 @@
+-      * CALLED BY: PRVDAY01 JOB (STEP040)                             *
++      * CALLED BY: PRVDAY01 JOB (STEP040)                              *
++      * ORIGINAL: source-code/BATCH/PRVRSK01.cbl.  CONTROL FLOW,       *
++      * PARAGRAPH ORDER, THE ALTER AND THE 2-DIGIT-YEAR ARITHMETIC     *
++      * ARE UNCHANGED.  EVALUATE/FUNCTION MOD/ACCEPT FROM DATE/        *
++      * REFERENCE MODIFICATION REWRITTEN FOR THE V2 COMPILER.          *
+@@ -9,9 +13,3 @@
+-      * ANTI-PATTERN 1: ALTER STATEMENT                              *
+-      *   APPLY-TIER-PARA's GO TO target is rewritten at runtime via    
+-      *   ALTER (limited vs high-risk routing). The branch destination  
+-      *   is invisible to static analysis - CAST cannot resolve it.     
+-      * ANTI-PATTERN 2: 2-DIGIT YEAR (YY) ARITHMETIC                 *
+-      *   Revalidation due date is computed as WS-YY + 5 with a < 70    
+-      *   pivot. A provider revalidated in 2068 gets a due year of 73   
+-      *   which the pivot reads as 1973 - the record sorts as decades   
+-      *   overdue. Fails for any 5-year window crossing 2070.           
++      * ANTI-PATTERN 1: ALTER STATEMENT (GO TO TARGET REWRITTEN AT     *
++      *   RUN TIME - INVISIBLE TO STATIC ANALYSIS).                    *
++      * ANTI-PATTERN 2: 2-DIGIT YEAR (YY) ARITHMETIC WITH A < 70 PIVOT *
+@@ -23 +20,0 @@
+-
+@@ -26,3 +23,2 @@
+-       SOURCE-COMPUTER. IBM-3090.
+-       OBJECT-COMPUTER. IBM-3090.
+-
++       SOURCE-COMPUTER. IBM-370.
++       OBJECT-COMPUTER. IBM-370.
+@@ -32,6 +28,3 @@
+-               ASSIGN TO PRVMSTR
+-               ORGANIZATION IS INDEXED
+-               ACCESS MODE IS DYNAMIC
+-               RECORD KEY IS PRV-NPI
+-               FILE STATUS IS WS-PRV-STATUS.
+-
++               ASSIGN TO DA-I-PRVMSTR
++               ACCESS MODE IS SEQUENTIAL
++               RECORD KEY IS PRV-NPI OF PRV-MASTER-RECORD.
+@@ -41 +34,4 @@
+-           RECORD CONTAINS 121 CHARACTERS.
++           RECORDING MODE IS F
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 10 RECORDS
++           RECORD CONTAINS 130 CHARACTERS.
+@@ -43,2 +39,48 @@
+-           COPY PRVRECRD.
+-
++      *    PRVRECRD - PROVIDER MASTER RECORD (130 BYTES) - FLATTENED.
++      *    (LEGACY RECORD CONTAINS 121 IS WRONG: THIS LAYOUT IS 130.)
++           05  PRV-NPI                 PIC X(10).
++           05  PRV-MEDICAID-ID         PIC X(09).
++           05  PRV-TYPE-CODE           PIC X(02).
++               88  PRV-INDIVIDUAL      VALUE 'IN'.
++               88  PRV-GROUP           VALUE 'GR'.
++               88  PRV-FACILITY        VALUE 'FA'.
++           05  PRV-TAXONOMY            PIC X(10).
++           05  PRV-TAXONOMY-R REDEFINES PRV-TAXONOMY.
++               10  PRV-TAX-GRP         PIC X(03).
++               10  FILLER              PIC X(07).
++           05  PRV-RISK-TIER           PIC X(01).   2
++               88  PRV-RISK-LIMITED    VALUE 'L'.
++               88  PRV-RISK-MODERATE   VALUE 'M'.
++               88  PRV-RISK-HIGH       VALUE 'H'.
++           05  PRV-ENROLL-STATUS       PIC X(01).
++               88  PRV-PENDING         VALUE 'P'.
++               88  PRV-ACTIVE          VALUE 'A'.
++               88  PRV-TERMINATED      VALUE 'T'.
++               88  PRV-DENIED          VALUE 'D'.
++           05  PRV-SCREEN-FLAG         PIC X(01).
++               88  PRV-UNSCREENED      VALUE 'U'.
++               88  PRV-SCREEN-PASS     VALUE 'P'.
++               88  PRV-SCREEN-FAIL     VALUE 'F'.
++           05  PRV-EFFECTIVE-DATE      PIC 9(08).
++           05  PRV-EFFECTIVE-DATE-R REDEFINES PRV-EFFECTIVE-DATE.
++               10  PRV-EFF-CC          PIC 9(02).
++               10  PRV-EFF-YY          PIC 9(02).
++               10  PRV-EFF-MMDD        PIC 9(04).
++           05  PRV-REVAL-DUE-DATE      PIC 9(08).
++           05  PRV-VARIANT             PIC X(80).
++      *    --- Individual provider view of PRV-VARIANT ---
++           05  PRV-INDIVIDUAL-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LAST-NAME       PIC X(30).
++               10  PRV-FIRST-NAME      PIC X(20).
++               10  PRV-LICENSE-NO      PIC X(15).
++               10  PRV-LICENSE-STATE   PIC X(02).
++               10  FILLER              PIC X(13).
++      *    --- Group / Facility view of the SAME 80 bytes ---
++           05  PRV-ORG-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LEGAL-NAME      PIC X(40).
++               10  PRV-DBA-NAME        PIC X(30).
++               10  PRV-OWNER-NPI       PIC X(10).
++      *    --- port helper: replaces reference modification (1:60) ---
++           05  PRV-VARIANT-HEAD REDEFINES PRV-VARIANT.
++               10  PRV-VARIANT-60      PIC X(60).
++               10  FILLER              PIC X(20).
+@@ -46,4 +88,50 @@
+-           COPY WRKSTORE.
+-
+-       01  WS-PRV-STATUS               PIC X(2).
+-
++      *    WRKSTORE - STANDARD WORKING STORAGE (NESTED COPYBOOK)
++      *    LEGACY: INCLUDES BOTH SCRNREC AND ERRCODES.  KEPT NESTED.
++       01  WS-STANDARD-WORK.
++           05  WS-PROGRAM-ID           PIC X(08).
++           05  WS-END-OF-FILE-FLAG     PIC X(01) VALUE 'N'.
++               88  WS-END-OF-FILE      VALUE 'Y'.
++           05  WS-FILE-STATUS          PIC X(02) VALUE '00'.
++               88  WS-FS-OK            VALUE '00'.
++               88  WS-FS-EOF           VALUE '10'.
++               88  WS-FS-DUP           VALUE '22'.
++           05  WS-RECORDS-READ         PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-WRITTEN      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-SKIPPED      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-ERRORED      PIC 9(07) VALUE ZERO.
++      *    --- NESTED COPYBOOKS (the anti-pattern) ---
++       01  SCREENING-RECORD.
++      *    SCRNREC - SCREENING / VERIFICATION RESULT RECORD (67 BYTES)
++           05  SCR-NPI                 PIC X(10).
++           05  SCR-SOURCE              PIC X(08).
++               88  SCR-NPPES           VALUE 'NPPES'.   3
++               88  SCR-LEIE            VALUE 'OIGLEIE'.
++               88  SCR-SAM             VALUE 'SAMGOV'.
++               88  SCR-LICENSE         VALUE 'LICBOARD'.
++               88  SCR-DMF             VALUE 'SSADMF'.
++               88  SCR-PECOS           VALUE 'PECOS'.
++           05  SCR-RESULT              PIC X(01).
++               88  SCR-PASS            VALUE 'P'.
++               88  SCR-FAIL            VALUE 'F'.
++               88  SCR-COND            VALUE 'C'.
++           05  SCR-VERDICT-DATE        PIC 9(08).
++           05  SCR-DETAIL              PIC X(40).
++       01  ERROR-CODES.
++      *    ERRCODES - SHARED ENROLLMENT/SCREENING ERROR CODES
++           05  EC-OK                   PIC X(04) VALUE '0000'.
++           05  EC-MISSING-NPI          PIC X(04) VALUE 'E101'.
++           05  EC-INVALID-TYPE         PIC X(04) VALUE 'E102'.
++           05  EC-DUP-NPI              PIC X(04) VALUE 'E103'.
++           05  EC-MISSING-TAXONOMY     PIC X(04) VALUE 'E104'.
++           05  EC-EXCLUDED             PIC X(04) VALUE 'E201'.
++           05  EC-LICENSE-EXPIRED      PIC X(04) VALUE 'E202'.
++           05  EC-OWNER-EXCLUDED       PIC X(04) VALUE 'E203'.
++           05  EC-DECEASED             PIC X(04) VALUE 'E204'.
++           05  EC-DEBARRED             PIC X(04) VALUE 'E205'.
++      *    MVS CURRENT-DATE IS 'MM/DD/YY' (2-DIGIT YEAR ONLY)
++       01  WS-CUR-DATE-RAW.
++           05  WS-RAW-MM               PIC 9(02).
++           05  FILLER                  PIC X(01).
++           05  WS-RAW-DD               PIC 9(02).
++           05  FILLER                  PIC X(01).
++           05  WS-RAW-YY               PIC 9(02).
+@@ -52,2 +140,4 @@
+-           05  WS-CURR-YY              PIC 9(02).
+-           05  WS-CURR-MMDD            PIC 9(04).
++           05  WS-CURR-DATE-R REDEFINES WS-CURR-DATE.
++               10  WS-CURR-CC          PIC 9(02).
++               10  WS-CURR-YY          PIC 9(02).
++               10  WS-CURR-MMDD        PIC 9(04).
+@@ -57 +147,2 @@
+-
++           05  WS-SUM                  PIC 9(03).
++           05  WS-QUOT                 PIC 9(03).
+@@ -59 +149,0 @@
+-
+@@ -62,5 +152,5 @@
+-           MOVE 'PRVRSK01' TO WS-PROGRAM-ID
+-           OPEN I-O PRV-MASTER-FILE
+-           MOVE 'N' TO WS-END-OF-FILE-FLAG
+-           PERFORM CLASSIFY-NEXT UNTIL WS-END-OF-FILE
+-           CLOSE PRV-MASTER-FILE
++           MOVE 'PRVRSK01' TO WS-PROGRAM-ID.
++           OPEN I-O PRV-MASTER-FILE.
++           MOVE 'N' TO WS-END-OF-FILE-FLAG.
++           PERFORM CLASSIFY-NEXT UNTIL WS-END-OF-FILE.
++           CLOSE PRV-MASTER-FILE.
+@@ -68 +157,0 @@
+-
+@@ -70,2 +159,3 @@
+-           READ PRV-MASTER-FILE NEXT RECORD
+-           MOVE WS-PRV-STATUS TO WS-FILE-STATUS
++           MOVE '00' TO WS-FILE-STATUS.   4
++           READ PRV-MASTER-FILE
++               AT END MOVE '10' TO WS-FILE-STATUS.
+@@ -73,5 +163,3 @@
+-               SET WS-END-OF-FILE TO TRUE
+-           ELSE
+-               PERFORM CLASSIFY-ONE
+-           END-IF.
+-
++               MOVE 'Y' TO WS-END-OF-FILE-FLAG
++           ELSE
++               PERFORM CLASSIFY-ONE.
+@@ -79,3 +167,2 @@
+-           MOVE PRV-TAXONOMY OF PRV-MASTER-RECORD (1:3)
+-                                              TO WS-TAXONOMY-GROUP
+-
++           MOVE PRV-TAX-GRP OF PRV-MASTER-RECORD
++                                              TO WS-TAXONOMY-GROUP.
+@@ -83,7 +170,6 @@
+-           EVALUATE WS-TAXONOMY-GROUP
+-               WHEN '332'
+-               WHEN '251'
+-                   ALTER APPLY-TIER-PARA TO PROCEED TO HIGH-TIER
+-               WHEN '341'
+-               WHEN '291'
+-               WHEN '225'
++           IF WS-TAXONOMY-GROUP = '332' OR WS-TAXONOMY-GROUP = '251'
++               ALTER APPLY-TIER-PARA TO PROCEED TO HIGH-TIER
++           ELSE
++               IF WS-TAXONOMY-GROUP = '341'
++                  OR WS-TAXONOMY-GROUP = '291'
++                  OR WS-TAXONOMY-GROUP = '225'
+@@ -91,6 +177,7 @@
+-               WHEN OTHER
+-                   ALTER APPLY-TIER-PARA TO PROCEED TO LIMITED-TIER
+-           END-EVALUATE
+-
+-           PERFORM APPLY-TIER-PARA
+-           PERFORM SET-REVALIDATION-DATE
++               ELSE
++                   ALTER APPLY-TIER-PARA TO PROCEED TO LIMITED-TIER.
++      *    PORT: V2 REJECTS ALTER OF A PARAGRAPH THAT IS ITSELF THE
++      *    END OF A PERFORM RANGE (IKF4033I), SO THE RANGE NOW ENDS
++      *    AT TIER-DONE.  THE ALTER ITSELF IS UNCHANGED.
++           PERFORM APPLY-TIER-PARA THRU TIER-DONE.
++           PERFORM SET-REVALIDATION-DATE.
+@@ -98,4 +185,3 @@
+-
+-      *----------------------------------------------------------------*
+-      * APPLY-TIER-PARA - ALTER target rewritten above (the anti-     *
+-      * pattern). Static analysis sees GO TO LIMITED-TIER only.       *
++      *----------------------------------------------------------------*
++      * APPLY-TIER-PARA - ALTER target rewritten above (the anti-      *
++      * pattern). Static analysis sees GO TO LIMITED-TIER only.        *
+@@ -105 +190,0 @@
+-
+@@ -107 +192 @@
+-           SET PRV-RISK-LIMITED OF PRV-MASTER-RECORD TO TRUE
++           MOVE 'L' TO PRV-RISK-TIER OF PRV-MASTER-RECORD.
+@@ -110 +195 @@
+-           SET PRV-RISK-MODERATE OF PRV-MASTER-RECORD TO TRUE
++           MOVE 'M' TO PRV-RISK-TIER OF PRV-MASTER-RECORD.
+@@ -113 +198 @@
+-           SET PRV-RISK-HIGH OF PRV-MASTER-RECORD TO TRUE
++           MOVE 'H' TO PRV-RISK-TIER OF PRV-MASTER-RECORD.
+@@ -117,4 +202,3 @@
+-
+-      *----------------------------------------------------------------*
+-      * SET-REVALIDATION-DATE                                         *
+-      * ANTI-PATTERN: 2-DIGIT YEAR ARITHMETIC                        *
++      *----------------------------------------------------------------*
++      * SET-REVALIDATION-DATE                                          *
++      * ANTI-PATTERN: 2-DIGIT YEAR ARITHMETIC                          *
+@@ -122,3 +206 @@
+-      *   Correct until 2065+; a 2068 enrollment yields due-year 73,   *
+-      *   pivoted to 1973 - the provider looks 90+ years overdue and    
+-      *   the revalidation sweep mis-sorts it.                          
++      *   A 2068 enrollment yields due-year 73, pivoted to 1973.       *
+@@ -127,4 +209,9 @@
+-           ACCEPT WS-CURR-DATE FROM DATE YYYYMMDD
+-           MOVE WS-CURR-DATE (3:2) TO WS-CURR-YY
+-           MOVE WS-CURR-DATE (5:4) TO WS-CURR-MMDD
+-           COMPUTE WS-DUE-YY = FUNCTION MOD (WS-CURR-YY + 5, 100)
++           MOVE CURRENT-DATE TO WS-CUR-DATE-RAW.
++           IF WS-RAW-YY < 70   5
++               MOVE 20 TO WS-CURR-CC
++           ELSE
++               MOVE 19 TO WS-CURR-CC.
++           MOVE WS-RAW-YY TO WS-CURR-YY.
++           COMPUTE WS-CURR-MMDD = (WS-RAW-MM * 100) + WS-RAW-DD.
++           ADD 5 WS-CURR-YY GIVING WS-SUM.
++           DIVIDE WS-SUM BY 100 GIVING WS-QUOT REMAINDER WS-DUE-YY.
+@@ -134,3 +221,2 @@
+-               COMPUTE WS-DUE-CCYY = 1900 + WS-DUE-YY
+-           END-IF
+-           COMPUTE WS-DUE-DATE = (WS-DUE-CCYY * 10000) + WS-CURR-MMDD
++               COMPUTE WS-DUE-CCYY = 1900 + WS-DUE-YY.
++           COMPUTE WS-DUE-DATE = (WS-DUE-CCYY * 10000) + WS-CURR-MMDD.

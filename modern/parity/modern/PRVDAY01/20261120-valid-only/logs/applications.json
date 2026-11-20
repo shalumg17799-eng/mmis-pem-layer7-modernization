@@ -1,0 +1,10 @@
+{
+  "http": 403,
+  "body": {
+    "type": "about:blank",
+    "title": "Forbidden",
+    "status": 403,
+    "detail": "You are not allowed to do this.",
+    "instance": "/api/v1/applications"
+  }
+}

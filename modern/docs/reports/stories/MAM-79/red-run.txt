@@ -1,0 +1,5 @@
+    Error: ALPHA must be listed in the public directory at the seed state (MAM-51 AC-4)
+    Expected value: "1005940865"
+    Received array: []
+    > 101 |     expect(await directoryNpis(request), 'ALPHA must be listed in the public directory at the seed state (MAM-51 AC-4)').toContain(NPI);
+Red for the right reason: the seed state has no directory read model for ALPHA (MAM-51 AC-4 not built). Also needed: MAM-80/82/90 pages, a sanctions_db reset in the seed.

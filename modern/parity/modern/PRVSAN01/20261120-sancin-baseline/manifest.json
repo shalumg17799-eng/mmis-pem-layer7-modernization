@@ -1,0 +1,128 @@
+{
+  "job": "PRVSAN01",
+  "runId": "20261120-sancin-baseline",
+  "side": "modern",
+  "scenario": "san-baseline",
+  "businessDate": "2026-11-20",
+  "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
+  "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
+  "startedUtc": "2026-11-20T11:22:10Z",
+  "finishedUtc": "2026-11-20T11:22:37Z",
+  "gateway": "http://localhost:8080",
+  "user": "admin1 (ADMIN)",
+  "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
+  "modernBuild": {
+    "gitHead": "6763144",
+    "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
+    "workingTree": "uncommitted changes of the lead (no commit in this task)"
+  },
+  "memoryPauseSeconds": 0,
+  "runs": [
+    {
+      "step": "PRVSAN01 sanction intake",
+      "startPath": "/api/v1/batch/sanction-intake-runs",
+      "startHttpStatus": 202,
+      "runId": "ad8fc151-ad51-485b-9372-adcda85b205f",
+      "status": "COMPLETED",
+      "businessDate": "2026-11-20",
+      "counts": {
+        "read": 6,
+        "applied": 4,
+        "notFound": 1,
+        "rejected": 1,
+        "skipped": 0,
+        "terminated": 1
+      },
+      "error": null,
+      "startedAt": "2026-11-20T11:22:27.318935Z",
+      "endedAt": "2026-11-20T11:22:27.500791Z",
+      "job": "PRVSAN01"
+    }
+  ],
+  "flowNotes": [
+    "Run on the seed state, like the legacy PRVSAN01 (ad-hoc lab deck). Status changes reach the provider master by events; the export is taken after it became stable.",
+    "SEED PREMISE: the SQL seed holds NULL where provider-master-seed.dat has the due date 99991231 for four providers (1005914035, 1005925213, 1005933068, 1005960046); the export writes an unset date as 00000000, so bytes 43-50 of those four records differ between the modern and the legacy BEFORE file (the other 12 records and all other bytes are equal)."
+  ],
+  "problems": [],
+  "normalised": [
+    "record separator only: the API returns one record per line (LF); the .ascii file holds the same records back to back like the converted golden files; no field is changed"
+  ],
+  "files": [
+    {
+      "path": "before/provider-master.delivered",
+      "role": "provider master export BEFORE (seed state) (as delivered by the API, one record per line)",
+      "bytes": 2095,
+      "sha256": "bd8064301c7cbc40f6c1efdf14ebea7589a1e9d89c89a512366e6ee18e6f2d74"
+    },
+    {
+      "path": "before/provider-master.ascii",
+      "role": "provider master export BEFORE (seed state) (record stream, records back to back)",
+      "bytes": 2080,
+      "sha256": "1544f0905b402d70782793f94fcf3a4f9432f52ca7cf4bdbd599c203dd4ec526",
+      "recordLength": 130,
+      "records": 16,
+      "goldenCounterpart": "before/provider-master.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "inputs/provider-master-seed-sorted.dat",
+      "role": "input as sent to the legacy run (same bytes)",
+      "bytes": 2096,
+      "sha256": "3febd267db27375183df9859f57776ed0d9c986b7a9fe08c3480dcefe741563c",
+      "records": 16,
+      "recordLength": 130,
+      "lineEnds": "LF after every record"
+    },
+    {
+      "path": "inputs/sancin.dat",
+      "role": "input as sent to the legacy run (same bytes)",
+      "bytes": 486,
+      "sha256": "caa42d0042c3aa1070cc8177c66549ba557c848e895114b5134e8be288a1a37a",
+      "records": 6,
+      "recordLength": 80,
+      "lineEnds": "LF after every record"
+    },
+    {
+      "path": "after/provider-master-after.delivered",
+      "role": "provider master export AFTER (status changes arrive by events) (as delivered by the API, one record per line)",
+      "bytes": 2095,
+      "sha256": "27f7068da60551d6ce1e9c4139b075044d8fafac5ea99d59d9d80ba539a17d07"
+    },
+    {
+      "path": "after/provider-master-after.ascii",
+      "role": "provider master export AFTER (status changes arrive by events) (record stream, records back to back)",
+      "bytes": 2080,
+      "sha256": "10b5d7c4ecdb04aba4d34958bdb1555386ae5493077230b091c1bdb009e453e7",
+      "recordLength": 130,
+      "records": 16,
+      "goldenCounterpart": "after/provider-master-after.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "logs/sanction-history.json",
+      "role": "GET /api/v1/sanctions after the run (HTTP 200)",
+      "bytes": 2688,
+      "sha256": "04b234a4712c399887761a51487a5bf20afbe720f6f48356f7be03ceb82b89bd"
+    },
+    {
+      "path": "logs/notices.json",
+      "role": "GET /api/v1/notices after the run (HTTP 200); modern counterpart of the PRVNT* CALLs",
+      "bytes": 1160,
+      "sha256": "4e8f3dd3eab393893637db6dbb4cc0ebc1cd48264e87fbab2b1dae2f4afedcdf"
+    },
+    {
+      "path": "logs/modern-job-lines.txt",
+      "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
+      "bytes": 2699,
+      "sha256": "cb25567f254918051173cf08bf9e98140dc0aab50eac1739d99c37b687f7009f"
+    },
+    {
+      "path": "logs/run-log.txt",
+      "role": "log of this script",
+      "bytes": 566,
+      "sha256": "1ff8976d9bb41de523772d6200e977d0cfc18b27712bfb8aa853b7253147b3fa"
+    }
+  ]
+}

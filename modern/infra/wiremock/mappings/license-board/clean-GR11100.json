@@ -1,0 +1,34 @@
+{
+  "name": "license-board clean: GR11100 / TX ACTIVE (license_board.txt)",
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/license-board/licenses",
+    "queryParameters": {
+      "licenseNo": {
+        "equalTo": "GR11100"
+      },
+      "state": {
+        "equalTo": "TX"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "LICBOARD",
+      "licenseNo": "GR11100",
+      "state": "TX",
+      "found": true,
+      "status": "ACTIVE",
+      "expiry": "2028-06"
+    }
+  },
+  "metadata": {
+    "source": "license-board",
+    "answer": "clean"
+  }
+}

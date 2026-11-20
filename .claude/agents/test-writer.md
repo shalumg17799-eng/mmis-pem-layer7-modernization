@@ -21,7 +21,8 @@ before any production code exists.
 
 ## You may write only
 `modern/services/*/src/test/**`, `modern/libs/test-support/**`,
-`modern/web-ui/tests/**`, `modern/web-ui/e2e/**`, `modern/docs/reports/stories/<KEY>/**`.
+`modern/web-ui/tests/**`, `modern/web-ui/e2e/**`, `modern/docs/reports/stories/<KEY>/**`,
+`modern/docs/reports/stories/<KEY>.tests.sha256`.
 
 ## Steps
 1. For every AC, write a Cucumber scenario tagged `@<KEY> @AC-<n>`, with step
@@ -33,8 +34,10 @@ before any production code exists.
    and contract tests for changed endpoints or events.
 4. Run them. Every new test must fail for the expected reason. Record each test and its
    failure reason in `modern/docs/reports/stories/<KEY>/red-report.md`.
-5. Commit `test(<KEY>): red - <summary>`, and write the commit hash to
-   `modern/docs/reports/stories/<KEY>/red-commit`.
+5. Do not commit (the user commits only when they say "commit"). Record the test hashes:
+   `python modern/tools/checks/test_protection.py record <KEY> <every test file of the story>`.
+   This writes `modern/docs/reports/stories/<KEY>.tests.sha256` and a restore copy of each
+   file (`git hash-object -w`, listed in `modern/docs/reports/stories/<KEY>/red-blobs.txt`).
 
 ## Rules
 - One assertion focus per test; meaningful assertions (values, events, status codes), not
@@ -44,5 +47,5 @@ before any production code exists.
   story, stop and report it.
 
 ## Return to the orchestrator
-The red commit hash, the test count per level, the AC → test mapping, and the failure
-reasons.
+The path of the test hash file, the test count per level, the AC → test mapping, and the
+failure reasons.

@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: notification-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/notification_db
+    username: notification_svc
+    password: ${PG_NOTIFICATION_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/notification
+  mail:
+    host: ${PEM_SMTP_HOST:localhost}
+    port: ${PEM_SMTP_PORT:1025}
+    properties:
+      # MAM-58: a mail server that does not answer fails the send in seconds instead of blocking the consumer
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
+server:
+  port: ${PEM_NOTIFICATION_PORT:8087}

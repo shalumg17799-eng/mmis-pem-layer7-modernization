@@ -1,0 +1,9 @@
+731944ed87635e8f923b8afa8a17e20e605da29a  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/IntegrationTest.java
+6dee400065e87d2be50dab9ea6f3df3bf3b0a6db  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/PlatformChecksTest.java
+4e1112ececa6cefd19da57910b3ea3b3ac11321d  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/TestMail.java
+93ebc1bcb02b16e39386361e3cb545d77e4e30e1  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/CucumberSpringConfig.java
+1611c42d23f28047a92404c93ab6f524a6604df7  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/CucumberSuiteTest.java
+178f63a39f52ae49cacbbcd226089f059a282290  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/acceptance/NoticeSteps.java
+05280ca97cf26cd05c6b5fd14c68e98694cb3948  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/application/SendNoticeTest.java
+b40fa791f0187c65aa803399ab03644a1c211f9e  modern/services/notification-service/src/test/java/gov/medicaid/pem/notification/domain/NoticeRulesTest.java
+bd057a54ebe119586190a2610f9e551edf228e92  modern/services/notification-service/src/test/resources/features/MAM-59.feature

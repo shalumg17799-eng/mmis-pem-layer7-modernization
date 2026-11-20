@@ -1,0 +1,68 @@
+# Settings shared by every PEM service, imported by each service's <name>.yml (spring.config.import).
+# A service file must not repeat these keys (imported values win); environment variables override both.
+spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+  kafka:
+    bootstrap-servers: ${PEM_KAFKA_BOOTSTRAP:localhost:9092}
+    consumer:
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    producer:
+      acks: all
+    listener:
+      ack-mode: record
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: never
+  threads:
+    virtual:
+      enabled: true
+  main:
+    banner-mode: off
+server:
+  shutdown: graceful
+  tomcat:
+    threads:
+      max: 50
+      min-spare: 2
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+info:
+  service: ${spring.application.name}
+pem:
+  security:
+    issuer: ${PEM_JWT_ISSUER:http://localhost:8180/realms/pem}
+    jwks-uri: ${PEM_JWKS_URI:http://localhost:8180/realms/pem/protocol/openid-connect/certs}
+  client:
+    token-uri: ${PEM_TOKEN_URI:http://localhost:8180/realms/pem/protocol/openid-connect/token}
+    client-id: pem-services
+    client-secret: ${PEM_SERVICES_CLIENT_SECRET:}
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+logging:
+  structured:
+    format:
+      console: ${PEM_LOG_FORMAT:ecs}

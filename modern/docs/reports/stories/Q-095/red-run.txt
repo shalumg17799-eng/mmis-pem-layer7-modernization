@@ -1,0 +1,35 @@
+Q-095 red run (2026-11-19), enrollment-service (user decision: an individual applies only under the NPI of their token)
+
+1) Acceptance + application unit test (Q-095.feature, OwnNpiSteps, SubmitOwnNpiTest; OwnNpiRuleTest held back):
+   ./gradlew --no-daemon :services:enrollment-service:test -> 84 tests completed, 5 failed
+   The scenarios for unchanged behaviour (own NPI accepted, GR/GRP/FA under another NPI accepted, ANALYST not restricted) pass already, as they must.
+   CucumberSuiteTest > Cucumber > An individual provider applies only under the NPI in their own token (Q-095, user decision 2026-11-19) > An individual application under another NPI is refused, nothing is stored or published > Examples > gov.medicaid.pem.enrollment.acceptance.CucumberSuiteTest.An indi
+       org.opentest4j.AssertionFailedError: [{"applicationId":"b6a52cee-2ac4-4638-ba71-f63762691db8","status":"VALIDATED","errors":[],"npi":"1003000222","medicaidId":"M00000222","providerType":"IN","taxonomy":"207Q00000X","individual":{"lastName":"RIVERA","firstName":"MARIA","licenseNo":"MD12345","lice
+       expected: 403
+        but was: 201
+   CucumberSuiteTest > Cucumber > An individual provider applies only under the NPI in their own token (Q-095, user decision 2026-11-19) > An individual application under another NPI is refused, nothing is stored or published > Examples > gov.medicaid.pem.enrollment.acceptance.CucumberSuiteTest.An indi
+       org.opentest4j.AssertionFailedError: [{"applicationId":"dc0dfbf1-f474-4fa3-9e2b-bcece18fdece","status":"VALIDATED","errors":[],"npi":"1003000222","medicaidId":"M00000222","providerType":"IN","taxonomy":"207Q00000X","individual":{"lastName":"RIVERA","firstName":"MARIA","licenseNo":"MD12345","lice
+       expected: 403
+        but was: 201
+   CucumberSuiteTest > Cucumber > An individual provider applies only under the NPI in their own token (Q-095, user decision 2026-11-19) > gov.medicaid.pem.enrollment.acceptance.CucumberSuiteTest.An individual application from a provider token without an npi claim is refused FAILED
+       org.opentest4j.AssertionFailedError: [{"applicationId":"7e182d94-2355-48f0-a6bf-441e5e89f754","status":"VALIDATED","errors":[],"npi":"1003000111","medicaidId":"M00000111","providerType":"IN","taxonomy":"207Q00000X","individual":{"lastName":"RIVERA","firstName":"MARIA","licenseNo":"MD12345","lice
+       expected: 403
+        but was: 201
+   SubmitOwnNpiTest > [Q-095] IN or IND under another NPI is refused (403): nothing is stored or announced FAILED
+       java.lang.AssertionError: 
+       Expecting code to raise a throwable.
+           at gov.medicaid.pem.enrollment.application.SubmitOwnNpiTest.other(SubmitOwnNpiTest.java:60)
+   SubmitOwnNpiTest > [Q-095] IN from a PROVIDER token without an npi claim is refused (403) FAILED
+       java.lang.AssertionError: 
+       Expecting code to raise a throwable.
+           at gov.medicaid.pem.enrollment.application.SubmitOwnNpiTest.noClaim(SubmitOwnNpiTest.java:70)
+   
+   [Incubating] Problems report is available at: file:///C:/Users/ks519/Downloads/Medco-Transform/modern/build/reports/problems/problems-report.html
+   
+   BUILD FAILED in 2m 23s
+   23 actionable tasks: 6 executed, 17 up-to-date
+
+2) Domain unit test (OwnNpiRuleTest): ./gradlew --no-daemon :services:enrollment-service:compileTestJava -> compilation failed, only the missing rule:
+        20 symbol:   variable OwnNpiRule
+
+Reason: SubmitApplication stores and announces an IN application whatever the token's npi claim; OwnNpiRule does not exist yet.

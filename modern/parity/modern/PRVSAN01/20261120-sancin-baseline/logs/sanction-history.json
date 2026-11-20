@@ -1,0 +1,91 @@
+{
+  "items": [
+    {
+      "sanctionId": "1e3af113-4a63-49b7-933b-69fc6ceb627c",
+      "npi": "1005933068",
+      "action": "R",
+      "reason": "SAMPLE: REINSTATE OF A PENDING PROVIDER",
+      "effectiveDate": "2026-01-15",
+      "sourceFeed": "SANCIN",
+      "recordedBy": "admin1",
+      "recordedAt": "2026-11-20T11:22:27.465013Z",
+      "resultingStatus": "A"
+    },
+    {
+      "sanctionId": "54866229-e2ed-488a-951c-ada34d3ad481",
+      "npi": "1005919109",
+      "action": "R",
+      "reason": "SAMPLE REINSTATEMENT: REVIEW DONE",
+      "effectiveDate": "2026-01-15",
+      "sourceFeed": "SANCIN",
+      "recordedBy": "admin1",
+      "recordedAt": "2026-11-20T11:22:27.418651Z",
+      "resultingStatus": "A"
+    },
+    {
+      "sanctionId": "a70c23ed-6928-419c-88a1-fca7c45cf568",
+      "npi": "1005992312",
+      "action": "S",
+      "reason": "SAMPLE SUSPENSION: PENDING REVIEW",
+      "effectiveDate": "2026-01-15",
+      "sourceFeed": "SANCIN",
+      "recordedBy": "admin1",
+      "recordedAt": "2026-11-20T11:22:27.390955Z",
+      "resultingStatus": "S"
+    },
+    {
+      "sanctionId": "99f97c0b-2528-4977-bf5e-600de0c6274a",
+      "npi": "1005943141",
+      "action": "T",
+      "reason": "SAMPLE TERMINATION: PROGRAM VIOLATION",
+      "effectiveDate": "2026-01-15",
+      "sourceFeed": "SANCIN",
+      "recordedBy": "admin1",
+      "recordedAt": "2026-11-20T11:22:27.354987Z",
+      "resultingStatus": "T"
+    },
+    {
+      "sanctionId": "5134fd7c-ff09-5f2c-a57b-d914c3dbb552",
+      "npi": "1005919109",
+      "action": "S",
+      "reason": "SEEDED SUSPENSION",
+      "effectiveDate": "2025-10-01",
+      "recordedBy": "supervisor1",
+      "recordedAt": "2025-10-01T09:00:00Z",
+      "resultingStatus": "S"
+    },
+    {
+      "sanctionId": "bad740ac-5583-556b-9c5d-ff62595faa0a",
+      "npi": "1005988179",
+      "action": "S",
+      "reason": "SEEDED SUSPENSION",
+      "effectiveDate": "2025-10-01",
+      "recordedBy": "supervisor1",
+      "recordedAt": "2025-10-01T09:00:00Z",
+      "resultingStatus": "S"
+    },
+    {
+      "sanctionId": "8ffd6ebb-df5a-5659-8bf4-de1d85abdca8",
+      "npi": "1005932946",
+      "action": "T",
+      "reason": "SEEDED TERMINATION",
+      "effectiveDate": "2025-09-30",
+      "recordedBy": "supervisor1",
+      "recordedAt": "2025-09-30T09:00:00Z",
+      "resultingStatus": "T"
+    },
+    {
+      "sanctionId": "61b264dc-0089-5864-9df1-df4443707a1c",
+      "npi": "1005918507",
+      "action": "T",
+      "reason": "SEEDED TERMINATION",
+      "effectiveDate": "2025-06-30",
+      "recordedBy": "supervisor1",
+      "recordedAt": "2025-06-30T09:00:00Z",
+      "resultingStatus": "T"
+    }
+  ],
+  "page": 0,
+  "size": 50,
+  "total": 8
+}

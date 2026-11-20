@@ -1,0 +1,27 @@
+{
+  "name": "nppes error: X-Pem-Stub: error answers 500",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/nppes/providers",
+    "headers": {
+      "X-Pem-Stub": {
+        "equalTo": "error"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "NPPES",
+      "error": "stubbed server error"
+    }
+  },
+  "metadata": {
+    "source": "nppes",
+    "answer": "error"
+  }
+}

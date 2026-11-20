@@ -1,0 +1,10 @@
+feed_code,legacy_type,basis
+IND,IN,"QF-2 default A (business to confirm), D-008"
+PT,IN,"QF-2 default A (business to confirm), D-008"
+GRP,GR,"QF-2 default A (business to confirm), D-008"
+DME,GR,"QF-2 default A (business to confirm), D-008"
+HOSP,FA,"QF-2 default A (business to confirm), D-008"
+HOS,FA,"QF-2 default A (business to confirm), D-008"
+AMB,FA,"QF-2 default A (business to confirm), D-008"
+LAB,FA,"QF-2 default A (business to confirm), D-008"
+HHA,FA,"QF-2 default A (business to confirm), D-008"

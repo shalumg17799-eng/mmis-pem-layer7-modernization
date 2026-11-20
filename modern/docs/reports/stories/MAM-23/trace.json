@@ -1,0 +1,48 @@
+{
+  "story": "MAM-23",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/VerdictAndTierSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/RecordVerdictsTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-23.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-23.feature 'The assigned tier is saved on the provider': PASSED"
+    ],
+    "AC-2": [
+      "MAM-23.feature 'The tier is saved for every provider, not only the first': PASSED",
+      "RecordVerdictsTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-23.feature 'A new tier replaces the old one': PASSED"
+    ],
+    "AC-4": [
+      "MAM-23.feature 'Assigning a tier changes nothing else, in particular not the due date': PASSED"
+    ],
+    "AC-5": [
+      "MAM-23.feature 'Arrival order does not matter': PASSED"
+    ],
+    "AC-6": [
+      "MAM-23.feature 'A redelivered tier event is applied once': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/ProviderChanges.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/RecordVerdicts.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/ScreenFlag.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/JpaProviderChanges.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/VerdictEventsListener.java"
+  ],
+  "rules": [
+    "R-PRVRSK01-cbl-00010",
+    "R-PRVRSK01-cbl-00048"
+  ]
+}

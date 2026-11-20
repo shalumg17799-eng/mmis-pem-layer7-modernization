@@ -16,35 +16,35 @@ MATCH (n:Job) WHERE n.proc = true RETURN count(n) AS actual;
 // Job nodes in total [explained: 2 pipeline + 1 proc + the 2 VSAM-definition jobs PRVVSM01/02, which the skill's '2 plus proc' leaves out] | expected: 5
 MATCH (n:Job) RETURN count(n) AS actual;
 
-// BusinessRule nodes | expected: 403
-MATCH (n:BusinessRule) RETURN count(n) AS actual;
+// BusinessRule nodes from AWS (ruleId contains -cbl-) | expected: 403
+MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVENR01 | expected: 68
-MATCH (n:BusinessRule) WHERE n.program = 'PRVENR01' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVENR01 | expected: 68
+MATCH (r:BusinessRule {program: 'PRVENR01'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVSCR01 | expected: 62
-MATCH (n:BusinessRule) WHERE n.program = 'PRVSCR01' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVSCR01 | expected: 62
+MATCH (r:BusinessRule {program: 'PRVSCR01'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVSAN01 | expected: 58
-MATCH (n:BusinessRule) WHERE n.program = 'PRVSAN01' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVSAN01 | expected: 58
+MATCH (r:BusinessRule {program: 'PRVSAN01'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVTMS01 | expected: 55
-MATCH (n:BusinessRule) WHERE n.program = 'PRVTMS01' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVTMS01 | expected: 55
+MATCH (r:BusinessRule {program: 'PRVTMS01'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVRSK01 | expected: 48
-MATCH (n:BusinessRule) WHERE n.program = 'PRVRSK01' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVRSK01 | expected: 48
+MATCH (r:BusinessRule {program: 'PRVRSK01'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVCICS1 | expected: 45
-MATCH (n:BusinessRule) WHERE n.program = 'PRVCICS1' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVCICS1 | expected: 45
+MATCH (r:BusinessRule {program: 'PRVCICS1'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVDIR01 | expected: 29
-MATCH (n:BusinessRule) WHERE n.program = 'PRVDIR01' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVDIR01 | expected: 29
+MATCH (r:BusinessRule {program: 'PRVDIR01'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVREV01 | expected: 24
-MATCH (n:BusinessRule) WHERE n.program = 'PRVREV01' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVREV01 | expected: 24
+MATCH (r:BusinessRule {program: 'PRVREV01'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
-// BusinessRule nodes for PRVDEAD1 | expected: 14
-MATCH (n:BusinessRule) WHERE n.program = 'PRVDEAD1' RETURN count(n) AS actual;
+// AWS BusinessRule nodes for PRVDEAD1 | expected: 14
+MATCH (r:BusinessRule {program: 'PRVDEAD1'}) WHERE r.ruleId CONTAINS '-cbl-' RETURN count(r) AS actual;
 
 // BusinessRule nodes without IMPLEMENTED_IN | expected: 0
 MATCH (r:BusinessRule) WHERE NOT (r)-[:IMPLEMENTED_IN]->(:Program) RETURN count(r) AS actual;
@@ -82,11 +82,8 @@ MATCH (n:KeyFunctionality) RETURN count(n) AS actual;
 // PART_OF relationships [explained: 88 of 403 rules sit in no key functionality in the AWS output] | expected: 315
 MATCH ()-[r:PART_OF]->() RETURN count(r) AS actual;
 
-// BusinessRule nodes without PART_OF | expected: 88
-MATCH (r:BusinessRule) WHERE NOT (r)-[:PART_OF]->(:KeyFunctionality) RETURN count(r) AS actual;
-
-// TestCase nodes from the AWS plan | expected: 4
-MATCH (n:TestCase) WHERE n.level = 'aws-plan' RETURN count(n) AS actual;
+// AWS BusinessRule nodes without PART_OF | expected: 88
+MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' AND NOT (r)-[:PART_OF]->(:KeyFunctionality) RETURN count(r) AS actual;
 
 // DB2 columns as Field nodes (the DDL defines 26; AWS's dictionary lists 22) | expected: 26
 MATCH (f:Field) WHERE f.id STARTS WITH 'PRVDDL01:' RETURN count(f) AS actual;
@@ -97,3 +94,41 @@ MATCH (p:Program)-[:HAS_PARAGRAPH]->() WITH DISTINCT p RETURN count(p) AS actual
 // Transaction PINQ is flagged as missing its CICS definition | expected: True
 MATCH (t:Transaction {id: 'PINQ'}) RETURN t.missingDefinition AS actual;
 
+// AWS rules with verification VERIFIED (as in rule-verification.csv) | expected: 339
+MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' AND r.verification = 'VERIFIED' RETURN count(r) AS actual;
+
+// AWS rules with verification MISMATCH (as in rule-verification.csv) | expected: 40
+MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' AND r.verification = 'MISMATCH' RETURN count(r) AS actual;
+
+// AWS rules with verification NOT_FOUND (as in rule-verification.csv) | expected: 3
+MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' AND r.verification = 'NOT_FOUND' RETURN count(r) AS actual;
+
+// AWS rules with verification DROPPED (as in rule-verification.csv) | expected: 21
+MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-cbl-' AND r.verification = 'DROPPED' RETURN count(r) AS actual;
+
+// Rules still UNVERIFIED | expected: 0
+MATCH (r:BusinessRule {verification: 'UNVERIFIED'}) RETURN count(r) AS actual;
+
+// Added rules R-<PROGRAM>-ADD-nn (as in rule-verification.csv) | expected: 52
+MATCH (r:BusinessRule) WHERE r.ruleId CONTAINS '-ADD-' RETURN count(r) AS actual;
+
+// VERIFIED or MISMATCH rules without evidence | expected: 0
+MATCH (r:BusinessRule) WHERE r.verification IN ['VERIFIED','MISMATCH'] AND coalesce(r.evidence, '') = '' RETURN count(r) AS actual;
+
+// Defect nodes (as in defect-register.md) | expected: 29
+MATCH (d:Defect) RETURN count(d) AS actual;
+
+// Defects still OPEN | expected: 0
+MATCH (d:Defect {decision: 'OPEN'}) RETURN count(d) AS actual;
+
+// Defects that AFFECT nothing | expected: 0
+MATCH (d:Defect) WHERE NOT (d)-[:AFFECTS]->() RETURN count(d) AS actual;
+
+// MISMATCH or NOT_FOUND rules with no defect and no question | expected: 0
+MATCH (r:BusinessRule) WHERE r.verification IN ['MISMATCH','NOT_FOUND'] AND NOT (r)<-[:AFFECTS]-(:Defect) AND NOT (r)<-[:ABOUT]-(:Question) RETURN count(r) AS actual;
+
+// Question nodes (as in questions.md) | expected: 91
+MATCH (q:Question) RETURN count(q) AS actual;
+
+// Regulations cited by no rule | expected: 0
+MATCH (g:Regulation) WHERE NOT (g)<-[:GOVERNED_BY]-() RETURN count(g) AS actual;

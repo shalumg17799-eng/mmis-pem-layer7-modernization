@@ -1,0 +1,5 @@
+label,business_date,purpose
+frozen,2026-01-15,the frozen business date of every fixture
+sweep,2026-03-31,the month-end revalidation sweep of journey J6: seeded due dates up to this date are due
+leap-day,2028-02-29,"legacy PRVRSK01 copies month and day into the year 2033 and makes the impossible date 20330229 (R-PRVRSK01-ADD-02, Q-017)"
+century-pivot,2065-01-15,"legacy 2-digit due year 70 is read as 1970 by the pivot at 70 (R-PRVRSK01-cbl-00044, D-004)"

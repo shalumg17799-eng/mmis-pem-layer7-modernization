@@ -1,0 +1,4 @@
+3dcfb9ecaff456dd4ca1c9dc49384d69135e16a41fad3343aae103f71f78e3f6  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ApprovalSteps.java
+1c90adf6e456b6ae10e8fb4a3e4a296787b4e1d16a0cffeca6e9306e1f0148f1  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/DecideProviderTest.java
+30e6e0d39738ed7ecb5da3b9b9a414fe0413e4c46640ff55dff7774851004b68  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ApprovalTest.java
+de421f04fb1e5e554f9dd7de14ac73eec9800f13d3c2b6f652bd270e9b9c659f  modern/services/provider-service/src/test/resources/features/MAM-27.feature

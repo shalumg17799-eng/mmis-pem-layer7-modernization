@@ -1,0 +1,3 @@
+67287857264a342e922b0d40f16cbde1cc61ca11  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/acceptance/ReadApplicationsSteps.java
+7fda73ad4ab4384589e601089cd45d2b127d1458  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/application/ReadApplicationTest.java
+19d33a0b5177a2e4772cf56a7cfc4e2333de0775  modern/services/enrollment-service/src/test/resources/features/MAM-54.feature

@@ -1,0 +1,9 @@
+ca9e43bff5c56dc37e805ec4b96795e69a669e22  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/IntegrationTest.java
+4d4f2b8c65d964b1c8168644b4765d273a476e6a  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/PlatformChecksTest.java
+0857e64fd710ebd03d5057432a1be0a323db3c99  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/TestSources.java
+c1eaec69fa8f64f4fdb5439b9118153344df8f0b  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/acceptance/CucumberSpringConfig.java
+ed5a3563ddba12b6fc955a2e8b60bd77e729843b  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/acceptance/CucumberSuiteTest.java
+2f74827065f734a8665063ce16e8802995041508  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/acceptance/DirectorySteps.java
+18fbec5248085d6a235180b495834d1e9785ad70  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/application/ProjectDirectoryTest.java
+a4facf828468c917aeb3a92e5b5ae00eb1b04ec8  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/domain/DirectoryRulesTest.java
+91f1d6e09370f3122aa6f04dc55091dc3069f050  modern/services/directory-service/src/test/resources/features/MAM-61.feature

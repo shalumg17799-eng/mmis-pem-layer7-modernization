@@ -1,0 +1,417 @@
+openapi: 3.1.0
+info:
+  title: PEM sanctions-service API
+  version: 1.0.1
+  description: 'sanctions-service (port 8086, database sanctions_db). Replaces: PRVSAN01. Contract-first; status DRAFT until Phase 3 approval,
+    then 1.0.0. 1.0.1 (2026-11-19, Q-096, user decision): recordSanction lists the 503 response that MAM-52 AC-7 requires.'
+  license:
+    name: Proprietary
+    identifier: LicenseRef-PEM-Proprietary
+servers:
+- url: http://api-gateway:8080
+  description: 'API gateway on the docker compose network (from the host: http://localhost:8080)'
+tags:
+- name: Sanctions
+  description: Sanction history and actions
+- name: Legacy files
+  description: Fixed-width legacy files kept for parity (MODERNIZATION.md rule 3)
+paths:
+  /api/v1/sanctions:
+    post:
+      operationId: recordSanction
+      summary: Record a sanction (T terminate, S suspend, R reinstate) and apply it
+      tags:
+      - Sanctions
+      description: 'Roles: SUPERVISOR. Legacy / decisions: PRVSAN01; D-006, D-013, D-018, D-026, D-027.'
+      x-roles: &id001
+      - SUPERVISOR
+      x-legacy: PRVSAN01; D-006, D-013, D-018, D-026, D-027
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SanctionRequest'
+      security:
+      - bearerAuth: *id001
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sanction'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Business validation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: 'The status change could not be applied: provider-service unreachable or failing (MAM-52 AC-7, Q-B13, D-024). Nothing is recorded and no SanctionApplied is published. Added in 1.0.1 (Q-096).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      operationId: listSanctions
+      summary: Sanction history
+      tags:
+      - Sanctions
+      description: 'Roles: ANALYST, SUPERVISOR, ADMIN. Legacy / decisions: D-018.'
+      x-roles: &id002
+      - ANALYST
+      - SUPERVISOR
+      - ADMIN
+      x-legacy: D-018
+      parameters:
+      - name: npi
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+          examples:
+          - '1003000111'
+        description: NPI
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+        description: Page number (0-based)
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 20
+        description: Page size
+      security:
+      - bearerAuth: *id002
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SanctionPage'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/batch/sanction-intake-runs:
+    post:
+      operationId: startSanctionIntakeRun
+      summary: Load a legacy SANCIN file (80-byte records) for a business date
+      tags:
+      - Legacy files
+      description: 'Roles: ADMIN, SYSTEM. Legacy / decisions: SANCIN.'
+      x-roles: &id003
+      - ADMIN
+      - SYSTEM
+      x-legacy: SANCIN
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileRunRequest'
+      security:
+      - bearerAuth: *id003
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchRun'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Business validation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/batch/sanction-intake-runs/{runId}:
+    get:
+      operationId: getSanctionIntakeRun
+      summary: Get a sanction intake run with its counts
+      tags:
+      - Legacy files
+      description: 'Roles: ADMIN. Legacy / decisions: PRVSAN01 counters.'
+      x-roles: &id004
+      - ADMIN
+      x-legacy: PRVSAN01 counters
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Run id
+      security:
+      - bearerAuth: *id004
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchRun'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Keycloak realm pem access token. Role names in each operation's security requirement are realm roles (OpenAPI 3.1 allows role
+        lists for non-OAuth schemes).
+  schemas:
+    BatchRun:
+      type: object
+      required:
+      - runId
+      - job
+      - businessDate
+      - status
+      properties:
+        runId: &id007
+          type: string
+          format: uuid
+        job:
+          type: string
+        businessDate: &id005
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - RUNNING
+          - COMPLETED
+          - FAILED
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+        error:
+          type:
+          - string
+          - 'null'
+          description: Why the run failed (D-024)
+        startedAt: &id008
+          type: string
+          format: date-time
+        endedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    FieldError:
+      type: object
+      required:
+      - code
+      - field
+      properties:
+        code:
+          type: string
+          enum: &id006
+          - E101
+          - E102
+          - E103
+          - E104
+          - E201
+          - E202
+          - E203
+          - E204
+          - E205
+        field:
+          type: string
+        message:
+          type: string
+    FileRunRequest:
+      type: object
+      required:
+      - file
+      - businessDate
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          description: Legacy fixed-width input file
+        businessDate: *id005
+        batchId:
+          type: string
+          maxLength: 8
+          description: A real job parameter (D-017)
+    Problem:
+      type: object
+      description: RFC 7807 problem details. `code` carries a legacy error code (E101-E205) where one applies (D-016).
+      required:
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        code:
+          type: string
+          enum: *id006
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+    Sanction:
+      type: object
+      required:
+      - sanctionId
+      - npi
+      - action
+      - effectiveDate
+      - recordedAt
+      properties:
+        sanctionId: *id007
+        npi: &id009
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+          examples:
+          - '1003000111'
+        action:
+          type: string
+          enum:
+          - T
+          - S
+          - R
+        reason:
+          type: string
+        effectiveDate: *id005
+        sourceFeed:
+          type: string
+        recordedBy:
+          type: string
+        recordedAt: *id008
+        resultingStatus:
+          type: string
+          enum:
+          - T
+          - S
+          - A
+    SanctionPage:
+      type: object
+      required:
+      - items
+      - page
+      - size
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sanction'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+    SanctionRequest:
+      type: object
+      required:
+      - npi
+      - action
+      - effectiveDate
+      properties:
+        npi: *id009
+        action:
+          type: string
+          description: T, S or R; anything else is rejected (D-026)
+        reason:
+          type: string
+          maxLength: 60
+        effectiveDate: *id005
+        sourceFeed:
+          type: string
+          maxLength: 20

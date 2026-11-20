@@ -1,9 +1,11 @@
 ---
 name: kag-ontology
-description: The Neo4j knowledge graph for the PEM modernization. Covers node labels, relationships, required properties, loader conventions, validation queries and standard read queries. Use whenever reading from or writing to the graph.
+description: The Neo4j knowledge graph for the PEM modernization: legacy code and AWS Transform output only. Covers node labels, relationships, required properties, loader conventions, validation queries and standard read queries. Use whenever reading from or writing to the graph.
 ---
 
 # PEM knowledge graph (KAG)
+
+**Scope (user decision 2026-11-19): Neo4j is the context engine for the legacy code and the AWS Transform output ONLY.** The labels below are the only ones in the graph. Design, backlog, tests and code are never loaded: traceability lives in `modern/docs/traceability/rule-trace.csv` (built by `modern/tools/trace/build_rule_trace.py`) and in each Jira story's "Legacy trace" section. The earlier delivery-layer data is archived in `modern/docs/traceability/graph-export/`.
 
 ## 1. Who writes and who reads
 
@@ -40,22 +42,11 @@ description: The Neo4j knowledge graph for the PEM modernization. Covers node la
 | Question | `id` (Q-001 …) | `text`, `options`, `recommended`, `status` (OPEN, ANSWERED), `answer` |
 | Regulation | `id` (e.g. 42CFR455.450) | `title` |
 
-### Delivery layer (what we build)
+### Delivery layer: not in the graph
 
-| Label | Key property | Other required properties |
-|---|---|---|
-| Service | `name` (e.g. risk-service) | `port`, `database` |
-| ApiEndpoint | `id` = `<service>:<METHOD> <path>` | `operationId` |
-| Event | `type` (e.g. RiskTierAssigned) | `topic`, `producer` |
-| Table | `id` = `<service>:<table>` | |
-| Column | `id` = `<table id>:<column>` | `type` |
-| UiScreen | `id` (e.g. console.provider-detail) | `route` |
-| Epic | `key` (Jira key, or local id L-E01 before Jira) | `title` |
-| Story | `key` | `title`, `specVersion` |
-| AcceptanceCriterion | `id` = `<story key>:AC-<n>` | `text` |
-| TestCase | `id` = `<service>:<test class>#<method or scenario>` | `level` (unit, acceptance, contract, e2e) |
-| CodeUnit | `id` = `<service>:<fully qualified class>` | `path` |
-| Decision (ADR) | `id` (ADR-001) | `title`, `status` |
+Service, ApiEndpoint, Event, Table, Column, UiScreen, Epic, Story, AcceptanceCriterion, TestCase, CodeUnit and Decision are
+not graph labels any more (removed 2026-11-19; exported to `modern/docs/traceability/graph-export/`). The AWS test plan
+stays in `aws-transform/06-test-plan/test-plan.json`.
 
 ## 3. Relationships
 
@@ -78,17 +69,6 @@ description: The Neo4j knowledge graph for the PEM modernization. Covers node la
 | BusinessRule | GOVERNED_BY | Regulation | |
 | Defect | AFFECTS | BusinessRule or Program | |
 | Question | ABOUT | any node | |
-| BusinessRule | OWNED_BY | Service | Set in Phase 3 |
-| Field | MAPS_TO | Column | Set in Phase 3 (or `dropped:true` on Field) |
-| Service | EXPOSES | ApiEndpoint | |
-| Service | PUBLISHES / CONSUMES | Event | |
-| Service | OWNS | Table | |
-| Epic | CONTAINS | Story | |
-| Story | DERIVED_FROM | BusinessRule | |
-| Story | HAS_AC | AcceptanceCriterion | |
-| TestCase | VERIFIES | AcceptanceCriterion | |
-| Story | IMPLEMENTED_BY | CodeUnit | |
-| UiScreen | CALLS | ApiEndpoint | |
 
 ## 4. Required provenance on every node and relationship you create
 
@@ -144,14 +124,5 @@ RETURN f.name, f.pic, f.start, f.length, f.redefines ORDER BY f.start;
 MATCH (p)-[rel:READS|WRITES|REWRITES]->(d:Dataset {dsn:$dsn})
 RETURN p.name, type(rel);
 
-// Everything a story traces to
-MATCH (s:Story {key:$key})
-OPTIONAL MATCH (s)-[:DERIVED_FROM]->(r:BusinessRule)
-OPTIONAL MATCH (s)-[:HAS_AC]->(ac)<-[:VERIFIES]-(t:TestCase)
-OPTIONAL MATCH (s)-[:IMPLEMENTED_BY]->(c:CodeUnit)
-RETURN s, collect(DISTINCT r.ruleId), collect(DISTINCT t.id), collect(DISTINCT c.id);
-
-// Rules not yet covered by any story (should be empty after Phase 4, except DROPPED)
-MATCH (r:BusinessRule) WHERE r.verification <> 'DROPPED'
-AND NOT (r)<-[:DERIVED_FROM]-(:Story) RETURN r.ruleId;
+// Traceability (rule -> story -> AC -> test -> code): modern/docs/traceability/rule-trace.csv, not the graph.
 ```

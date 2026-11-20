@@ -1,0 +1,2 @@
+8f2b10b25e12bb64bde7caab2e6daad6771e2cd5  modern/web-ui/e2e/portal-status.spec.ts
+1f0d59bfda8b6d763cb3ddde6d9b9b294807ccbc  modern/web-ui/tests/portal/application-status.test.tsx

@@ -1,0 +1,3 @@
+    Error: page.waitForRequest: Test ended.
+    > 72 |     page.waitForRequest((r) => new URL(r.url()).pathname === '/api/v1/providers' && r.method() === 'GET'),
+Red for the right reason: AC-1 waits for GET /api/v1/providers?npi=... but the console search still calls GET /api/v1/providers/{npi} (MAM-34 lookup); the search by NPI / Medicaid ID / name is MAM-77 (UI) on MAM-37 (back end); the audit panel needs MAM-40. The set-up (J1 API steps) passed.

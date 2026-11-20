@@ -25,7 +25,7 @@ None. This is the first phase.
    - Create or update `.gitignore` with these lines: `.env`, `__pycache__/`, `.pytest_cache/`,
      `modern/kag/.venv/`, `**/build/`, `**/.gradle/`, `**/node_modules/`,
      `modern/web-ui/dist/`.
-   - Commit everything as `chore: baseline legacy estate and agent kit`.
+   - No commit: the user commits only when they say "commit" (rule of 2026-11-18).
    - Create and switch to branch `modernization`.
 5. **Protection check.** These must be **refused** by the permission settings:
    - Try to create the file `source-code/.permcheck`.
@@ -46,7 +46,7 @@ None. This is the first phase.
 7. **Kit check.** Confirm all 11 agents exist in `.claude/agents/` and all 10 skills exist
    in `.claude/skills/*/SKILL.md`, and that every file listed under "Read first" in each
    agent exists or is created in a later phase. List any problem.
-8. Commit: `chore(phase-0): workspace and modern skeleton`.
+8. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Exit checks
 - [ ] The tool table shows everything OK, or the missing tools are listed for the user.

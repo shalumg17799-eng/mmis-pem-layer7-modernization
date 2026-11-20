@@ -1,0 +1,558 @@
+openapi: 3.1.0
+info:
+  title: PEM enrollment-service API
+  version: 1.0.0
+  description: 'enrollment-service (port 8082, database enrollment_db). Replaces: PRVENR01 / PRVDAY01 STEP010. Contract-first; status DRAFT until
+    Phase 3 approval, then 1.0.0.'
+  license:
+    name: Proprietary
+    identifier: LicenseRef-PEM-Proprietary
+servers:
+- url: http://api-gateway:8080
+  description: 'API gateway on the docker compose network (from the host: http://localhost:8080)'
+tags:
+- name: Applications
+  description: Enrolment applications
+- name: Legacy files
+  description: Fixed-width legacy files kept for parity (MODERNIZATION.md rule 3)
+paths:
+  /api/v1/applications:
+    post:
+      operationId: submitApplication
+      summary: Submit an enrolment application (validates E101, E102, E103, E104)
+      tags:
+      - Applications
+      description: 'Roles: PROVIDER, ANALYST. Legacy / decisions: PRVENR01 VALIDATE-APPLICATION; D-001, D-016.'
+      x-roles: &id001
+      - PROVIDER
+      - ANALYST
+      x-legacy: PRVENR01 VALIDATE-APPLICATION; D-001, D-016
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRequest'
+      security:
+      - bearerAuth: *id001
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Business validation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      operationId: listApplications
+      summary: List applications (a PROVIDER sees only their own)
+      tags:
+      - Applications
+      description: 'Roles: PROVIDER, ANALYST, SUPERVISOR. Legacy / decisions: APPERROR review.'
+      x-roles: &id002
+      - PROVIDER
+      - ANALYST
+      - SUPERVISOR
+      x-legacy: APPERROR review
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - SUBMITTED
+          - VALIDATED
+          - REJECTED
+        description: Status
+      - name: npi
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+          examples:
+          - '1003000111'
+        description: NPI
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+        description: Page number (0-based)
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 20
+        description: Page size
+      security:
+      - bearerAuth: *id002
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationPage'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/applications/{applicationId}:
+    get:
+      operationId: getApplication
+      summary: Get one application with its validation errors
+      tags:
+      - Applications
+      description: 'Roles: PROVIDER, ANALYST, SUPERVISOR. Legacy / decisions: PRVENR01.'
+      x-roles: &id003
+      - PROVIDER
+      - ANALYST
+      - SUPERVISOR
+      x-legacy: PRVENR01
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Application id
+      security:
+      - bearerAuth: *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/batch/intake-runs:
+    post:
+      operationId: startIntakeRun
+      summary: Load a legacy APPINPUT file (200-byte records) for a business date
+      tags:
+      - Legacy files
+      description: 'Roles: ADMIN, SYSTEM. Legacy / decisions: PRVDAY01 STEP010; D-017, D-020, D-025.'
+      x-roles: &id004
+      - ADMIN
+      - SYSTEM
+      x-legacy: PRVDAY01 STEP010; D-017, D-020, D-025
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileRunRequest'
+      security:
+      - bearerAuth: *id004
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchRun'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Business validation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/batch/intake-runs/{runId}:
+    get:
+      operationId: getIntakeRun
+      summary: Get an intake run with its read, written, errored and skipped counts
+      tags:
+      - Legacy files
+      description: 'Roles: ADMIN. Legacy / decisions: PRVENR01 TERMINATE-PROGRAM counters.'
+      x-roles: &id005
+      - ADMIN
+      x-legacy: PRVENR01 TERMINATE-PROGRAM counters
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Run id
+      security:
+      - bearerAuth: *id005
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchRun'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/batch/intake-runs/{runId}/error-file:
+    get:
+      operationId: getIntakeErrorFile
+      summary: Download the APPERROR file of a run (250-byte records)
+      tags:
+      - Legacy files
+      description: 'Roles: ADMIN. Legacy / decisions: APPERROR; D-001 one row per invalid application.'
+      x-roles: &id006
+      - ADMIN
+      x-legacy: APPERROR; D-001 one row per invalid application
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Run id
+      security:
+      - bearerAuth: *id006
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: 250-byte APPERROR records
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Keycloak realm pem access token. Role names in each operation's security requirement are realm roles (OpenAPI 3.1 allows role
+        lists for non-OAuth schemes).
+  schemas:
+    Application:
+      type: object
+      required:
+      - applicationId
+      - status
+      - npi
+      - source
+      - submittedAt
+      properties:
+        applicationId: &id007
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - SUBMITTED
+          - VALIDATED
+          - REJECTED
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+          description: Exactly one error per failed check (D-001)
+        npi:
+          type: string
+        medicaidId:
+          type: string
+        providerType:
+          type: string
+        taxonomy:
+          type: string
+        individual:
+          $ref: '#/components/schemas/Individual'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        source:
+          type: string
+          enum:
+          - PORTAL
+          - LEGACY_FILE
+        submittedAt: &id008
+          type: string
+          format: date-time
+    ApplicationPage:
+      type: object
+      required:
+      - items
+      - page
+      - size
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Application'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+    ApplicationRequest:
+      type: object
+      required:
+      - npi
+      - medicaidId
+      - providerType
+      - taxonomy
+      properties:
+        npi:
+          type: string
+          description: 'Validated: present (E101), 10 digits'
+        medicaidId:
+          type: string
+          maxLength: 9
+        providerType:
+          type: string
+          description: IN, GR or FA (E102); feed codes are mapped (D-008)
+        taxonomy:
+          type: string
+          maxLength: 10
+          description: Present (E104)
+        individual:
+          $ref: '#/components/schemas/Individual'
+        organization:
+          $ref: '#/components/schemas/Organization'
+    BatchRun:
+      type: object
+      required:
+      - runId
+      - job
+      - businessDate
+      - status
+      properties:
+        runId: *id007
+        job:
+          type: string
+        businessDate: &id009
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - RUNNING
+          - COMPLETED
+          - FAILED
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+        error:
+          type:
+          - string
+          - 'null'
+          description: Why the run failed (D-024)
+        startedAt: *id008
+        endedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    FieldError:
+      type: object
+      required:
+      - code
+      - field
+      properties:
+        code:
+          type: string
+          enum: &id010
+          - E101
+          - E102
+          - E103
+          - E104
+          - E201
+          - E202
+          - E203
+          - E204
+          - E205
+        field:
+          type: string
+        message:
+          type: string
+    FileRunRequest:
+      type: object
+      required:
+      - file
+      - businessDate
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          description: Legacy fixed-width input file
+        businessDate: *id009
+        batchId:
+          type: string
+          maxLength: 8
+          description: A real job parameter (D-017)
+    Individual:
+      type: object
+      description: PRV-INDIVIDUAL-DATA view of PRV-VARIANT (provider type IN).
+      properties:
+        lastName:
+          type: string
+          maxLength: 30
+        firstName:
+          type: string
+          maxLength: 20
+        licenseNo:
+          type: string
+          maxLength: 15
+        licenseState:
+          type: string
+          minLength: 2
+          maxLength: 2
+    Organization:
+      type: object
+      description: PRV-ORG-DATA view of PRV-VARIANT (provider type GR or FA).
+      properties:
+        legalName:
+          type: string
+          maxLength: 60
+        dbaName:
+          type: string
+          maxLength: 30
+        ownerNpi:
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+          examples:
+          - '1003000111'
+    Problem:
+      type: object
+      description: RFC 7807 problem details. `code` carries a legacy error code (E101-E205) where one applies (D-016).
+      required:
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        code:
+          type: string
+          enum: *id010
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'

@@ -1,0 +1,28 @@
+MAM-36 red run (2026-11-19): ./gradlew --no-daemon --continue :libs:service-kit:test :services:provider-service:test :services:enrollment-service:test
+
+1) libs/service-kit ObservabilityKitTest: compileTestJava FAILED, only the missing class:
+         8 symbol:   class CorrelationIdRecordInterceptor
+
+2) provider-service: 128 tests completed, 2 failed (all others, incl. MAM-17/21/23/27/33/34, passed):
+   ObservabilityTest > [MAM-36 AC-1] health answers 200 UP without a token, with the database and Kafka components UP FAILED
+       java.lang.AssertionError: [kafka health component] 
+       Expecting actual not to be null
+           at gov.medicaid.pem.provider.ObservabilityTest.healthUp(ObservabilityTest.java:78)
+   
+   ObservabilityTest > [MAM-36 AC-4] the correlationId of a consumed ApplicationValidated is in the registration log line and in ProviderRegistered FAILED
+       org.opentest4j.AssertionFailedError: 
+       expected: "mam36-corr-p1"
+        but was: "adb4adae-d671-4222-affb-c0111a5fc1d9"
+           at app//gov.medicaid.pem.provider.ObservabilityTest.correlationIdFollowsTheEvent(ObservabilityTest.java:186)
+   [MAM-36 AC-1] health 503 DOWN while the test Postgres is paused, UP again after: PASSED already (Spring Boot default, kept as a regression test)
+
+3) enrollment-service: 90 tests completed, 1 failed:
+   CorrelationIdTest > [MAM-36 AC-4] an application without X-Correlation-Id gets a generated id in the answer, the log line and ApplicationValidated FAILED
+       java.lang.AssertionError: 
+       Expecting any elements of:
+         []
+       to match given predicate but none did.
+   (the answer header and the ApplicationValidated envelope already carried the generated id; no log line names the application)
+
+Reasons: no CorrelationIdRecordInterceptor (consumers ignore the envelope's correlationId), no Kafka health indicator, no log line for a submission or a registration.
+AC-5 (compose health while a database is stopped) is not in the recorded tests: it waits for Q-099 and needs a database stopped in the running stack.

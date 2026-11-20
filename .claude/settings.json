@@ -23,7 +23,18 @@
       "Write(aws-transform/08-smf-analysis/**)",
       "Read(.env)",
       "Edit(.env)",
-      "Write(.env)"
+      "Write(.env)",
+      "Bash(docker rm:*)",
+      "Bash(docker container rm:*)",
+      "Bash(docker container prune:*)",
+      "Bash(docker system prune:*)",
+      "Bash(docker volume rm:*)",
+      "Bash(docker volume prune:*)",
+      "Bash(docker image rm:*)",
+      "Bash(docker rmi:*)",
+      "Bash(docker network rm:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker kill:*)"
     ]
   }
 }

@@ -41,7 +41,7 @@ Phase 1 is `APPROVED`.
    - In `questions.md`: status `ANSWERED` with the answer, or `DEFERRED` (default used).
    - Add a row to the PROGRESS decisions log for each decision.
    - kag-curator re-runs the Phase 2 loader.
-7. Commit: `docs(phase-2): verified rules, defect register, decisions`.
+7. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Exit checks
 - [ ] 403 rules verified, each with line evidence (or Dropped by decision).

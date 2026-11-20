@@ -1,0 +1,11 @@
+CucumberSuiteTest > Cucumber > Public provider directory search > gov.medicaid.pem.directory.acceptance.CucumberSuiteTest.Filter by provider type FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: 400
+     but was: 200
+        at app//gov.medicaid.pem.directory.acceptance.DirectorySearchSteps.badRequest(DirectorySearchSteps.java:126)
+        at ✽.the search answers 400 problem+json(classpath:features/MAM-63.feature:37)
+
+CucumberSuiteTest > Cucumber > Public provider directory search > gov.medicaid.pem.directory.acceptance.CucumberSuiteTest.Results are paged in a stable order FAILED
+    org.opentest4j.AssertionFailedError: 
+    Expecting actual:
+      ["1003001025",

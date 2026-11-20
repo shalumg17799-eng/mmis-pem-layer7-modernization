@@ -1,0 +1,271 @@
+openapi: 3.1.0
+info:
+  title: PEM risk-service API
+  version: 1.0.0
+  description: 'risk-service (port 8084, database risk_db). Replaces: PRVRSK01 / PRVDAY01 STEP040 (tier only). Contract-first; status DRAFT until
+    Phase 3 approval, then 1.0.0.'
+  license:
+    name: Proprietary
+    identifier: LicenseRef-PEM-Proprietary
+servers:
+- url: http://api-gateway:8080
+  description: 'API gateway on the docker compose network (from the host: http://localhost:8080)'
+tags:
+- name: Risk rules
+  description: Risk-tier rule table
+- name: Risk assessments
+  description: Risk-tier computation
+paths:
+  /api/v1/risk-rules:
+    get:
+      operationId: getRiskRules
+      summary: Get the current risk-tier rule table
+      tags:
+      - Risk rules
+      description: 'Roles: ANALYST, SUPERVISOR, ADMIN. Legacy / decisions: PRVRSK01 EVALUATE; Q-005.'
+      x-roles: &id001
+      - ANALYST
+      - SUPERVISOR
+      - ADMIN
+      x-legacy: PRVRSK01 EVALUATE; Q-005
+      security:
+      - bearerAuth: *id001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskRuleSet'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: replaceRiskRules
+      summary: Replace the risk-tier rule table with a new version
+      tags:
+      - Risk rules
+      description: 'Roles: ADMIN. Legacy / decisions: data-driven table (pem-domain section 3).'
+      x-roles: &id002
+      - ADMIN
+      x-legacy: data-driven table (pem-domain section 3)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskRuleSet'
+      security:
+      - bearerAuth: *id002
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskRuleSet'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Business validation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/risk-assessments:
+    post:
+      operationId: assessRisk
+      summary: Compute the risk tier for a taxonomy (no side effect)
+      tags:
+      - Risk assessments
+      description: 'Roles: ANALYST, SUPERVISOR, SYSTEM. Legacy / decisions: PRVRSK01 CLASSIFY-ONE; D-002.'
+      x-roles: &id003
+      - ANALYST
+      - SUPERVISOR
+      - SYSTEM
+      x-legacy: PRVRSK01 CLASSIFY-ONE; D-002
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskAssessmentRequest'
+      security:
+      - bearerAuth: *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskAssessment'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Keycloak realm pem access token. Role names in each operation's security requirement are realm roles (OpenAPI 3.1 allows role
+        lists for non-OAuth schemes).
+  schemas:
+    FieldError:
+      type: object
+      required:
+      - code
+      - field
+      properties:
+        code:
+          type: string
+          enum: &id004
+          - E101
+          - E102
+          - E103
+          - E104
+          - E201
+          - E202
+          - E203
+          - E204
+          - E205
+        field:
+          type: string
+        message:
+          type: string
+    Problem:
+      type: object
+      description: RFC 7807 problem details. `code` carries a legacy error code (E101-E205) where one applies (D-016).
+      required:
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        code:
+          type: string
+          enum: *id004
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+    RiskAssessment:
+      type: object
+      required:
+      - taxonomy
+      - tier
+      - ruleSetVersion
+      properties:
+        npi: &id005
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+          examples:
+          - '1003000111'
+        taxonomy:
+          type: string
+        tier:
+          type: string
+          enum:
+          - L
+          - M
+          - H
+        ruleSetVersion:
+          type: integer
+        assessedAt:
+          type: string
+          format: date-time
+    RiskAssessmentRequest:
+      type: object
+      required:
+      - taxonomy
+      properties:
+        npi: *id005
+        taxonomy:
+          type: string
+          maxLength: 10
+    RiskRule:
+      type: object
+      required:
+      - taxonomyPrefix
+      - tier
+      properties:
+        taxonomyPrefix:
+          type: string
+          pattern: ^[0-9A-Z]{3}$
+        tier:
+          type: string
+          enum:
+          - L
+          - M
+          - H
+    RiskRuleSet:
+      type: object
+      required:
+      - version
+      - defaultTier
+      - rules
+      description: 'Legacy table: 332, 251 High; 341, 291, 225 Moderate; otherwise Limited (data, not code)'
+      properties:
+        version:
+          type: integer
+        effectiveFrom:
+          type: string
+          format: date
+        defaultTier:
+          type: string
+          enum:
+          - L
+          - M
+          - H
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskRule'

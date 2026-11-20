@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: enrollment-service
+  config:
+    import: classpath:pem-common.yml
+  datasource:
+    url: jdbc:postgresql://${PEM_DB_HOST:localhost}:${PEM_DB_PORT:5433}/enrollment_db
+    username: enrollment_svc
+    password: ${PG_ENROLLMENT_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/enrollment
+server:
+  port: ${PEM_ENROLLMENT_PORT:8082}

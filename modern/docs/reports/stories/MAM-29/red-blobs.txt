@@ -1,0 +1,6 @@
+0a70b13412f885999436567466f546a69c81d08a  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/HelpersTest.java
+57ae9e56d9fca4406b01b02cc3c337f628274756  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/config/PemKitAutoConfigurationTest.java
+31f41b6f39c66d7015f9d4e35d9f7c2c489d7805  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/ProblemHandlerTest.java
+29ae61591562b37aa32ee75a9102618b5eaf95b6  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/ProblemHandlerUnreadableTest.java
+92b15550078dba0eaf1f70885eb59bcb4d26b913  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/UnreadableBodyWebTest.java
+79d62420bee09b20399f6909077cdbfdf15fb646  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayRoutingTest.java

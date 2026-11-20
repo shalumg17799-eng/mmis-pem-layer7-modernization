@@ -1,0 +1,13 @@
+{
+  "story": "MAM-77",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "tests": [
+    "modern/web-ui/tests/console/provider-search.test.tsx",
+    "modern/web-ui/tests/support/search.ts",
+    "modern/web-ui/e2e/console-search.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/features/console/providers/ProviderSearch.tsx"
+  ],
+  "rules": []
+}

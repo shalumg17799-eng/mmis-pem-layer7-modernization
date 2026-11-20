@@ -1,0 +1,192 @@
+{
+  "job": "PRVDAY01",
+  "runId": "20261120-valid-only",
+  "side": "modern",
+  "scenario": "day-valid-only",
+  "businessDate": "2026-11-20",
+  "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
+  "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
+  "startedUtc": "2026-11-20T11:20:49Z",
+  "finishedUtc": "2026-11-20T11:21:25Z",
+  "gateway": "http://localhost:8080",
+  "user": "admin1 (ADMIN)",
+  "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
+  "modernBuild": {
+    "gitHead": "6763144",
+    "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
+    "workingTree": "uncommitted changes of the lead (no commit in this task)"
+  },
+  "memoryPauseSeconds": 0,
+  "runs": [
+    {
+      "step": "PRVENR01 intake",
+      "startPath": "/api/v1/batch/intake-runs",
+      "startHttpStatus": 202,
+      "runId": "f5f6d755-9ac1-45fa-9285-282a79a7ea62",
+      "status": "COMPLETED",
+      "businessDate": "2026-11-20",
+      "counts": {
+        "read": 3,
+        "written": 3,
+        "errored": 0,
+        "skipped": 0
+      },
+      "error": null,
+      "startedAt": "2026-11-20T11:21:13.713692Z",
+      "endedAt": "2026-11-20T11:21:13.779678Z",
+      "job": "PRVENR01"
+    },
+    {
+      "step": "PRVSCR01 screening run",
+      "startPath": "/api/v1/batch/screening-runs",
+      "startHttpStatus": 202,
+      "runId": "b274024e-5661-44d4-a06f-65c6fd606568",
+      "status": "COMPLETED",
+      "businessDate": "2026-11-20",
+      "counts": {
+        "read": 19,
+        "screened": 2,
+        "skipped": 17,
+        "failed": 0
+      },
+      "error": null,
+      "startedAt": "2026-11-20T11:21:19.624181Z",
+      "endedAt": "2026-11-20T11:21:19.792685Z",
+      "job": "PRVSCR01"
+    }
+  ],
+  "flowNotes": [
+    "PRVDAY01 is three programs in sequence on one master; the modern system is event-driven: an accepted application (ApplicationValidated) registers a PENDING provider, which is screened (ProviderRegistered -> INITIAL screening) and tiered (ScreeningCompleted -> RiskTierAssigned) within seconds, before the screening run is started. The export 'after-step010' is therefore taken after those events settled, not between PRVENR01 and PRVSCR01.",
+    "The screening run (PRVSCR01) screens only providers with flag U that have no INITIAL screening yet: here the two seed providers 1005925213 and 1005933068; the new providers were screened by the event before the run, so SCRNOUT holds their rows only if a screening of the run exists.",
+    "D-019: nothing becomes ACTIVE without an analyst approval. The legacy run did not make any new provider ACTIVE (they stay P flag U/P), so no approval was given by hand.",
+    "D-003: the modern system does not reset the due date of every provider on each run; the due date is set at approval.",
+    "STATE WHEN EACH FILE WAS WRITTEN, modern: APPERROR = written by the intake run itself, before any provider of the file was registered. after-step010 = after the intake run and after the events registered the validated applications as PENDING, screened them and tiered the passed ones. SCRNOUT = written by the screening run, which screened only the two seed providers with flag U (1005925213, 1005933068); the screenings of the new providers happened earlier, by events (logs/screenings-of-new-providers.json). after-step040 = after the screening run and the events it caused (screen flag, risk tier).",
+    "STATE WHEN EACH FILE WAS WRITTEN, legacy (golden manifests): APPERROR = STEP010 (the load stopped at the first bad application; only the baseline run). SCRNOUT = STEP030, which screened every provider with flag U in one pass (the 3 new and the 2 seed providers: 20 rows). after-step010 = master right after PRVENR01; after-step040 = master after PRVRSK01 (tier and due date rewritten for every record). The baseline legacy run stopped after STEP010 (RC 4), so it has no SCRNOUT and no tier; the modern baseline run went on through screening and tiering.",
+    "Modern screening verdicts come from the mocked sources (D-005): an application whose licence is unknown to the licence board mock (1006133288, SD20001) fails screening (flag F, no tier); the legacy stubs returned P for everyone.",
+    "SEED PREMISE: the SQL seed holds NULL where provider-master-seed.dat has the due date 99991231 for four providers (1005914035, 1005925213, 1005933068, 1005960046); the export writes an unset date as 00000000, so bytes 43-50 of those four records differ between the modern and the legacy BEFORE file (the other 12 records and all other bytes are equal)."
+  ],
+  "problems": [],
+  "normalised": [
+    "record separator only: the API returns one record per line (LF); the .ascii file holds the same records back to back like the converted golden files; no field is changed"
+  ],
+  "files": [
+    {
+      "path": "before/provider-master.delivered",
+      "role": "provider master export BEFORE (seed state, 16 providers) (as delivered by the API, one record per line)",
+      "bytes": 2095,
+      "sha256": "bd8064301c7cbc40f6c1efdf14ebea7589a1e9d89c89a512366e6ee18e6f2d74"
+    },
+    {
+      "path": "before/provider-master.ascii",
+      "role": "provider master export BEFORE (seed state, 16 providers) (record stream, records back to back)",
+      "bytes": 2080,
+      "sha256": "1544f0905b402d70782793f94fcf3a4f9432f52ca7cf4bdbd599c203dd4ec526",
+      "recordLength": 130,
+      "records": 16,
+      "goldenCounterpart": "before/provider-master.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "inputs/appinput.dat",
+      "role": "input as sent to the legacy run (same bytes)",
+      "bytes": 603,
+      "sha256": "f42a9af137205bde766bc977922e2af75606145a44391228ed432bc348086617",
+      "records": 3,
+      "recordLength": 200,
+      "lineEnds": "LF after every record"
+    },
+    {
+      "path": "after/apperror.delivered",
+      "role": "APPERROR written by the intake run (as delivered by the API, one record per line)",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "after/apperror.ascii",
+      "role": "APPERROR written by the intake run (record stream, records back to back)",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordLength": 250,
+      "records": 0,
+      "goldenCounterpart": "after/apperror.ebcdic.ascii",
+      "deliveredLineEnds": "none (records back to back)",
+      "badRecordLengths": []
+    },
+    {
+      "path": "after/provider-master-after-step010.delivered",
+      "role": "provider master after the intake and the event-driven registration, screening and tiering (the modern system cannot stop between STEP010 and STEP030/040) (as delivered by the API, one record per line)",
+      "bytes": 2488,
+      "sha256": "bc9802e0958c867cd4a71b95b5f8cc0b500189f023fa080a50bebaf90cbd6f90"
+    },
+    {
+      "path": "after/provider-master-after-step010.ascii",
+      "role": "provider master after the intake and the event-driven registration, screening and tiering (the modern system cannot stop between STEP010 and STEP030/040) (record stream, records back to back)",
+      "bytes": 2470,
+      "sha256": "bfc2de65d0166a291286936c2fe23dfc9afb6d2c075faa0750bce571dc53bb25",
+      "recordLength": 130,
+      "records": 19,
+      "goldenCounterpart": "after/provider-master-after-step010.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "after/scrnout.delivered",
+      "role": "SCRNOUT written by the screening run (as delivered by the API, one record per line)",
+      "bytes": 536,
+      "sha256": "525ff457866b4dd3a8237942194815aba4abcd5d98e934c3b66a54eb33065b9d"
+    },
+    {
+      "path": "after/scrnout.ascii",
+      "role": "SCRNOUT written by the screening run (record stream, records back to back)",
+      "bytes": 536,
+      "sha256": "525ff457866b4dd3a8237942194815aba4abcd5d98e934c3b66a54eb33065b9d",
+      "recordLength": 67,
+      "records": 8,
+      "goldenCounterpart": "after/scrnout.ebcdic.ascii",
+      "deliveredLineEnds": "none (records back to back)",
+      "badRecordLengths": []
+    },
+    {
+      "path": "logs/screenings-of-new-providers.json",
+      "role": "GET /api/v1/screenings?npi=... for every provider registered by the intake (screened by events)",
+      "bytes": 4172,
+      "sha256": "25e4b9d24bf4d94d0ebf8e63e20b4858d865d2bdf5d16c37f0a6380c0a5ad700"
+    },
+    {
+      "path": "logs/applications.json",
+      "role": "GET /api/v1/applications after the run: status and error codes of every application",
+      "bytes": 194,
+      "sha256": "6cb2da989bdb9af5796200194614211690958e5ef3ea3dd183972d7e4bb7e0b7"
+    },
+    {
+      "path": "after/provider-master-after-step040.delivered",
+      "role": "provider master after the screening run and the event-driven tiering (final) (as delivered by the API, one record per line)",
+      "bytes": 2488,
+      "sha256": "d890ae8a88ef0f326bb2e1b900b6b1e6ec12c9a1f59ddeff30d12dbf4f92a19e"
+    },
+    {
+      "path": "after/provider-master-after-step040.ascii",
+      "role": "provider master after the screening run and the event-driven tiering (final) (record stream, records back to back)",
+      "bytes": 2470,
+      "sha256": "5632c0ccda2f5bd9eef0b5522036743738c4254fccf2487054983d8c78cc70ca",
+      "recordLength": 130,
+      "records": 19,
+      "goldenCounterpart": "after/provider-master-after-step040.ebcdic.ascii",
+      "deliveredLineEnds": "LF between records",
+      "badRecordLengths": []
+    },
+    {
+      "path": "logs/modern-job-lines.txt",
+      "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
+      "bytes": 3580,
+      "sha256": "5c4de38557e5dc481b5bab1e021490b68ab3d2446847aea3c6af723356f8db70"
+    },
+    {
+      "path": "logs/run-log.txt",
+      "role": "log of this script",
+      "bytes": 1071,
+      "sha256": "3174ee1c6f1e36cd608bcab2a0394a1a991316efdbf9dd63ee61ba273a6be8ee"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "story": "MAM-66",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6"],
+  "tests": [
+    "modern/web-ui/tests/portal/application-status.test.tsx",
+    "modern/web-ui/e2e/portal-status.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/features/portal/applications/ApplicationStatus.tsx",
+    "modern/web-ui/src/shared/api/types.ts"
+  ],
+  "rules": []
+}

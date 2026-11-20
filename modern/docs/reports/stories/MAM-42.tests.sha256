@@ -1,0 +1,10 @@
+aa9bab83e6153ed2a11e1ad5a4c8b71486bc83e8a7e971daced77cd38c892897  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/BadInputTest.java
+cbad9f0fdf85092f7fe86a34957008ae144bddc8797a68bea626ed245512824e  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/DataLayoutsDoc.java
+c5f1c3bf5893dbf66356752751ad270c65fbb5fe467af37fa6f774d9bc15f7fb  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/DateFieldsTest.java
+e09e5726f6f3df3aace3344668db0ce95e83e2aa6f04e7e74f9cb69e96044bff  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/FieldTypesTest.java
+1856b0525f7b448c093eadb264f00869db76c00511a09714811a67c7f2beafb0  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/LayoutFilesTest.java
+682870f35fdd41e88c0f453ebb8dd88e94ae527c5982c6cf83a4ee53f7e62fe9  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/LibraryGateTest.java
+45081c211b65c0ac564fcb99bf4d23f9990d8af25615664b42782b4494b36ec9  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/ProviderMasterLayoutTest.java
+0d0369673f7be08b03ed6ea66d4caa232478bc8b8e34881575763942a3c34ca0  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/ProviderVariantTest.java
+108f480935ba9cd94bae85133b703e87171d6544c123541e768918fefc7626c9  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/RoundTripTest.java
+146bc3ee80d513df4e6295d5c35d0c62e1017a74a03dee82c32104fa514b0c70  modern/libs/fixed-width/src/test/java/gov/medicaid/pem/fixedwidth/Samples.java

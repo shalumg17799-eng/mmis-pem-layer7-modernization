@@ -1,0 +1,537 @@
+openapi: 3.1.0
+info:
+  title: PEM screening-service API
+  version: 1.1.0
+  description: 'screening-service (port 8083, database screening_db). Replaces: PRVSCR01 / PRVDAY01 STEP030. Contract-first; status DRAFT until
+    Phase 3 approval, then 1.0.0. 1.1.0 (2026-11-19, user decision): adds GET /api/v1/batch/screening-runs/{runId} (run status, BatchRun) so the batch jobs page can follow a run to COMPLETED or FAILED; additive.'
+  license:
+    name: Proprietary
+    identifier: LicenseRef-PEM-Proprietary
+servers:
+- url: http://api-gateway:8080
+  description: 'API gateway on the docker compose network (from the host: http://localhost:8080)'
+tags:
+- name: Screenings
+  description: Screening against external sources
+- name: Legacy files
+  description: Fixed-width legacy files kept for parity (MODERNIZATION.md rule 3)
+paths:
+  /api/v1/screenings:
+    get:
+      operationId: listScreenings
+      summary: List screenings with their per-source results
+      tags:
+      - Screenings
+      description: 'Roles: ANALYST, SUPERVISOR, ADMIN. Legacy / decisions: SCRNOUT; D-018.'
+      x-roles: &id001
+      - ANALYST
+      - SUPERVISOR
+      - ADMIN
+      x-legacy: SCRNOUT; D-018
+      parameters:
+      - name: npi
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+          examples:
+          - '1003000111'
+        description: NPI
+      - name: result
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - PASS
+          - FAIL
+        description: Overall result
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+        description: Page number (0-based)
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 20
+        description: Page size
+      security:
+      - bearerAuth: *id001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScreeningPage'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: requestScreening
+      summary: Start a screening of one provider against all sources
+      tags:
+      - Screenings
+      description: 'Roles: ANALYST, SUPERVISOR, SYSTEM. Legacy / decisions: PRVSCR01 SCREEN-ONE-PROVIDER; D-005.'
+      x-roles: &id002
+      - ANALYST
+      - SUPERVISOR
+      - SYSTEM
+      x-legacy: PRVSCR01 SCREEN-ONE-PROVIDER; D-005
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScreeningRequest'
+      security:
+      - bearerAuth: *id002
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/screenings/{screeningId}:
+    get:
+      operationId: getScreening
+      summary: Get one screening
+      tags:
+      - Screenings
+      description: 'Roles: ANALYST, SUPERVISOR, ADMIN. Legacy / decisions: PRVSCR01.'
+      x-roles: &id003
+      - ANALYST
+      - SUPERVISOR
+      - ADMIN
+      x-legacy: PRVSCR01
+      parameters:
+      - name: screeningId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Screening id
+      security:
+      - bearerAuth: *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/batch/screening-runs:
+    post:
+      operationId: startScreeningRun
+      summary: Screen every unscreened provider for a business date (the STEP030 equivalent)
+      tags:
+      - Legacy files
+      description: 'Roles: ADMIN, SYSTEM. Legacy / decisions: PRVDAY01 STEP030.'
+      x-roles: &id004
+      - ADMIN
+      - SYSTEM
+      x-legacy: PRVDAY01 STEP030
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchRunRequest'
+      security:
+      - bearerAuth: *id004
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchRun'
+        '400':
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/batch/screening-runs/{runId}:
+    get:
+      operationId: getScreeningRun
+      summary: Get a screening run with its status, counts and failure reason
+      tags:
+      - Legacy files
+      description: 'Roles: ADMIN. Legacy / decisions: PRVSCR01 counters (MAM-32). Added in 1.1.0 (user decision 2026-11-19): run status for the batch jobs page (MAM-93).'
+      x-roles:
+      - ADMIN
+      x-legacy: PRVSCR01 counters (MAM-32)
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Run id
+      security:
+      - bearerAuth:
+        - ADMIN
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchRun'
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/batch/screening-runs/{runId}/results-file:
+    get:
+      operationId: getScreeningResultsFile
+      summary: Download the SCRNOUT file of a run (67-byte SCRNREC records)
+      tags:
+      - Legacy files
+      description: 'Roles: ADMIN. Legacy / decisions: SCRNOUT.'
+      x-roles: &id005
+      - ADMIN
+      x-legacy: SCRNOUT
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Run id
+      security:
+      - bearerAuth: *id005
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: 67-byte SCRNREC records
+        '401':
+          description: Not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Role not allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Keycloak realm pem access token. Role names in each operation's security requirement are realm roles (OpenAPI 3.1 allows role
+        lists for non-OAuth schemes).
+  schemas:
+    BatchRun:
+      type: object
+      required:
+      - runId
+      - job
+      - businessDate
+      - status
+      properties:
+        runId: &id007
+          type: string
+          format: uuid
+        job:
+          type: string
+        businessDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - RUNNING
+          - COMPLETED
+          - FAILED
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+        error:
+          type:
+          - string
+          - 'null'
+          description: Why the run failed (D-024)
+        startedAt: &id008
+          type: string
+          format: date-time
+        endedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    BatchRunRequest:
+      type: object
+      required:
+      - businessDate
+      properties:
+        businessDate:
+          type: string
+          format: date
+          description: Explicit business date (D-020)
+    FieldError:
+      type: object
+      required:
+      - code
+      - field
+      properties:
+        code:
+          type: string
+          enum: &id006
+          - E101
+          - E102
+          - E103
+          - E104
+          - E201
+          - E202
+          - E203
+          - E204
+          - E205
+        field:
+          type: string
+        message:
+          type: string
+    Problem:
+      type: object
+      description: RFC 7807 problem details. `code` carries a legacy error code (E101-E205) where one applies (D-016).
+      required:
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        code:
+          type: string
+          enum: *id006
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+    Screening:
+      type: object
+      required:
+      - screeningId
+      - npi
+      - reason
+      - status
+      properties:
+        screeningId: *id007
+        npi: &id009
+          type: string
+          pattern: ^[0-9]{10}$
+          description: National Provider Identifier (10 digits), the provider key
+          examples:
+          - '1003000111'
+        reason:
+          type: string
+          enum:
+          - INITIAL
+          - REVALIDATION
+          - MANUAL
+        status:
+          type: string
+          enum:
+          - RUNNING
+          - COMPLETED
+        result:
+          type:
+          - string
+          - 'null'
+          enum:
+          - PASS
+          - FAIL
+          - null
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceResult'
+        startedAt: *id008
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    ScreeningPage:
+      type: object
+      required:
+      - items
+      - page
+      - size
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Screening'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+    ScreeningRequest:
+      type: object
+      required:
+      - npi
+      properties:
+        npi: *id009
+    SourceResult:
+      type: object
+      required:
+      - source
+      - result
+      - verdictAt
+      properties:
+        source:
+          type: string
+          enum:
+          - NPPES
+          - OIGLEIE
+          - SAMGOV
+          - LICBOARD
+          - SSADMF
+        result:
+          type: string
+          enum:
+          - P
+          - F
+          - C
+        verdictAt: *id008
+        detail:
+          type: string
+          maxLength: 60
+        errorCode:
+          type:
+          - string
+          - 'null'
+          enum:
+          - E201
+          - E202
+          - E203
+          - E204
+          - E205
+          - null
+          description: Screening error code when the source fails (D-016)

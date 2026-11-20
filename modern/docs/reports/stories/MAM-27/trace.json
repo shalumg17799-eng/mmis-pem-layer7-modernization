@@ -1,0 +1,68 @@
+{
+  "story": "MAM-27",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/ApprovalSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/DecideProviderTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ApprovalTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-27.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "ApprovalTest: PASSED",
+      "MAM-27.feature 'Approval sets ACTIVE and the revalidation due date, and publishes ProviderStatusChanged': PASSED"
+    ],
+    "AC-2": [
+      "MAM-27.feature 'Approval sets ACTIVE and the revalidation due date, and publishes ProviderStatusChanged': PASSED"
+    ],
+    "AC-3": [
+      "ApprovalTest: PASSED",
+      "DecideProviderTest: PASSED",
+      "MAM-27.feature 'Denial sets DENIED and leaves no due date': PASSED"
+    ],
+    "AC-4": [
+      "ApprovalTest: PASSED",
+      "DecideProviderTest: PASSED",
+      "MAM-27.feature 'Approval needs a passed screening; denial needs a finished one': PASSED"
+    ],
+    "AC-5": [
+      "ApprovalTest: PASSED",
+      "DecideProviderTest: PASSED",
+      "MAM-27.feature 'A decision cannot be taken twice and never resets the due date': PASSED"
+    ],
+    "AC-6": [
+      "DecideProviderTest: PASSED",
+      "MAM-27.feature 'An unknown provider gives 404': PASSED"
+    ],
+    "AC-7": [
+      "MAM-27.feature 'Only ANALYST and SUPERVISOR can decide': PASSED"
+    ],
+    "AC-8": [
+      "MAM-27.feature 'Approval does not wait for the risk tier': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/api/ProviderController.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/DecideProvider.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/DecisionWriter.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/application/ProviderStatusChangedData.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/Approval.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/Decision.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/DecisionRefused.java",
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/infrastructure/JpaProviderChanges.java"
+  ],
+  "rules": [
+    "R-PRVRSK01-ADD-01",
+    "R-PRVRSK01-cbl-00009",
+    "R-PRVRSK01-cbl-00047"
+  ]
+}

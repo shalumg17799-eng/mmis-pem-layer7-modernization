@@ -1,0 +1,24 @@
+{
+  "story": "MAM-74",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "tests": [
+    "modern/web-ui/e2e/journeys/j3-screening-fails.spec.ts"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [],
+    "AC-3": [],
+    "AC-4": [],
+    "AC-5": [],
+    "AC-6": []
+  },
+  "codeUnits": [],
+  "rules": []
+}

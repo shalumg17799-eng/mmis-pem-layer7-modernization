@@ -1,0 +1,89 @@
+{
+  "story": "MAM-25",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/ScreeningSteps.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/ScreenProviderTest.java",
+    "modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/domain/VerdictTest.java",
+    "modern/services/screening-service/src/test/resources/features/MAM-25.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "MAM-25.feature 'All four sources pass: the screening passes': PASSED",
+      "ScreenProviderTest: PASSED",
+      "VerdictTest: PASSED"
+    ],
+    "AC-2": [
+      "MAM-25.feature 'One failing source fails the screening, whichever it is': PASSED",
+      "ScreenProviderTest: PASSED",
+      "VerdictTest: PASSED"
+    ],
+    "AC-3": [
+      "MAM-25.feature 'One stored result per source, with an error code only where one applies': PASSED",
+      "VerdictTest: PASSED"
+    ],
+    "AC-4": [
+      "MAM-25.feature 'Results are kept and never overwritten': PASSED"
+    ],
+    "AC-5": [
+      "MAM-25.feature 'ScreeningCompleted is published for every completed screening': PASSED",
+      "ScreenProviderTest: PASSED"
+    ],
+    "AC-6": [
+      "MAM-25.feature 'Failed screenings can be listed with the failing source': PASSED",
+      "ScreenProviderTest: PASSED"
+    ],
+    "AC-7": [
+      "MAM-25.feature 'One screening can be read, an unknown id is not found': PASSED",
+      "ScreenProviderTest: PASSED"
+    ],
+    "AC-8": [
+      "MAM-25.feature 'Only staff can read screenings': PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/api/ScreeningController.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/EventOutbox.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFacts.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ProviderFactsSource.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ReadScreenings.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreenProvider.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/Screening.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningCompletedData.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningPage.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningSources.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/application/ScreeningStore.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Source.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceResult.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/SourceRules.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/domain/Verdict.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/HttpScreeningSources.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/JdbcScreeningStore.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/KitEventOutbox.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderEventsListener.java",
+    "modern/services/screening-service/src/main/java/gov/medicaid/pem/screening/infrastructure/ProviderServiceClient.java"
+  ],
+  "rules": [
+    "R-PRVSCR01-ADD-02",
+    "R-PRVSCR01-cbl-00010",
+    "R-PRVSCR01-cbl-00030",
+    "R-PRVSCR01-cbl-00031",
+    "R-PRVSCR01-cbl-00035",
+    "R-PRVSCR01-cbl-00036",
+    "R-PRVSCR01-cbl-00037",
+    "R-PRVSCR01-cbl-00040",
+    "R-PRVSCR01-cbl-00041",
+    "R-PRVSCR01-cbl-00042",
+    "R-PRVSCR01-cbl-00044",
+    "R-PRVSCR01-cbl-00045"
+  ]
+}

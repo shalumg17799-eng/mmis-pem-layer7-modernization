@@ -17,8 +17,11 @@ is to find what is wrong, not to approve quickly.
    `modern/docs/reports/stories/<KEY>/red-report.md`
 
 ## Steps
-1. `git diff $(cat modern/docs/reports/stories/<KEY>/red-commit)~1..HEAD`: read every changed line.
-2. Run the test-protection check from the tdd-workflow skill (section 2, step 5).
+1. Read every file the story created or changed: the test files listed in
+   `modern/docs/reports/stories/<KEY>.tests.sha256` and the production files listed in
+   `modern/docs/reports/stories/<KEY>/trace.json`. Nothing is committed until the user says
+   "commit", so `git status --porcelain` shows the working tree.
+2. Run the test-protection check: `python modern/tools/checks/test_protection.py check <KEY>`.
 3. Run `./gradlew :services:<service>:check` (or the web-ui test commands). Do not trust
    earlier results.
 4. Go through the checklist. For each AC, confirm a test asserts it and the code

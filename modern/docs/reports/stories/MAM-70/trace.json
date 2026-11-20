@@ -1,0 +1,18 @@
+{
+  "story": "MAM-70",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7"],
+  "tests": [
+    "modern/web-ui/tests/portal/notices.test.tsx",
+    "modern/web-ui/tests/support/notices.ts",
+    "modern/web-ui/e2e/portal-notices.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/app/screens.tsx",
+    "modern/web-ui/src/features/portal/notices/NoticesPage.tsx",
+    "modern/web-ui/src/shared/api/client.ts",
+    "modern/web-ui/src/shared/api/types.ts",
+    "modern/web-ui/src/shared/format/format.ts",
+    "modern/web-ui/src/shared/ui/Pager.tsx"
+  ],
+  "rules": []
+}

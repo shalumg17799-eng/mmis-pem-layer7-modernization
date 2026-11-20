@@ -1,0 +1,7 @@
+64eb0678439e76f50884e54d352b4eaf0277a988  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/RiskFixtures.java
+28c3ca02421f1d3ae85b4c4824e05b477ddf57c8  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/RuleTableSteps.java
+3f48ddb158436c1452fbe41514afdca54597e772  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/api/RiskRulesApiTest.java
+f7adcf539ad489115100acfdfa86bfb435a28034  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/application/ManageRiskRulesTest.java
+eda277f34aaa7a4f683dedc53be7a6bba5425716  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/domain/RuleTableTest.java
+bc7a46c0be7bb54c61ac1f6026803315f2150f4d  modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/infrastructure/JdbcRiskStoreTest.java
+4ebb300f225496a9bde669228d47b1183743284a  modern/services/risk-service/src/test/resources/features/MAM-38.feature

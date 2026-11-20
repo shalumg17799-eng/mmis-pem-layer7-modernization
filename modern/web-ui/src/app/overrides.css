@@ -1,0 +1,28 @@
+/* Overrides of USWDS for this application. */
+
+/* A badge reads in sentence case ("Validated"), not in the capitals USWDS gives a tag. */
+.usa-tag {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* The main menu on one line: the title takes a row of its own above the menu on a wide screen, the menu items do not wrap. */
+@media (min-width: 64em) {
+  .usa-header--basic .usa-nav-container {
+    flex-wrap: wrap;
+  }
+  .usa-header--basic .usa-navbar {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  .usa-header--basic .usa-nav {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .usa-header--basic .usa-nav__primary {
+    flex-wrap: nowrap;
+  }
+  .usa-header--basic .usa-nav__link span {
+    white-space: nowrap;
+  }
+}

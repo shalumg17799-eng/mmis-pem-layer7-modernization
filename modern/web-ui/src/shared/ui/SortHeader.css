@@ -1,0 +1,12 @@
+/* The sort button inside a column header: dark ink, because USWDS paints the header of a sorted column light blue and the link
+   blue of an unstyled button does not reach the 4.5:1 contrast on it. */
+.pem-sort-button.usa-button--unstyled {
+  color: #1b1b1b;
+  font-weight: 700;
+  text-decoration: none;
+}
+.pem-sort-button.usa-button--unstyled:hover,
+.pem-sort-button.usa-button--unstyled:focus {
+  color: #1b1b1b;
+  text-decoration: underline;
+}

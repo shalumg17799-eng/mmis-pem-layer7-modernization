@@ -1,0 +1,3 @@
+c89e1170a089ab6450b11ae80aa627e4c2306b6b  modern/web-ui/e2e/scaffold-a11y.spec.ts
+d287f7d80ee3c076fa7fa2189ed4361ed4cd2668  modern/web-ui/tests/scaffold.test.tsx
+bb02c60cd055452852c33afe9078e35455935fb0  modern/web-ui/tests/setup.ts

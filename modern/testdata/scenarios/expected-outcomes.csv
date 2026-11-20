@@ -1,0 +1,9 @@
+npi,feed_type,legacy_type,expected_outcome,expected_code,note
+1003000111,IND,IN,PASS,,clean on all four sources
+1003000222,DME,GR,PASS,,clean on all four sources
+1003000333,HOS,FA,PASS,,clean on all four sources
+1003000444,GRP,GR,FAIL,E203,owner 1990000111 is on the LEIE list (test-data/leie.txt)
+1003000555,PT,IN,FAIL,E202,licence PT99900 is EXPIRED on the licence board (test-data/license_board.txt)
+1003000666,IND,IN,NONE,,"no expected outcome yet: QF-14 default A; the screening stories decide how a licence that is not found is classified, then this row is updated"
+1003000777,HOSP,FA,PASS,,clean on all four sources
+1003000888,AMB,FA,PASS,,clean on all four sources

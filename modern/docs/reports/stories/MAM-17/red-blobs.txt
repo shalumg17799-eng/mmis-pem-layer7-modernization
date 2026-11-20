@@ -1,0 +1,4 @@
+d3dee950c11caf44feba15a7e85c3a27bb8edaf3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/RegistrationSteps.java
+be42ff25950210892ad2c2a24dac5edbd14f1da0  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/RegisterProviderTest.java
+df18228d93185d7ea117471efc9d005293bdb8af  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ProviderRegistrationTest.java
+651339fb8b190e3bd13042fe570ebc9cf652cd88  modern/services/provider-service/src/test/resources/features/MAM-17.feature

@@ -1,0 +1,62 @@
+{
+  "story": "MAM-62",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/web-ui/e2e/support/gateway.ts",
+    "modern/web-ui/e2e/support/keycloak.ts",
+    "modern/web-ui/e2e/support/page.ts",
+    "modern/web-ui/e2e/ui-shell.spec.ts",
+    "modern/web-ui/tests/portal/home-applications.test.tsx",
+    "modern/web-ui/tests/portal/home-provider-summary.test.tsx",
+    "modern/web-ui/tests/shell/access-denied.test.tsx",
+    "modern/web-ui/tests/shell/accessibility-structure.test.tsx",
+    "modern/web-ui/tests/shell/menu.test.tsx",
+    "modern/web-ui/tests/shell/sign-in.test.tsx",
+    "modern/web-ui/tests/shell/sign-out-and-session.test.tsx",
+    "modern/web-ui/tests/support/fakeApi.ts",
+    "modern/web-ui/tests/support/fakeOidc.ts",
+    "modern/web-ui/tests/support/fixtures.ts",
+    "modern/web-ui/tests/support/world.tsx"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [],
+    "AC-3": [],
+    "AC-4": [],
+    "AC-5": [],
+    "AC-6": [],
+    "AC-7": []
+  },
+  "codeUnits": [
+    "modern/web-ui/src/app/App.tsx",
+    "modern/web-ui/src/app/AppShell.tsx",
+    "modern/web-ui/src/app/RequireRole.tsx",
+    "modern/web-ui/src/app/pages/AccessDenied.tsx",
+    "modern/web-ui/src/app/pages/Landing.tsx",
+    "modern/web-ui/src/app/pages/Placeholder.tsx",
+    "modern/web-ui/src/app/pages/SignInPages.tsx",
+    "modern/web-ui/src/app/pages/SignedOut.tsx",
+    "modern/web-ui/src/app/screens.tsx",
+    "modern/web-ui/src/features/portal/home/ApplicationsSection.tsx",
+    "modern/web-ui/src/features/portal/home/PortalHome.tsx",
+    "modern/web-ui/src/features/portal/home/ProviderSummary.tsx",
+    "modern/web-ui/src/features/portal/home/queries.ts",
+    "modern/web-ui/src/shared/api/client.ts",
+    "modern/web-ui/src/shared/api/types.ts",
+    "modern/web-ui/src/shared/api/useApi.ts",
+    "modern/web-ui/src/shared/auth/AuthProvider.tsx",
+    "modern/web-ui/src/shared/auth/claims.ts",
+    "modern/web-ui/src/shared/auth/userManager.ts",
+    "modern/web-ui/src/shared/format/format.ts",
+    "modern/web-ui/src/shared/ui/PageHeading.tsx"
+  ],
+  "rules": []
+}

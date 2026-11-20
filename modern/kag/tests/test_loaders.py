@@ -92,6 +92,16 @@ def test_master_ksds_uses_the_130_byte_layout():
     assert ("USES_LAYOUT", "Dataset", "MMPRV.PROVIDER.MASTER.KSDS", "Record", "PRVRECRD:PROVIDER-RECORD") in g.rels
 
 
+def test_analysis_loader_matches_the_analysis_files():
+    g = build("load_09_analysis")
+    assert g.node_counts()["BusinessRule"] == 52          # the added rules; the 403 AWS rules are updated, not created
+    assert sum(1 for k in g.updates if k[0] == "BusinessRule") == 403
+    assert g.node_counts()["Defect"] == 29 and g.node_counts()["Question"] >= 10
+    assert all(p["decision"] in {"FIX", "PRESERVE", "DROP", "REPLACE"} for (l, _), p in g.nodes.items() if l == "Defect")
+    affected = {r[2] for r in g.rels if r[0] == "AFFECTS"}
+    assert affected == {k for (l, k) in g.nodes if l == "Defect"}   # every defect affects something
+
+
 def test_validate_offline_all_checks_match():
     checks = validate.evaluate("offline")
     assert [c["name"] for c in checks if not c["ok"]] == []

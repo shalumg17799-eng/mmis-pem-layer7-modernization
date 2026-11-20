@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work queues - PEM wireframe</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uswds/uswds@3.8.0/dist/css/uswds.min.css"></head>
+<body><a class="usa-skipnav" href="#main">Skip to main content</a>
+<header class="usa-header usa-header--basic"><div class="usa-nav-container"><div class="usa-navbar"><div class="usa-logo"><em class="usa-logo__text">PEM console</em></div></div></div></header>
+<main id="main" class="grid-container margin-y-4"><h1>Work queues</h1>
+<p class="usa-intro">Pending approval (screen PASS), failed screening, revalidation due, rejected applications.</p>
+<table class="usa-table usa-table--borderless"><caption>Pending approval</caption><thead><tr><th scope="col">NPI</th><th scope="col">Name</th><th scope="col">Screened</th><th scope="col">Action</th></tr></thead><tbody><tr><td>1003000333</td><td>SUNSET HOSPICE INC</td><td>Pass (P)</td><td><a class="usa-link" href="console-approval.html">Review</a></td></tr></tbody></table><table class="usa-table usa-table--borderless"><caption>Failed screening</caption><thead><tr><th scope="col">NPI</th><th scope="col">Name</th><th scope="col">Failing source</th></tr></thead><tbody><tr><td>1003000444</td><td>EXCLUDED CLINIC LLC</td><td>OIGLEIE (E203 owner excluded)</td></tr></tbody></table><table class="usa-table usa-table--borderless"><caption>Revalidation due</caption><thead><tr><th scope="col">NPI</th><th scope="col">Due</th><th scope="col">Case</th></tr></thead><tbody><tr><td>1003000222</td><td>02/28/2026</td><td>Due</td></tr></tbody></table>
+<section class="margin-top-6 border-top-1px padding-top-2" aria-label="Wireframe notes"><h2>Wireframe notes (low fidelity, synthetic data)</h2>
+<dl><dt>Route</dt><dd><code>/console/queues</code></dd><dt>Roles</dt><dd>ANALYST, SUPERVISOR</dd>
+<dt>API calls</dt><dd><ul><li><code>GET /api/v1/providers</code></li><li><code>GET /api/v1/revalidations</code></li><li><code>GET /api/v1/applications</code></li></ul></dd><dt>Serves</dt><dd>D-019, D-029; PRVREV01 rules (revalidation-service)</dd></dl></section>
+<p><a class="usa-link" href="index.html">All wireframes</a></p></main></body></html>

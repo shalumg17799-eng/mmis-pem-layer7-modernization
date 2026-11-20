@@ -1,0 +1,27 @@
+{
+  "name": "leie error: X-Pem-Stub: error answers 500",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/leie/exclusions",
+    "headers": {
+      "X-Pem-Stub": {
+        "equalTo": "error"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "OIGLEIE",
+      "error": "stubbed server error"
+    }
+  },
+  "metadata": {
+    "source": "leie",
+    "answer": "error"
+  }
+}

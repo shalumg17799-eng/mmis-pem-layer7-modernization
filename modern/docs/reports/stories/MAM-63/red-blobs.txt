@@ -1,0 +1,3 @@
+953f2e3ad9ebdd8e9c8dd1f1b2499512a579e688  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/acceptance/DirectorySearchSteps.java
+86d997f374e5ac6f2c4fe1d607d779039de950d8  modern/services/directory-service/src/test/java/gov/medicaid/pem/directory/api/DirectoryNameSearchLiteralTest.java
+a2538ab13e39538c6298eb038b921e4629907c4f  modern/services/directory-service/src/test/resources/features/MAM-63.feature

@@ -28,15 +28,15 @@ FORBIDDEN_DATABASES = {"neo4j", "system"}  # the PEM graph lives only in its ded
 BATCH = 500
 
 LOADERS = ["load_01_source", "load_02_dependencies", "load_03_lineage", "load_04_data_dictionary",
-           "load_05_business_rules", "load_06_test_plan", "load_07_anti_patterns", "load_08_missing"]
+           "load_05_business_rules", "load_07_anti_patterns", "load_08_missing", "load_09_analysis"]
+# Disabled 2026-11-19 (Neo4j = legacy context only): load_06_test_plan (TestCase), load_10_architecture, load_11_backlog,
+# load_12_trace. Their data is in modern/docs/traceability/ and the design/backlog files.
 
 # label -> key property (one uniqueness constraint each, see constraints.cypher)
 LABEL_KEYS = {
     "Program": "name", "Paragraph": "id", "Copybook": "name", "Record": "id", "Field": "id", "Dataset": "dsn",
     "Job": "name", "Step": "id", "Transaction": "id", "AntiPattern": "id",
     "BusinessRule": "ruleId", "KeyFunctionality": "id", "Defect": "id", "Question": "id", "Regulation": "id",
-    "Service": "name", "ApiEndpoint": "id", "Event": "type", "Table": "id", "Column": "id", "UiScreen": "id",
-    "Epic": "key", "Story": "key", "AcceptanceCriterion": "id", "TestCase": "id", "CodeUnit": "id", "Decision": "id",
 }
 
 

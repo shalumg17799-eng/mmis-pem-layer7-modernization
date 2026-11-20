@@ -32,7 +32,8 @@ Phase 6 and Phase 7 are `APPROVED`.
      and provider detail
    - compare with `modern/docs/architecture/nfr.md`; anything still marked DEFAULT is
      reported as such
-6. **Traceability.** kag-curator produces `modern/docs/reports/traceability.md`: for
+6. **Traceability.** The orchestrator produces `modern/docs/reports/traceability.md` from
+   `modern/docs/traceability/rule-trace.csv` (never from Neo4j): for
    every non-dropped rule, its story, AC, test(s) and code class(es), plus the test
    result. **Target: zero rules without a passing test.** List any exceptions.
 7. **Runbooks:** `local-run.md`, `operations.md` (jobs, schedules, manual triggers,
@@ -40,7 +41,7 @@ Phase 6 and Phase 7 are `APPROVED`.
 8. **Whole-system review.** code-reviewer reviews cross-cutting concerns: security
    config, error handling consistency, logging and correlation IDs, outbox and
    idempotency, configuration and secrets.
-9. Commit: `chore(phase-8): e2e, hardening, traceability`.
+9. No commit: the user commits only when they say "commit" (rule of 2026-11-18).
 
 ## Exit checks
 - [ ] All journeys pass 3 runs in a row.

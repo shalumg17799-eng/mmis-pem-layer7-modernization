@@ -1,0 +1,29 @@
+{
+  "name": "ssa-dmf hit: fabricated deceased NPI",
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/ssa-dmf/deaths",
+    "queryParameters": {
+      "npi": {
+        "equalTo": "1005999028"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "SSADMF",
+      "npi": "1005999028",
+      "deceased": true,
+      "dateOfDeath": "2025-08-01"
+    }
+  },
+  "metadata": {
+    "source": "ssa-dmf",
+    "answer": "hit"
+  }
+}

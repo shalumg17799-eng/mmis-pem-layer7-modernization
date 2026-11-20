@@ -1,0 +1,103 @@
+{
+  "story": "MAM-35",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/IntegrationTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/PlatformChecksTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/CucumberSpringConfig.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/CucumberSuiteTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/acceptance/RiskSteps.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/application/AssessRiskTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/domain/RuleSetTest.java",
+    "modern/services/risk-service/src/test/java/gov/medicaid/pem/risk/infrastructure/ScreeningEventsCorrelationIdTest.java",
+    "modern/services/risk-service/src/test/resources/features/MAM-35.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "AssessRiskTest: PASSED",
+      "MAM-35.feature 'A passed screening gets a risk tier, which is announced for saving': PASSED"
+    ],
+    "AC-2": [
+      "AssessRiskTest: PASSED",
+      "MAM-35.feature 'Prefixes 332 and 251 are High, 341, 291 and 225 Moderate, every other prefix Limited': PASSED"
+    ],
+    "AC-3": [
+      "MAM-35.feature 'Prefixes 332 and 251 are High, 341, 291 and 225 Moderate, every other prefix Limited': PASSED"
+    ],
+    "AC-4": [
+      "MAM-35.feature 'Prefixes 332 and 251 are High, 341, 291 and 225 Moderate, every other prefix Limited': PASSED",
+      "RuleSetTest: PASSED"
+    ],
+    "AC-5": [
+      "MAM-35.feature 'Each assessment carries exactly one tier, and a later passed screening is assessed again': PASSED"
+    ],
+    "AC-6": [
+      "AssessRiskTest: PASSED",
+      "MAM-35.feature 'A failed screening gets no tier': PASSED"
+    ],
+    "AC-7": [
+      "MAM-35.feature 'Every passed screening is classified exactly once': PASSED"
+    ],
+    "AC-8": [
+      "MAM-35.feature 'A failure to save is not silent, and assignments are counted': PASSED",
+      "ScreeningEventsCorrelationIdTest: PASSED (35 tests, code review round 1: a crafted correlation id is safe in the log, in the outbox and in the MDC)"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/AssessRisk.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/Assessments.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/RiskTierAssignedData.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/RuleSets.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/application/TierMetrics.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/domain/RuleSet.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/infrastructure/JdbcRiskStore.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/infrastructure/RiskAdapters.java",
+    "modern/services/risk-service/src/main/java/gov/medicaid/pem/risk/infrastructure/ScreeningEventsListener.java",
+    "modern/services/risk-service/src/main/resources/db/migration/risk/V2__legacy_rule_set.sql"
+  ],
+  "rules": [
+    "R-PRVRSK01-ADD-04",
+    "R-PRVRSK01-ADD-05",
+    "R-PRVRSK01-ADD-06",
+    "R-PRVRSK01-ADD-07",
+    "R-PRVRSK01-cbl-00001",
+    "R-PRVRSK01-cbl-00002",
+    "R-PRVRSK01-cbl-00004",
+    "R-PRVRSK01-cbl-00005",
+    "R-PRVRSK01-cbl-00006",
+    "R-PRVRSK01-cbl-00007",
+    "R-PRVRSK01-cbl-00011",
+    "R-PRVRSK01-cbl-00012",
+    "R-PRVRSK01-cbl-00013",
+    "R-PRVRSK01-cbl-00014",
+    "R-PRVRSK01-cbl-00015",
+    "R-PRVRSK01-cbl-00016",
+    "R-PRVRSK01-cbl-00017",
+    "R-PRVRSK01-cbl-00022",
+    "R-PRVRSK01-cbl-00023",
+    "R-PRVRSK01-cbl-00024",
+    "R-PRVRSK01-cbl-00025",
+    "R-PRVRSK01-cbl-00026",
+    "R-PRVRSK01-cbl-00027",
+    "R-PRVRSK01-cbl-00028",
+    "R-PRVRSK01-cbl-00029",
+    "R-PRVRSK01-cbl-00030",
+    "R-PRVRSK01-cbl-00031",
+    "R-PRVRSK01-cbl-00032",
+    "R-PRVRSK01-cbl-00033",
+    "R-PRVRSK01-cbl-00034",
+    "R-PRVRSK01-cbl-00035",
+    "R-PRVRSK01-cbl-00036",
+    "R-PRVRSK01-cbl-00037",
+    "R-PRVRSK01-cbl-00038"
+  ]
+}

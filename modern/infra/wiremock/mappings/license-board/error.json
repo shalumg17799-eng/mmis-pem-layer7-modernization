@@ -1,0 +1,27 @@
+{
+  "name": "license-board error: X-Pem-Stub: error answers 500",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/license-board/licenses",
+    "headers": {
+      "X-Pem-Stub": {
+        "equalTo": "error"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "LICBOARD",
+      "error": "stubbed server error"
+    }
+  },
+  "metadata": {
+    "source": "license-board",
+    "answer": "error"
+  }
+}

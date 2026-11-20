@@ -1,0 +1,10 @@
+/* An empty list or page: a calm grey panel with a strong left edge, dark ink on #f0f0f0 (15:1), never colour alone (the first line says it). */
+.pem-empty-state {
+  background-color: #f0f0f0;
+  border-left: 0.5rem solid #71767a;
+  margin: 1rem 0;
+  padding: 1rem 1.5rem;
+}
+.pem-empty-state > :last-child {
+  margin-bottom: 0;
+}

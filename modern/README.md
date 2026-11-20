@@ -14,7 +14,7 @@ Everything created for the PEM modernization lives here. The legacy estate in `s
 | `docs/ux/wireframes/` | Low-fidelity USWDS wireframes |
 | `docs/backlog/` | Draft and approved Jira backlog |
 | `docs/reports/` | One report per phase and per service or UI area |
-| `docs/reports/stories/<KEY>/` | Everything about one story: its report, `red-report.md`, `red-commit`, `trace.json` (no hidden temp folder) |
+| `docs/reports/stories/<KEY>/` | Everything about one story: `red-report.md`, `red-blobs.txt` (restore copies of the red tests), `trace.json`; next to it `<KEY>.md` (the story report) and `<KEY>.tests.sha256` (test-protection hashes) |
 | `docs/runbooks/` | How to run, operate and troubleshoot the system |
 | `kag/` | Neo4j knowledge graph: constraints, validation, loader runner |
 | `kag/loaders/` | Python loader scripts (`load_<nn>_<what>.py`), the only writers to Neo4j |

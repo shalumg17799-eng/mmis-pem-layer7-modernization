@@ -1,0 +1,18 @@
+{
+  "story": "MAM-90",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "tests": [
+    "modern/web-ui/tests/console/sanction.test.tsx",
+    "modern/web-ui/tests/support/sanction.ts",
+    "modern/web-ui/e2e/console-sanction.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/app/screens.tsx",
+    "modern/web-ui/src/features/console/sanction/SanctionPage.tsx",
+    "modern/web-ui/src/features/console/sanction/sanctionForm.ts",
+    "modern/web-ui/src/features/console/providers/ProviderDetail.tsx",
+    "modern/web-ui/src/features/console/providers/panels/SanctionTable.tsx",
+    "modern/web-ui/src/features/console/providers/panels/DetailPanels.tsx"
+  ],
+  "rules": []
+}

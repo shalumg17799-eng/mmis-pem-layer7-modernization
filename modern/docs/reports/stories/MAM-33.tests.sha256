@@ -1,0 +1,4 @@
+1c9ec537085a414c4135c1a94ea05b6352297cba9d446669185abbe13f0532d7  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/StatusChangeSteps.java
+8180ed6374a9cea9114c302c8fd110619aee0a1d7f2707f517ac45b8c4b1f9ef  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/ChangeProviderStatusTest.java
+9956aeadca2aa5f7174c4a0abca7ffa67accb7a068c6b775cce009e76d84f048  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/StatusActionTest.java
+20fc70dc6bed4194d7cce28622a913e41a4c9c852d693f97e9fc6979df39d7f3  modern/services/provider-service/src/test/resources/features/MAM-33.feature

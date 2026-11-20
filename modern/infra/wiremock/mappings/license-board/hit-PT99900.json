@@ -1,0 +1,34 @@
+{
+  "name": "license-board hit: PT99900 / TX EXPIRED (license_board.txt)",
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/license-board/licenses",
+    "queryParameters": {
+      "licenseNo": {
+        "equalTo": "PT99900"
+      },
+      "state": {
+        "equalTo": "TX"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "source": "LICBOARD",
+      "licenseNo": "PT99900",
+      "state": "TX",
+      "found": true,
+      "status": "EXPIRED",
+      "expiry": "2024-01"
+    }
+  },
+  "metadata": {
+    "source": "license-board",
+    "answer": "hit"
+  }
+}

@@ -1,0 +1,9 @@
+35f738e51c9a36d1c1efe7793bb033deb76215b4  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/IntegrationTest.java
+d1b0bb413d9a2b83fba35fe47a6f730d5dfab7bc  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/PlatformChecksTest.java
+14e5665f7e0fc6d05666abab5820063c8b20059f  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/TestSources.java
+ea788dec676e236982c8cb390c42c2154a4df164  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/CucumberSpringConfig.java
+b03ebff939d0b2eb5a77646beabed7c7730a12b9  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/CucumberSuiteTest.java
+dafd56393e21586afce46e4159abc5115abbfdf5  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/acceptance/ScreeningSteps.java
+05519214dddff0d921e8375bb7a4bbf9941d54cf  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/ScreenProviderTest.java
+1dbf32663f3c502c4b2db69bd58b3fc7182b4143  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/domain/SourceRulesTest.java
+57525767f8d8a34b062853dcd35528b2c2e05172  modern/services/screening-service/src/test/resources/features/MAM-18.feature

@@ -1,0 +1,18 @@
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:23: error: cannot find symbol
+  symbol:   class NoticeLog
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:45: error: cannot find symbol
+  symbol:   class ListNotices
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:24: error: cannot find symbol
+  symbol:   class NoticeLog
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:26: error: cannot find symbol
+  symbol: class NoticePage
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:25: error: method does not override or implement a method from a supertype
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:30: error: cannot find symbol
+  symbol: class NoticePage
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:32: error: cannot find symbol
+  symbol: class NoticeView
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:39: error: method does not override or implement a method from a supertype
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:45: error: cannot find symbol
+  symbol:   class ListNotices
+C:\Users\ks519\Downloads\Medco-Transform\modern\services\notification-service\src\test\java\gov\medicaid\pem\notification\application\ListNoticesTest.java:59: error: cannot find symbol
+  symbol:   class NoticePage

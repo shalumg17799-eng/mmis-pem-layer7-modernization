@@ -1,0 +1,4 @@
+{
+  "GHSA-j9f9-w8pj-32f8": "Not exploitable here: the defect needs Server-Sent Events with view fragments; no PEM service uses SSE or view rendering (REST/JSON only; no SseEmitter, text/event-stream or view resolver under services/*/src/main and libs/*/src/main, checked 2026-11-20). No fix exists in the 6.2 line (last affected 6.2.19, the version in use; fixed only in 7.0.9, which needs Spring Boot 4). Revisit with the move to Boot 4 (Q-122).",
+  "GHSA-pc63-qcmh-9cmg": "Not exploitable here: the defect needs XsltView with a /** mapping that renders views; no PEM service uses XsltView or any view rendering (checked 2026-11-20). No fix exists in the 6.2 line (fixed only in 7.0.9). Revisit with the move to Boot 4 (Q-122)."
+}

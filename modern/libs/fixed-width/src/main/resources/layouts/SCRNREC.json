@@ -1,0 +1,44 @@
+{
+  "name": "SCRNREC",
+  "source": "SCRNREC:SCREENING-RECORD",
+  "length": 67,
+  "readQuery": "MATCH (r:Record {id: 'SCRNREC:SCREENING-RECORD'}) OPTIONAL MATCH (r)-[:HAS_FIELD]->(f:Field) RETURN r.name AS recordName, r.length AS recordLength, f.name AS name, f.level AS level, f.pic AS pic, f.start AS start, f.length AS length, f.group AS isGroup, f.line AS line ORDER BY f.line",
+  "discriminator": null,
+  "fields": [
+    {
+      "name": "SCR-NPI",
+      "start": 1,
+      "length": 10,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "SCR-SOURCE",
+      "start": 11,
+      "length": 8,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "SCR-RESULT",
+      "start": 19,
+      "length": 1,
+      "type": "ALPHANUMERIC",
+      "views": []
+    },
+    {
+      "name": "SCR-VERDICT-DATE",
+      "start": 20,
+      "length": 8,
+      "type": "DATE_CCYYMMDD",
+      "views": []
+    },
+    {
+      "name": "SCR-DETAIL",
+      "start": 28,
+      "length": 40,
+      "type": "ALPHANUMERIC",
+      "views": []
+    }
+  ]
+}

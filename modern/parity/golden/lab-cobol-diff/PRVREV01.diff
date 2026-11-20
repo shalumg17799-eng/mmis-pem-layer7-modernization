@@ -1,0 +1,226 @@
+--- source-code/BATCH/PRVREV01.cbl (cols 1-72)
++++ lab PRVREV01 (compiled, PRVBLD01 job 154)
+@@ -2 +2 @@
+-      * PROGRAM:  PRVREV01                                             *
++      * PROGRAM:  PRVREV01  (TK5 / OS ANS COBOL V2 LAB PORT)           *
+@@ -6 +6,2 @@
+-      * CALLED BY: PRVMTH01 JOB (STEP010)                            *
++      * CALLED BY: PRVMTH01 JOB (STEP010)                              *
++      * ORIGINAL: source-code/BATCH/PRVREV01.cbl.                      *
+@@ -8,6 +9,2 @@
+-      * NOTE: This is point-in-time, month-end only. It inherits the    
+-      *   2-digit-year due-date defect from PRVRSK01 (a provider whose  
+-      *   due year wrapped past 2070 mis-sorts here too). The modern    
+-      *   revalidation service replaces this with CONTINUOUS monitoring 
+-      *   (re-screen the day a new LEIE/licence event arrives, not at   
+-      *   the next month-end batch).                                    
++      * NOTE: Point-in-time, month-end only. Inherits the 2-digit-year *
++      *   due-date defect from PRVRSK01.                               *
+@@ -19 +15,0 @@
+-
+@@ -22,3 +18,2 @@
+-       SOURCE-COMPUTER. IBM-3090.
+-       OBJECT-COMPUTER. IBM-3090.
+-
++       SOURCE-COMPUTER. IBM-370.
++       OBJECT-COMPUTER. IBM-370.
+@@ -28,6 +23,3 @@
+-               ASSIGN TO PRVMSTR
+-               ORGANIZATION IS INDEXED
+-               ACCESS MODE IS DYNAMIC
+-               RECORD KEY IS PRV-NPI
+-               FILE STATUS IS WS-PRV-STATUS.
+-
++               ASSIGN TO DA-I-PRVMSTR
++               ACCESS MODE IS SEQUENTIAL
++               RECORD KEY IS PRV-NPI OF PRV-MASTER-RECORD.
+@@ -35,4 +27 @@
+-               ASSIGN TO REVALQ
+-               ORGANIZATION IS SEQUENTIAL
+-               FILE STATUS IS WS-REV-STATUS.
+-
++               ASSIGN TO UT-S-REVALQ.
+@@ -42 +31,4 @@
+-           RECORD CONTAINS 121 CHARACTERS.
++           RECORDING MODE IS F
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 10 RECORDS
++           RECORD CONTAINS 130 CHARACTERS.
+@@ -44,2 +36,48 @@
+-           COPY PRVRECRD.
+-
++      *    PRVRECRD - PROVIDER MASTER RECORD (130 BYTES) - FLATTENED.
++      *    (LEGACY RECORD CONTAINS 121 IS WRONG: THIS LAYOUT IS 130.)
++           05  PRV-NPI                 PIC X(10).
++           05  PRV-MEDICAID-ID         PIC X(09).
++           05  PRV-TYPE-CODE           PIC X(02).
++               88  PRV-INDIVIDUAL      VALUE 'IN'.
++               88  PRV-GROUP           VALUE 'GR'.
++               88  PRV-FACILITY        VALUE 'FA'.
++           05  PRV-TAXONOMY            PIC X(10).
++           05  PRV-TAXONOMY-R REDEFINES PRV-TAXONOMY.
++               10  PRV-TAX-GRP         PIC X(03).
++               10  FILLER              PIC X(07).
++           05  PRV-RISK-TIER           PIC X(01).
++               88  PRV-RISK-LIMITED    VALUE 'L'.
++               88  PRV-RISK-MODERATE   VALUE 'M'.   2
++               88  PRV-RISK-HIGH       VALUE 'H'.
++           05  PRV-ENROLL-STATUS       PIC X(01).
++               88  PRV-PENDING         VALUE 'P'.
++               88  PRV-ACTIVE          VALUE 'A'.
++               88  PRV-TERMINATED      VALUE 'T'.
++               88  PRV-DENIED          VALUE 'D'.
++           05  PRV-SCREEN-FLAG         PIC X(01).
++               88  PRV-UNSCREENED      VALUE 'U'.
++               88  PRV-SCREEN-PASS     VALUE 'P'.
++               88  PRV-SCREEN-FAIL     VALUE 'F'.
++           05  PRV-EFFECTIVE-DATE      PIC 9(08).
++           05  PRV-EFFECTIVE-DATE-R REDEFINES PRV-EFFECTIVE-DATE.
++               10  PRV-EFF-CC          PIC 9(02).
++               10  PRV-EFF-YY          PIC 9(02).
++               10  PRV-EFF-MMDD        PIC 9(04).
++           05  PRV-REVAL-DUE-DATE      PIC 9(08).
++           05  PRV-VARIANT             PIC X(80).
++      *    --- Individual provider view of PRV-VARIANT ---
++           05  PRV-INDIVIDUAL-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LAST-NAME       PIC X(30).
++               10  PRV-FIRST-NAME      PIC X(20).
++               10  PRV-LICENSE-NO      PIC X(15).
++               10  PRV-LICENSE-STATE   PIC X(02).
++               10  FILLER              PIC X(13).
++      *    --- Group / Facility view of the SAME 80 bytes ---
++           05  PRV-ORG-DATA REDEFINES PRV-VARIANT.
++               10  PRV-LEGAL-NAME      PIC X(40).
++               10  PRV-DBA-NAME        PIC X(30).
++               10  PRV-OWNER-NPI       PIC X(10).
++      *    --- port helper: replaces reference modification (1:60) ---
++           05  PRV-VARIANT-HEAD REDEFINES PRV-VARIANT.
++               10  PRV-VARIANT-60      PIC X(60).
++               10  FILLER              PIC X(20).
+@@ -47,0 +86,2 @@
++           LABEL RECORDS ARE STANDARD
++           BLOCK CONTAINS 0 RECORDS
+@@ -54 +93,0 @@
+-
+@@ -56,3 +95,50 @@
+-           COPY WRKSTORE.
+-       01  WS-PRV-STATUS               PIC X(2).
+-       01  WS-REV-STATUS               PIC X(2).
++      *    WRKSTORE - STANDARD WORKING STORAGE (NESTED COPYBOOK)
++      *    LEGACY: INCLUDES BOTH SCRNREC AND ERRCODES.  KEPT NESTED.
++       01  WS-STANDARD-WORK.
++           05  WS-PROGRAM-ID           PIC X(08).
++           05  WS-END-OF-FILE-FLAG     PIC X(01) VALUE 'N'.
++               88  WS-END-OF-FILE      VALUE 'Y'.
++           05  WS-FILE-STATUS          PIC X(02) VALUE '00'.
++               88  WS-FS-OK            VALUE '00'.
++               88  WS-FS-EOF           VALUE '10'.
++               88  WS-FS-DUP           VALUE '22'.
++           05  WS-RECORDS-READ         PIC 9(07) VALUE ZERO.   3
++           05  WS-RECORDS-WRITTEN      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-SKIPPED      PIC 9(07) VALUE ZERO.
++           05  WS-RECORDS-ERRORED      PIC 9(07) VALUE ZERO.
++      *    --- NESTED COPYBOOKS (the anti-pattern) ---
++       01  SCREENING-RECORD.
++      *    SCRNREC - SCREENING / VERIFICATION RESULT RECORD (67 BYTES)
++           05  SCR-NPI                 PIC X(10).
++           05  SCR-SOURCE              PIC X(08).
++               88  SCR-NPPES           VALUE 'NPPES'.
++               88  SCR-LEIE            VALUE 'OIGLEIE'.
++               88  SCR-SAM             VALUE 'SAMGOV'.
++               88  SCR-LICENSE         VALUE 'LICBOARD'.
++               88  SCR-DMF             VALUE 'SSADMF'.
++               88  SCR-PECOS           VALUE 'PECOS'.
++           05  SCR-RESULT              PIC X(01).
++               88  SCR-PASS            VALUE 'P'.
++               88  SCR-FAIL            VALUE 'F'.
++               88  SCR-COND            VALUE 'C'.
++           05  SCR-VERDICT-DATE        PIC 9(08).
++           05  SCR-DETAIL              PIC X(40).
++       01  ERROR-CODES.
++      *    ERRCODES - SHARED ENROLLMENT/SCREENING ERROR CODES
++           05  EC-OK                   PIC X(04) VALUE '0000'.
++           05  EC-MISSING-NPI          PIC X(04) VALUE 'E101'.
++           05  EC-INVALID-TYPE         PIC X(04) VALUE 'E102'.
++           05  EC-DUP-NPI              PIC X(04) VALUE 'E103'.
++           05  EC-MISSING-TAXONOMY     PIC X(04) VALUE 'E104'.
++           05  EC-EXCLUDED             PIC X(04) VALUE 'E201'.
++           05  EC-LICENSE-EXPIRED      PIC X(04) VALUE 'E202'.
++           05  EC-OWNER-EXCLUDED       PIC X(04) VALUE 'E203'.
++           05  EC-DECEASED             PIC X(04) VALUE 'E204'.
++           05  EC-DEBARRED             PIC X(04) VALUE 'E205'.
++      *    MVS CURRENT-DATE IS 'MM/DD/YY' (2-DIGIT YEAR ONLY)
++       01  WS-CUR-DATE-RAW.
++           05  WS-RAW-MM               PIC 9(02).
++           05  FILLER                  PIC X(01).
++           05  WS-RAW-DD               PIC 9(02).
++           05  FILLER                  PIC X(01).
++           05  WS-RAW-YY               PIC 9(02).
+@@ -59,0 +146,4 @@
++       01  WS-TODAY-R REDEFINES WS-TODAY.
++           05  WS-TODAY-CC             PIC 9(02).
++           05  WS-TODAY-YY             PIC 9(02).
++           05  WS-TODAY-MMDD           PIC 9(04).
+@@ -61 +150,0 @@
+-
+@@ -64,9 +153,9 @@
+-           MOVE 'PRVREV01' TO WS-PROGRAM-ID
+-           ACCEPT WS-TODAY FROM DATE YYYYMMDD
+-           OPEN INPUT  PRV-MASTER-FILE
+-           OPEN OUTPUT REVAL-OUT-FILE
+-           MOVE 'N' TO WS-END-OF-FILE-FLAG
+-           PERFORM CHECK-NEXT UNTIL WS-END-OF-FILE
+-           CLOSE PRV-MASTER-FILE REVAL-OUT-FILE
+-           DISPLAY 'PRVREV01: PROVIDERS QUEUED FOR REVAL='
+-                   WS-REVAL-COUNT
++           MOVE 'PRVREV01' TO WS-PROGRAM-ID.
++           PERFORM GET-TODAY.
++           OPEN INPUT  PRV-MASTER-FILE.
++           OPEN OUTPUT REVAL-OUT-FILE.
++           MOVE 'N' TO WS-END-OF-FILE-FLAG.
++           PERFORM CHECK-NEXT UNTIL WS-END-OF-FILE.
++           CLOSE PRV-MASTER-FILE REVAL-OUT-FILE.
++           DISPLAY 'PRVREV01: PROVIDERS QUEUED FOR REVAL='   4
++                   WS-REVAL-COUNT.
+@@ -74 +163,9 @@
+-
++      *    LAB: REPLACES ACCEPT ... FROM DATE YYYYMMDD (NOT IN V2)
++       GET-TODAY.
++           MOVE CURRENT-DATE TO WS-CUR-DATE-RAW.
++           IF WS-RAW-YY < 70
++               MOVE 20 TO WS-TODAY-CC
++           ELSE
++               MOVE 19 TO WS-TODAY-CC.
++           MOVE WS-RAW-YY TO WS-TODAY-YY.
++           COMPUTE WS-TODAY-MMDD = (WS-RAW-MM * 100) + WS-RAW-DD.
+@@ -76,2 +173,3 @@
+-           READ PRV-MASTER-FILE NEXT RECORD
+-           MOVE WS-PRV-STATUS TO WS-FILE-STATUS
++           MOVE '00' TO WS-FILE-STATUS.
++           READ PRV-MASTER-FILE
++               AT END MOVE '10' TO WS-FILE-STATUS.
+@@ -79 +177 @@
+-               SET WS-END-OF-FILE TO TRUE
++               MOVE 'Y' TO WS-END-OF-FILE-FLAG
+@@ -83,5 +181,2 @@
+-                                                  <= WS-TODAY
+-                   PERFORM QUEUE-FOR-REVAL
+-               END-IF
+-           END-IF.
+-
++                                       NOT GREATER THAN WS-TODAY
++                   PERFORM QUEUE-FOR-REVAL.
+@@ -89 +184,3 @@
+-           MOVE PRV-NPI OF PRV-MASTER-RECORD          TO REV-NPI
++      *    LAB: BLANK THE RECORD FOR EVERY ROW (QSAM BUFFER SLOTS).
++           MOVE SPACES TO REVAL-OUT-RECORD.
++           MOVE PRV-NPI OF PRV-MASTER-RECORD          TO REV-NPI.
+@@ -91,4 +188,4 @@
+-                                                      TO REV-DUE-DATE
+-           MOVE 'RESCREEN-REQUIRED'                   TO REV-ACTION
+-           WRITE REVAL-OUT-RECORD
+-           ADD 1 TO WS-REVAL-COUNT.
++                                                      TO REV-DUE-DATE.
++           MOVE 'RESCREEN-REQUIRED'                   TO REV-ACTION.
++           WRITE REVAL-OUT-RECORD.
++           ADD 1 TO WS-REVAL-COUNT.   5

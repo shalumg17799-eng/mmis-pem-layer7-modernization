@@ -1,0 +1,5 @@
+/* The error summary gets the keyboard focus when it appears: the focus must be visible (WCAG 2.4.7). 2491ff is the USWDS focus colour. */
+.pem-error-summary:focus {
+  outline: 0.25rem solid #2491ff;
+  outline-offset: 0.25rem;
+}

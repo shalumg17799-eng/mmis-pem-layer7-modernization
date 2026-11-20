@@ -1,0 +1,18 @@
+{
+  "story": "MAM-93",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "tests": [
+    "modern/web-ui/tests/admin/batch-jobs.test.tsx",
+    "modern/web-ui/tests/support/batch.ts",
+    "modern/web-ui/e2e/admin-jobs.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/app/screens.tsx",
+    "modern/web-ui/src/features/console/admin/jobs/JobsPage.tsx",
+    "modern/web-ui/src/features/console/admin/jobs/jobs.ts",
+    "modern/web-ui/src/shared/api/client.ts",
+    "modern/web-ui/src/shared/format/dates.ts",
+    "modern/web-ui/src/features/console/sanction/sanctionForm.ts"
+  ],
+  "rules": []
+}

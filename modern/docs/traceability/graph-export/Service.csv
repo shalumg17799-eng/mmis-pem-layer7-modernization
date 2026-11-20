@@ -1,0 +1,12 @@
+name,database,loadedAt,loader,port,source
+api-gateway,none,2026-11-18T13:32:37+00:00,load_10_architecture.py,8080,architect
+directory-service,directory_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8088,architect
+enrollment-service,enrollment_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8082,architect
+notification-service,notification_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8087,architect
+provider-service,provider_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8081,architect
+revalidation-service,revalidation_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8085,architect
+risk-service,risk_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8084,architect
+sanctions-service,sanctions_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8086,architect
+screening-service,screening_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8083,architect
+tmsis-service,tmsis_db,2026-11-18T13:32:37+00:00,load_10_architecture.py,8089,architect
+web-ui,none,2026-11-18T13:32:37+00:00,load_10_architecture.py,5173,architect

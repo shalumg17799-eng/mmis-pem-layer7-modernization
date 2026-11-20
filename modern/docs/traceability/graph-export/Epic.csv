@@ -1,0 +1,16 @@
+key,area,loadedAt,loader,source,title
+MAM-1,platform,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,Platform and CI
+MAM-10,directory-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,directory-service
+MAM-11,tmsis-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,tmsis-service
+MAM-12,web-ui,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,Web UI portal
+MAM-13,web-ui,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,Web UI console
+MAM-14,e2e,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,End-to-end and hardening
+MAM-15,parity,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,Parity (deferred)
+MAM-2,data,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,Synthetic data and legacy formats
+MAM-3,provider-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,provider-service
+MAM-4,enrollment-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,enrollment-service
+MAM-5,screening-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,screening-service
+MAM-6,risk-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,risk-service
+MAM-7,revalidation-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,revalidation-service
+MAM-8,sanctions-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,sanctions-service
+MAM-9,notification-service,2026-11-18T18:05:31+00:00,load_11_backlog.py,backlog-planner,notification-service

@@ -1,0 +1,41 @@
+{
+  "story": "MAM-50",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/seed/ProviderSeedTest.java",
+    "modern/tools/checks/tests/test_seed_script.py"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [
+      "ProviderSeedTest: PASSED"
+    ],
+    "AC-3": [
+      "ProviderSeedTest: PASSED"
+    ],
+    "AC-4": [
+      "ProviderSeedTest: PASSED"
+    ],
+    "AC-5": [
+      "ProviderSeedTest: PASSED"
+    ],
+    "AC-6": [
+      "test_seed_script: PASSED"
+    ],
+    "AC-7": [
+      "ProviderSeedTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/infra/scripts/seed.sh"
+  ],
+  "rules": []
+}

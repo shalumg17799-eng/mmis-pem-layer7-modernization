@@ -26,24 +26,37 @@ description: The mandatory test-first workflow for every story. Covers red/green
 
    Run the tests. **Every new test must fail, and fail for the expected reason**: an
    assertion failure, or a missing endpoint/class. A failure from broken unrelated code
-   does not count. Commit: `test(<KEY>): red - <short summary>`.
-3. **Record the red commit hash** (`git rev-parse HEAD`) in `modern/docs/reports/stories/<KEY>/red-commit`.
+   does not count. **No git commit** (user rule, 2026-11-18: nothing is committed until the
+   user says "commit"; this replaces every commit step in the kit).
+3. **Record the test hashes** (replaces the red commit). test-writer runs
+   ```bash
+   python modern/tools/checks/test_protection.py record <KEY> <every test file of the story>
+   ```
+   It writes `modern/docs/reports/stories/<KEY>.tests.sha256` (`sha256sum` format, one
+   line per file, sorted by path) and keeps a restore copy of each file in git's object
+   store (`git hash-object -w`, no commit), listed in
+   `modern/docs/reports/stories/<KEY>/red-blobs.txt`. "Every test file" = the feature file,
+   step definitions, unit, integration, contract, Vitest and Playwright files the story
+   created or changed, including shared test support it touched.
 4. **Green.** java-developer (or ui-developer) writes the least production code that
    makes the tests pass. At most 3 attempts.
-5. **Test-protection check** (the orchestrator runs this, every time):
+5. **Test-protection check** (the orchestrator runs this after every green attempt):
    ```bash
-   git diff --name-only $(cat modern/docs/reports/stories/<KEY>/red-commit) -- '*/src/test/*' 'modern/web-ui/tests/*' 'modern/web-ui/e2e/*' '*.feature'
+   python modern/tools/checks/test_protection.py check <KEY>
    ```
-   The output must be empty. If not, revert those files
-   (`git checkout $(cat modern/docs/reports/stories/<KEY>/red-commit) -- <files>`) and send the developer back
-   to step 4 with a warning.
+   It recomputes the hashes and also lists test files that are in no `*.tests.sha256`
+   file. The result must be `OK`. Any difference means a test was changed: restore it
+   (`python modern/tools/checks/test_protection.py restore <KEY>`), then redo the green
+   step (step 4) with a warning to the developer. A restore counts as an attempt.
 6. **Refactor.** The developer improves names and removes duplication, with all tests
    still green. No behaviour change.
 7. **Full verification.** Run `./gradlew :services:<svc>:check` (unit, acceptance,
    integration, contract, ArchUnit, JaCoCo, PIT), or `npm test && npm run e2e` for UI.
-   Commit: `feat(<KEY>): <summary>`.
-8. **Review.** code-reviewer reviews the diff since the red commit (section 5). Any
-   MUST-FIX → back to step 4 (it counts as an attempt).
+   Run the test-protection check again. No commit.
+8. **Review.** code-reviewer reviews the story's changes (section 5): the test files in
+   `<KEY>.tests.sha256` and the production files in `trace.json` (nothing is committed, so
+   `git status --porcelain` and the file lists are the diff). Any MUST-FIX → back to step 4
+   (it counts as an attempt).
 9. **Done for the story** when every item in section 6 is true.
 
 ## 3. Naming
@@ -77,8 +90,10 @@ description: The mandatory test-first workflow for every story. Covers red/green
 - [ ] The test-protection check output is empty.
 - [ ] code-reviewer says APPROVE.
 - [ ] Traceability written to `modern/docs/reports/stories/<KEY>/trace.json` (story, ACs, test IDs, code classes,
-      rule IDs), for kag-curator to load.
-- [ ] `modern/specs/<KEY>.md` updated: `builtCommit` = the feat commit.
+      rule IDs); then run `python modern/tools/trace/build_rule_trace.py` to refresh
+      `modern/docs/traceability/rule-trace.csv` (traceability is in files and Jira, never in Neo4j).
+- [ ] `modern/specs/<KEY>.md` updated: `builtCommit: pending-user-commit` and
+      `testsSha256:` the sha256 of `modern/docs/reports/stories/<KEY>.tests.sha256`.
 - [ ] Story report written in `modern/docs/reports/stories/<KEY>.md` (phase report format).
 
 ## 7. When things go wrong

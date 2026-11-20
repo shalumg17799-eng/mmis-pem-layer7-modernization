@@ -1,0 +1,26 @@
+{
+  "story": "MAM-76",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/web-ui/e2e/journeys/j4-inquiry.spec.ts"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [],
+    "AC-3": [],
+    "AC-4": [],
+    "AC-5": [],
+    "AC-6": [],
+    "AC-7": []
+  },
+  "codeUnits": [],
+  "rules": []
+}

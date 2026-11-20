@@ -1,0 +1,18 @@
+{
+  "story": "MAM-73",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "tests": [
+    "modern/web-ui/tests/public/directory.test.tsx",
+    "modern/web-ui/tests/support/directory.ts",
+    "modern/web-ui/e2e/public-directory.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/app/App.tsx",
+    "modern/web-ui/src/features/public/directory/PublicDirectory.tsx",
+    "modern/web-ui/src/shared/api/client.ts",
+    "modern/web-ui/src/shared/api/useApi.ts",
+    "modern/web-ui/src/shared/api/types.ts",
+    "modern/web-ui/src/shared/ui/Pager.tsx"
+  ],
+  "rules": []
+}

@@ -1,0 +1,103 @@
+label,key,property,value
+BusinessRule,R-PRVDEAD1-ADD-01,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00001,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00002,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00003,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00004,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00005,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00006,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00007,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00008,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00009,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00010,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00011,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00012,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00013,owner,DROPPED
+BusinessRule,R-PRVDEAD1-cbl-00014,owner,DROPPED
+BusinessRule,R-PRVSCR01-cbl-00004,owner,DROPPED
+BusinessRule,R-PRVSCR01-cbl-00005,owner,DROPPED
+BusinessRule,R-PRVSCR01-cbl-00024,owner,DROPPED
+BusinessRule,R-PRVSCR01-cbl-00025,owner,DROPPED
+BusinessRule,R-PRVSCR01-cbl-00026,owner,DROPPED
+BusinessRule,R-PRVSCR01-cbl-00027,owner,DROPPED
+BusinessRule,R-PRVSCR01-cbl-00028,owner,DROPPED
+Field,DCLPROV:DCLPROVIDER:PRVT-EFFECTIVE-DATE,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-ENROLL-STATUS,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-LEGAL-NAME,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-LEGAL-NAME-LEN,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-LEGAL-NAME-TEXT,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-MEDICAID-ID,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-NPI,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-PROVIDER-TYPE,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-REVAL-DUE-DATE,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-RISK-TIER,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-TAXONOMY-CODE,dropped,True
+Field,ERRCODES:ERROR-CODES:EC-OK,dropped,True
+Field,PRVDEAD1:WS-CONTROL:WS-CARD-COUNT,dropped,True
+Field,PRVDEAD1:WS-CONTROL:WS-PAPER-FP-ENABLED,dropped,True
+Field,PRVDIR01:DIR-OUT-RECORD:FILLER@L53,dropped,True
+Field,PRVRECRD:PROVIDER-RECORD:FILLER@L39,dropped,True
+Field,PRVRECRD:PROVIDER-RECORD:PRV-INDIVIDUAL-DATA,dropped,True
+Field,PRVRECRD:PROVIDER-RECORD:PRV-ORG-DATA,dropped,True
+Field,PRVRECRD:PROVIDER-RECORD:PRV-VARIANT,dropped,True
+Field,PRVREV01:REVAL-OUT-RECORD:FILLER@L53,dropped,True
+Field,PRVRSK01:WS-DATE-WORK:WS-CURR-DATE,dropped,True
+Field,PRVRSK01:WS-DATE-WORK:WS-CURR-MMDD,dropped,True
+Field,PRVRSK01:WS-DATE-WORK:WS-CURR-YY,dropped,True
+Field,PRVRSK01:WS-DATE-WORK:WS-DUE-CCYY,dropped,True
+Field,PRVRSK01:WS-DATE-WORK:WS-DUE-DATE,dropped,True
+Field,PRVRSK01:WS-DATE-WORK:WS-DUE-YY,dropped,True
+Field,PRVSAN01:SANCTION-IN-RECORD:FILLER@L64,dropped,True
+Field,PRVSAN01:WS-NOTICE-CONTROL:WS-NOTICE-PGM,dropped,True
+Field,PRVSAN01:WS-NOTICE-CONTROL:WS-NOTICE-PREFIX,dropped,True
+Field,PRVSAN01:WS-NOTICE-CONTROL:WS-NOTICE-SUFFIX,dropped,True
+Field,PRVSCR01:WS-CONTROL-FLAGS:WS-RECIPROCITY-ENABLED,dropped,True
+Field,PRVTMS01:WS-JULIAN-WORK:WS-AGE-DAYS,dropped,True
+Field,PRVTMS01:WS-JULIAN-WORK:WS-ENROLL-JUL,dropped,True
+Field,PRVTMS01:WS-JULIAN-WORK:WS-ENROLL-YY,dropped,True
+Field,PRVTMS01:WS-JULIAN-WORK:WS-TODAY-DDD,dropped,True
+Field,PRVTMS01:WS-JULIAN-WORK:WS-TODAY-YY,dropped,True
+Field,PRVTMS01:WS-TMSIS-DETAIL:FILLER@L73,dropped,True
+Field,WRKSTORE:WS-STANDARD-WORK:WS-END-OF-FILE-FLAG,dropped,True
+Field,WRKSTORE:WS-STANDARD-WORK:WS-FILE-STATUS,dropped,True
+Field,WRKSTORE:WS-STANDARD-WORK:WS-PROGRAM-ID,dropped,True
+Field,DCLPROV:DCLPROVIDER:PRVT-EFFECTIVE-DATE,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-ENROLL-STATUS,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-LEGAL-NAME,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-LEGAL-NAME-LEN,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-LEGAL-NAME-TEXT,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-MEDICAID-ID,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-NPI,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-PROVIDER-TYPE,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-REVAL-DUE-DATE,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-RISK-TIER,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,DCLPROV:DCLPROVIDER:PRVT-TAXONOMY-CODE,dropReason,DCLGEN host variable for DB2 PROVIDER (unused by any program); the data is mapped from MMPRV.PROVIDER (D-014)
+Field,ERRCODES:ERROR-CODES:EC-OK,dropReason,success needs no error row
+Field,PRVDEAD1:WS-CONTROL:WS-CARD-COUNT,dropReason,program dropped (D-011)
+Field,PRVDEAD1:WS-CONTROL:WS-PAPER-FP-ENABLED,dropReason,program dropped (D-011)
+Field,PRVDIR01:DIR-OUT-RECORD:FILLER@L53,dropReason,FILLER: no data
+Field,PRVRECRD:PROVIDER-RECORD:FILLER@L39,dropReason,FILLER: no data
+Field,PRVRECRD:PROVIDER-RECORD:PRV-INDIVIDUAL-DATA,dropReason,group view; its fields are mapped
+Field,PRVRECRD:PROVIDER-RECORD:PRV-ORG-DATA,dropReason,group view; its fields are mapped
+Field,PRVRECRD:PROVIDER-RECORD:PRV-VARIANT,dropReason,raw 80-byte area; mapped through its two REDEFINES views field by field (AP-10)
+Field,PRVREV01:REVAL-OUT-RECORD:FILLER@L53,dropReason,FILLER: no data
+Field,PRVRSK01:WS-DATE-WORK:WS-CURR-DATE,dropReason,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+Field,PRVRSK01:WS-DATE-WORK:WS-CURR-MMDD,dropReason,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+Field,PRVRSK01:WS-DATE-WORK:WS-CURR-YY,dropReason,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+Field,PRVRSK01:WS-DATE-WORK:WS-DUE-CCYY,dropReason,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+Field,PRVRSK01:WS-DATE-WORK:WS-DUE-DATE,dropReason,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+Field,PRVRSK01:WS-DATE-WORK:WS-DUE-YY,dropReason,2-digit-year work field; replaced by java.time with 4-digit years (D-004)
+Field,PRVSAN01:SANCTION-IN-RECORD:FILLER@L64,dropReason,FILLER: no data
+Field,PRVSAN01:WS-NOTICE-CONTROL:WS-NOTICE-PGM,dropReason,builds the dynamic CALL name; replaced by notice templates (D-012)
+Field,PRVSAN01:WS-NOTICE-CONTROL:WS-NOTICE-PREFIX,dropReason,builds the dynamic CALL name; replaced by notice templates (D-012)
+Field,PRVSAN01:WS-NOTICE-CONTROL:WS-NOTICE-SUFFIX,dropReason,builds the dynamic CALL name; replaced by notice templates (D-012)
+Field,PRVSCR01:WS-CONTROL-FLAGS:WS-RECIPROCITY-ENABLED,dropReason,flag never set; reciprocity check dropped (D-010)
+Field,PRVTMS01:WS-JULIAN-WORK:WS-AGE-DAYS,dropReason,Julian work field; unused or replaced by java.time (D-004)
+Field,PRVTMS01:WS-JULIAN-WORK:WS-ENROLL-JUL,dropReason,Julian work field; unused or replaced by java.time (D-004)
+Field,PRVTMS01:WS-JULIAN-WORK:WS-ENROLL-YY,dropReason,Julian work field; unused or replaced by java.time (D-004)
+Field,PRVTMS01:WS-JULIAN-WORK:WS-TODAY-DDD,dropReason,Julian work field; unused or replaced by java.time (D-004)
+Field,PRVTMS01:WS-JULIAN-WORK:WS-TODAY-YY,dropReason,Julian work field; unused or replaced by java.time (D-004)
+Field,PRVTMS01:WS-TMSIS-DETAIL:FILLER@L73,dropReason,FILLER: no data
+Field,WRKSTORE:WS-STANDARD-WORK:WS-END-OF-FILE-FLAG,dropReason,loop control
+Field,WRKSTORE:WS-STANDARD-WORK:WS-FILE-STATUS,dropReason,I/O status; replaced by exceptions and run failure_reason (D-024)
+Field,WRKSTORE:WS-STANDARD-WORK:WS-PROGRAM-ID,dropReason,program name; each service records its own runs

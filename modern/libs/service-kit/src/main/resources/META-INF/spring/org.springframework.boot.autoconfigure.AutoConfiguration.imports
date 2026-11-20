@@ -1,0 +1,5 @@
+gov.medicaid.pem.kit.config.PemWebAutoConfiguration
+gov.medicaid.pem.kit.config.PemSecurityAutoConfiguration
+gov.medicaid.pem.kit.config.PemEventsAutoConfiguration
+gov.medicaid.pem.kit.config.PemClientAutoConfiguration
+gov.medicaid.pem.kit.config.PemKafkaAutoConfiguration

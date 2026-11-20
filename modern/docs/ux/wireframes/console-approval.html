@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Approve or deny - PEM wireframe</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uswds/uswds@3.8.0/dist/css/uswds.min.css"></head>
+<body><a class="usa-skipnav" href="#main">Skip to main content</a>
+<header class="usa-header usa-header--basic"><div class="usa-nav-container"><div class="usa-navbar"><div class="usa-logo"><em class="usa-logo__text">PEM console</em></div></div></div></header>
+<main id="main" class="grid-container margin-y-4"><h1>Approve or deny</h1>
+<p class="usa-intro">The analyst approval step that sets ACTIVE after a PASS screening (or DENIED).</p>
+<table class="usa-table usa-table--borderless"><caption>Provider</caption><thead><tr><th scope="col">Field</th><th scope="col">Value</th></tr></thead><tbody><tr><td>NPI</td><td>1003000333</td></tr><tr><td>Name</td><td>SUNSET HOSPICE INC</td></tr><tr><td>Status</td><td>Pending (P)</td></tr><tr><td>Screen flag</td><td>Pass (P)</td></tr></tbody></table><form class="usa-form"><fieldset class="usa-fieldset"><legend class="usa-legend">Decision</legend><div class="usa-radio"><input class="usa-radio__input" id="approve" type="radio" name="decision" value="APPROVE"><label class="usa-radio__label" for="approve">Approve (becomes Active; revalidation due 03/05/2031)</label></div><div class="usa-radio"><input class="usa-radio__input" id="deny" type="radio" name="decision" value="DENY"><label class="usa-radio__label" for="deny">Deny (becomes Denied)</label></div></fieldset><label class="usa-label" for="reason">Reason</label><input class="usa-input" id="reason" name="reason" type="text" value=""><button class="usa-button" type="button">Record decision</button></form>
+<section class="margin-top-6 border-top-1px padding-top-2" aria-label="Wireframe notes"><h2>Wireframe notes (low fidelity, synthetic data)</h2>
+<dl><dt>Route</dt><dd><code>/console/providers/:npi/approval</code></dd><dt>Roles</dt><dd>ANALYST, SUPERVISOR</dd>
+<dt>API calls</dt><dd><ul><li><code>GET /api/v1/providers/{npi}</code></li><li><code>GET /api/v1/screenings</code></li><li><code>POST /api/v1/providers/{npi}/approval</code></li></ul></dd><dt>Serves</dt><dd>D-019, D-003 (due date = approval + 5 years); R-PRVSCR01-ADD-03</dd></dl></section>
+<p><a class="usa-link" href="index.html">All wireframes</a></p></main></body></html>

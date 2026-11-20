@@ -1,0 +1,44 @@
+{
+  "story": "MAM-87",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/web-ui/e2e/console-approval.spec.ts",
+    "modern/web-ui/tests/console/approval-decision.test.tsx",
+    "modern/web-ui/tests/console/approval-page.test.tsx",
+    "modern/web-ui/tests/console/approval-reach.test.tsx",
+    "modern/web-ui/tests/support/approval.ts"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [],
+    "AC-3": [],
+    "AC-4": [],
+    "AC-5": [],
+    "AC-6": [],
+    "AC-7": []
+  },
+  "codeUnits": [
+    "modern/web-ui/src/app/screens.tsx",
+    "modern/web-ui/src/features/console/approval/ApprovalPage.tsx",
+    "modern/web-ui/src/features/console/approval/DecisionForm.tsx",
+    "modern/web-ui/src/features/console/approval/ScreeningResults.tsx",
+    "modern/web-ui/src/features/console/approval/decision.ts",
+    "modern/web-ui/src/features/console/providers/ProviderDetail.tsx",
+    "modern/web-ui/src/features/console/providers/ProviderLoader.tsx",
+    "modern/web-ui/src/features/console/providers/ProviderSearch.tsx",
+    "modern/web-ui/src/features/console/providers/ProviderTable.tsx",
+    "modern/web-ui/src/features/portal/home/queries.ts",
+    "modern/web-ui/src/shared/api/types.ts",
+    "modern/web-ui/src/shared/api/useProvider.ts",
+    "modern/web-ui/src/shared/format/format.ts"
+  ],
+  "rules": []
+}

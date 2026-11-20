@@ -1,0 +1,45 @@
+{
+  "story": "MAM-64",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "tests": [
+    "modern/web-ui/e2e/portal-apply.spec.ts",
+    "modern/web-ui/e2e/support/gateway-routes.ts",
+    "modern/web-ui/tests/portal/apply-failures.test.tsx",
+    "modern/web-ui/tests/portal/apply-followup.test.tsx",
+    "modern/web-ui/tests/portal/apply-form.test.tsx",
+    "modern/web-ui/tests/portal/apply-status-page.test.tsx",
+    "modern/web-ui/tests/portal/apply-submit.test.tsx",
+    "modern/web-ui/tests/support/applyForm.ts"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [],
+    "AC-3": [],
+    "AC-4": [],
+    "AC-5": [],
+    "AC-6": [],
+    "AC-7": []
+  },
+  "codeUnits": [
+    "modern/web-ui/src/app/screens.tsx",
+    "modern/web-ui/src/features/portal/applications/ApplicationStatus.tsx",
+    "modern/web-ui/src/features/portal/apply/ApplyPage.tsx",
+    "modern/web-ui/src/features/portal/apply/applicationForm.ts",
+    "modern/web-ui/src/features/portal/apply/fields.tsx",
+    "modern/web-ui/src/features/portal/home/ProviderSummary.tsx",
+    "modern/web-ui/src/features/portal/provider/ProviderRecord.tsx",
+    "modern/web-ui/src/shared/api/client.ts",
+    "modern/web-ui/src/shared/api/types.ts",
+    "modern/web-ui/src/shared/ui/ErrorSummary.css",
+    "modern/web-ui/src/shared/ui/ErrorSummary.tsx"
+  ],
+  "rules": []
+}

@@ -1,0 +1,32 @@
+{
+  "story": "MAM-24",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/PlatformChecksTest.java"
+  ],
+  "testIds": {
+    "AC-1": [],
+    "AC-2": [],
+    "AC-3": [
+      "PlatformChecksTest: PASSED"
+    ],
+    "AC-4": [],
+    "AC-5": [],
+    "AC-6": [],
+    "AC-7": [],
+    "AC-8": []
+  },
+  "codeUnits": [
+    "modern/infra/docker-compose.yml"
+  ],
+  "rules": []
+}

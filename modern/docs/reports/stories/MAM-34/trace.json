@@ -1,0 +1,51 @@
+{
+  "story": "MAM-34",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3"
+  ],
+  "tests": [
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/security/SecurityKitTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/ProblemHandlerTest.java",
+    "modern/libs/test-support/build.gradle.kts",
+    "modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/OpenApiContract.java",
+    "modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/PemArchitecture.java",
+    "modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/PemContainers.java",
+    "modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/PemJwt.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/IntegrationTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/PlatformChecksTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/CucumberSpringConfig.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/CucumberSuiteTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/acceptance/WalkingSkeletonSteps.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/api/ProviderLookupRolesTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/application/FindProviderTest.java",
+    "modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/domain/ProviderCodesTest.java",
+    "modern/services/provider-service/src/test/resources/features/MAM-34.feature",
+    "modern/web-ui/e2e/provider-lookup.spec.ts",
+    "modern/web-ui/tests/console/provider-lookup.test.tsx"
+  ],
+  "testIds": {
+    "AC-1": [
+      "FindProviderTest: PASSED",
+      "MAM-34.feature 'An analyst reads a seeded provider': PASSED",
+      "ProviderCodesTest: PASSED",
+      "ProviderLookupRolesTest: PASSED",
+      "SecurityKitTest: PASSED"
+    ],
+    "AC-2": [
+      "FindProviderTest: PASSED",
+      "MAM-34.feature 'A provider cannot read another provider's record': PASSED",
+      "MAM-34.feature 'A request without a token is refused': PASSED",
+      "PemKitAutoConfigurationTest: PASSED",
+      "ProblemHandlerTest: PASSED",
+      "ProviderLookupRolesTest: PASSED",
+      "SecurityKitTest: PASSED"
+    ],
+    "AC-3": []
+  },
+  "codeUnits": [
+    "modern/services/provider-service/src/main/java/gov/medicaid/pem/provider/domain/Provider.java"
+  ],
+  "rules": []
+}

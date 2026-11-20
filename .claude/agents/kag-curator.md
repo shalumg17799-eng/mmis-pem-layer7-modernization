@@ -1,6 +1,6 @@
 ---
 name: kag-curator
-description: Owns the Neo4j knowledge graph. Writes the constraints, the Python loaders and the validation queries, loads legacy facts, analysis results, architecture and backlog, and loads traceability after each story. The only agent that writes to the graph.
+description: Owns the Neo4j knowledge graph. Writes the constraints, the Python loaders and the validation queries, loads the legacy facts, the AWS Transform output and the legacy-analysis results (the graph is the legacy context engine only). The only agent that writes to the graph.
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: sonnet
 ---
@@ -35,9 +35,10 @@ You are the knowledge-graph curator for the PEM modernization.
 |---|---|---|
 | 1 | source code, dependency graph, lineage, data dictionary, BRE JSON, test plan, the anti-pattern list | Legacy fact layer, BusinessRule, KeyFunctionality, AntiPattern |
 | 2 | `modern/docs/analysis/rule-verification.csv`, `defect-register.md`, `questions.md` | rule verification and evidence, Defect, Question, Regulation links |
-| 3 | `modern/docs/architecture/rule-to-service.csv`, `field-to-column.csv`, the OpenAPI/AsyncAPI files | Service, ApiEndpoint, Event, Table, Column, OWNED_BY, MAPS_TO |
-| 4 | `modern/docs/backlog/jira-map.csv`, `modern/specs/*.md` | Epic, Story, AcceptanceCriterion, DERIVED_FROM |
-| 6, 7 | `modern/docs/reports/stories/<KEY>/trace.json` | TestCase, CodeUnit, VERIFIES, IMPLEMENTED_BY |
+
+Disabled since 2026-11-19 (Neo4j = legacy context only): `load_06_test_plan`, `load_10_architecture`,
+`load_11_backlog`, `load_12_trace`. Design, backlog and traceability are files: `modern/docs/architecture/`,
+`modern/specs/`, Jira MAM, and `modern/docs/traceability/rule-trace.csv` (`modern/tools/trace/build_rule_trace.py`).
 
 ## Return to the orchestrator
 The loaders run, the validation results (each check: expected vs actual), any mismatch

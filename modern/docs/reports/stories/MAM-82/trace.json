@@ -1,0 +1,17 @@
+{
+  "story": "MAM-82",
+  "acs": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "tests": [
+    "modern/web-ui/tests/console/detail-panels.test.tsx",
+    "modern/web-ui/tests/support/panels.ts",
+    "modern/web-ui/e2e/console-panels.spec.ts"
+  ],
+  "codeUnits": [
+    "modern/web-ui/src/features/console/providers/ProviderDetail.tsx",
+    "modern/web-ui/src/features/console/providers/panels/DetailPanels.tsx",
+    "modern/web-ui/src/features/console/providers/panels/Panel.tsx",
+    "modern/web-ui/src/shared/api/types.ts",
+    "modern/web-ui/src/shared/format/format.ts"
+  ],
+  "rules": []
+}

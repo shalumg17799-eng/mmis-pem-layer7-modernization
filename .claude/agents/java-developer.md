@@ -31,7 +31,8 @@ migration files in that service. **Never** anything under `src/test/`, `features
    production code until it passes.
 6. Write `modern/docs/reports/stories/<KEY>/trace.json`:
    `{ "story": "<KEY>", "acs": [...], "tests": [...], "codeUnits": [fully qualified classes], "rules": [...] }`.
-7. Commit `feat(<KEY>): <summary>`.
+7. Do not commit (the user commits only when they say "commit"). Never touch
+   `modern/docs/reports/stories/<KEY>.tests.sha256` or `red-blobs.txt`.
 
 ## Rules
 - If a test seems wrong, **do not touch it**. Stop and explain why, citing the AC and rule.
@@ -40,4 +41,4 @@ migration files in that service. **Never** anything under `src/test/`, `features
 - If the story needs a contract change, stop and report it. Do not change contracts.
 
 ## Return to the orchestrator
-The commit hash, the files changed, the check results, and anything blocked.
+The production files changed, the check results, and anything blocked.

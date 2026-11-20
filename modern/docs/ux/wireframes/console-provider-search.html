@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Provider search - PEM wireframe</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uswds/uswds@3.8.0/dist/css/uswds.min.css"></head>
+<body><a class="usa-skipnav" href="#main">Skip to main content</a>
+<header class="usa-header usa-header--basic"><div class="usa-nav-container"><div class="usa-navbar"><div class="usa-logo"><em class="usa-logo__text">PEM console</em></div></div></div></header>
+<main id="main" class="grid-container margin-y-4"><h1>Provider search</h1>
+<p class="usa-intro">Find a provider by NPI, Medicaid ID or name (replaces CICS PINQ; the typed NPI is the key, D-022).</p>
+<form class="usa-form usa-search" role="search"><label class="usa-label" for="npi">NPI</label><input class="usa-input" id="npi" name="npi" type="text" value="1003000111"><label class="usa-label" for="medicaidId">Medicaid ID</label><input class="usa-input" id="medicaidId" name="medicaidId" type="text" value=""><label class="usa-label" for="name">Name contains</label><input class="usa-input" id="name" name="name" type="text" value=""><button class="usa-button" type="button">Search</button></form><table class="usa-table usa-table--borderless"><caption>Results</caption><thead><tr><th scope="col">NPI</th><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col">Risk</th></tr></thead><tbody><tr><td><a class="usa-link" href="console-provider-detail.html">1003000111</a></td><td>RIVERA MARIA</td><td>Individual (IN)</td><td>Active (A)</td><td>Limited (L)</td></tr></tbody></table>
+<section class="margin-top-6 border-top-1px padding-top-2" aria-label="Wireframe notes"><h2>Wireframe notes (low fidelity, synthetic data)</h2>
+<dl><dt>Route</dt><dd><code>/console/providers</code></dd><dt>Roles</dt><dd>ANALYST, SUPERVISOR, ADMIN</dd>
+<dt>API calls</dt><dd><ul><li><code>GET /api/v1/providers</code></li></ul></dd><dt>Serves</dt><dd>PRVCICS1 00001-00002, 00012-00020, 00042-00045; R-PRVCICS1-ADD-02, -07; D-022</dd></dl></section>
+<p><a class="usa-link" href="index.html">All wireframes</a></p></main></body></html>

@@ -1,10 +1,10 @@
 rule_id,program,paragraph,start_line,end_line,status,note
-R-PRVSAN01-ADD-01,PRVSAN01,PROCESS-SANCTION,90,101,VERIFIED,"Any READ status other than 00 on the master (including I/O errors) prints 'NPI NOT FOUND', and any sanction-file read status other than EOF is not handled."
-R-PRVSAN01-ADD-02,PRVSAN01,"APPLY-SANCTION,GENERATE-NOTICE",104,129,VERIFIED,"An action code that is not T, S or R is not rejected: no status changes, but the master is REWRITTEN and PRVNTGEN is called."
+R-PRVSAN01-ADD-01,PRVSAN01,PROCESS-SANCTION,90,101,VERIFIED,"Any READ status other than 00 on the master (including I/O errors) prints 'NPI NOT FOUND', and any sanction-file read status other than EOF is not handled. (D-024)"
+R-PRVSAN01-ADD-02,PRVSAN01,"APPLY-SANCTION,GENERATE-NOTICE",104,129,VERIFIED,"An action code that is not T, S or R is not rejected: no status changes, but the master is REWRITTEN and PRVNTGEN is called. (D-026)"
 R-PRVSAN01-ADD-03,PRVSAN01,"(data division),APPLY-SANCTION",57,116,VERIFIED,SAN-REASON and SAN-EFF-DATE are never used: no sanction history is kept anywhere (the SANCTION KSDS and the DB2 table are unused). D-018 FIX.
-R-PRVSAN01-ADD-04,PRVSAN01,APPLY-SANCTION,107,112,VERIFIED,A terminate or reinstate is applied whatever the current status or screening result is: a reinstate can make a DENIED or PENDING provider ACTIVE. Business question (Q-006).
-R-PRVSAN01-ADD-05,PRVSAN01,APPLY-SANCTION,115,115,VERIFIED,The REWRITE status is not tested.
-R-PRVSAN01-ADD-06,PRVSAN01,MAIN-CONTROL,80,87,VERIFIED,Not-found NPIs are not counted and RETURN-CODE is never set.
+R-PRVSAN01-ADD-04,PRVSAN01,APPLY-SANCTION,107,112,VERIFIED,A terminate or reinstate is applied whatever the current status or screening result is: a reinstate can make a DENIED or PENDING provider ACTIVE. Business question (Q-006). (D-027)
+R-PRVSAN01-ADD-05,PRVSAN01,APPLY-SANCTION,115,115,VERIFIED,The REWRITE status is not tested. (D-024)
+R-PRVSAN01-ADD-06,PRVSAN01,MAIN-CONTROL,80,87,VERIFIED,Not-found NPIs are not counted and RETURN-CODE is never set. (D-024)
 R-PRVSAN01-ADD-07,PRVSAN01,"MAIN-CONTROL,PROCESS-SANCTION,APPLY-SANCTION",81,115,VERIFIED,AP-06: PEMAPP2 opens PEMAPP1's master I-O and rewrites it with no API. D-013 FIX.
 R-PRVSAN01-cbl-00001,PRVSAN01,PROCESS-SANCTION,90,95,VERIFIED,The sanction record is read; its NPI is moved to the master key.
 R-PRVSAN01-cbl-00002,PRVSAN01,PROCESS-SANCTION,96,98,VERIFIED,READ of the master by key; status 00 leads to APPLY-SANCTION.

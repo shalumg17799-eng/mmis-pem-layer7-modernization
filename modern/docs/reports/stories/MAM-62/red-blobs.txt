@@ -1,0 +1,15 @@
+fbc633d06b14d8bfa53436003a41e8cb42a89b65  modern/web-ui/e2e/support/gateway.ts
+a0bfdaf15eaf469450a13dbc0fa23edb575c751e  modern/web-ui/e2e/support/keycloak.ts
+d2b4cf8e39e426a421025680acfd68f38e7fb105  modern/web-ui/e2e/support/page.ts
+a852d0a794462442db05d531cb5cb99c2293ebbd  modern/web-ui/e2e/ui-shell.spec.ts
+3231ef38dad7c5c180c945c69f876657d8c0350b  modern/web-ui/tests/portal/home-applications.test.tsx
+cb7a965b314530971ad4cb19c87765a505431192  modern/web-ui/tests/portal/home-provider-summary.test.tsx
+39ed66ec07a363a66b6eb46bd5430a9101878aed  modern/web-ui/tests/shell/access-denied.test.tsx
+9f59caece998e23f34fcb5712c84fecc5c6de99c  modern/web-ui/tests/shell/accessibility-structure.test.tsx
+ff2ff3b9306ea70d7fa496be229a77667659d1e5  modern/web-ui/tests/shell/menu.test.tsx
+1c8b779d5a19dd5512ecca508e378da693a35e8c  modern/web-ui/tests/shell/sign-in.test.tsx
+141d9534100beadf54f938568351f605ecd0a772  modern/web-ui/tests/shell/sign-out-and-session.test.tsx
+22ab2fafe90aea3962fced16dc5aee0381fb48bd  modern/web-ui/tests/support/fakeApi.ts
+65fa7d1055c0a892d0e686d9f5e44b7b7cbf1586  modern/web-ui/tests/support/fakeOidc.ts
+815d9dd4b8601d5a9ca96ce451bff67f7f7b8672  modern/web-ui/tests/support/fixtures.ts
+0ab4b230a68ba07b60a22e3b9fdda9da82a98edb  modern/web-ui/tests/support/world.tsx

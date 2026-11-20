@@ -1,0 +1,8 @@
+0a126f3508dd7cc16744e24e7d4034eb55d64be7  modern/web-ui/e2e/portal-apply.spec.ts
+92c3b7d3b613e1f5ad55ede9a9ba4ecfc2bf85d8  modern/web-ui/e2e/support/gateway-routes.ts
+d5f49a03b5bec2cd131d5081a2667b194aec7a90  modern/web-ui/tests/portal/apply-failures.test.tsx
+35cd74949f9ef43ef47d35e211850aa12a8e0920  modern/web-ui/tests/portal/apply-followup.test.tsx
+ea28d29e4b63817114d55cf8f11cfcad3ede11dd  modern/web-ui/tests/portal/apply-form.test.tsx
+1b32aa94a7b3e02d26bc685a815644e238e53d35  modern/web-ui/tests/portal/apply-status-page.test.tsx
+ae5b109fad175599105de7e3d83a8aa8483ea7bd  modern/web-ui/tests/portal/apply-submit.test.tsx
+77c17c93a5620ceb4107352625b74953aa51b33f  modern/web-ui/tests/support/applyForm.ts
