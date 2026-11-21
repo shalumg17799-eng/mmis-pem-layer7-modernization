@@ -14,8 +14,8 @@ decisions: [D-004, D-006, D-013, D-018, D-020, D-023, D-024, D-026, D-027]
 dependsOn: [MAM-52, MAM-42]
 mainJourney: false
 labels: [svc-sanctions-service, kag-L-S042, agentic, decision-D-004, decision-D-006, decision-D-013, decision-D-018, decision-D-020, decision-D-023, decision-D-024, decision-D-026, decision-D-027]
-builtCommit: 2e20ead
-testsSha256: 846046de712431e122e924c18f2b841e547338f876e040f4455df1ce2d6e1041
+builtCommit: c211f6a
+testsSha256: b75635a620ceb79a92aa92a30013835d733d26030afc51cb792e98cc24632b8d
 ---
 ## Business requirement
 Sanction actions also arrive in the old fixed-width sanction file. An administrator or a scheduler can load such a file for a stated business date. Every record is applied like a sanction entered by a supervisor. Records for unknown providers, with unknown actions or with an invalid date are counted and skipped without stopping the run, the number of terminations is reported as before, the run ends with an explicit result that says whether it completed or failed and why, and running the same business date again applies nothing twice.

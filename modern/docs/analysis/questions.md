@@ -1431,9 +1431,9 @@ The class FailureReason (new this night in screening-service and revalidation-se
 back to the exception's own text when its message is blank, and that text is not cut and not joined to one line: 233 to
 5033 characters with line breaks in the test-writer's nine red tests for revalidation-service.
 Options: A) fix it in every service that has the class, tests first; B) only where a test is red.
-**Default applied: A in steps**: revalidation-service now, in its lane (the red tests exist); screening-service (closed and
-live since deploy 6; its review listed this as a note) and tmsis-service as one small item after the open lanes, with the
-same tests. Until then a screening run that fails with a message-less exception can show a long reason to an
+**Default applied: A in steps**: revalidation-service in its lane (done, live since deploy 8); screening-service (closed and
+live since deploy 6; its review listed this as a note) as one small item of its own, with the same tests (started 06:36).
+tmsis-service is not affected: its own class cuts every branch (read by the revalidation developer, 06:07). Until then a screening run that fails with a message-less exception can show a long reason to an
 administrator; no SQL text was seen in such a reason.
 
 ## Q-153. (code review of revalidation-service, MAM-49 AC-2, 2026-11-21 06:17) A provider that leaves ACTIVE while a sweep is running can still get a case (status: DEFAULT APPLIED - revisit)
@@ -1449,3 +1449,23 @@ still ACTIVE and due; a test with a held lock, as for the completion of a case; 
 one sweep transaction, once a month.
 **Default applied: B** (as built; it follows the default of Q-148). **Recommended: A**, tests first; the user asked for the
 concurrent case to be a test for the T-MSIS extract (Q-132), and this is the same kind of case.
+
+## Q-154. (review fix of api-gateway, MAM-29 AC-6, 2026-11-21 07:10) The time limit of the gateway for a call to a service: what it limits, and 30 seconds (status: DEFAULT APPLIED - revisit)
+
+The review asked for a time limit on proxied calls (lesson: every outgoing call has one). Two choices had to be made.
+1. What the limit covers. With the Spring property alone the limit covers the whole exchange, so a download that is still
+   flowing is cut when it takes longer (shown by a test: the caller gets a bare 500). Options: A) the whole exchange, with
+   a limit sized to the slowest export; B) the time between two reads, so a flowing download survives and a stalled one
+   ends (needs the simple client of the JDK; it does not support the PATCH method, which no contract uses, and does not
+   forward a few restricted headers). **Default applied: B.**
+2. The value. **Default applied: 30 seconds**, set by `PEM_GATEWAY_READ_TIMEOUT` (connect limit 2 seconds). It is six times
+   the 5 second limit of the services' own calls and is not measured: the slowest synchronous calls are the export of the
+   provider master and the file downloads. To be looked at again with the numbers of the performance smoke (MAM-88).
+
+## Q-155. (review fix of api-gateway, 2026-11-21 07:10) What the caller gets when a transfer fails after its first bytes (status: DEFAULT APPLIED - revisit)
+
+Found while the tests for Q-154 were written; no review item and no test covers it. When the copy of a service's answer
+fails after the service's content type (for example text/plain of a legacy file) has been set, the gateway cannot write its
+problem answer any more and the caller gets an empty 500. Options: A) while nothing has been sent, reset the answer and
+send the usual 503 problem; when bytes have gone out, cut the connection; B) leave it.
+**Default applied: B** (new behaviour needs a decision and a test first). **Recommended: A.**
