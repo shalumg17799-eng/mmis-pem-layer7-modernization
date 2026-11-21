@@ -345,3 +345,19 @@ workflow journals; one section per review.
 - Bookkeeping: testsSha256 in specs/MAM-59.md:18 (848b4d..) and specs/MAM-60.md:18 (f94542..) does not match the re-recorded hash files (bfe855.., c250cc..). The story reports MAM-59.md and MAM-60.md (2026-11-20 18:25) do not describe this fix round.
 - Other round-1 notes this fix did not touch are still open: lenient page/size binding (NoticeController.java:33-34, best fixed in the kit), Mailpit HTTP calls without a timeout in NoticeSteps/SanctionNoticeSteps, the NoticeView JSON shape in the application layer, no (npi, created_at) index, and action/runId logged raw in the plain log format.
 
+## review:revalidation-service (verdict APPROVE)
+
+- ExecuteSweep.java:53-62, JdbcRevalidationStore.java:57 race (from reading the code, not run): a provider leaves ACTIVE while a sweep transaction is open. Its event commits but finds no case to cancel (the new case is still invisible), and the sweep opens a case and a RevalidationDue from its stale read. Breaks MAM-49 AC-2 and R-PRVREV01-cbl-00003.
+- Fix for the race above: just before cases.open, re-read the provider row FOR SHARE and skip it unless it is still ACTIVE and due (or read trackedProviders FOR SHARE). Test it with a held lock, as CaseCompletionConcurrencyTest does. Same class as Q-148, whose default was to accept it, so raise this as a question next to it.
+- JdbcRevalidationStore.java:205-213: fail() has no status guard (Q-151). If Spring Batch's bookkeeping fails after the commit, a COMPLETED run with committed cases turns FAILED, and its REVALQ file is no longer served (queueFile:242 requires COMPLETED). Recommended Q-151 A: guard with WHERE status='RUNNING'.
+- RunSweep.java:37-44: when the job cannot be launched, the run is stored FAILED but the 202 answer still says RUNNING. Return the stored run (FAILED, with its reason) or a 503 problem.
+- Q-145: a run cut off by a restart, or a launch the shut-down executor rejects (TaskExecutorJobLauncher swallows TaskRejectedException and afterJob never runs), stays RUNNING forever. Needs start-up recovery as in Q-145 A.
+- ProviderEventsListener.java:44-48: consumed fields are not validated. A missing or blank 'to' counts as not ACTIVE and cancels an open case, and npi is not checked against ^[0-9]{10}$. Send such events to the DLT before any change.
+- events.yaml RevalidationDue x-consumers lists screening and notification only, but revalidation-service consumes its own RevalidationDue (RevalidationEventsListener, MAM-49 AC-1, C-13). Add the receive operation; a contract change needs the user's approval.
+- CompleteCase.java:70-74: the 200 answer's closedAt is the clock instant, while Postgres keeps microseconds, so the answer and a later GET can differ by less than 1 us (CaseCompletionConcurrencyTest tolerates this). Truncate the instant to microseconds.
+- FailureReasonBlankMessageTest (infrastructure) is now green. Move it into application/FailureReasonTest so PIT counts it (test-writer, Q-097 rule). screening-service FailureReason still has the uncut blank-message fallback (Q-152, outside this lane).
+- Process: the FOR UPDATE change (JdbcRevalidationStore.java:122-144) was written before a test. The tests were added later and shown red only in a scratchpad copy. Keep that evidence (run5 log and XML) with the MAM-48 red report, not only in the scratchpad.
+- DoD bookkeeping: specs MAM-45, MAM-48 and MAM-49 have empty builtCommit and testsSha256. Update them at story close and run build_rule_trace.py.
+- Style: CompleteCase (application layer) throws the kit's web ApiException, and SweepController.JOB duplicates SweepJobConfig.JOB.
+- Q-146 (sweep events get a fresh correlation id each) and Q-147 (no cron, unlike java-microservices section 10; manual start as the story says) still wait on the user.
+

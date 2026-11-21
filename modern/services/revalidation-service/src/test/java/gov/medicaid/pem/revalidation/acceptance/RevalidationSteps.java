@@ -777,9 +777,22 @@ public class RevalidationSteps {
     assertThat(casesOf(npi)).hasSize(n);
   }
 
+  /**
+   * The open cases of the provider (DUE or IN_SCREENING) from ONE read of its cases. A case opened
+   * by a sweep moves from DUE to IN_SCREENING by itself once its RevalidationDue has been published
+   * (MAM-49 AC-1), so two reads, one per status, can list the same case under both (seen once in a
+   * full run: "Expected size: 1 but was: 2", the same caseId as DUE and as IN_SCREENING).
+   */
   private List<JsonNode> openCases(String npi) throws Exception {
-    List<JsonNode> open = new ArrayList<>(casesOf(npi, "DUE"));
-    open.addAll(casesOf(npi, "IN_SCREENING"));
+    List<JsonNode> open = new ArrayList<>();
+    casesOf(npi)
+        .forEach(
+            c -> {
+              String status = c.path("status").asText();
+              if (status.equals("DUE") || status.equals("IN_SCREENING")) {
+                open.add(c);
+              }
+            });
     return open;
   }
 

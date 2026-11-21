@@ -1408,3 +1408,44 @@ Options: A) a confirmed exclusion of the provider itself is reported as F with E
 answer (the detail says that the owner could not be checked); B) keep C.
 **Default applied: B** (as built; no criterion says otherwise and the screening fails in both cases). **Recommended: A**,
 tests first (a new example for MAM-22).
+
+## Q-151. (revalidation lane, MAM-45, 2026-11-21 05:56) A sweep whose work is committed can still end as FAILED when the job's own bookkeeping fails afterwards (status: DEFAULT APPLIED - revisit)
+
+The run is set to COMPLETED in the transaction of the job's step, together with the cases, the events and the REVALQ rows.
+Spring Batch writes its own step and job status after that transaction. If that later write fails (the test-writer forced
+it with a database trigger in a scratch copy, not in the repository), the run goes RUNNING, COMPLETED and then FAILED
+(SweepJobConfig.java:64-77; JdbcRevalidationStore.java:205-213 has no guard on the status), although one case and one
+event are committed. The REVALQ file of a FAILED run is not served, and a re-run for the same date opens no new case
+(D-029), so the file of that run cannot be had any more. No rule says which status is right, so no test was written.
+The screening run, the T-MSIS extract and the three other jobs are built in the same way and were not probed.
+Options: A) a run that is COMPLETED stays COMPLETED and the later failure is logged (the failure may only end a RUNNING
+run); B) keep it as built.
+**Default applied: B** (no criterion asks for it; a change for one job would make the six jobs differ).
+**Recommended: A, as one item for all six batch jobs**, together with Q-145 A (a run interrupted by a restart) and
+Q-146 A (the correlation id of a run), tests first.
+
+## Q-152. (revalidation lane and the screening review, 2026-11-21 05:56) The short failure reason of a run is not cut when the exception has no message (status: DEFAULT APPLIED - revisit)
+
+D-024 and the criteria of the batch stories say a failure reason is one line of at most 200 characters without SQL text.
+The class FailureReason (new this night in screening-service and revalidation-service; tmsis-service has its own) falls
+back to the exception's own text when its message is blank, and that text is not cut and not joined to one line: 233 to
+5033 characters with line breaks in the test-writer's nine red tests for revalidation-service.
+Options: A) fix it in every service that has the class, tests first; B) only where a test is red.
+**Default applied: A in steps**: revalidation-service now, in its lane (the red tests exist); screening-service (closed and
+live since deploy 6; its review listed this as a note) and tmsis-service as one small item after the open lanes, with the
+same tests. Until then a screening run that fails with a message-less exception can show a long reason to an
+administrator; no SQL text was seen in such a reason.
+
+## Q-153. (code review of revalidation-service, MAM-49 AC-2, 2026-11-21 06:17) A provider that leaves ACTIVE while a sweep is running can still get a case (status: DEFAULT APPLIED - revisit)
+
+Reasoned from the code by the reviewer, not run (ExecuteSweep.java:53-62, JdbcRevalidationStore.java:57): the sweep reads
+the tracked providers at the start of its transaction. If a provider is suspended or terminated while that transaction is
+open, the event of the status change finds no case to cancel (the new case is not visible yet), and the sweep then opens a
+case and publishes RevalidationDue from what it read before. MAM-49 AC-2 and the legacy rule "only ACTIVE providers"
+(R-PRVREV01-cbl-00003) do not hold for that provider. The reviewer rated it a note, not MUST-FIX, and sees it as the same
+kind of window as Q-148.
+Options: A) just before a case is opened the sweep reads the provider's row again under a lock and skips it unless it is
+still ACTIVE and due; a test with a held lock, as for the completion of a case; B) accept it: the window is the length of
+one sweep transaction, once a month.
+**Default applied: B** (as built; it follows the default of Q-148). **Recommended: A**, tests first; the user asked for the
+concurrent case to be a test for the T-MSIS extract (Q-132), and this is the same kind of case.

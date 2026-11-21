@@ -1,0 +1,122 @@
+{
+  "story": "MAM-48",
+  "acs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "tests": [
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/ContractFile.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/EventsContractFile.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/IntegrationTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/RevalidationFixtures.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/CucumberSpringConfig.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/CucumberSuiteTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/RevalidationSteps.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/CaseApiTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/CaseCompletionConcurrencyTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/RequestFailureTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/RevalidationContractTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/CaseStagesAndListTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/CompleteCaseTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/FollowProviderTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/InMemoryStore.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/domain/CaseStatusTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/ConsumedEventFixturesTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/EventListenersTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/JdbcRevalidationStoreTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/NextDueDateFollowsProviderTest.java",
+    "modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/RevalidationCorrelationIdTest.java",
+    "modern/services/revalidation-service/src/test/resources/features/MAM-48.feature"
+  ],
+  "testIds": {
+    "AC-1": [
+      "CaseApiTest: PASSED",
+      "CaseStagesAndListTest: PASSED",
+      "CaseStatusTest: PASSED",
+      "JdbcRevalidationStoreTest: PASSED",
+      "MAM-48.feature 'A closed case shows when it was closed': PASSED",
+      "MAM-48.feature 'Analysts list cases by status and by NPI': PASSED",
+      "MAM-48.feature 'Cases are listed one page at a time, oldest due date first': PASSED",
+      "MAM-48.feature 'Each status filter lists only the cases in that status': PASSED",
+      "MAM-48.feature 'Invalid query values are refused with a problem': PASSED",
+      "MAM-48.feature 'The invalid status OPEN is refused with a problem': PASSED",
+      "RevalidationContractTest: PASSED"
+    ],
+    "AC-2": [
+      "CaseApiTest: PASSED",
+      "CompleteCaseTest: PASSED",
+      "JdbcRevalidationStoreTest: PASSED",
+      "MAM-48.feature 'A FAIL result also closes the case and leaves the due date alone': PASSED",
+      "MAM-48.feature 'A case is completed with a PASS screening result': PASSED",
+      "MAM-48.feature 'A completion request without a screening id or with another result is refused': PASSED",
+      "RequestFailureTest: PASSED",
+      "RevalidationContractTest: PASSED"
+    ],
+    "AC-3": [
+      "CaseApiTest: PASSED",
+      "CaseCompletionConcurrencyTest: PASSED",
+      "CaseStatusTest: PASSED",
+      "CompleteCaseTest: PASSED",
+      "JdbcRevalidationStoreTest: PASSED",
+      "MAM-48.feature 'A closed case cannot be completed again and stays unchanged': PASSED",
+      "MAM-48.feature 'An unknown case is not found': PASSED"
+    ],
+    "AC-4": [
+      "CaseCompletionConcurrencyTest: PASSED",
+      "CompleteCaseTest: PASSED",
+      "ConsumedEventFixturesTest: PASSED",
+      "EventListenersTest: PASSED",
+      "JdbcRevalidationStoreTest: PASSED",
+      "MAM-48.feature 'A passed re-screening completes the case by itself': PASSED",
+      "MAM-48.feature 'A passed re-screening completes the open case in either stage': PASSED",
+      "RevalidationCorrelationIdTest: PASSED"
+    ],
+    "AC-5": [
+      "CompleteCaseTest: PASSED",
+      "MAM-48.feature 'A failed re-screening closes the case but does not move the due date': PASSED",
+      "MAM-48.feature 'A failed re-screening closes the case in either stage and opens no new case': PASSED",
+      "NextDueDateFollowsProviderTest: PASSED"
+    ],
+    "AC-6": [
+      "CompleteCaseTest: PASSED",
+      "ConsumedEventFixturesTest: PASSED",
+      "EventListenersTest: PASSED",
+      "MAM-48.feature 'A revalidation screening of a provider without an open case is ignored': PASSED",
+      "MAM-48.feature 'Only revalidation screenings close cases': PASSED"
+    ],
+    "AC-7": [
+      "EventListenersTest: PASSED",
+      "FollowProviderTest: PASSED",
+      "JdbcRevalidationStoreTest: PASSED",
+      "MAM-48.feature 'The next due date comes from provider-service and is followed here': PASSED",
+      "NextDueDateFollowsProviderTest: PASSED"
+    ],
+    "AC-8": [
+      "MAM-48.feature 'Who may complete a case': PASSED",
+      "MAM-48.feature 'Who may list cases': PASSED",
+      "RevalidationContractTest: PASSED"
+    ]
+  },
+  "codeUnits": [
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/api/RevalidationController.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/application/CaseCompletions.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/application/CasePage.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/application/CompleteCase.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/application/FollowProvider.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/application/ListCases.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/domain/CaseStatus.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/domain/RevalidationCase.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/infrastructure/JdbcRevalidationStore.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/infrastructure/ProviderEventsListener.java",
+    "modern/services/revalidation-service/src/main/java/gov/medicaid/pem/revalidation/infrastructure/ScreeningEventsListener.java"
+  ],
+  "rules": [
+    "R-PRVREV01-ADD-01"
+  ]
+}

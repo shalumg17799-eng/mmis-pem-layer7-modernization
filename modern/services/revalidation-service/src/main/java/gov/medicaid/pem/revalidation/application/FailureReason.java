@@ -8,8 +8,8 @@ import org.springframework.dao.DataAccessException;
  * The reason stored with and shown for a failed sweep run (D-024, MAM-45 AC-8): one line of at most
  * {@value #MAX} characters that holds no SQL statement text. A failure with a database error in its
  * chain shows the database's own words (the first line of the root cause, without its "ERROR:"
- * mark); any other failure shows its own message. The log has the whole exception with its stack
- * trace.
+ * mark); any other failure shows its own message. A failure whose message is missing or only white
+ * space shows its class name. The log has the whole exception with its stack trace.
  */
 public final class FailureReason {
 
@@ -25,10 +25,9 @@ public final class FailureReason {
     boolean database = hasDatabaseError(failure);
     Throwable shown = database ? NestedExceptionUtils.getMostSpecificCause(failure) : failure;
     String line = firstLine(shown.getMessage());
-    String reason = database ? afterDatabaseMark(line) : line;
-    return reason.isBlank()
-        ? shown.toString()
-        : reason.substring(0, Math.min(reason.length(), MAX));
+    String words = database ? afterDatabaseMark(line) : line;
+    String reason = words.isBlank() ? shown.getClass().getName() : words;
+    return reason.substring(0, Math.min(reason.length(), MAX));
   }
 
   private static String firstLine(String message) {

@@ -4,8 +4,9 @@ f0f39c5cd20a6ff63a62943db517d9b62982e2fe  modern/services/revalidation-service/s
 4e11c080a03de5fcd3de560f41075966e047ca85  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/RevalidationFixtures.java
 f701e87ad144746c85bf511273db08c6a0378883  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/CucumberSpringConfig.java
 cfad5e440c0ca72433100a28ee639d77423c338e  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/CucumberSuiteTest.java
-e77094ce4066daac7e9a3e5d04e0043599695d7b  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/RevalidationSteps.java
+9037287889a5eb98ca8774d0bea6343025b21386  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/RevalidationSteps.java
 f00c57aaf441c9e943ec70fa4c012677acd5a839  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/CaseApiTest.java
+6858d9e35369400b8bc4d9476e0d2e34320b3147  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/CaseCompletionConcurrencyTest.java
 9b5356f667e8857052057b98ace902c39c7bfd4f  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/RequestFailureTest.java
 e5f856b405898c4b2333dc35fef9f04be265e93b  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/RevalidationContractTest.java
 7fa866fbbf0294fb5d17c99b52e209c2330a0016  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/CaseStagesAndListTest.java

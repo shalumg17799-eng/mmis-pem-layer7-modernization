@@ -38,3 +38,24 @@ Per AC (JUnit + Cucumber examples, run 2): AC-1 16, AC-2 31, AC-3 6, AC-4 7.
   listed; a case that was cancelled while suspended is not swept while the provider is suspended.
 - `ConsumedEventFixturesTest` (new in this lane): ProviderStatusChanged from A to each of P, A, T, D, S and the RevalidationDue
   of a case conform to the contract; the checker refuses a status outside the enum.
+
+## Test addition at the end of the lane (2026-11-21, additive)
+
+The java-developer's `FOR UPDATE` read of `JdbcRevalidationStore.openCaseOf` (line 139) is used by `FollowProvider.statusChanged`
+too: a provider that leaves ACTIVE cancels its open case. Without the lock a completion that closes the case at the same time can
+be answered 200 while the stored case ends CANCELLED. Five new tests in `api/CaseCompletionConcurrencyTest` (the class is recorded
+under MAM-48 and MAM-49; technique and table in `MAM-48/red-report.md`), all tagged `[MAM-49 AC-2]`, all green at once in the real
+module (runs 3 and 7). The two callers wait in a chosen order behind a row locked by the test (the order in which they wait is the
+order in which they get the row):
+
+| Test | What it proves | In the copy without the two `FOR UPDATE` |
+|---|---|---|
+| `completionAfterTheCancellationIsRefused` | the status change to S gets the row first: a completion that waited is answered 409 problem+json | FAILS: expected 409 but was 200 |
+| `completionAfterTheCancellationLeavesItCancelled` | the same order: the case stays CANCELLED, closedAt set, no screening id, version 1 | passes (the stored state is right, only the answer is wrong) |
+| `cancellationAfterTheCompletionFindsNothing` | the completion gets the row first: 200, case COMPLETED with its screening, not cancelled afterwards | passes |
+| `trackedStatusFollowsInBothOrders` (2 invocations) | the tracked status of the provider is S whichever gets the row first | pass (not about the lock) |
+
+The shared file `acceptance/RevalidationSteps.java` was corrected (Q-097 C, nothing weakened): `openCases` reads the cases of a
+provider once instead of twice, because a case moves DUE to IN_SCREENING by itself (AC-1) between two reads (details in
+`MAM-48/red-report.md`). `MAM-49.tests.sha256` now holds 18 files (recorded 2026-11-21 after run 7; `test_protection.py check
+MAM-49` prints OK). All tests of MAM-49 pass in run 7.

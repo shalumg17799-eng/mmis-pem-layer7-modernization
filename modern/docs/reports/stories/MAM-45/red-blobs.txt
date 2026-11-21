@@ -5,7 +5,7 @@ f0f39c5cd20a6ff63a62943db517d9b62982e2fe  modern/services/revalidation-service/s
 4e11c080a03de5fcd3de560f41075966e047ca85  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/RevalidationFixtures.java
 f701e87ad144746c85bf511273db08c6a0378883  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/CucumberSpringConfig.java
 cfad5e440c0ca72433100a28ee639d77423c338e  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/CucumberSuiteTest.java
-e77094ce4066daac7e9a3e5d04e0043599695d7b  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/RevalidationSteps.java
+9037287889a5eb98ca8774d0bea6343025b21386  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/acceptance/RevalidationSteps.java
 49d032523625763873506b37376a459020fdd0a5  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/adapter/legacy/RevalqFileTest.java
 772132007fb001dbcb44614535341be0a71cc157  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/adapter/legacy/RevalqGoldenFileTest.java
 9b5356f667e8857052057b98ace902c39c7bfd4f  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/api/RequestFailureTest.java
@@ -14,15 +14,17 @@ e5f856b405898c4b2333dc35fef9f04be265e93b  modern/services/revalidation-service/s
 7fa866fbbf0294fb5d17c99b52e209c2330a0016  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/CaseStagesAndListTest.java
 1fad268542a8086a67199f63891b8ca604fe1967  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/ExecuteSweepFileFailureTest.java
 dc0f8e1965a5d7a2e598f8a81cab2f917fa127ac  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/ExecuteSweepTest.java
+20a610828c7d1e9c409cbe755f2503d66f365dfa  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/FailureReasonTest.java
 7324d4763c32846fbb9df3771eb4a2f687135094  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/FollowProviderTest.java
 735afc281e2a6eec932d44e7d2ba7420aaeb1a44  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/InMemoryStore.java
 7399d5b4ac4fb944121f48d7ae217e79be8f8ea6  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/application/RunSweepTest.java
 99688864973d4336077f7b80b6ec142ec2c17731  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/domain/SweepRuleTest.java
 2a7e2a2c09d6ac7026ebdb7f5d9ee1555d808261  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/ConsumedEventFixturesTest.java
 b641142cbfeb525de00a907d6b897f534f8fde31  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/EventListenersTest.java
+a65a2c08dd2f918df2abbbea8a33dc8a4908ebf5  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/FailureReasonBlankMessageTest.java
 2499340a366044c5d43584e1aa297af33570fcd9  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/JdbcRevalidationStoreTest.java
 5d610252615ebd35ae7af9879d5fe80bf98ad93e  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/RevalidationCorrelationIdTest.java
 82cdea7b2fee6e14a234d1c450fbb88363e6687f  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/RevalidationDueEventContractTest.java
 6617278620f744331b669a7b9aed6471cbed0c21  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/SweepFailureTest.java
-591dd9dc39250995a9bbbb32461eae988b6a2a4f  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/SweepJobTest.java
+1adc1058142ad843e218d60eb480de71d1073e7d  modern/services/revalidation-service/src/test/java/gov/medicaid/pem/revalidation/infrastructure/SweepJobTest.java
 302380a562e0f30f595fd79667ee7d61e28bdf29  modern/services/revalidation-service/src/test/resources/features/MAM-45.feature

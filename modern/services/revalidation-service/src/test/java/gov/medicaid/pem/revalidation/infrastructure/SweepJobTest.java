@@ -48,7 +48,32 @@ class SweepJobTest extends IntegrationTest {
     RevalidationFixtures.reset(jdbc);
   }
 
+  /**
+   * The run turns COMPLETED in the transaction of the step (ExecuteSweep), but Spring Batch writes
+   * the final status of the step and of the job after that transaction has committed (AbstractStep
+   * and AbstractJob: the status update comes after doExecute and after the listeners). A reader
+   * that saw the run COMPLETED can therefore still find the batch job STARTED for a moment. The
+   * batch tables are read once the job has ended; the wait has its own time guard, so a job that
+   * never ends fails the test instead of hanging it.
+   */
+  private void awaitJobEnd(UUID run) {
+    Awaitility.await("the batch job of run " + run + " has ended")
+        .atMost(RevalidationFixtures.BOUND)
+        .pollInterval(Duration.ofMillis(100))
+        .until(
+            () ->
+                RevalidationFixtures.count(
+                        jdbc,
+                        "SELECT count(*) FROM batch_job_execution e"
+                            + " JOIN batch_job_execution_params p ON p.job_execution_id = e.job_execution_id"
+                            + " WHERE p.parameter_name = 'runId' AND p.parameter_value = ?"
+                            + " AND e.status NOT IN ('STARTING', 'STARTED')",
+                        run.toString())
+                    == 1);
+  }
+
   private Map<String, Object> step(UUID run) {
+    awaitJobEnd(run);
     return jdbc.queryForMap(
         "SELECT s.step_name, s.status, s.read_count, s.write_count, s.filter_count"
             + " FROM batch_step_execution s"
@@ -58,6 +83,7 @@ class SweepJobTest extends IntegrationTest {
   }
 
   private String jobStatus(UUID run) {
+    awaitJobEnd(run);
     return jdbc.queryForObject(
         "SELECT e.status FROM batch_job_execution e"
             + " JOIN batch_job_execution_params p ON p.job_execution_id = e.job_execution_id"
