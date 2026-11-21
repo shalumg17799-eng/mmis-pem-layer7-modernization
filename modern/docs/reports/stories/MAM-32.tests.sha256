@@ -11,6 +11,7 @@ b9cd43b96d72d157a434780e692dbea31aa9a046c46ae0543fdbca726fa3806d  modern/service
 4f443f39e9faeece4c960565fd4a4410122d686fcedab4d1708f87195b5f28c2  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/adapter/legacy/ScrnoutRoundTripTest.java
 e66cb223c41f31288cc27d20831097358ecf85b9d5bf4d9a52e5567a16ee844d  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/adapter/legacy/ScrnoutWriterTest.java
 e7118fd02f516ddcc69d6d03417f0c608071c99b5eafa0c046aa50c3946278b9  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/api/BatchRunApiTest.java
+5f75d089b07edf03f5faaf0204dd0d0c8de4555ecfc3a09635bf6ac8910b7d89  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/FailureReasonTest.java
 103d5357c15b5e8894ebc25f569ae79978085929832d68de88eef83555e240c7  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/Fakes.java
 64c58f19e0b0107cf8394528ae2ec4e0597b4bad966b5bf1d03b1c05a86fa8fb  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/RunScreeningBatchTest.java
 b86b1e7a5f15c5590cded0e52e1e85c260b00d35af16e109d9f1cd7718360291  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/StartScreeningBatchTest.java
@@ -18,6 +19,7 @@ b86b1e7a5f15c5590cded0e52e1e85c260b00d35af16e109d9f1cd7718360291  modern/service
 1f90b456caf3b4436b4ae85c995f9f70a4719630c596bd95ea6abb38532aeb12  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunFailureTest.java
 dde8af7a46871905c1a253d2d420fecca1fe10179ab9c5389c3f9f08c1eb2b41  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunFileTest.java
 e418c81c039706f37f8f62c75251344222e5bd7368493dd56bef1a4c03aa100c  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunRepositoryTest.java
+1b2bf91250cc9755c75d767ab36a6aa15d5e216e6a5d28356107e323dc76b9f8  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/FailureReasonBlankMessageTest.java
 f1341fed53738a7004c0873c1b5d32410ed24f0aa827b9283d3e03cfeea73692  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/JdbcScreeningRunsTest.java
 2b257c9f32c5ecddd5328c6b82ea57f0e2bbc83ecdd00ff250392aca40002cef  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/ProviderContractUseTest.java
 529d5a010da72d9930014063e89914a7745a84bc2a5fd280afca0c5dcb55ad0d  modern/services/screening-service/src/test/resources/features/MAM-32.feature

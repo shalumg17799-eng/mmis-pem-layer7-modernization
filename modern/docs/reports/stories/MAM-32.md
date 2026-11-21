@@ -57,3 +57,25 @@ Outcome line unchanged. Production code written by the java-developer to make th
 - Not verified: the live stack (no deploy, no bootJar, by the rules of this lane); `FailureReason` has no unit test of its own, its database branch is covered by the integration tests only (PIT sees the unit tests: 5 mutants without coverage are in that branch).
 - Traceability: `MAM-32/trace.json`.
 - Second verification (2026-11-21 03:12 to 03:21, java-developer, production code unchanged since the run above): `./gradlew --no-daemon --continue :services:screening-service:test --rerun :services:screening-service:check` (the tests re-run on purpose, PIT and Spotless were up to date): BUILD SUCCESSFUL in 9m 21s; 705 tests, 0 failures, 0 skipped; JaCoCo line coverage 98.82 % (668 of 676); PIT 84 % (74 of 88; 9 survivors: 6 in `FailureReason` (database branch, covered by integration tests only), 1 equivalent boundary mutant in `SourceRules`, 2 in `RequestScreening` (return value of the background run, ignored by design); `test_protection.py check` prints OK for MAM-18, 20, 22, 25, 28, 32.
+
+## Follow-up after the service gate (2026-11-21, question Q-152)
+
+This section replaces two statements above: "FailureReason has no unit test of its own" and "PIT 84 %".
+
+The code review of the service had listed as a note that the short failure reason of a run is not cut when the exception
+has no message (the last branch of `FailureReason` fell back to the exception's own text). revalidation-service had the same
+class and got tests and a fix on the morning of 2026-11-21; this story got the same, tests first.
+
+- Tests (test-writer, 06:36 to 07:07): `application/FailureReasonTest`, 59 unit tests of every branch (the database's own
+  words, one line, no SQL text, at most 200 characters for long messages, line breaks and nested causes), green at once; and
+  `infrastructure/FailureReasonBlankMessageTest`, 25 tests for a blank message or a blank message of the database root, all
+  red before the fix (for example 233, 333 and 5033 characters instead of at most 200; two lines instead of one). 25 recorded
+  test files for the story; the protection check prints OK.
+- Fix (java-developer, 07:08 to 07:20): a blank message now shows the class name of the exception, and the cut to 200
+  characters applies to every branch, as in revalidation-service. No other production file changed.
+- Whole check of the module (07:08 to 07:18): 789 tests, 0 failures, 0 skipped, JaCoCo 98.81 % of lines, PIT 96.6 % (85 of 88;
+  all 15 mutants of `FailureReason` killed; it was 74 of 88).
+- Short review of this one change (07:22): APPROVE, no MUST-FIX. Notes: the 25 tests can move into `FailureReasonTest` now
+  that they are green; a cyclic cause chain would loop (also in Spring's own helper, and in revalidation-service); the cut
+  counts UTF-16 units; the class is copied between two services and could live in the shared kit.
+- Not verified: a FAILED run with such an exception on the running stack.

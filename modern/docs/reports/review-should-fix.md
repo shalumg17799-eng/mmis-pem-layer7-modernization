@@ -350,17 +350,6 @@ workflow journals; one section per review.
 - Style: CompleteCase (application layer) throws the kit's web ApiException, and SweepController.JOB duplicates SweepJobConfig.JOB.
 - Q-146 (sweep events get a fresh correlation id each) and Q-147 (no cron, unlike java-microservices section 10; manual start as the story says) still wait on the user.
 
-## review2:notification-service (verdict APPROVE)
-
-- NoticeDelivery.java:55-56,66-71: the WARN line carries only e.getMessage(), so the stack trace and the nested MailConnectException are lost. Pass e as the last logger argument. Open since round 1, and it now covers all seven notice types.
-- NoticeDelivery.java:53-60: the email goes out before the SENT row and the outbox row commit. A later DB failure rolls back, the kit retries twice, and the provider can get up to 3 identical emails (O-2, round 1). Record a pending row first, or stop retrying once the mail was sent.
-- NoticeEventsListener.java:59-75: the NPI from the ProviderStatusChanged subject and from SanctionApplied/RevalidationDue data is not checked against ^[0-9]{10}$ before the email is addressed. A long value fails the CHAR(10) insert after the send, so it is retried and re-sent (round 1, still open).
-- NoticeSendFailureTest.java:331-333 (same in NoticeApiTest.java:449): '!(has && isNull)' also passes if a FAILED notice wrongly carried a sentAt string. Assert that n.has("sentAt") is false.
-- NoticeSendFailureTest.java:125,243,296 changes the port of the context's shared JavaMailSenderImpl. A late Kafka event consumed by this context's listener in that window would be recorded FAILED (O-4). Give the JUnit context its own consumer group, or no listener.
-- NoticeDelivery.java:54: JavaMailSenderImpl throws MailSendException when only transport.close() fails after a successful send, so an email that went out is recorded FAILED. This is rare. It could be told apart through MailSendException.getFailedMessages() being empty.
-- Bookkeeping: testsSha256 in specs/MAM-59.md:18 (848b4d..) and specs/MAM-60.md:18 (f94542..) does not match the re-recorded hash files (bfe855.., c250cc..). The story reports MAM-59.md and MAM-60.md (2026-11-20 18:25) do not describe this fix round.
-- Other round-1 notes this fix did not touch are still open: lenient page/size binding (NoticeController.java:33-34, best fixed in the kit), Mailpit HTTP calls without a timeout in NoticeSteps/SanctionNoticeSteps, the NoticeView JSON shape in the application layer, no (npi, created_at) index, and action/runId logged raw in the plain log format.
-
 ## review2:sanctions-service (verdict APPROVE)
 
 - modern/specs/MAM-55.md still has testsSha256 846046de… (26 files). The DoD needs b75635a6… (27 files). Story report MAM-55.md has no entry yet for this fix (RequestProblems, SanctionIntakeUploadTest, Q-143), and the rule-trace.csv refresh was not seen.
@@ -373,4 +362,26 @@ workflow journals; one section per review.
 - Fix-check run 1 (06:19-06:26) failed 33 Cucumber scenarios on a Kafka Testcontainer start timeout. That was environmental: the Cucumber suite was the first class to run. Only one green run since. Record it in the story report.
 - JaCoCo is 98.42 %, below the 98.84 % of the earlier gate, although that code did not change: SanctionIntakeJobConfig:55 (file gone) and :107 (failure without exception) are not covered in this run. Coverage of these defensive paths seems to vary between runs.
 - Pre-existing, outside this fix: safe re-runs rely on the single-thread 'sanction-intake' executor in one JVM plus a count query. No database constraint stops two instances re-running the same business date at the same time.
+
+## review2:notification-service (verdict APPROVE)
+
+- NoticeDelivery.java:55-56,66-71: the WARN line carries only e.getMessage(), so the stack trace and the nested MailConnectException are lost. Pass e as the last logger argument. Open since round 1, and it now covers all seven notice types.
+- NoticeDelivery.java:53-60: the email goes out before the SENT row and the outbox row commit. A later DB failure rolls back, the kit retries twice, and the provider can get up to 3 identical emails (O-2, round 1). Record a pending row first, or stop retrying once the mail was sent.
+- NoticeEventsListener.java:59-75: the NPI from the ProviderStatusChanged subject and from SanctionApplied/RevalidationDue data is not checked against ^[0-9]{10}$ before the email is addressed. A long value fails the CHAR(10) insert after the send, so it is retried and re-sent (round 1, still open).
+- NoticeSendFailureTest.java:331-333 (same in NoticeApiTest.java:449): '!(has && isNull)' also passes if a FAILED notice wrongly carried a sentAt string. Assert that n.has("sentAt") is false.
+- NoticeSendFailureTest.java:125,243,296 changes the port of the context's shared JavaMailSenderImpl. A late Kafka event consumed by this context's listener in that window would be recorded FAILED (O-4). Give the JUnit context its own consumer group, or no listener.
+- NoticeDelivery.java:54: JavaMailSenderImpl throws MailSendException when only transport.close() fails after a successful send, so an email that went out is recorded FAILED. This is rare. It could be told apart through MailSendException.getFailedMessages() being empty.
+- Bookkeeping: testsSha256 in specs/MAM-59.md:18 (848b4d..) and specs/MAM-60.md:18 (f94542..) does not match the re-recorded hash files (bfe855.., c250cc..). The story reports MAM-59.md and MAM-60.md (2026-11-20 18:25) do not describe this fix round.
+- Other round-1 notes this fix did not touch are still open: lenient page/size binding (NoticeController.java:33-34, best fixed in the kit), Mailpit HTTP calls without a timeout in NoticeSteps/SanctionNoticeSteps, the NoticeView JSON shape in the application layer, no (npi, created_at) index, and action/runId logged raw in the plain log format.
+
+## review:screening-service (verdict APPROVE)
+
+- FailureReasonBlankMessageTest.java:11-17 and FailureReasonTest.java:27-28: the doc comments still say the tests are 'red until the fallback is cut'. They are green now. Move the 25 tests into application/FailureReasonTest so PIT sees them too (test-writer task, as planned).
+- modern/docs/reports/stories/MAM-32.md:57,59 is out of date: it says FailureReason has no unit test and gives PIT 84 % (74/88). The current gate is 789 tests, PIT 85/88 (96.6 %), FailureReason 15/15 killed.
+- FailureReason.java:43 (hasDatabaseError) and Spring's NestedExceptionUtils.getMostSpecificCause loop forever on a cyclic cause chain (A caused by B caused by A). This was already there, is unlikely in practice and is the same in revalidation-service. Bound the walk with an identity set or a depth cap, in both services.
+- FailureReason.java:30 counts the 200 in UTF-16 units, so the cut can split a surrogate pair at the end. Back off one character when the last kept one is a high surrogate (both services).
+- FailureReasonTest.java:229-231 blankMessageGivesTheClassName only checks startsWith. The result is now exactly the class name; FailureReasonBlankMessageTest checks it exactly, so this is only tidiness.
+- FailureReason is copied between screening-service and revalidation-service (tmsis-service has its own). Moving one version into the shared kit would keep the services alike; that belongs to the final report.
+- A first line that ends in spaces keeps them (' boom \nmore' gives 'boom '). No rule covers this; stripping the line would be cleaner (the red report already describes it).
+- When the root database error has a blank message, the reason shows the root's class name (for example org.postgresql.util.PSQLException). That is not SQL text and matches revalidation-service. It is noted here only as a small piece of internal detail.
 

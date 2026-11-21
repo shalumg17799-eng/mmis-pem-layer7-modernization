@@ -11,6 +11,7 @@ bb03f49fb422f40323c7a4bad7ca8d4e4062bc1c  modern/services/screening-service/src/
 bd963e6580d4adf7e5dce5e62ef9f5a266dc5049  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/adapter/legacy/ScrnoutRoundTripTest.java
 6402ef2fbb14aef388e9ad6327f9fc9a23a67fc1  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/adapter/legacy/ScrnoutWriterTest.java
 c5ab7cbeae13831d1402aac5c980f169e3093332  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/api/BatchRunApiTest.java
+3e12459c484ccf423d99e4ee732af4c8093f262f  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/FailureReasonTest.java
 b9e5730615c8b5b0e9e6962a102c2c87b9a23c5a  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/Fakes.java
 d49af81f2773121379cb4630b1ecf499141695c1  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/RunScreeningBatchTest.java
 67c657bb25700521afacd72e8ed45eeb3f885100  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/application/StartScreeningBatchTest.java
@@ -18,6 +19,7 @@ b322ff97c4b7c834f10e4ad93c1407d819e8b55f  modern/services/screening-service/src/
 cb63969afe08c38227669d0d871dff7c99daa921  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunFailureTest.java
 588109ba9d193abc5b8f8d0852d4ebf459713c70  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunFileTest.java
 79933bad2c530c7fd9c4160a071fc8ecbf2af1b7  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/BatchRunRepositoryTest.java
+6c9c414868bccf81a412deb7350defd5dc02ad2d  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/FailureReasonBlankMessageTest.java
 c664dd3dff8d24911b94d07ea868aad2a60e1b07  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/JdbcScreeningRunsTest.java
 ee7e0070a3e3b7ef453ce8eb6e00434665ddce8e  modern/services/screening-service/src/test/java/gov/medicaid/pem/screening/infrastructure/ProviderContractUseTest.java
 d271491615c0d770b95ab9cd74e077cff44c0322  modern/services/screening-service/src/test/resources/features/MAM-32.feature
