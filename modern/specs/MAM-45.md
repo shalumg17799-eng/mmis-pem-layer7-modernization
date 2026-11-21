@@ -14,8 +14,8 @@ decisions: [D-003, D-029, D-004, D-020, D-024, D-006, D-014]
 dependsOn: [MAM-27, MAM-42]
 mainJourney: false
 labels: [svc-revalidation-service, kag-L-S038, agentic, decision-D-003, decision-D-029, decision-D-004, decision-D-020, decision-D-024, decision-D-006, decision-D-014]
-builtCommit:
-testsSha256:
+builtCommit: a529d4f
+testsSha256: 50cfe8b66add57fe2e801f0526d447eef640fde85b947b4cf05a674d2b90d04e
 ---
 ## Business requirement
 Providers must be revalidated at least every five years. Once a month the state must find every active provider whose revalidation date has arrived and open one revalidation case for each, so that nobody is forgotten and nobody is queued twice. Today the list is rebuilt from scratch every month with no memory of earlier months, and the dates it relies on are reset every day, so it rarely finds anyone. After this story each due provider has exactly one open case, the administrator can run the sweep for any business date, and the same fixed-format queue file as before can be downloaded.

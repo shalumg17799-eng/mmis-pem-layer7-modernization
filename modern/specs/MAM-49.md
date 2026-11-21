@@ -14,8 +14,8 @@ decisions: [D-029, D-006]
 dependsOn: [MAM-45, MAM-48]
 mainJourney: false
 labels: [svc-revalidation-service, kag-L-S040, agentic, decision-D-029, decision-D-006]
-builtCommit:
-testsSha256:
+builtCommit: a529d4f
+testsSha256: a0fc1e7801758133d9af7291f97fc9581557d8fce35f208e702ebe39783e1d43
 ---
 ## Business requirement
 A revalidation case passes through stages, and staff need to see which stage it is in: waiting to be screened, being screened, finished, or no longer needed because the provider is no longer active. This story defines when a case moves to the screening stage and when it is cancelled, so that the work queue never shows cases that nobody can act on, and so that a provider who is reinstated while still overdue is picked up again at the next sweep.

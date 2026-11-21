@@ -14,8 +14,8 @@ decisions: [D-003, D-029, D-023]
 dependsOn: [MAM-45]
 mainJourney: false
 labels: [svc-revalidation-service, kag-L-S039, agentic, decision-D-003, decision-D-029, decision-D-023]
-builtCommit:
-testsSha256:
+builtCommit: a529d4f
+testsSha256: f130f9ef4bc754b77327e169727e0a92dba4108473ccc27745a8fdab5959c582
 ---
 ## Business requirement
 Once a revalidation case has been opened, staff must be able to see it, and the case must be closed when the provider's re-screening is done, so that the provider is not chased again and, after a pass, gets a new five-year date. Today the legacy queue only listed the provider and nothing recorded what happened afterwards. After this story analysts see the open and closed cases, a re-screening result closes the case by itself, an analyst can close it by hand, and the provider's next due date comes from the provider record, not from this service.

@@ -1,0 +1,207 @@
+gradle start 2026-11-21 05:25:48 free 2609 MB (waited 0s for memory): --no-build-cache --continue :services:revalidation-service:test --tests gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest --tests gov.medicaid.pem.revalidation.infrastructure.PostCommitFailureProbeTest
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:generateExternalPluginSpecBuilders
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins
+> Task :buildSrc:generateScriptPluginAdapters
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources
+> Task :buildSrc:compilePluginsBlocks
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors
+> Task :buildSrc:compileKotlin
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes
+> Task :buildSrc:jar
+> Task :libs:fixed-width:compileJava
+> Task :libs:fixed-width:processResources
+> Task :libs:fixed-width:classes
+> Task :libs:fixed-width:jar
+> Task :libs:service-kit:compileJava
+> Task :libs:service-kit:processResources
+> Task :libs:service-kit:classes
+> Task :libs:service-kit:jar
+> Task :libs:test-support:compileJava
+> Task :libs:test-support:processResources NO-SOURCE
+> Task :libs:test-support:classes
+> Task :libs:test-support:jar
+> Task :services:revalidation-service:compileJava
+> Task :services:revalidation-service:processResources
+> Task :services:revalidation-service:classes
+> Task :services:revalidation-service:compileTestJava
+> Task :services:revalidation-service:processTestResources
+> Task :services:revalidation-service:testClasses
+> Task :services:revalidation-service:test
+
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :services:revalidation-service:test
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] two requests that wait together for one case: the 409 is a problem+json FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: 409
+     but was: 200
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.assertProblem(CaseCompletionConcurrencyTest.java:150)
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.twoWaitingRequestsLoserIsAProblem(CaseCompletionConcurrencyTest.java:428)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] two requests released together for one case, 30 times: the stored case equals the 200 answer every time FAILED
+    org.opentest4j.AssertionFailedError: [round 0: screening id stored with the case answered 200] 
+    expected: 8d0ca5b3-9ff8-465b-9d20-b094eda2bd78
+     but was: d790444b-56b7-4829-9a63-cc603f07126c
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.latchedRequestsStoredIsTheWinner(CaseCompletionConcurrencyTest.java:679)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] two requests released together for one case, 30 times: every time exactly one is answered 200 and the other 409 FAILED
+    java.lang.AssertionError: [round 0: the answers of the two requests] 
+    Expecting actual:
+      [200, 200]
+    to contain exactly in any order:
+      [200, 409]
+    elements not found:
+      [409]
+    and elements not expected:
+      [200]
+        at gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.latchedRequestsOneWins(CaseCompletionConcurrencyTest.java:660)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] two requests that wait together for one case: the stored case is the one the 200 answer shows FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: cf7e6d79-766f-4ce1-8cda-99469d2decfe
+     but was: 76d1289d-3a2d-4eca-8aa8-3683709e4a4b
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.twoWaitingRequestsStoredIsTheWinner(CaseCompletionConcurrencyTest.java:441)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] a second request that arrives while the first is not committed waits and is answered 409; the first answer is the stored case FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: 409
+     but was: 200
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.assertProblem(CaseCompletionConcurrencyTest.java:150)
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.secondRequestWaitsForTheUncommittedFirst(CaseCompletionConcurrencyTest.java:373)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] two requests that wait together for one case: exactly one is answered 200 and the other 409 FAILED
+    org.opentest4j.AssertionFailedError: 
+    Expecting actual:
+      [200, 200]
+    to contain exactly (and in same order):
+      [200, 409]
+    but some elements were not found:
+      [409]
+    and others were not expected:
+      [200]
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.twoWaitingRequestsOneWins(CaseCompletionConcurrencyTest.java:418)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-4] two REVALIDATION ScreeningCompleted events for one provider that wait together: exactly one closes the case FAILED
+    org.opentest4j.AssertionFailedError: [exactly one event closes the case (first: true, second: true)] 
+    Expecting value to be true but was false
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.twoEventsOneCloses(CaseCompletionConcurrencyTest.java:537)
+
+CaseCompletionConcurrencyTest > [MAM-49 AC-2] a provider that leaves ACTIVE cancels the case before a waiting completion gets the row: the completion is answered 409 problem+json FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: 409
+     but was: 200
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.assertProblem(CaseCompletionConcurrencyTest.java:150)
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.completionAfterTheCancellationIsRefused(CaseCompletionConcurrencyTest.java:589)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] a request and a REVALIDATION ScreeningCompleted that wait together: exactly one closes the case, the request is 200 or 409 FAILED
+    org.opentest4j.AssertionFailedError: [exactly one of request (200) and event (closed: true) closes the case] 
+    Expecting value to be true but was false
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.requestAndEventOneCloses(CaseCompletionConcurrencyTest.java:499)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] a request and a ScreeningCompleted released together, 30 times: every time exactly one closes the case FAILED
+    org.opentest4j.AssertionFailedError: [round 1: exactly one of request (200) and event (closed: true) closes the case] 
+    Expecting value to be true but was false
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.latchedRequestAndEventOneCloses(CaseCompletionConcurrencyTest.java:722)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] a completion that waited for the row of a case closed in the meantime is answered 409 problem+json FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: 409
+     but was: 200
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.assertProblem(CaseCompletionConcurrencyTest.java:150)
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.waitingRequestIsRefused(CaseCompletionConcurrencyTest.java:322)
+
+CaseCompletionConcurrencyTest > [MAM-48 AC-3] a request and a ScreeningCompleted released together, 30 times: the stored case carries the screening of the one that closed it FAILED
+    org.opentest4j.AssertionFailedError: [round 0: screening id of the winner] 
+    expected: 1defb621-b4f8-4422-bd64-6f7e62e6df00
+     but was: 48ab5811-6d91-4992-9cae-b9750aba95fc
+        at app//gov.medicaid.pem.revalidation.api.CaseCompletionConcurrencyTest.latchedRequestAndEventStoredIsTheWinner(CaseCompletionConcurrencyTest.java:737)
+
+PostCommitFailureProbeTest > probe() FAILED
+    java.lang.AssertionError: PROBE run statuses seen=[RUNNING, COMPLETED, FAILED], job=UNKNOWN, reason=[SYNTHETIC BATCH REPOSITORY DOWN], queue_file stored=true, cases=1, RevalidationDue in outbox=1
+        at gov.medicaid.pem.revalidation.infrastructure.PostCommitFailureProbeTest.probe(PostCommitFailureProbeTest.java:73)
+
+2026-11-20T23:58:56.556Z  INFO 11712 --- [revalidation-service] [        kafka-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-revalidation-service-1, groupId=revalidation-service] Revoke previously assigned partitions pem.screening.events-0
+2026-11-20T23:58:56.556Z  INFO 11712 --- [revalidation-service] [        kafka-2] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-revalidation-service-2, groupId=revalidation-service] Revoke previously assigned partitions pem.provider.events-0
+2026-11-20T23:58:56.557Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.s.k.l.KafkaMessageListenerContainer    : revalidation-service: partitions revoked: [pem.provider.events-0]
+2026-11-20T23:58:56.557Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.s.k.l.KafkaMessageListenerContainer    : revalidation-service: partitions revoked: [pem.screening.events-0]
+2026-11-20T23:58:56.558Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-1, groupId=revalidation-service] Member consumer-revalidation-service-1-b92bfd27-37d3-4327-8ab8-967ef5f81329 sending LeaveGroup request to coordinator localhost:52656 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
+2026-11-20T23:58:56.558Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-2, groupId=revalidation-service] Member consumer-revalidation-service-2-e505ff82-2b56-4f18-8a6d-a4d137655f39 sending LeaveGroup request to coordinator localhost:52656 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
+2026-11-20T23:58:56.559Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-2, groupId=revalidation-service] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.559Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-1, groupId=revalidation-service] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.559Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-2, groupId=revalidation-service] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.559Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-1, groupId=revalidation-service] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.559Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-revalidation-service-1, groupId=revalidation-service] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T23:58:56.559Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-revalidation-service-2, groupId=revalidation-service] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T23:58:56.561Z  INFO 11712 --- [revalidation-service] [        kafka-3] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-revalidation-service-3, groupId=revalidation-service] Revoke previously assigned partitions pem.revalidation.events-0, pem.revalidation.events-1, pem.revalidation.events-2
+2026-11-20T23:58:56.562Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.s.k.l.KafkaMessageListenerContainer    : revalidation-service: partitions revoked: [pem.revalidation.events-0, pem.revalidation.events-1, pem.revalidation.events-2]
+2026-11-20T23:58:56.562Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-3, groupId=revalidation-service] Member consumer-revalidation-service-3-438e9ae4-ede4-4ed0-bbb9-c8be7f14021b sending LeaveGroup request to coordinator localhost:52656 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
+2026-11-20T23:58:56.562Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-3, groupId=revalidation-service] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.562Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-3, groupId=revalidation-service] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.562Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-revalidation-service-3, groupId=revalidation-service] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T23:58:56.564Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-1, groupId=revalidation-service] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.564Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-2, groupId=revalidation-service] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.564Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-1, groupId=revalidation-service] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.564Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-3, groupId=revalidation-service] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.564Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-3, groupId=revalidation-service] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.564Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-revalidation-service-2, groupId=revalidation-service] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T23:58:56.573Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T23:58:56.573Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T23:58:56.573Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T23:58:56.573Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T23:58:56.582Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-revalidation-service-3 unregistered
+2026-11-20T23:58:56.583Z  INFO 11712 --- [revalidation-service] [        kafka-3] o.s.k.l.KafkaMessageListenerContainer    : revalidation-service: Consumer stopped
+2026-11-20T23:58:56.822Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T23:58:56.822Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T23:58:56.822Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T23:58:56.822Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T23:58:56.822Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T23:58:56.822Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T23:58:56.822Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T23:58:56.822Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T23:58:56.832Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-revalidation-service-2 unregistered
+2026-11-20T23:58:56.833Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-revalidation-service-1 unregistered
+2026-11-20T23:58:56.833Z  INFO 11712 --- [revalidation-service] [        kafka-2] o.s.k.l.KafkaMessageListenerContainer    : revalidation-service: Consumer stopped
+2026-11-20T23:58:56.833Z  INFO 11712 --- [revalidation-service] [        kafka-1] o.s.k.l.KafkaMessageListenerContainer    : revalidation-service: Consumer stopped
+2026-11-20T23:58:56.833Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=revalidation-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T23:58:56.838Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T23:58:56.838Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T23:58:56.838Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T23:58:56.838Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T23:58:56.839Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for revalidation-service-producer-1 unregistered
+2026-11-20T23:58:56.852Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T23:58:56.862Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T23:58:56.864Z  INFO 11712 --- [revalidation-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:revalidation-service:test
+
+20 tests completed, 13 failed
+
+> Task :services:revalidation-service:test FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/ks519/AppData/Local/Temp/claude/afae246eb5f474f0/dfe81b9f-23d2-44cd-8efc-409693dc0951/scratchpad/rev-scratch/modern/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':services:revalidation-service:test'.
+> There were failing tests. See the report at: file:///C:/Users/ks519/AppData/Local/Temp/claude/afae246eb5f474f0/dfe81b9f-23d2-44cd-8efc-409693dc0951/scratchpad/rev-scratch/modern/services/revalidation-service/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.7/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 3m 10s
+22 actionable tasks: 22 executed
+GRADLE_EXIT=1 at 2026-11-21 05:29:00
