@@ -86,7 +86,7 @@
       "BatchRunDatabaseErrorTest: PASSED",
       "BatchRunFailureTest: PASSED",
       "BatchRunRepositoryTest: PASSED",
-      "FailureReasonBlankMessageTest: FAILED (25 red: blank-message fallback of FailureReason not cut, not one line; Q-152)",
+      "FailureReasonBlankMessageTest: PASSED",
       "FailureReasonTest: PASSED",
       "JdbcScreeningRunsTest: PASSED",
       "MAM-32.feature 'A run during which provider-service answers 5xx is FAILED and stops reading': PASSED",

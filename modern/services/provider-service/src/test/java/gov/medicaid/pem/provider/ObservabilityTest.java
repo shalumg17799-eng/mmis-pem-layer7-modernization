@@ -184,7 +184,7 @@ class ObservabilityTest extends IntegrationTest {
       "[MAM-36 AC-4] the correlationId of a consumed ApplicationValidated is in the registration log line and in ProviderRegistered")
   void correlationIdFollowsTheEvent() throws Exception {
     String npi = "1003000361";
-    String correlationId = "mam36-corr-p1";
+    String correlationId = "6b3a9f10-2c4e-4d7a-8b5c-000000000361";
     jdbc.update(
         "DELETE FROM provider_owner WHERE provider_id IN (SELECT id FROM provider WHERE npi = ?)",
         npi);

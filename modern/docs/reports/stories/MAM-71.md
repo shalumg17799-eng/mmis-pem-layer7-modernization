@@ -35,3 +35,27 @@ Not verified:      automated tests (Part D); AC-5 with 450 providers; the Spring
                    (no database access from here; the runs and counts were checked through the API)
 Questions for you: none
 ```
+
+## Review fix (2026-11-21, review-fix step of the lead's plan)
+
+The code review of 2026-11-20 rated two points MUST-FIX for tmsis-service; both are fixed, tests first, in two rounds.
+
+1. **Paging (MAM-71 AC-5, the user's decision Q-132).** The extract read the providers by page number and never noticed a
+   change between two pages. It now walks by key (`afterNpi`, provider-service 1.2.0): the first request has no key, each
+   next one is after the last NPI of the answer before. The walk ends only on an answer shorter than 200 (the empty one
+   included); the total never ends it. The second review found that the first version of the fix still stopped when the
+   rows read reached the total, so a termination before the key and an approval after it could drop the last provider of
+   a COMPLETED run; that stop is gone (25 tests red before, among them the reviewer's case). Safety net as the user asked:
+   a total that differs from the first answer, an answer out of order or one that ignores the key ends the run FAILED with
+   a short reason ("provider data changed during the extract; run it again"); see question Q-156 for what that means.
+2. **Interrupted runs (MAM-75 AC-6).** A run that was RUNNING when the service stopped stayed RUNNING for ever. At start-up
+   every RUNNING run is now ended as FAILED with "interrupted: tmsis-service stopped during the run", and its job execution
+   is ended too (9 tests). It assumes one instance of the service per database (stated in the code).
+- Recorded tests that changed are listed with their reasons in `MAM-71/red-report.md` (both sections), `MAM-75/red-report.md`
+  and `MAM-78/red-report.md`.
+- Whole check of the module (08:07 to 08:13): 585 tests, 0 failures, 0 skipped, JaCoCo 98.34 % of lines, PIT 100 % (27 of 27;
+  PIT covers the domain and application packages only, so the two infrastructure classes of these fixes have no mutation
+  score).
+- Reviews: second review MUST-FIX (1 item, above), third review APPROVE. Notes in `modern/docs/reports/review-should-fix.md`.
+- Not verified: against a real provider-service in a test (a fake pinned to contract 1.2.0 was used); a restart in the
+  middle of a run on the running stack.

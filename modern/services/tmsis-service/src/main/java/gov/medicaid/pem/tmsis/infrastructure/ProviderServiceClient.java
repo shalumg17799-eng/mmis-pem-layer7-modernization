@@ -13,7 +13,8 @@ import org.springframework.web.client.RestClient;
 
 /**
  * Reads the ACTIVE providers from provider-service GET /api/v1/providers?status=A with the SYSTEM
- * token (MAM-71 AC-6, D-014, ADR-007); tmsis-service never reads the provider database.
+ * token (MAM-71 AC-6, D-014, ADR-007); tmsis-service never reads the provider database. The extract
+ * pages by key with the optional afterNpi of contract 1.2.0 (Q-132).
  */
 @Component
 public class ProviderServiceClient implements ActiveProviders {
@@ -27,11 +28,18 @@ public class ProviderServiceClient implements ActiveProviders {
 
   @Override
   public Page page(int page, int size) {
-    JsonNode body =
-        http.get()
-            .uri("/api/v1/providers?status=A&page={page}&size={size}", page, size)
-            .retrieve()
-            .body(JsonNode.class);
+    return read("/api/v1/providers?status=A&page={page}&size={size}", page, size);
+  }
+
+  @Override
+  public Page after(String afterNpi, int size) {
+    return afterNpi == null
+        ? read("/api/v1/providers?status=A&size={size}", size)
+        : read("/api/v1/providers?status=A&size={size}&afterNpi={afterNpi}", size, afterNpi);
+  }
+
+  private Page read(String uri, Object... variables) {
+    JsonNode body = http.get().uri(uri, variables).retrieve().body(JsonNode.class);
     if (body == null || !body.path("items").isArray()) {
       throw new IllegalStateException("provider-service answered without a provider page");
     }

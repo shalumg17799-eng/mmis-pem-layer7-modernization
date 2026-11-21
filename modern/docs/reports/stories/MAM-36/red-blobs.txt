@@ -2,7 +2,7 @@
 57ae9e56d9fca4406b01b02cc3c337f628274756  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/config/PemKitAutoConfigurationTest.java
 e8940edc3d7efaa6b3cca91c041b62a9698ef807  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/CorrelationIdFilterTest.java
 a7cf9af7100b4601091b01ee5924179653e07f79  modern/services/enrollment-service/src/test/java/gov/medicaid/pem/enrollment/CorrelationIdTest.java
-cdf0e6e80632f5668dbc94288b5877a1342a8bdc  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ObservabilityTest.java
+393ad1c1ed6fd7820621127b4634f95560dc47f2  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ObservabilityTest.java
 adff04be6197e25b699d8b7451f7c816b6fa068a  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/PlatformChecksTest.java
 1af7fd03c5f493bea173187a1fb77944f21ee2d3  modern/services/provider-service/src/test/java/gov/medicaid/pem/provider/ProviderOutageTest.java
 9d87aa62f037594f1504a3edb60e3a0419190af2  modern/services/provider-service/src/test/resources/junit-platform.properties

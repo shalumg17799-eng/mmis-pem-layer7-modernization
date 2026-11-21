@@ -116,3 +116,13 @@ Feature: T-MSIS extract run: archive every file, report counts, publish ExtractP
     When the ADMIN starts the extract with the body '{"businessDate":"2026-03-31T00:00:00"}'
     Then the extract answers 400 problem+json
     And no extract run was created
+
+  @AC-6
+  Scenario: A run that was RUNNING when tmsis-service stopped is FAILED when the service starts again
+    Given a run for "2026-03-31" was RUNNING when tmsis-service stopped
+    When tmsis-service starts again
+    Then the run is listed as "FAILED" with an end time and a non-empty error text
+    And the error text of the run is "interrupted: tmsis-service stopped during the run"
+    And downloading the file of that run answers 404
+    And no archive generation was added
+    And no ExtractProduced event was published

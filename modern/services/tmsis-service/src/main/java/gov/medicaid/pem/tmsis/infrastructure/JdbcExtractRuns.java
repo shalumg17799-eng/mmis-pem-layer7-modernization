@@ -130,6 +130,16 @@ public class JdbcExtractRuns implements ExtractRuns {
         runId);
   }
 
+  /**
+   * The runs that are RUNNING, oldest first: after a stop of the service they are the runs that
+   * were interrupted (InterruptedRunRecovery).
+   */
+  public List<UUID> running() {
+    return jdbc.queryForList(
+        "SELECT public_id FROM extract_run WHERE status = 'RUNNING' ORDER BY started_at, id",
+        UUID.class);
+  }
+
   @Override
   public Optional<ExtractRun> find(UUID runId) {
     return jdbc.query(RUN_COLUMNS + " WHERE r.public_id = ?", JdbcExtractRuns::run, runId).stream()

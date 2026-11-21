@@ -92,10 +92,9 @@ class ReportedProvidersApiTest extends IntegrationTest {
 
   @Test
   @DisplayName(
-      "[MAM-71 AC-1] the file is in ascending NPI order even when provider-service lists the providers in descending order")
+      "[MAM-71 AC-1] the file is in ascending NPI order even when the providers were registered in descending NPI order (provider-service lists them ascending, contract 1.2.0; a provider-service that lists them descending is a FAILED run, see ProviderDataChangeApiTest)")
   void fileOrderIsTheExtractsNotTheProviderServices() throws Exception {
     sixProviders();
-    TestProviderService.answerInDescendingOrder();
     assertThat(Tmsisout.npis(fileOfRun(DATE))).containsExactly("1003000111", "1003000333");
   }
 
@@ -220,7 +219,6 @@ class ReportedProvidersApiTest extends IntegrationTest {
       all.add(Prov.active("1003" + String.format("%06d", i)));
     }
     TestProviderService.holds(all);
-    TestProviderService.answerInDescendingOrder();
     JsonNode run = api.runToEnd(DATE);
     assertThat(run.path("status").asText()).as(run.toString()).isEqualTo("COMPLETED");
     assertThat(run.path("counts").path("rows").asInt()).isEqualTo(450);
@@ -232,7 +230,7 @@ class ReportedProvidersApiTest extends IntegrationTest {
 
   @Test
   @DisplayName(
-      "[MAM-71 AC-5] 450 providers are read as three pages of 200: page 0, 1 and 2, each with size 200")
+      "[MAM-71 AC-5] 450 providers are read as three requests of size 200 by key: the first has no key, the second is after 1003001200, the third after 1003001400, and none asks for a page after the first (contract 1.2.0, Q-132)")
   void threePagesOf200() throws Exception {
     List<Prov> all = new ArrayList<>();
     for (int i = 1; i <= 450; i++) {
@@ -241,8 +239,12 @@ class ReportedProvidersApiTest extends IntegrationTest {
     TestProviderService.holds(all);
     fileOfRun(DATE);
     List<Request> searches = TestProviderService.searches();
-    assertThat(searches).extracting(r -> r.query().get("page")).containsExactly("0", "1", "2");
+    assertThat(searches)
+        .extracting(r -> r.query().get("afterNpi"))
+        .containsExactly(null, "1003001200", "1003001400");
     assertThat(searches).allSatisfy(r -> assertThat(r.query()).containsEntry("size", "200"));
+    assertThat(searches)
+        .allSatisfy(r -> assertThat(r.query().getOrDefault("page", "0")).isEqualTo("0"));
   }
 
   @ParameterizedTest(

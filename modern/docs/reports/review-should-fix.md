@@ -385,3 +385,42 @@ workflow journals; one section per review.
 - A first line that ends in spaces keeps them (' boom \nmore' gives 'boom '). No rule covers this; stripping the line would be cleaner (the red report already describes it).
 - When the root database error has a blank message, the reason shows the root's class name (for example org.postgresql.util.PSQLException). That is not SQL text and matches revalidation-service. It is noted here only as a small piece of internal detail.
 
+## review2:api-gateway (verdict MUST-FIX)
+
+- GatewayProxyTimeoutTest.java:149-158 stalledDownloadIsEndedWithinABoundedTime asserts only elapsed < 5 s, so an early error (route miss, refused call) also passes; add STUB.callsTo(STALLED_PATH) grew and elapsed >= READ_LIMIT-200ms.
+- PemRoutes.java:75 predicate ex -> true still answers a gateway defect as 'service not available' (now logged at WARN). Narrow to ResourceAccessException when a test can show it (developer is right that IOException would be wrong).
+- Stall after headers: caller gets an empty 500 (HttpMessageNotWritableException, preset text/plain in GatewayProblems; seen in test output, Tomcat logs ERROR). Kept per default; raise the question (default: 503 problem while not committed).
+- Simple-factory trade-offs to record (moot if MUST-FIX 1 replaces it): PATCH unsupported while the CorsFilter (PemRoutes.java:108) allows PATCH; Origin not forwarded; JDK keep-alive cache keeps at most 5 idle connections per service.
+- 30 s default not measured; revisit after MAM-88. The config-test window (5 s < read limit <= 5 min, connect <= 10 s) is test-writer reasoning, not a rule: record it as a question/default.
+- Stalled download ended after 2.2 s with a 1 s limit (body read timeout plus drain): the real worst case is about 2 x PEM_GATEWAY_READ_TIMEOUT; state this in the story report.
+- modern/specs/MAM-29.md:17-18 testsSha256 is still 7df9a78d... while MAM-29.tests.sha256 now hashes to e3143a60...; builtCommit 2e20ead: update at story close (tdd-workflow section 6).
+- The WARN stack trace (ResourceAccessException message) holds the internal URL with host, port, path and query (an NPI in a path). Acceptable for operators; note it in the logging NFR. No token or body (tested).
+- flowingDownloadIsNotCutOff uses 0.5 s gaps against a 1 s limit (ran 2.06 s); a GC pause on a loaded CI agent could approach the limit. Consider smaller gaps or a wider limit to keep the margin.
+- No gateway test shows that a service's 401/403 to a write method passes through unchanged (the gap that hid MUST-FIX 1); add a 403 case beside the 401 test.
+- GatewayFailureLoggingTest collects log events JVM-wide at the root logger; fine while tests run sequentially (no JUnit parallel config found), would mix events under parallel execution.
+
+## review2:tmsis-service (verdict MUST-FIX)
+
+- No red-report.md for MAM-71/MAM-75 for this round's Q-097 C corrections (ReportedProvidersApiTest: 2 answerInDescendingOrder() calls removed; ProviderPagesReaderTest, MAM-71.feature:85, ExtractSteps page->key). Byte-level check: no assertion weakened; descending is now asserted FAILED elsewhere.
+- Story reports MAM-71.md/MAM-75.md not updated for the fix round: keyset walk, safety net, startup recovery, and the safer default for a changed total (FAILED, 'run it again'). That default is a business choice for needsLeadDecision and is not recorded in questions.md.
+- ADR-004 does not record the one-instance-per-tmsis_db assumption that InterruptedRunRecovery.java:31-34 relies on (the first review asked for it).
+- Inferred startup race: recovery runs at ApplicationReadyEvent, after the web server and scheduler start. A run started in that window would be FAILED while its thread goes on, and JdbcExtractRuns.complete :111-117 has no status='RUNNING' guard. Fail only runs started before this instance; guard complete().
+- InterruptedRunRecovery.java:70-72 catches every RuntimeException and only logs it. If tmsis_db is down at start, runs stay RUNNING until the next restart, and the catch path is untested (2 lines missed in JaCoCo).
+- ProviderPagesReader.java:34 says the gap was 'reported to the lead with Q-132', but questions.md Q-132 has no such report. Fix the text together with the MUST-FIX.
+- Optional stronger safety net: at the end of the walk, if rows read differ from the last total, fail with DATA_CHANGED. This catches most mixed-moment pairs, but needs a lead decision: the recorded tests emptyAnswerEndsTheWalk and shortPageEndsTheRead expect no failure.
+- ProviderServiceClient.java:153 reads total with asLong(), so a missing total becomes 0. Treat a missing or non-numeric total as 'answered without a provider page'.
+- ActiveProviders.page / ProviderServiceClient.page (offset form) are no longer used by production code. Remove them later so an offset walk cannot come back by accident.
+- SpringBatchExtractLauncher still uses an unmanaged SimpleAsyncTaskExecutor (the optional part of the first fix). A deploy mid-run relies only on the next start's recovery.
+- PIT mutates only domain/application (27 mutants). The reader and recovery logic in infrastructure is outside the mutation gate, which is why the early-stop defect passed every gate.
+- InterruptedRunRecovery.java:76 writes the batch end time in clock.getZone(), while Spring Batch uses the JVM default zone. Harmless while both are UTC.
+
+## review3:tmsis-service (verdict APPROVE)
+
+- Second-review MUST-FIX is resolved: ProviderPagesReader.java:78 now ends the walk only when an answer is short or empty (rowsRead is gone, the total is used only by checkTotal :71/:82). The javadoc at :19-38 was corrected. Covers MAM-71 AC-5, contract 1.2.0 walk end and R-PRVTMS01-cbl-00027.
+- Lead decision (Q-132 default): a changed total fails the run. Because the walk now makes one more request after an exact multiple of 200, a termination or approval after the last full answer also fails it (ProviderWalkEndTest :190/:200). This is a business choice and should be confirmed.
+- modern/docs/reports/stories/MAM-71.md and MAM-75.md (both dated 2026-11-19) do not mention the keyset walk, the changed-total safety-net default or this walk-end correction. final-report.md section 3 does not either. State them as the task asked.
+- The PIT targetClasses in buildSrc pem.spring-service.gradle.kts cover only domain.* and application.*. ProviderPagesReader and InterruptedRunRecovery, the two classes the review items were about, have no mutation score. The 100 % comes from 27 mutants in 7 classes.
+- MAM-71/trace.json lists 33 test files, but MAM-71.tests.sha256 records 34. ServiceRestart.java is missing from the trace (it is in MAM-75's trace).
+- Hardening: ProviderPagesReader does not check that an answer has at most size (200) items. Such a breach loses no data but goes unnoticed. Optional: fail with a short reason, like NOT_ASCENDING.
+- A termination plus an approval in the same run keeps the total, so the safety net cannot see it. The file then has 401 rows and mixes two moments (this is documented and allowed by the contract). Say so in the story report next to the changed-total default.
+

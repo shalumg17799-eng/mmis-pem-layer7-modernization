@@ -9,12 +9,14 @@ import gov.medicaid.pem.testsupport.PemJwt;
 import gov.medicaid.pem.tmsis.KafkaEvents;
 import gov.medicaid.pem.tmsis.KafkaEvents.Message;
 import gov.medicaid.pem.tmsis.LogCapture;
+import gov.medicaid.pem.tmsis.ServiceRestart;
 import gov.medicaid.pem.tmsis.TestClock;
 import gov.medicaid.pem.tmsis.TestProviderService;
 import gov.medicaid.pem.tmsis.TestProviderService.Fault;
 import gov.medicaid.pem.tmsis.TestProviderService.Prov;
 import gov.medicaid.pem.tmsis.TmsisApi;
 import gov.medicaid.pem.tmsis.Tmsisout;
+import gov.medicaid.pem.tmsis.application.ExtractRuns;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -27,7 +29,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.awaitility.Awaitility;
+import org.awaitility.core.ConditionTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTask;
@@ -50,6 +54,8 @@ public class ExtractSteps {
   @Autowired private JdbcTemplate jdbc;
   @Autowired private ObjectMapper json;
   @Autowired private ScheduledTaskHolder scheduler;
+  @Autowired private ExtractRuns runs;
+  @Autowired private ConfigurableApplicationContext context;
 
   private TmsisApi api;
   private LogCapture log;
@@ -172,6 +178,32 @@ public class ExtractSteps {
     TestClock.set(instant);
   }
 
+  @Given("provider-service also holds the PENDING provider {string}")
+  public void alsoHoldsPending(String npi) {
+    TestProviderService.add(Prov.of(npi, "P"));
+  }
+
+  @Given("provider-service terminates the provider {string} after its first answer")
+  public void terminatesAfterTheFirstAnswer(String npi) {
+    TestProviderService.afterSearch(1, () -> TestProviderService.changeStatus(npi, "T"));
+  }
+
+  @Given("provider-service approves the provider {string} after its first answer")
+  public void approvesAfterTheFirstAnswer(String npi) {
+    TestProviderService.afterSearch(1, () -> TestProviderService.changeStatus(npi, "A"));
+  }
+
+  @Given(
+      "provider-service ignores the key of the search, as a provider-service older than 1.2.0 does")
+  public void ignoresTheKey() {
+    TestProviderService.answerIgnoringTheKey();
+  }
+
+  @Given("a run for {string} was RUNNING when tmsis-service stopped")
+  public void runWasRunningWhenTheServiceStopped(String date) {
+    runIds.add(ServiceRestart.crashedDuringRun(jdbc, runs, date, true).toString());
+  }
+
   @Given("the archive is empty")
   public void archiveIsEmpty() {
     assertThat(jdbc.queryForObject("SELECT count(*) FROM extract_archive", Integer.class)).isZero();
@@ -242,6 +274,21 @@ public class ExtractSteps {
     String runId = api.list(0, 20).path("items").get(0).path("runId").asText();
     runIds.add(runId);
     listedRun = api.await(runId);
+  }
+
+  @When("tmsis-service starts again")
+  public void serviceStartsAgain() throws Exception {
+    ServiceRestart.startsAgain(context);
+    String runId = lastRunId();
+    try {
+      Awaitility.await("the run " + runId + " has left RUNNING")
+          .atMost(Duration.ofSeconds(8))
+          .pollInterval(Duration.ofMillis(100))
+          .until(() -> !"RUNNING".equals(api.listed(runId).path("status").asText()));
+    } catch (ConditionTimeoutException e) {
+      // the steps that follow show the status
+    }
+    listedRun = api.listed(runId);
   }
 
   private static RequestPostProcessor as(String role) {
@@ -329,12 +376,19 @@ public class ExtractSteps {
 
   // ---- Then: how the providers were read (MAM-71 AC-5, AC-6) ------------------------------------
 
-  @Then("provider-service was asked for the pages {string} with the size {int}")
-  public void pagesAsked(String pages, int size) {
+  @Then(
+      "provider-service was asked in {int} requests of the size {int}, the first without a key and the others after the NPIs {string}")
+  public void keysAsked(int requests, int size, String keys) {
     var searches = TestProviderService.searches();
-    assertThat(searches.stream().map(r -> r.query().get("page")).toList())
-        .containsExactlyElementsOf(Arrays.asList(pages.split(",")));
+    assertThat(searches).hasSize(requests);
+    List<String> expected = new ArrayList<>();
+    expected.add(null);
+    expected.addAll(Arrays.asList(keys.split(",")));
+    assertThat(searches.stream().map(r -> r.query().get("afterNpi")).toList())
+        .containsExactlyElementsOf(expected);
     assertThat(searches).allSatisfy(r -> assertThat(r.query()).containsEntry("size", "" + size));
+    assertThat(searches)
+        .allSatisfy(r -> assertThat(r.query().getOrDefault("page", "0")).isEqualTo("0"));
   }
 
   @Then(
@@ -402,6 +456,16 @@ public class ExtractSteps {
   public void listedWithError(String status) {
     listedAs(status);
     assertThat(listedRun.path("error").asText()).isNotBlank();
+  }
+
+  @Then("the error text of the run is {string}")
+  public void errorTextIs(String text) {
+    assertThat(listedRun.path("error").asText()).isEqualTo(text);
+  }
+
+  @Then("the file holds a record for the NPIs {string}")
+  public void fileHoldsRecordsFor(String npis) {
+    assertThat(Tmsisout.npis(file)).containsAll(Arrays.asList(npis.split(",")));
   }
 
   @Then("the run counts {int} rows, as many as the records of its file")

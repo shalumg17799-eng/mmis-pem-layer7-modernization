@@ -1469,3 +1469,20 @@ fails after the service's content type (for example text/plain of a legacy file)
 problem answer any more and the caller gets an empty 500. Options: A) while nothing has been sent, reset the answer and
 send the usual 503 problem; when bytes have gone out, cut the connection; B) leave it.
 **Default applied: B** (new behaviour needs a decision and a test first). **Recommended: A.**
+
+## Q-156. (review fix of tmsis-service, MAM-71 AC-5, 2026-11-21 08:25) What a T-MSIS extract does when the provider data change while it runs (status: DEFAULT APPLIED - revisit)
+
+With the user's decision Q-132 the extract reads the providers by key and keeps the check "detect a change and fail with a
+clear reason" as a safety net. Built: the extract compares the total that provider-service reports with every answer; when
+it differs from the first answer the run ends FAILED with "provider data changed during the extract; run it again", and no
+file is archived. Two consequences were pinned by tests and are for the user to confirm.
+1. Any termination or approval that changes the total while a run reads (a few seconds) fails that run, also when the walk
+   by key would have read every provider correctly. Options: A) keep it: a month-end file never mixes two moments, at the
+   price of running the extract again; B) fail only when the walk itself cannot be trusted (an answer out of order or
+   ignoring the key) and let a changed total pass. **Default applied: A** (it is what "keep the check as a safety net"
+   says, read literally).
+2. A termination and an approval in the same run keep the total, so the check cannot see them. The walk by key still reads
+   every provider that is ACTIVE at the moment its part of the list is read, none twice and none dropped (this was the
+   defect of the second review, now fixed and tested), but the file then holds providers of two moments. The contract of
+   provider-service allows this; nothing more is done. **Default applied: accept.**
+Cost of the fix: at an exact multiple of 200 providers the walk makes one request more (the empty answer ends it).
