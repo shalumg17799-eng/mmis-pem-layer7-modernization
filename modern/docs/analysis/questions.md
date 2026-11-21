@@ -1305,6 +1305,16 @@ outbox.
 of shared code), **and A is planned as its own item after the service lanes** (tests first in the kit, regression of
 every service, one deploy), because the contract is explicit and the defect class exists in every service.
 **Recommended: A.**
+**A applied on 2026-11-21 (07:46 to 08:46), in the shared kit:** `OutboxWriter` puts the current correlation id into an event
+only when it is a uuid (stored in its canonical lower-case form) and a new uuid otherwise; the log context and the
+response header are untouched. Tests first (`OutboxWriterCorrelationIdTest`, 71 tests, 28 red before the fix), one code
+review: APPROVE. Two recorded tests that put a non-uuid id into an event got a uuid as input (kit `OutboxWriterTest`,
+provider `ObservabilityTest`; assertions unchanged, rule Q-097 C); a search of all ten services found no other such test.
+Two things follow from it and are for the user: (1) a request whose id is no uuid gives every event its own new uuid,
+so several events of one such request no longer share a correlation id, and no log line links the request's id to them;
+(2) a text that Java reads as a uuid although it is not written in the 8-4-4-4-12 form (for example 1-1-1-1-1) is
+kept, in its canonical form; a strict reading would replace it. The wording of MAM-31 AC-5 ("equals that id") now
+holds for a uuid only and is to be brought in line as a text change of the story.
 
 ## Q-143. (enrollment lane, MAM-56 AC-7, 2026-11-21 02:26) Malformed multipart uploads answer 500, and Q-120's limit is 1 MB, not 2 MB (status: DEFAULT APPLIED - revisit)
 

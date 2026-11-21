@@ -38,3 +38,23 @@ Not verified:      AC-3 against the live stack (Kafka of project pem was not sto
 Questions for you: none
 Next step:         Jira Done (user approval 2026-11-19 20:34)
 ```
+
+## Follow-up (2026-11-21, question Q-142, option A)
+
+The event contract says the correlation id of an event is a uuid. The kit copied the id of the request into every event, and
+the request filter accepts any safe text (for example `trace-42`), so such a request wrote events against the contract.
+
+- Tests first (test-writer, 07:46 to 08:18): `OutboxWriterCorrelationIdTest`, 71 tests: a non-uuid or unsafe current id
+  is replaced by a new uuid, a uuid is kept in its canonical lower-case form, without a current id the event gets a uuid,
+  the log context is never changed, the stored envelope conforms to `events.yaml`; 28 were red before the fix.
+- One recorded test changed under rule Q-097 C: `OutboxWriterTest#writesTheEnvelopeToTheOutboxTable` used the id `corr-42`
+  and now uses a uuid (2 lines; the assertion that the envelope carries the current id is unchanged). The same was done
+  for provider-service's `ObservabilityTest` (MAM-36, 1 line). Both are described in the red reports of MAM-31 and MAM-36.
+- Fix (java-developer, 08:19 to 08:33): `OutboxWriter.eventCorrelationId()`; nothing else in the kit changed.
+- Checks: `:libs:service-kit:check` 181 tests, 0 failures, 0 skipped, JaCoCo 91.9 % of lines (the kit has no PIT); the test
+  tasks of risk-service (351 tests) and notification-service (346 tests): 0 failures. The regression of the other services
+  is the GitHub pipeline for the commit that carries this change.
+- One code review (08:46): APPROVE, no MUST-FIX. Notes in `modern/docs/reports/review-should-fix.md`.
+- For the user (recorded under Q-142): events of one request with a non-uuid id no longer share a correlation id; a text
+  that Java accepts as a uuid without the 8-4-4-4-12 form is kept in canonical form; AC-5 of this story says "equals that
+  id", which now holds for a uuid only (a text change of the story is to follow).

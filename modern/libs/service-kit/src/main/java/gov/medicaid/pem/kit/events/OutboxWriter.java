@@ -38,7 +38,7 @@ public class OutboxWriter {
     Instant now = clock.instant();
     var envelope =
         new EventEnvelope(
-            id, type, source, now, subject, CorrelationId.currentOrNew(), json.valueToTree(data));
+            id, type, source, now, subject, eventCorrelationId(), json.valueToTree(data));
     try {
       jdbc.update(
           INSERT_SQL, id, type, subject, json.writeValueAsString(envelope), Timestamp.from(now));
@@ -46,5 +46,18 @@ public class OutboxWriter {
       throw new IllegalStateException("cannot serialise event " + type, e);
     }
     return id;
+  }
+
+  /**
+   * The correlationId of an event is a uuid (events.yaml). The id of the current request or
+   * consumed event is used when it is one, in its canonical lower-case form; a safe id that is no
+   * uuid (for example "trace-42") stays in the log context and the event gets a new uuid (Q-142).
+   */
+  private static String eventCorrelationId() {
+    try {
+      return UUID.fromString(CorrelationId.currentOrNew()).toString();
+    } catch (IllegalArgumentException e) {
+      return UUID.randomUUID().toString();
+    }
   }
 }

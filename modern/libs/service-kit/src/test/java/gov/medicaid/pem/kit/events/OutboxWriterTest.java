@@ -38,7 +38,7 @@ class OutboxWriterTest {
   @DisplayName(
       "[MAM-31 AC-2] an event is written to outbox_event in the caller's transaction with the full envelope")
   void writesTheEnvelopeToTheOutboxTable() throws Exception {
-    MDC.put(CorrelationId.MDC_KEY, "corr-42");
+    MDC.put(CorrelationId.MDC_KEY, "5a1e7b20-3c4d-4e5f-9a6b-000000000456");
 
     UUID id = writer.enqueue("ProviderRegistered", "1003000111", Map.of("npi", "1003000111"));
 
@@ -57,7 +57,7 @@ class OutboxWriterTest {
     assertThat(env.get("source").asText()).isEqualTo("provider-service");
     assertThat(env.get("time").asText()).isEqualTo("2026-01-15T10:00:00Z");
     assertThat(env.get("subject").asText()).isEqualTo("1003000111");
-    assertThat(env.get("correlationId").asText()).isEqualTo("corr-42");
+    assertThat(env.get("correlationId").asText()).isEqualTo("5a1e7b20-3c4d-4e5f-9a6b-000000000456");
     assertThat(env.get("data").get("npi").asText()).isEqualTo("1003000111");
   }
 

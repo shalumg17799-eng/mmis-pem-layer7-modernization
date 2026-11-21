@@ -16,6 +16,7 @@
     "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/config/PemKitAutoConfigurationTest.java",
     "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/EventEnvelopeTest.java",
     "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxRelayTest.java",
+    "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxWriterCorrelationIdTest.java",
     "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxWriterTest.java",
     "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/ProcessedEventsTest.java",
     "modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/EventProbe.java",
@@ -25,6 +26,7 @@
     "AC-1": [
       "EventEnvelopeTest: PASSED",
       "OutboxRelayTest: PASSED",
+      "OutboxWriterCorrelationIdTest: PASSED",
       "ProcessedEventsTest: PASSED"
     ],
     "AC-2": [
@@ -39,6 +41,7 @@
     ],
     "AC-5": [
       "HelpersTest: PASSED",
+      "OutboxWriterCorrelationIdTest: PASSED",
       "OutboxWriterTest: PASSED"
     ],
     "AC-6": [
@@ -52,6 +55,10 @@
       "PemKitAutoConfigurationTest: PASSED"
     ]
   },
-  "codeUnits": [],
-  "rules": []
+  "codeUnits": [
+    "gov.medicaid.pem.kit.events.OutboxWriter"
+  ],
+  "rules": [
+    "Q-142"
+  ]
 }

@@ -385,20 +385,6 @@ workflow journals; one section per review.
 - A first line that ends in spaces keeps them (' boom \nmore' gives 'boom '). No rule covers this; stripping the line would be cleaner (the red report already describes it).
 - When the root database error has a blank message, the reason shows the root's class name (for example org.postgresql.util.PSQLException). That is not SQL text and matches revalidation-service. It is noted here only as a small piece of internal detail.
 
-## review2:api-gateway (verdict MUST-FIX)
-
-- GatewayProxyTimeoutTest.java:149-158 stalledDownloadIsEndedWithinABoundedTime asserts only elapsed < 5 s, so an early error (route miss, refused call) also passes; add STUB.callsTo(STALLED_PATH) grew and elapsed >= READ_LIMIT-200ms.
-- PemRoutes.java:75 predicate ex -> true still answers a gateway defect as 'service not available' (now logged at WARN). Narrow to ResourceAccessException when a test can show it (developer is right that IOException would be wrong).
-- Stall after headers: caller gets an empty 500 (HttpMessageNotWritableException, preset text/plain in GatewayProblems; seen in test output, Tomcat logs ERROR). Kept per default; raise the question (default: 503 problem while not committed).
-- Simple-factory trade-offs to record (moot if MUST-FIX 1 replaces it): PATCH unsupported while the CorsFilter (PemRoutes.java:108) allows PATCH; Origin not forwarded; JDK keep-alive cache keeps at most 5 idle connections per service.
-- 30 s default not measured; revisit after MAM-88. The config-test window (5 s < read limit <= 5 min, connect <= 10 s) is test-writer reasoning, not a rule: record it as a question/default.
-- Stalled download ended after 2.2 s with a 1 s limit (body read timeout plus drain): the real worst case is about 2 x PEM_GATEWAY_READ_TIMEOUT; state this in the story report.
-- modern/specs/MAM-29.md:17-18 testsSha256 is still 7df9a78d... while MAM-29.tests.sha256 now hashes to e3143a60...; builtCommit 2e20ead: update at story close (tdd-workflow section 6).
-- The WARN stack trace (ResourceAccessException message) holds the internal URL with host, port, path and query (an NPI in a path). Acceptable for operators; note it in the logging NFR. No token or body (tested).
-- flowingDownloadIsNotCutOff uses 0.5 s gaps against a 1 s limit (ran 2.06 s); a GC pause on a loaded CI agent could approach the limit. Consider smaller gaps or a wider limit to keep the margin.
-- No gateway test shows that a service's 401/403 to a write method passes through unchanged (the gap that hid MUST-FIX 1); add a 403 case beside the 401 test.
-- GatewayFailureLoggingTest collects log events JVM-wide at the root logger; fine while tests run sequentially (no JUnit parallel config found), would mix events under parallel execution.
-
 ## review2:tmsis-service (verdict MUST-FIX)
 
 - No red-report.md for MAM-71/MAM-75 for this round's Q-097 C corrections (ReportedProvidersApiTest: 2 answerInDescendingOrder() calls removed; ProviderPagesReaderTest, MAM-71.feature:85, ExtractSteps page->key). Byte-level check: no assertion weakened; descending is now asserted FAILED elsewhere.
@@ -423,4 +409,31 @@ workflow journals; one section per review.
 - MAM-71/trace.json lists 33 test files, but MAM-71.tests.sha256 records 34. ServiceRestart.java is missing from the trace (it is in MAM-75's trace).
 - Hardening: ProviderPagesReader does not check that an answer has at most size (200) items. Such a breach loses no data but goes unnoticed. Optional: fail with a short reason, like NOT_ASCENDING.
 - A termination plus an approval in the same run keeps the total, so the safety net cannot see it. The file then has 401 rows and mixes two moments (this is documented and allowed by the contract). Say so in the story report next to the changed-total default.
+
+## review2:api-gateway (verdict MUST-FIX)
+
+- GatewayProxyTimeoutTest.java:149-158 stalledDownloadIsEndedWithinABoundedTime asserts only elapsed < 5 s, so an early error (route miss, refused call) also passes; add STUB.callsTo(STALLED_PATH) grew and elapsed >= READ_LIMIT-200ms.
+- PemRoutes.java:75 predicate ex -> true still answers a gateway defect as 'service not available' (now logged at WARN). Narrow to ResourceAccessException when a test can show it (developer is right that IOException would be wrong).
+- Stall after headers: caller gets an empty 500 (HttpMessageNotWritableException, preset text/plain in GatewayProblems; seen in test output, Tomcat logs ERROR). Kept per default; raise the question (default: 503 problem while not committed).
+- Simple-factory trade-offs to record (moot if MUST-FIX 1 replaces it): PATCH unsupported while the CorsFilter (PemRoutes.java:108) allows PATCH; Origin not forwarded; JDK keep-alive cache keeps at most 5 idle connections per service.
+- 30 s default not measured; revisit after MAM-88. The config-test window (5 s < read limit <= 5 min, connect <= 10 s) is test-writer reasoning, not a rule: record it as a question/default.
+- Stalled download ended after 2.2 s with a 1 s limit (body read timeout plus drain): the real worst case is about 2 x PEM_GATEWAY_READ_TIMEOUT; state this in the story report.
+- modern/specs/MAM-29.md:17-18 testsSha256 is still 7df9a78d... while MAM-29.tests.sha256 now hashes to e3143a60...; builtCommit 2e20ead: update at story close (tdd-workflow section 6).
+- The WARN stack trace (ResourceAccessException message) holds the internal URL with host, port, path and query (an NPI in a path). Acceptable for operators; note it in the logging NFR. No token or body (tested).
+- flowingDownloadIsNotCutOff uses 0.5 s gaps against a 1 s limit (ran 2.06 s); a GC pause on a loaded CI agent could approach the limit. Consider smaller gaps or a wider limit to keep the margin.
+- No gateway test shows that a service's 401/403 to a write method passes through unchanged (the gap that hid MUST-FIX 1); add a 403 case beside the 401 test.
+- GatewayFailureLoggingTest collects log events JVM-wide at the root logger; fine while tests run sequentially (no JUnit parallel config found), would mix events under parallel execution.
+
+## review:service-kit (verdict APPROVE)
+
+- OutboxWriter.java:56-62: a non-uuid current id gets a fresh uuid per event, so several events of one request or consumed event stop sharing a correlationId, and no log line links the request id to the event uuid. One generated uuid per scope (second MDC key) or a log line would need a decision.
+- OutboxWriter.java:58: UUID.fromString's legacy path accepts short groups and silently masks long ones (123456789-1-1-1-1 -> 23456789-0001-...; 1-1-1-1-1 and 01-1-1-1-1 give one id). Strict option A would give these a new uuid; an 8-4-4-4-12 check (also in enrollment uuidOf) is the user's call.
+- OutboxWriterCorrelationIdTest nonCanonicalUuids (3 rows) pins a JDK implementation detail (lenient UUID.fromString). A later JDK that tightens it turns those rows red. Fine on Temurin 21.0.7, which ci.yml uses.
+- specs/MAM-31.md AC-5 says the envelope correlationId equals the request's id; by Q-142 that now holds only for a uuid. Reword AC-5 ('equals that id when it is a uuid, else a new uuid') with the user's approval.
+- Bookkeeping: specs/MAM-31.md testsSha256 is still 5af3536d... (the file is now bf0bd0c7...); docs/reports/stories/MAM-31.md has no Q-142 section; questions.md Q-142 still says 'A planned'. Update all three after approval.
+- Evidence: the XML results of the full post-fix kit check were overwritten by the later filtered OutboxWriterTest run (08:36). Record the per-class counts of a full run in the story report before running filtered tests again.
+- The EnvelopeContract checker inside the new test duplicates the EventsContractFile helpers of notification, revalidation, screening and tmsis; one shared checker in libs/test-support would keep one reading of events.yaml.
+- enrollment-service KitEventOutbox.uuidOf is redundant after the kit fix (kept by decision, still harmless); remove it in a later cleanup without changing its tests.
+- provider-service JdbcAuditTrail.uuid stores NULL for a non-uuid request id while the event now carries a generated uuid, so audit history and event cannot be joined for such requests (pre-existing, outside Q-142).
+- Process: the provider ObservabilityTest correction for Q-142 (MAM-36 record) was committed in 7aa7820 before this item was approved. Harmless (a uuid input passes with the old and new writer), but the MAM-36 record now comes before the kit commit.
 

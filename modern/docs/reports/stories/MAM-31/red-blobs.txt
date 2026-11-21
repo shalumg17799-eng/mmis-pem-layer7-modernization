@@ -3,7 +3,8 @@
 57ae9e56d9fca4406b01b02cc3c337f628274756  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/config/PemKitAutoConfigurationTest.java
 bf871d16584ba073e7e69e0bc89c6f0d331fe1a6  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/EventEnvelopeTest.java
 3b9aad0e3d21a371ced806f1bc35e41b6a00b83c  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxRelayTest.java
-74542f1d73f37c69283b86eec6da2c3348528949  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxWriterTest.java
+23e16310578dd45afd609623e0b01644758bbb9d  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxWriterCorrelationIdTest.java
+512fff9a51efd6ac846ff2a89fe7b24ce72c2c63  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/OutboxWriterTest.java
 025011e0349570bd6747df8d7bcd4ae17ed77aac  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/events/ProcessedEventsTest.java
 5628d4a8fd65ca76f4aa29948942751fc7a3c01f  modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/EventProbe.java
 01e80049b33616098f266a5e8c4bbf9201a37cf6  modern/libs/test-support/src/main/java/gov/medicaid/pem/testsupport/PemContainers.java
