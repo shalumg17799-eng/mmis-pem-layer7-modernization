@@ -14,8 +14,8 @@ decisions: [D-015, D-020, D-024, D-023]
 dependsOn: [MAM-71, MAM-31]
 mainJourney: false
 labels: [svc-tmsis-service, kag-L-S051, agentic, decision-D-015, decision-D-020, decision-D-024, decision-D-023]
-builtCommit: pending-user-commit
-testsSha256: 31518f57b3165dacefdcae54ba6bd421e83cea475208800dc5ffcf83237f4b96
+builtCommit: 7aa7820
+testsSha256: 6c94999b6d1796552f0c167e5a542ca56566890e4e6be424c2837a0cc65c4bf2
 ---
 ## Business requirement
 The monthly T-MSIS extract is run by an administrator for a chosen business date, or automatically each month. Each run reports how many providers it wrote, keeps a permanent copy of its file as the next archive generation so that earlier months can still be retrieved, and tells the rest of the system that the extract is ready. If a run fails, the failure is visible, nothing is archived and nobody is told the extract is ready.

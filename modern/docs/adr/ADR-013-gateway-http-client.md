@@ -1,5 +1,5 @@
 # ADR-013: Apache HttpClient 5 behind the gateway's proxy routes
-Status: ACCEPTED (default applied by the java-developer role in the review fix of MAM-29, 2026-11-21; revisit after the performance smoke MAM-88)
+Status: APPLIED AS A DEFAULT, NOT YET CONFIRMED BY THE USER (written by the java-developer in the review fix of MAM-29 on 2026-11-21; question Q-157 in `modern/docs/analysis/questions.md`; the numbers are to be looked at again after the performance smoke MAM-88)
 
 ## Context
 The gateway (Spring Cloud Gateway Server MVC 4.3.5, Spring Framework 6.2.19, Spring Boot 3.5.16) forwards every call with the

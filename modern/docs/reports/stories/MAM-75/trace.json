@@ -13,6 +13,7 @@
   "tests": [
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/PlatformChecksTest.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/ServiceRestart.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/TestProviderService.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/acceptance/ExtractSteps.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/adapter/legacy/TmsisOutFileTest.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/api/ArchiveGenerationApiTest.java",

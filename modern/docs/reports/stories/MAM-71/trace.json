@@ -15,6 +15,7 @@
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/KafkaEvents.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/LogCapture.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/PlatformChecksTest.java",
+    "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/ServiceRestart.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/TestClock.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/TestProviderService.java",
     "modern/services/tmsis-service/src/test/java/gov/medicaid/pem/tmsis/TestProviderServiceKeysetTest.java",

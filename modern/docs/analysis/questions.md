@@ -1486,3 +1486,15 @@ file is archived. Two consequences were pinned by tests and are for the user to 
    defect of the second review, now fixed and tested), but the file then holds providers of two moments. The contract of
    provider-service allows this; nothing more is done. **Default applied: accept.**
 Cost of the fix: at an exact multiple of 200 providers the walk makes one request more (the empty answer ends it).
+
+## Q-157. (review fix of api-gateway, MAM-29, 2026-11-21 08:33) A new library in the gateway: Apache HttpClient 5 (ADR-013) (status: DEFAULT APPLIED - revisit)
+
+The time limit for proxied calls (Q-154) needs an HTTP client that limits the time per read. Three were tried against the
+same tests (ADR-013): the JDK client limits the whole exchange and cuts a flowing download; the simple JDK client loses the
+body of a service's 401 answer to a write (found by the second review) and knows no PATCH; a client of our own on the JDK
+client would be code to write and keep. Options: A) Apache HttpClient 5, whose version is managed by Spring Boot, set up as
+a plain relay (no automatic retry, no compression, no cookies, a pool of 200 connections); B) an own request factory on the
+JDK client. **Default applied: A**, by the developer of the lane with ADR-013, which the lead marked as "applied as a
+default, not yet confirmed by the user". It is a new third-party library in one service; in the local run mode (all
+services in one process, ADR-011) it is on the shared class path, where the other services name their HTTP client
+explicitly. Nothing of it is live until the third review of the gateway approves.
