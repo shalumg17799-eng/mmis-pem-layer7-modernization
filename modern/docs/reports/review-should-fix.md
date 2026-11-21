@@ -334,17 +334,6 @@ workflow journals; one section per review.
 - HEAD 6e24725 holds mutant M19 in structure.ts, while HEAD's gate.a11y.spec.ts already has the body guard, so the default suite on HEAD (CI) fails that guard. Put the working-tree structure.ts (sha aefdd63e) in the next commit.
 - Pin the probed limits (13 accepted, 4 over-reported) as recorded 'known limit' gate cases so that a later change to them shows up. Today they exist only in scratchpad probe JSON.
 
-## review2:notification-service (verdict APPROVE)
-
-- NoticeDelivery.java:55-56,66-71: the WARN line carries only e.getMessage(), so the stack trace and the nested MailConnectException are lost. Pass e as the last logger argument. Open since round 1, and it now covers all seven notice types.
-- NoticeDelivery.java:53-60: the email goes out before the SENT row and the outbox row commit. A later DB failure rolls back, the kit retries twice, and the provider can get up to 3 identical emails (O-2, round 1). Record a pending row first, or stop retrying once the mail was sent.
-- NoticeEventsListener.java:59-75: the NPI from the ProviderStatusChanged subject and from SanctionApplied/RevalidationDue data is not checked against ^[0-9]{10}$ before the email is addressed. A long value fails the CHAR(10) insert after the send, so it is retried and re-sent (round 1, still open).
-- NoticeSendFailureTest.java:331-333 (same in NoticeApiTest.java:449): '!(has && isNull)' also passes if a FAILED notice wrongly carried a sentAt string. Assert that n.has("sentAt") is false.
-- NoticeSendFailureTest.java:125,243,296 changes the port of the context's shared JavaMailSenderImpl. A late Kafka event consumed by this context's listener in that window would be recorded FAILED (O-4). Give the JUnit context its own consumer group, or no listener.
-- NoticeDelivery.java:54: JavaMailSenderImpl throws MailSendException when only transport.close() fails after a successful send, so an email that went out is recorded FAILED. This is rare. It could be told apart through MailSendException.getFailedMessages() being empty.
-- Bookkeeping: testsSha256 in specs/MAM-59.md:18 (848b4d..) and specs/MAM-60.md:18 (f94542..) does not match the re-recorded hash files (bfe855.., c250cc..). The story reports MAM-59.md and MAM-60.md (2026-11-20 18:25) do not describe this fix round.
-- Other round-1 notes this fix did not touch are still open: lenient page/size binding (NoticeController.java:33-34, best fixed in the kit), Mailpit HTTP calls without a timeout in NoticeSteps/SanctionNoticeSteps, the NoticeView JSON shape in the application layer, no (npi, created_at) index, and action/runId logged raw in the plain log format.
-
 ## review:revalidation-service (verdict APPROVE)
 
 - ExecuteSweep.java:53-62, JdbcRevalidationStore.java:57 race (from reading the code, not run): a provider leaves ACTIVE while a sweep transaction is open. Its event commits but finds no case to cancel (the new case is still invisible), and the sweep opens a case and a RevalidationDue from its stale read. Breaks MAM-49 AC-2 and R-PRVREV01-cbl-00003.
@@ -360,4 +349,28 @@ workflow journals; one section per review.
 - DoD bookkeeping: specs MAM-45, MAM-48 and MAM-49 have empty builtCommit and testsSha256. Update them at story close and run build_rule_trace.py.
 - Style: CompleteCase (application layer) throws the kit's web ApiException, and SweepController.JOB duplicates SweepJobConfig.JOB.
 - Q-146 (sweep events get a fresh correlation id each) and Q-147 (no cron, unlike java-microservices section 10; manual start as the story says) still wait on the user.
+
+## review2:notification-service (verdict APPROVE)
+
+- NoticeDelivery.java:55-56,66-71: the WARN line carries only e.getMessage(), so the stack trace and the nested MailConnectException are lost. Pass e as the last logger argument. Open since round 1, and it now covers all seven notice types.
+- NoticeDelivery.java:53-60: the email goes out before the SENT row and the outbox row commit. A later DB failure rolls back, the kit retries twice, and the provider can get up to 3 identical emails (O-2, round 1). Record a pending row first, or stop retrying once the mail was sent.
+- NoticeEventsListener.java:59-75: the NPI from the ProviderStatusChanged subject and from SanctionApplied/RevalidationDue data is not checked against ^[0-9]{10}$ before the email is addressed. A long value fails the CHAR(10) insert after the send, so it is retried and re-sent (round 1, still open).
+- NoticeSendFailureTest.java:331-333 (same in NoticeApiTest.java:449): '!(has && isNull)' also passes if a FAILED notice wrongly carried a sentAt string. Assert that n.has("sentAt") is false.
+- NoticeSendFailureTest.java:125,243,296 changes the port of the context's shared JavaMailSenderImpl. A late Kafka event consumed by this context's listener in that window would be recorded FAILED (O-4). Give the JUnit context its own consumer group, or no listener.
+- NoticeDelivery.java:54: JavaMailSenderImpl throws MailSendException when only transport.close() fails after a successful send, so an email that went out is recorded FAILED. This is rare. It could be told apart through MailSendException.getFailedMessages() being empty.
+- Bookkeeping: testsSha256 in specs/MAM-59.md:18 (848b4d..) and specs/MAM-60.md:18 (f94542..) does not match the re-recorded hash files (bfe855.., c250cc..). The story reports MAM-59.md and MAM-60.md (2026-11-20 18:25) do not describe this fix round.
+- Other round-1 notes this fix did not touch are still open: lenient page/size binding (NoticeController.java:33-34, best fixed in the kit), Mailpit HTTP calls without a timeout in NoticeSteps/SanctionNoticeSteps, the NoticeView JSON shape in the application layer, no (npi, created_at) index, and action/runId logged raw in the plain log format.
+
+## review2:sanctions-service (verdict APPROVE)
+
+- modern/specs/MAM-55.md still has testsSha256 846046de… (26 files). The DoD needs b75635a6… (27 files). Story report MAM-55.md has no entry yet for this fix (RequestProblems, SanctionIntakeUploadTest, Q-143), and the rule-trace.csv refresh was not seen.
+- Lesson b: the code rejects 2026-03-31T00:00:00 (LocalDate.parse in SanctionIntakeController:100), but no test sends a date with a time part. Add it to the values of SanctionIntakeApiTest.businessDateIsNotADate (tag MAM-55 AC-1).
+- The detail text differs from enrollment-service: sanctions says 'The upload could not be read: ...', enrollment says 'The request is not valid.'. Status and media type match. Align the wording in both services (lead decision).
+- RequestProblems.java:28 applies to the whole service, so a malformed multipart body sent to POST /api/v1/sanctions gets a detail that names 'the file and the businessDate'. Neutral wording ('The upload could not be read.') would fit every endpoint.
+- @PreAuthorize runs only after Tomcat has parsed the multipart body (eager resolution). A token without ADMIN/SYSTEM gets 400 for a malformed body, and the body is parsed before the 403. Hardening: a URL rule in the security chain. Same in enrollment.
+- A non-multipart Content-Type on the intake endpoint gives Spring's 415 with Boot's application/json error body, not problem+json. Lesson h and the contract do not list 415, but it does not match the other error answers.
+- RequestProblems does not log the multipart parse failure at all. A DEBUG line with the exception class would help diagnose gateway or client problems without showing anything to the caller.
+- Fix-check run 1 (06:19-06:26) failed 33 Cucumber scenarios on a Kafka Testcontainer start timeout. That was environmental: the Cucumber suite was the first class to run. Only one green run since. Record it in the story report.
+- JaCoCo is 98.42 %, below the 98.84 % of the earlier gate, although that code did not change: SanctionIntakeJobConfig:55 (file gone) and :107 (failure without exception) are not covered in this run. Coverage of these defensive paths seems to vary between runs.
+- Pre-existing, outside this fix: safe re-runs rely on the single-thread 'sanction-intake' executor in one JVM plus a count query. No database constraint stops two instances re-running the same business date at the same time.
 

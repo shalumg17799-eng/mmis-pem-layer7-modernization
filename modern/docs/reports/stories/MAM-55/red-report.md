@@ -116,3 +116,83 @@ Command: `:services:sanctions-service:test --tests <the 6 new classes>`. **39 te
 ### Hashes
 
 Re-recorded with `test_protection.py record MAM-55` (the 20 recorded files plus the 6 new ones); `check` prints `OK: 26 test files of MAM-55 unchanged; no unrecorded test files`. The red copies are in git's object store, listed in `MAM-55/red-blobs.txt`; the draft copies stay under the blob ids named above.
+
+## Test correction under Q-097 (code review 2026-11-20, additive)
+
+Cause: the code review of sanctions-service returned MUST-FIX for one item that the enrollment lane found (same upload pattern, Q-143 part 1) and the lead confirmed on the running stack on 2026-11-21 at 02:27:
+a multipart start of `POST /api/v1/batch/sanction-intake-runs` whose body is malformed is answered **500 with Spring Boot's default JSON error body** instead of 400 `application/problem+json`
+(lesson h: an unreadable body is a 400 problem). Seen through the gateway with an ADMIN token: (1) `Content-Type: multipart/form-data` without a boundary parameter, (2) a file part cut off (no closing boundary);
+no run is started in either case. Story MAM-55 and epic MAM-8 were reopened in Jira for it. The user's standing rule **Q-097 C** applies: additive, no assertion weakened, removed or relaxed, documented here and re-recorded.
+
+**This correction is additive.** No recorded file was edited: the 26 recorded files of MAM-55 are byte-identical (`test_protection.py check MAM-55` printed only the new file as unrecorded before it was recorded) and one new file is added,
+so the hash file now has 27 entries (previous: 26 files, sha256 `846046de712431e122e924c18f2b841e547338f876e040f4455df1ce2d6e1041`; now sha256 `b75635a620ceb79a92aa92a30013835d733d26030afc51cb792e98cc24632b8d`).
+MAM-52 is not affected (`check MAM-52` prints OK, 11 files). No Cucumber scenario was added: AC-1 already has scenarios for a call without the file or the business date, and MockMvc (which the Cucumber suite uses)
+does not parse a multipart body the way Tomcat does, so the unreadable-body cases can only be shown against the real web server; the new class follows `IntakeUploadLimitTest` of enrollment-service (MAM-56 AC-7).
+
+### File (under `modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/`; CRLF kept, formatted by Spotless on test sources only)
+
+| File | Blob id (recorded) | In hash file of | Tests |
+|---|---|---|---|
+| `api/SanctionIntakeUploadTest.java` (own Spring context, real web server on a random port, a test decoder accepts any bearer token as ADMIN, the shared Postgres and Kafka wired through properties, not as beans) | `4c9779009ff9ffe911069cbb4a2b03be4699049e` | MAM-55 | 44 (14 methods: 10 parameterised over 4 bodies each = 40, 4 plain = 4) |
+
+```diff
+--- MAM-55.tests.sha256 (previous, 26 files)  +++ MAM-55.tests.sha256 (now, 27 files): added line only
++ 6cc12432526b...  modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeUploadTest.java
+```
+
+### The new tests (display names start `[MAM-55 AC-1]`; the AC is AC-1: "a call without businessDate or without the file returns 400 problem+json and creates no run", extended here to a body that cannot be read at all)
+
+The four unreadable bodies (`unreadableBodies`): (a) content type `multipart/form-data` without a boundary parameter, the body itself a complete valid message with one record; (b) a file part cut off before its closing boundary
+(the record is complete, the closing boundary is missing); (c) a file part whose headers are cut off; (d) a businessDate part cut off. (a) and (b) are the two of the review, (c) and (d) are two more cases of the same kind.
+
+| Method (each x4 bodies unless stated) | What it asserts (one focus per test; each requires the answer to be 400 first) | Today |
+|---|---|---|
+| `unreadableMultipartBodyIsA400Problem` | `Content-Type` of the answer starts with `application/problem+json` | RED |
+| `problemHasStatusAndTitle` | the problem has `status` 400 and `title` "Bad Request" | RED |
+| `detailSaysTheUploadCouldNotBeRead` | the `detail`, lower-cased, contains "upload" and "could not be read" | RED |
+| `answerNamesNeitherSqlNorClass` | the body has none of select, insert, update, sql, exception, org.apache, org.springframework, java., tomcat, fileupload, stacktrace; the detail is 1 to 200 characters | RED |
+| `correlationIdOfTheCallIsEchoed` | a call with `X-Correlation-Id: upload-check-400` gets the same header back | RED |
+| `correlationIdIsGeneratedWhenTheCallHasNone` | without the header the answer carries a generated id that matches `[A-Za-z0-9._:-]{1,64}` | RED |
+| `problemMediaTypeHoldsForAJsonClient` | with `Accept: application/json` the answer is still `application/problem+json` | RED |
+| `unreadableBodyStartsNoRun` | no row in `sanction_intake_run` and no new `batch_job_execution` | RED |
+| `unreadableBodyAppliesNothing` | no call to provider-service (WireMock journal), no `sanction` row, no `outbox_event` row | RED |
+| `bodyWithoutARequiredPartIsA400Problem` (x4: boundary never appears, empty body, complete message without the file part, complete message without the businessDate part) | 400 `application/problem+json`, no run row, no new execution | guard, passes |
+| `fileUnderTheLimitIsAccepted` (x1) | 0.9 MB upload: 202 with a BatchRun (`job` PRVSAN01, `businessDate` 2026-03-31); proves the harness reaches the real endpoint | guard, passes |
+| `fileOverTheLimitIsStill413` (x1) | 2.1 MB upload: 413, no run row, no new execution: the new mapping must not swallow `MaxUploadSizeExceededException` (a `MultipartException`) into the 400 (Q-120) | guard, passes |
+| `serviceGoesOnAfterAnOversizeUpload`, `serviceGoesOnAfterAnUnreadableBody` (x2) | the next well-formed upload is accepted (202) | guards, pass |
+
+**Time guards.** The class has `@Timeout(3 minutes)` per test, every HTTP call has a 30 s timeout, the wait for background jobs (`awaitNoJob`) is bounded at 60 s: a defect makes a test fail, never hang.
+
+**Not tested, and why.** `MissingServletRequestPartException` (named in the review's fix) cannot be raised by this endpoint: `file` is `@RequestPart(required = false)` and a missing part is the controller's own 400 ("file is required.", guards above),
+so no request produces it; the developer may map it as well, but nothing could show whether it is mapped. The role check (`@PreAuthorize`) runs after Tomcat parses the body, so a caller without the role who sends a malformed body gets the 400 problem and not 403
+(same as enrollment-service; no AC asks otherwise, so no test).
+
+### Red run (2026-11-21 05:52 to 05:55, `--no-daemon`, under the Gradle lock)
+
+Command: `./gradlew --no-daemon -I <spotless init script, sanctions-service src/test only> :services:sanctions-service:spotlessApply :services:sanctions-service:test --tests gov.medicaid.pem.sanctions.api.SanctionIntakeUploadTest`
+(shell `timeout 2700`). Waited 380 s for free memory (690 MB at the start; 1024 MB needed) and for the lock (held by the revalidation lane). Build 2 m 5 s, the class ran 16 s.
+Result: **44 tests, 36 fail, 8 pass, 0 skipped, no hang.** Every one of the 36 fails on the same assertion, for the expected reason (the endpoint answers 500, not a broken harness):
+
+```
+[answer 500 {"timestamp":"2026-11-21T00:24:31.581+00:00","status":500,"error":"Internal Server Error","path":"/api/v1/batch/sanction-intake-runs"}]
+expected: 400
+ but was: 500
+```
+
+All four unreadable bodies are answered 500, including the two the review did not name ((c) headers cut off, (d) businessDate part cut off): every parse failure of Tomcat's multipart reader escapes as a `MultipartException` that no problem mapping handles.
+The 8 passes are guards (they must stay green, each catches a wrong fix): the four bodies without a required part (400 problem from the controller), `fileUnderTheLimitIsAccepted` (the harness is sound: a valid upload is 202),
+`fileOverTheLimitIsStill413` (today 413; a mapping of the whole `MultipartException` family to 400 would break it), and the two "service goes on" tests.
+The tests that assert the absence of a run or of an applied sanction fail today only on their 400 precondition (the review says no run is started in either case, and the side effects are indeed absent today);
+they keep the precondition so that each test checks the whole expected behaviour of the fixed endpoint.
+
+### Constraints for the developer (the tests stay green)
+
+- The mapping belongs in the service's own problem mapping (a `@RestControllerAdvice` in `gov.medicaid.pem.sanctions.api`, as enrollment-service's `RequestProblems`), not in the shared kit.
+- `MultipartException` (and, if wanted, `MissingServletRequestPartException`) gives 400 `application/problem+json`; the `detail` says the upload could not be read ("upload" and "could not be read"), at most 200 characters, with no SQL, class or parser text.
+- `MaxUploadSizeExceededException` is a subclass of `MultipartException` and needs its own, more specific handler: 413 stays (as `RequestProblems.tooLarge` of enrollment-service; problem+json is allowed, Q-120 leaves it for later).
+- The `X-Correlation-Id` header is set by the kit's filter before the controller and stays on the answer; nothing to add for it unless the new handler resets the response.
+- enrollment-service's detail for the same case is the generic "The request is not valid."; the review asks for a detail that says the upload could not be read. Equal wording in both services would need the same text in enrollment-service (its test does not assert the detail).
+
+### Hashes
+
+Re-recorded with `test_protection.py record MAM-55` (the 26 recorded files plus the new one); `check MAM-55` prints `OK: 27 test files of MAM-55 unchanged; no unrecorded test files`. The red copy of the new file is in git's object store (`4c9779009ff9ffe911069cbb4a2b03be4699049e`), listed in `MAM-55/red-blobs.txt`.

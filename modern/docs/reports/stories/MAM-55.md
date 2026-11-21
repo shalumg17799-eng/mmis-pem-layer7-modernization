@@ -131,3 +131,24 @@ Not verified:      the log lines are checked as the formatted message of the log
                    above); the SanctionApplied event is checked on the Kafka topic for one NPI only; the 5xx case is now
                    tested (provider-service WireMock) but not against a live provider-service.
 ```
+
+## Review fix (2026-11-21, review-fix step of the lead's plan)
+
+Found by the enrollment lane (same upload pattern) and confirmed by the lead on the running stack on 2026-11-21 at 02:27:
+a multipart request that cannot be read was answered 500 with the default error body, not a 400 problem (question Q-143).
+The story and epic MAM-8 were reopened for it.
+
+- Tests first (test-writer, 05:38 to 05:57): `SanctionIntakeUploadTest`, 44 tests against the real web server: four kinds of
+  malformed body (no boundary, a file part that is cut off, cut-off part headers, a cut-off businessDate part), each with nine
+  checks (400, problem+json also for a JSON client, a detail that says the upload could not be read, no SQL or class name,
+  the correlation id, no run started, nothing applied), and 8 guards (a missing part stays the controller's own 400, a file
+  over the limit stays 413, the service goes on). 36 were red before the fix, all with "expected 400 but was 500".
+- Fix (java-developer, 05:57 to 06:50): `api/RequestProblems.java`, the service's own advice: a multipart error is a 400
+  problem with the detail "The upload could not be read: send the file and the businessDate as a complete
+  multipart/form-data message."; a file over the limit keeps 413, now as a problem too. The shared kit is untouched.
+- Whole check of the module (06:44 to 06:48): 370 tests, 0 failures, 0 skipped, JaCoCo 98.4 % of lines, PIT 86 % (75 of 87).
+  A first run (06:19 to 06:26) had failed 33 Cucumber scenarios because the Kafka test container did not start in time on
+  the loaded machine; the second run with the same sources passed. Only that one green full run exists since.
+- Second review (07:00): APPROVE, no MUST-FIX. Its notes are in `modern/docs/reports/review-should-fix.md` (among them: the
+  wording of the detail differs from enrollment-service; the role check runs after the body is parsed, so a caller without the
+  role gets 400 for a malformed body, as in enrollment-service; a wrong content type gets Spring's 415 in the default format).

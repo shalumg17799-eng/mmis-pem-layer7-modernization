@@ -24,6 +24,7 @@
     "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeControllerTest.java",
     "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeDatasetsTest.java",
     "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeRolesTest.java",
+    "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionIntakeUploadTest.java",
     "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/api/SanctionListApiTest.java",
     "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/application/ListSanctionsTest.java",
     "modern/services/sanctions-service/src/test/java/gov/medicaid/pem/sanctions/application/RecordSanctionRulesTest.java",
@@ -49,7 +50,8 @@
       "SanctionIntakeContractTest: PASSED",
       "SanctionIntakeControllerTest: PASSED",
       "SanctionIntakeJobTest: PASSED",
-      "SanctionIntakeTest: PASSED"
+      "SanctionIntakeTest: PASSED",
+      "SanctionIntakeUploadTest: PASSED"
     ],
     "AC-2": [
       "MAM-55.feature 'Every record is read from its fixed positions until the last one': PASSED",
@@ -119,6 +121,7 @@
   },
   "codeUnits": [
     "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/SanctionsServiceApplication.java",
+    "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/api/RequestProblems.java",
     "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/api/SanctionController.java",
     "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/api/SanctionIntakeController.java",
     "modern/services/sanctions-service/src/main/java/gov/medicaid/pem/sanctions/application/ListSanctions.java",
