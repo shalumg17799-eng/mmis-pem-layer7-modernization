@@ -1508,3 +1508,20 @@ JDK client. **Default applied: A**, by the developer of the lane with ADR-013, w
 default, not yet confirmed by the user". It is a new third-party library in one service; in the local run mode (all
 services in one process, ADR-011) it is on the shared class path, where the other services name their HTTP client
 explicitly. Nothing of it is live until the third review of the gateway approves.
+
+**Addition of 2026-11-21 09:01 (after the third review approved, before any deploy):** one note of that review asked for
+the dependency scan before the deploy. The lead looked the three jars up in the OSV database (the source of
+`tools/checks/scan_dependencies.py`) at the versions the Spring Boot 3.5.16 BOM manages: httpclient5 5.5.2 has 1 MODERATE
+advisory (GHSA-hjcp-jmpx-g3qm: the classic client does not give a pooled connection back when an answer has an invalid
+Content-Encoding; fixed in 5.6.3), httpcore5 5.3.6 has 1 HIGH (GHSA-hf6x-8p5f-cgmf: memory exhaustion in the HTTP/1.1
+header parser; fixed in 5.4.3, the 5.3 line has no fix) and httpcore5-h2 5.3.6 has 1 HIGH (GHSA-v3jc-474w-2wm6: HTTP/2
+header decoder; fixed in 5.4.3). The gateway uses the client only towards PEM's own services, without compression and
+without HTTP/2, so the lead sees no way for a caller to reach any of the three; that was reasoned, not tested. A fix
+exists, so the recorded default of Q-122 (option A) is applied instead of a justification: the three libraries are raised
+above the BOM, with the constraints that Q-122 introduced, to httpclient5 5.6.5 and httpcore5 / httpcore5-h2 5.4.4
+(published 2026-10-06 and 2026-09-20; 5.6.5 is built against 5.4.4; OSV knows no vulnerability of them). This is a newer
+minor line than the one Spring Boot 3.5.16 manages, as the raises of lz4-java, log4j and bcprov under Q-122 were. In work
+since 09:00: the build change (devops-engineer), the gateway check with the raised versions and a narrow independent
+review; the gateway is committed and deployed only after that. Fallback if the raised versions break the gateway's
+tests: the BOM versions with a written justification for the two HIGH advisories, which then needs the user's
+confirmation. **For the user:** confirm the raise (recommended), or name another way.
