@@ -30,18 +30,36 @@ jobs:
         with:
           distribution: temurin
           java-version: "21.0.7"
-      # Run 17 (2026-11-21, commit a60dcd3): the Gradle plugin portal did not serve kotlin-stdlib 2.0.21 ("Could not find"), 75
-      # seconds into the job and before any task ran. The first Gradle call resolves the build logic and the plugins, the only
-      # part of the start that depends on the network, so it is repeated up to three times here. Only this warm-up is repeated:
-      # the gate below runs once, and a failing test or a compile error of the modules' code is never repeated. (A build-logic
-      # error, which "help" also finds, is repeated three times and then fails the job; its output goes to warmup.log so that
-      # the failure summary below can still show it.)
-      - name: Resolve build logic and plugins (up to three attempts)
+      # Runs 17 and 19: Gradle could not download the build logic's libraries before any task ran. Run 17 (2026-11-21) said "Could not
+      # find kotlin-stdlib 2.0.21"; run 19 (2026-11-24) showed the cause once the failure summary printed it: "Received status code
+      # 429 from server: Too Many Requests" from repo.maven.apache.org (Maven Central limits the shared addresses of the runners)
+      # on all three attempts within two minutes. Two measures. (1) The libraries that Gradle downloaded in earlier runs and the
+      # Gradle distribution are restored first and saved again at the end. Only these two folders: neither the Gradle build cache
+      # nor any test result is cached, so every gate below still runs from scratch. (2) The first Gradle call, which resolves the
+      # build logic and the plugins, is repeated up to five times with growing waits (60, 120, 180, 240 seconds). Only this
+      # warm-up is repeated: the gate below runs once, and a failing test or a compile error of the modules' code is never
+      # repeated. (A build-logic error, which "help" also finds, is repeated and then fails the job; its output goes to
+      # warmup.log so that the failure summary below can still show it.)
+      - name: Restore the downloaded Gradle libraries
+        id: gradle-libs
+        uses: actions/cache/restore@v5.0.5
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper/dists
+          key: gradle-libs-${{ hashFiles('modern/gradle/libs.versions.toml', 'modern/gradle/wrapper/gradle-wrapper.properties', 'modern/buildSrc/**/*.kts', 'modern/**/build.gradle.kts') }}-${{ github.run_id }}
+          restore-keys: |
+            gradle-libs-${{ hashFiles('modern/gradle/libs.versions.toml', 'modern/gradle/wrapper/gradle-wrapper.properties', 'modern/buildSrc/**/*.kts', 'modern/**/build.gradle.kts') }}-
+            gradle-libs-
+      - name: Resolve build logic and plugins (up to five attempts)
+        id: warmup
         run: |
-          for attempt in 1 2 3; do
+          for attempt in 1 2 3 4 5; do
             ./gradlew --no-daemon -q help 2>&1 | tee "$RUNNER_TEMP/warmup.log" && exit 0
-            echo "::warning title=Gradle resolution::attempt $attempt of 3 failed"
-            sleep 30
+            [ "$attempt" -lt 5 ] || break
+            wait=$((attempt * 60))
+            echo "::warning title=Gradle resolution::attempt $attempt of 5 failed; waiting $wait seconds"
+            sleep "$wait"
           done
           exit 1
       # AC-1: unit, acceptance, integration, contract, ArchUnit, JaCoCo (85% per service) and PIT; any failure is red
@@ -91,6 +109,16 @@ jobs:
           for i, d in enumerate(details):
               print('::error title=First failure in detail %d::%s' % (i + 1, esc(d)))
           PY
+      # Saved after a successful warm-up even when a test failed: the libraries that were downloaded are good in any case. A new key
+      # per run (the run id); the newest cache of the same build files is restored by the first restore key.
+      - name: Save the downloaded Gradle libraries
+        if: always() && steps.warmup.outcome == 'success'
+        uses: actions/cache/save@v5.0.5
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper/dists
+          key: ${{ steps.gradle-libs.outputs.cache-primary-key }}
 
   contract-lint:
     name: Contract lint
