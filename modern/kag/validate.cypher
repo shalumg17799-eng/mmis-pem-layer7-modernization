@@ -127,8 +127,9 @@ MATCH (d:Defect) WHERE NOT (d)-[:AFFECTS]->() RETURN count(d) AS actual;
 // MISMATCH or NOT_FOUND rules with no defect and no question | expected: 0
 MATCH (r:BusinessRule) WHERE r.verification IN ['MISMATCH','NOT_FOUND'] AND NOT (r)<-[:AFFECTS]-(:Defect) AND NOT (r)<-[:ABOUT]-(:Question) RETURN count(r) AS actual;
 
-// Question nodes (as in questions.md) | expected: 91
+// Question nodes (as in questions.md) | expected: 157
 MATCH (q:Question) RETURN count(q) AS actual;
 
 // Regulations cited by no rule | expected: 0
 MATCH (g:Regulation) WHERE NOT (g)<-[:GOVERNED_BY]-() RETURN count(g) AS actual;
+

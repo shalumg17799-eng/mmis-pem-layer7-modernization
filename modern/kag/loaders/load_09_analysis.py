@@ -68,7 +68,10 @@ def questions():
     text = (A / "questions.md").read_text(encoding="utf-8")
     out = []
     for block in re.split(r"\n(?=## Q-\d{3}\.)", text):
-        m = re.match(r"## (Q-\d{3})\. (.+?) \(raised [^,]+, status: (.+)\)\s*$", block.splitlines()[0]) if block.startswith("## Q-") else None
+        head = block.splitlines()[0] if block.startswith("## Q-") else ""
+        m = (re.match(r"## (Q-\d{3})\. (.+?) \(raised [^,]+, status: (.+)\)\s*$", head)
+             # later headings put the context first: "## Q-nnn. (context, date) title (status: ...)"
+             or re.match(r"## (Q-\d{3})\. \([^()]*\) (.+?) \(status: (.+)\)\s*$", head))
         if not m:
             continue
         st = m.group(3).upper()
@@ -128,7 +131,8 @@ def build() -> GraphData:
         g.node("Question", q["id"], SRC, text=q["text"], options=q["options"] or None, recommended=q["recommended"],
                status=q["status"], answer=q["answer"])
         for did in q["defects"]:
-            g.rel("ABOUT", "Question", q["id"], "Defect", did, SRC)
+            if ("Defect", did) in g.nodes:   # D-030 and later are conventions recorded below the register table, not Defect nodes
+                g.rel("ABOUT", "Question", q["id"], "Defect", did, SRC)
         for rid in q["rules"]:
             if rid in rule_ids:
                 g.rel("ABOUT", "Question", q["id"], "BusinessRule", rid, SRC)

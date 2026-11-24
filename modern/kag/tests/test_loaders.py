@@ -102,6 +102,14 @@ def test_analysis_loader_matches_the_analysis_files():
     assert affected == {k for (l, k) in g.nodes if l == "Defect"}   # every defect affects something
 
 
+def test_every_question_heading_becomes_a_question_node():
+    # both heading shapes: "## Q-nnn. title (raised date, status: ...)" and "## Q-nnn. (context, date) title (status: ...)"
+    text = (common.REPO / "modern" / "docs" / "analysis" / "questions.md").read_text(encoding="utf-8")
+    headings = set(re.findall(r"^## (Q-\d{3})\.", text, re.M))
+    loaded = {k for (l, k) in build("load_09_analysis").nodes if l == "Question"}
+    assert loaded == headings
+
+
 def test_validate_offline_all_checks_match():
     checks = validate.evaluate("offline")
     assert [c["name"] for c in checks if not c["ok"]] == []
