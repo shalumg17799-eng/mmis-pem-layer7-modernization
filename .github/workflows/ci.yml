@@ -30,6 +30,20 @@ jobs:
         with:
           distribution: temurin
           java-version: "21.0.7"
+      # Run 17 (2026-11-21, commit a60dcd3): the Gradle plugin portal did not serve kotlin-stdlib 2.0.21 ("Could not find"), 75
+      # seconds into the job and before any task ran. The first Gradle call resolves the build logic and the plugins, the only
+      # part of the start that depends on the network, so it is repeated up to three times here. Only this warm-up is repeated:
+      # the gate below runs once, and a failing test or a compile error of the modules' code is never repeated. (A build-logic
+      # error, which "help" also finds, is repeated three times and then fails the job; its output goes to warmup.log so that
+      # the failure summary below can still show it.)
+      - name: Resolve build logic and plugins (up to three attempts)
+        run: |
+          for attempt in 1 2 3; do
+            ./gradlew --no-daemon -q help 2>&1 | tee "$RUNNER_TEMP/warmup.log" && exit 0
+            echo "::warning title=Gradle resolution::attempt $attempt of 3 failed"
+            sleep 30
+          done
+          exit 1
       # AC-1: unit, acceptance, integration, contract, ArchUnit, JaCoCo (85% per service) and PIT; any failure is red
       # --continue: every module is checked even when one fails, so one run shows every failure (the job is still red)
       - name: Build and check
@@ -44,22 +58,38 @@ jobs:
           import xml.etree.ElementTree as ET
           NL = chr(10)
           esc = lambda s: s.replace('%', '%25').replace(chr(13), '').replace(NL, '%0A')[:6000]
-          log = open(os.path.join(os.environ['RUNNER_TEMP'], 'gradle.log'), errors='replace').read()
+          # gradle.log exists only when the gate step started; when the warm-up failed three times, its output is warmup.log
+          rt = os.environ['RUNNER_TEMP']
+          found = [p for p in ('gradle.log', 'warmup.log') if os.path.exists(os.path.join(rt, p))]
+          log = open(os.path.join(rt, found[0]), errors='replace').read() if found else ''
           tasks = re.findall(r'^> Task (\S+) FAILED', log, re.M)
           print('::error title=Failed Gradle tasks (%d)::%s' % (len(tasks), esc(NL.join(tasks) or 'none found in the log')))
           for i, w in enumerate(re.findall(r'\* What went wrong:\n((?:.+\n){1,14})', log)[:5]):
               print('::error title=What went wrong %d::%s' % (i + 1, esc(w)))
           failed = []
+          details = []
           for f in sorted(glob.glob('**/build/test-results/test/*.xml', recursive=True)):
               try:
                   root = ET.parse(f).getroot()
               except ET.ParseError:
                   continue
+              out = NL.join((so.text or '') for so in root.iter('system-out'))
               for tc in root.iter('testcase'):
                   node = tc.find('failure') if tc.find('failure') is not None else tc.find('error')
                   if node is not None:
                       failed.append('%s > %s: %s' % (tc.get('classname', '').split('.')[-1], tc.get('name', '')[:120], (node.get('message') or '')[:160].replace(NL, ' ')))
+                      # Run 18 (2026-11-21): 16 timeouts in one class and a 160-character message that did not say why. The first
+                      # two failures are therefore written in detail: the message (700 characters), the top of the stack trace (14
+                      # lines) and up to 25 warning and error lines of the class's output. Annotations are readable without a
+                      # sign-in and the repository is public: nothing here filters payloads, so this relies on the tests using
+                      # synthetic data only.
+                      if len(details) < 2:
+                          trace = (node.text or '').splitlines()[:14]
+                          noisy = [l[:220] for l in out.splitlines() if re.search(r'ERROR|WARN|Exception|ebalanc|assign|revoked|imeout', l)][-25:]
+                          details.append(NL.join(['%s > %s' % (tc.get('classname', ''), tc.get('name', '')[:160]), (node.get('message') or '')[:700], '--- stack trace (top)'] + trace + ['--- output of the class (warnings, errors, Kafka group events; last 25)'] + noisy))
           print('::error title=Failed tests (%d)::%s' % (len(failed), esc(NL.join(failed[:40]) or 'none in the JUnit XML files')))
+          for i, d in enumerate(details):
+              print('::error title=First failure in detail %d::%s' % (i + 1, esc(d)))
           PY
 
   contract-lint:

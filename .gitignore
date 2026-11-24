@@ -13,3 +13,4 @@ modern/infra/.env.local
 # pytest JUnit XML of the tool tests (read by tools/trace/build_rule_trace.py)
 modern/tools/checks/test-results/
 modern/tools/perf/out/
+**/.kotlin/
