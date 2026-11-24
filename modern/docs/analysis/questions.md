@@ -1503,7 +1503,7 @@ file is archived. Two consequences were pinned by tests and are for the user to 
    provider-service allows this; nothing more is done. **Default applied: accept.**
 Cost of the fix: at an exact multiple of 200 providers the walk makes one request more (the empty answer ends it).
 
-## Q-157. (review fix of api-gateway, MAM-29, 2026-11-21 08:33) A new library in the gateway: Apache HttpClient 5 (ADR-013) (status: DEFAULT APPLIED - revisit)
+## Q-157. (review fix of api-gateway, MAM-29, 2026-11-21 08:33) A new library in the gateway: Apache HttpClient 5 (ADR-013) (status: ANSWERED 2026-11-24 by the user: A)
 
 The time limit for proxied calls (Q-154) needs an HTTP client that limits the time per read. Three were tried against the
 same tests (ADR-013): the JDK client limits the whole exchange and cuts a flowing download; the simple JDK client loses the
@@ -1539,3 +1539,4 @@ resolved versions and the rebuilt deployable hold exactly these three jars; the 
 statements in documents that were corrected (ADR-010 now records the raise). Left open by that review, for the performance smoke (MAM-88): the pool has
 no wait limit, so Apache's default of 3 minutes applies when all 200 connections to one silent service are held (each up to the 30 s read limit); a
 limit of about 2 s (the connect limit) and a per-service limit below the total are the suggested change, test first.
+**Answer (user, 2026-11-24): A. Apache HttpClient 5 (version managed by Spring Boot, raised to 5.6.5 / httpcore5 5.4.4) is approved for the gateway; ADR-013 is ACCEPTED. A small story for the pool limits (wait for a connection, limit per service) is to be created in Jira, To Do, linked to MAM-29, and not built now.**

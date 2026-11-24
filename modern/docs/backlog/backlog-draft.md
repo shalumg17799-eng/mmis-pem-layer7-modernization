@@ -5931,3 +5931,49 @@ Every non-dropped rule (433) and the item that owns it. Uncovered rules: **none*
 | R-PRVTMS01-cbl-00053 | tmsis-service | MAM-75 |
 | R-PRVTMS01-cbl-00054 | tmsis-service | MAM-75 |
 | R-PRVTMS01-cbl-00055 | tmsis-service | MAM-75 |
+
+## Added after Phase 4
+
+#### L-S079 Gateway pool limits: a wait limit for a connection and a connection limit per service (Jira key: not created yet)
+
+Type: Story. Service: api-gateway. Parent: MAM-1 (Platform and CI; the epic is Done, the story is To Do). Link: relates to MAM-29. Labels: svc-api-gateway, kag-L-S079, agentic. Status: DRAFT; to be created in Jira, To Do, not built now (user, 2026-11-24, answers to Q-157 and the review of MAM-29).
+
+##### Business requirement
+When one service stops answering, the callers of every other service must not be slowed down. The front door answers a call to a silent service quickly with a clear error, and one service can never use up all the connections the front door has.
+
+##### Acceptance criteria
+###### AC-1 A call to a silent service is refused quickly
+Given every connection from the gateway to one service is in use by calls that wait for a silent service
+When one more call to that service arrives
+Then the caller gets the 503 problem answer within 3 seconds, not after the 3 minutes of the library default
+Basis: modern/docs/reports/review-should-fix.md (MAM-29, 2026-11-24, first note), ADR-013, Q-157, modern/docs/reports/stories/MAM-88.md (gap)
+
+###### AC-2 One silent service cannot take all connections
+Given a silent service holds as many connections as its own limit allows (default 50 of the 200 in all) because many callers wait for it
+When a call to a different service arrives
+Then it is answered in its normal time and is not delayed by the silent service
+Basis: modern/docs/reports/review-should-fix.md (MAM-29, 2026-11-24, first note), ADR-013
+
+###### AC-3 The limits are settings with documented defaults
+Given the three values (wait for a connection, limit per service, limit in all) are set as properties of the gateway
+When the gateway starts with other values
+Then AC-1 and AC-2 hold with those values, and ADR-013 and the runbook state the defaults (wait 2 seconds, per service 50, in all 200; all DEFAULT, to be looked at again with the performance smoke)
+Basis: ADR-013, modern/docs/runbooks/operations.md
+
+###### AC-4 Calls that keep flowing are not cut
+Given a download from a service that keeps sending data for longer than the wait limit
+When the pool limits are in force
+Then the download completes, and a service's 401 answer to a write still reaches the caller with its body
+Basis: ADR-013, MAM-29 AC-6, modern/docs/reports/stories/MAM-29.md ("Review fix 2")
+
+##### Out of scope
+- Changing the read limit per read (30 seconds) or the connect limit (2 seconds).
+- Retrying calls: the gateway never repeats a write.
+
+##### Legacy trace (agent-owned, do not edit)
+Rules: none (technical story)
+Programs: none
+Decisions: none; ADR-013 (accepted 2026-11-24)
+
+##### Technical notes (agent-owned)
+Service: api-gateway. Endpoints/events: none new. Roles: none. Tests first; the performance smoke (MAM-88) is not changed.

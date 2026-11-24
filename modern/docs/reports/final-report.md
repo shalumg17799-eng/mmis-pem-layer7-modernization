@@ -17,17 +17,16 @@ is not authorized in this session, so Jira could not be read or changed.
 | Performance (MAM-88) | **6 of 6 targets MET, 0 NOT MET** (search p95 144 ms, detail 60 ms, submit 63 ms, one screening 137 ms, T-MSIS extract 1.6 s, revalidation sweep 2.1 s for 10,016 providers). Every target is a DEFAULT of nfr.md (a placeholder), the 90 s job limit is a projection, and the smoke does not exhaust the gateway pool: `performance-report.md`, `stories/MAM-88.md`. |
 | Parity with the legacy jobs (MAM-91) | **MATCH 168, EXPECTED 67, UNEXPECTED 1** units (rows 102 EXPECTED, 1 UNEXPECTED). The one is **U-8, BLOCKED (Q-129)**: the permanent GDG generation could not be captured because the lab account HERC01 was refused; listed, not closed. Decisions D-031 to D-034 (your answers of 2026-11-24) explain the rest. `parity-report.md`, top block. |
 | Knowledge graph | `medicaid-kag` loaded again: **44 of 44 checks match**, a second load changes nothing (1029 nodes, 1399 relationships), 157 Question nodes (the loader had read only 102; fixed, commit b08b5fe). |
-| Jira | Last read **2026-11-21 09:02: 86 of 93 Done**. Open then: MAM-29, MAM-39, MAM-88, MAM-91 and the epics MAM-1, MAM-14, MAM-15. All four stories now meet their acceptance criteria (records above); **the transitions and comments are queued in PROGRESS.md and need the Atlassian connection**. |
+| Jira | **93 of 93 Done** (reported by the user on 2026-11-24: MAM-29, MAM-39, MAM-88, MAM-91 and the epics MAM-1, MAM-14, MAM-15 were closed from another session with the comments that had been queued; this session has no Atlassian tools and did not read Jira). Open in Jira: the story for the gateway pool limits (drafted, not yet created) and the MAM-39 AC-6 text (the spec is version 2, the Jira description is not yet updated). |
 | Commits | Pushed to `origin/modernization` today: c2ed622 (gateway), b08b5fe (graph loader), 18f6efc (parity decisions), ee34503 and b82359a (CI). Documents of today are committed after this update. Nothing was pushed to `main`. |
 
+**Decided by you on 2026-11-24**: Phases 5, 7, 8 and 9 are APPROVED; Q-157 is answered A (Apache HttpClient 5 approved, ADR-013 ACCEPTED); MAM-39 AC-6 is re-versioned (the workflow is active); the gateway pool limits become one small story, To Do, linked to MAM-29, not built now.
+
 **What still needs you**
-1. **Authorize the Atlassian connector** (`/mcp` in an interactive session) so that MAM-29, MAM-39, MAM-88 and MAM-91 can go to Done with their comments and the epics MAM-1, MAM-14, MAM-15 can be closed (target 93 of 93).
-2. **Q-157**: Apache HttpClient 5 in the gateway (ADR-013) is applied as a default; your instruction of today named the raised versions, which is not an answer about the choice of the library.
-3. **Q-144** (the 503 of `requestScreening` in the screening contract) and the defaults applied on 2026-11-20 and 2026-11-21 (Q-136 to Q-155): still DEFAULT APPLIED, not confirmed.
-4. **Q-129**: the lab password for HERC01 in the root `.env` (never in chat) when you want the archive generation closed.
-5. **MAM-39 AC-6**: the spec still says the workflow is inert under `modern/.github`; the workflow runs from the repository root since your decision of 2026-11-20. Re-version the spec? (recommended)
-6. A story for the gateway pool limits (wait for a connection, limit per service), proposed in `stories/MAM-88.md` and `review-should-fix.md`.
-7. Not measured: the web UI line coverage (no coverage tool in the UI build, `ui-coverage.md`), and the 100,000-provider volume.
+1. **Q-144** (the 503 of `requestScreening` in the screening contract) and the defaults applied on 2026-11-20 and 2026-11-21 (Q-136 to Q-155): still DEFAULT APPLIED, not confirmed.
+2. **Q-129**: the lab password for HERC01 in the root `.env` (never in chat) when you want the archive generation closed (U-8).
+3. **Jira, from a session that has the Atlassian tools**: create the pool-limits story (L-S079), and update the description of MAM-39 so that its AC-6 matches the spec.
+4. Not measured: the web UI line coverage (no coverage tool in the UI build, `ui-coverage.md`), and the 100,000-provider volume.
 
 ---
 

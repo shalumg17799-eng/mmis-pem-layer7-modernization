@@ -1,5 +1,5 @@
 # ADR-013: Apache HttpClient 5 behind the gateway's proxy routes
-Status: APPLIED AS A DEFAULT (written by the java-developer in the review fix of MAM-29 on 2026-11-21; question Q-157 in `modern/docs/analysis/questions.md`). On 2026-11-24 the user named the three raised versions and ordered review, commit and deploy of the upgrade; that is not an explicit answer to Q-157 about the choice of the library, so the question stays open. The numbers (pool size, wait for a connection) are to be looked at again after the performance smoke MAM-88
+Status: ACCEPTED (user, 2026-11-24, answer to Q-157: Apache HttpClient 5, with the version managed by Spring Boot and raised to 5.6.5 / httpcore5 5.4.4 by the constraints of ADR-010, is approved for the gateway). It was written by the java-developer in the review fix of MAM-29 on 2026-11-21 and applied as a default. The numbers (pool size, wait for a connection) are looked at again in the story that adds the pool limits (local id L-S079, drafted in `modern/docs/backlog/backlog-draft.md`, to be created in Jira)
 
 ## Context
 The gateway (Spring Cloud Gateway Server MVC 4.3.5, Spring Framework 6.2.19, Spring Boot 3.5.16) forwards every call with the

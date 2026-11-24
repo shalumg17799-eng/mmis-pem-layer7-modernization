@@ -6,8 +6,8 @@ service: platform
 type: Task
 title: "CI pipeline: build, check, contract lint, web-ui tests, compose smoke test"
 slug: plt-ci
-specVersion: 1
-descriptionSha256: 9c5310ed3a3824f45df92f6ad33dceb43df2d623b09618a348898b587a21a2bf
+specVersion: 2
+descriptionSha256: 9d6ab1967e817e77e09baa6f5c0678c902958306c1620a3cd175296f75dd1c8c
 jiraUpdated: 2026-11-18T09:16:12.617-0600
 rules: []
 decisions: []
@@ -16,6 +16,7 @@ mainJourney: false
 labels: [svc-platform, kag-L-S009, agentic]
 builtCommit:
 testsSha256:
+jiraDescriptionDiffers: AC-6 (spec version 2 of 2026-11-24 states the user decision of 2026-11-20; the Jira description still has the version 1 text until it is updated)
 ---
 ## Business requirement
 Every change should be checked automatically with the same steps the team runs by hand, so that a broken build, a violated contract or a failing screen is noticed before anyone depends on it.
@@ -51,11 +52,12 @@ When both are read
 Then every action and image in the workflow has an exact version (no latest), and modern/docs/runbooks/ci.md lists the same steps (build and check, contract lint, web-ui tests, compose smoke test) with their exact commands for anyone who does not use the workflow
 Basis: .claude/agents/devops-engineer.md (Rules, deliverable 6), QF-5 (default applied)
 
-### AC-6 The workflow is inert until the user decides
+### AC-6 The workflow is active
 Given the repository state
 When the workflow file's location is checked
-Then it is at modern/.github/workflows/ci.yml, nothing is pushed, and the runbook says it must be copied to the repository root .github/workflows to run on GitHub
-Basis: QF-5 (default applied), modern/docs/PROGRESS.md (Phase 0 note: git stays local, push only when the user asks), .claude/agents/devops-engineer.md ('You may write only': modern/.github/**)
+Then it is at .github/workflows/ci.yml in the repository root and runs on GitHub on every push and pull request, and the runbook says so
+Basis: user decision of 2026-11-20 19:32 (KEEP GOING, answer 1; it replaces QF-5 and the Phase 0 note that git stays local), modern/docs/runbooks/ci.md
+
 
 ## Out of scope
 - Security scans such as the dependency check (nfr-security)
