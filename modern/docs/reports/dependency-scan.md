@@ -1,11 +1,11 @@
 # Dependency vulnerability scan (MAM-84 AC-5)
 
-Generated 2026-11-20 18:42 by `modern/tools/checks/scan_dependencies.py` from the OSV database (https://osv.dev); do not edit by hand.
+Generated 2026-11-24 13:12 by `modern/tools/checks/scan_dependencies.py` from the OSV database (https://osv.dev); do not edit by hand.
 Stands in for the OWASP dependency check and npm audit named in the AC (neither is installed here). Only open-source
 package names and versions are sent; the project's own modules are not.
 
-- Java run time: 107 third-party libraries inside `infra/local-runtime/build/libs/pem-local-runtime.jar` (built 2026-11-20 18:36)
-- Web UI: 314 packages of `web-ui/package-lock.json` (25 run time, 289 build time)
+- Java run time: 110 third-party libraries inside `infra/local-runtime/build/libs/pem-local-runtime.jar` (built 2026-11-24 13:12)
+- Web UI: 322 packages of `web-ui/package-lock.json` (25 run time, 297 build time)
 - Findings: 2 (CRITICAL 2)
 - HIGH, CRITICAL or unscored findings without a written justification: **0**
 

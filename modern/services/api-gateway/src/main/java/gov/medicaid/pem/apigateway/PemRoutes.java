@@ -8,6 +8,8 @@ import gov.medicaid.pem.kit.web.CorrelationId;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,14 @@ import org.springframework.web.servlet.function.ServerResponse;
 /**
  * The route table: each path family of the OpenAPI contracts goes to the service that owns it. The
  * bearer token is passed on unchanged (the services decide on roles); the correlation id is
- * forwarded; an unreachable service answers 503 problem details without internal addresses.
+ * forwarded; a service that is unreachable, or does not answer within the connect or read limit
+ * (api-gateway.yml), is answered with a 503 problem without internal addresses, and the failure is
+ * logged with its exception.
  */
 @Configuration
 public class PemRoutes {
+
+  private static final Logger LOG = LoggerFactory.getLogger(PemRoutes.class);
 
   /** service -> the path patterns it owns (modern/contracts/openapi/[service]-service.yaml). */
   static final Map<String, List<String>> OWNERS = new LinkedHashMap<>();
@@ -65,7 +71,12 @@ public class PemRoutes {
               .route(paths, http())
               .before(uri(props.url(service)))
               .before(PemRoutes::forwardCorrelationId)
-              .onError(ex -> true, (ex, req) -> unavailable(service))
+              .onError(
+                  ex -> true,
+                  (ex, req) -> {
+                    LOG.warn("{}-service call failed: {}", service, req.method(), ex);
+                    return unavailable(service);
+                  })
               .build();
       all = all == null ? r : all.and(r);
     }

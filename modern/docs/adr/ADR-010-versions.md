@@ -43,4 +43,14 @@ The OSV scan of the deployable (`docs/reports/dependency-scan.md`) found 33 advi
 | bcprov-jdk18on (`org.bouncycastle`) | 1.80.2 -> 1.85 | 1 CRITICAL (GHSA-9pwp-9qqc-pr26), 1 HIGH (GHSA-qp49-qgx5-5m26) | `spring-cloud-starter` 4.3.3 (compile scope) through `spring-cloud-starter-gateway-server-webmvc` of the api-gateway; a production dependency, not a test library, so it is raised and not removed |
 | log4j-api, log4j-to-slf4j (`org.apache.logging.log4j`) | 2.24.3 -> 2.25.5 | GHSA-qv9r-c865-cp47 (MODERATE) | Spring Boot BOM (`log4j2.version`), `spring-boot-starter-logging` |
 
-Every target version exists on Maven Central; none was replaced by a lower patch. Not changed: spring-webmvc 6.2.19 (2 CRITICAL advisories, fixed only in Spring Framework 7 / Spring Boot 4; justified in `tools/checks/dependency-justifications.json`). The pins live in `gradle/libs.versions.toml` (keys `tomcat`, `jackson`, `postgresql-jdbc`, `snappy-java`, `lz4-java`, `bouncycastle`, `log4j`) and `buildSrc/src/main/kotlin/pem.java-conventions.gradle.kts`.
+Every target version exists on Maven Central; none was replaced by a lower patch. Not changed: spring-webmvc 6.2.19 (2 CRITICAL advisories, fixed only in Spring Framework 7 / Spring Boot 4; justified in `tools/checks/dependency-justifications.json`). The pins live in `gradle/libs.versions.toml` (keys `tomcat`, `jackson`, `postgresql-jdbc`, `snappy-java`, `lz4-java`, `bouncycastle`, `log4j`, and since 2026-11-21 `httpclient5` and `httpcore5`) and `buildSrc/src/main/kotlin/pem.java-conventions.gradle.kts`.
+
+## Library raise of 2026-11-21 (api-gateway HTTP client, ADR-013, Q-122 option A, Q-157)
+The gateway uses Apache HttpClient 5 (ADR-013). The Spring Boot 3.5.16 BOM would bring it in with the versions below; the OSV database (2026-11-21) lists advisories for them and the 5.5.x and 5.3.x lines have no fix, so the three are raised by the same constraint mechanism as the table above. Checked again on 2026-11-24: the scan of the deployable jar (13:12) shows no advisory on any of the three.
+
+| Library | Before -> after | Advisories fixed | Where it comes from |
+|---|---|---|---|
+| httpclient5 (`org.apache.httpcomponents.client5`) | 5.5.2 -> 5.6.5 | GHSA-hjcp-jmpx-g3qm (MODERATE, fixed in 5.6.3) | Spring Boot BOM; declared (without a version) by `services/api-gateway/build.gradle.kts` only (ADR-013); in the local run mode it is on the shared class path of `pem-local-runtime.jar` because that jar contains the gateway |
+| httpcore5, httpcore5-h2 (`org.apache.httpcomponents.core5`) | 5.3.6 -> 5.4.4 | GHSA-hf6x-8p5f-cgmf (HIGH, httpcore5), GHSA-v3jc-474w-2wm6 (HIGH, httpcore5-h2), both fixed in 5.4.3 | transitive of httpclient5; 5.4.4 is the httpcore line that httpclient5 5.6.5 itself names; both artifacts stay on one version (key `httpcore5`) |
+
+httpcore5 5.5 was published on 2026-11-15 and is not used. A Gradle constraint only raises a module that is already in the dependency graph; it does not add one, so no other service gets httpclient5 from this raise (read of all build files and of the cached POMs in the review of 2026-11-24).

@@ -437,3 +437,11 @@ workflow journals; one section per review.
 - provider-service JdbcAuditTrail.uuid stores NULL for a non-uuid request id while the event now carries a generated uuid, so audit history and event cannot be joined for such requests (pre-existing, outside Q-142).
 - Process: the provider ObservabilityTest correction for Q-142 (MAM-36 record) was committed in 7aa7820 before this item was approved. Harmless (a uuid input passes with the old and new writer), but the MAM-36 record now comes before the kit commit.
 
+
+## MAM-29 api-gateway, review of the dependency raise (2026-11-24, code-reviewer; no MUST-FIX left after two document corrections)
+
+- GatewayHttpClient.java: the pool has no wait limit for a connection (Spring Boot 3.5.16 sets no connectionRequestTimeout, so Apache's 3 minutes apply) and the limit per service equals the total (200); 200 concurrent calls to one silent service (each up to 30 s) hold the whole pool and calls to every other service wait up to 3 minutes before the 503. New with ADR-013 (there was no pool before). Suggested: a wait limit of about 2 s with `withDefaultRequestConfigCustomizer`, a per-service limit below the total, test first; look at it with MAM-88 (Q-157).
+- GatewayHttpClient.java:22-24: the Javadoc says "a pool as large as the number of calls that can be in flight" and in the next clause that virtual threads set no limit on calls in flight; 200 is a guess (Tomcat's `threads.max` of 50 in `pem-common.yml` does not limit virtual threads). Reword.
+- pem.java-conventions.gradle.kts:37: the `because(...)` note of the constraint list cites `dependency-scan.md` and ADR-010 for every entry; ADR-010 now has the section "Library raise of 2026-11-21" and the scan of 2026-11-24 lists no advisory on the three libraries, so the note is right now; it could also cite ADR-013. Not changed on purpose: a change of build logic invalidates every task cache.
+- MAM-29.md: the scratch proof of retries, compression, cookies and pool size used the 5.5.2 jars and was not repeated with 5.6.5; "the guards fail without `disableAutomaticRetries`" is not verified for 5.6.5 (said in "Review fix 3").
+- MAM-29/trace.json `codeUnits` lists api-gateway/build.gradle.kts but not `gradle/libs.versions.toml` and `pem.java-conventions.gradle.kts`, which carry the raise (optional).

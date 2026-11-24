@@ -23,6 +23,8 @@ snappy-java = "1.1.10.9"        # Kafka brings 1.1.10.5; 2 HIGH, 1 MODERATE advi
 lz4-java = "1.11.4"             # Kafka brings 1.10.1; 1 HIGH, 4 MODERATE, 1 LOW advisories
 bouncycastle = "1.85"           # spring-cloud-starter brings bcprov-jdk18on 1.80.2; 1 CRITICAL, 1 HIGH advisories
 log4j = "2.25.5"                # BOM 2.24.3; GHSA-qv9r-c865-cp47 (MODERATE); log4j-api and log4j-to-slf4j on one version
+httpclient5 = "5.6.5"           # BOM 5.5.2; GHSA-hjcp-jmpx-g3qm (MODERATE, fixed in 5.6.3); declared by the api-gateway only (ADR-013), but on the class path of pem-local-runtime.jar, which contains the gateway; 5.5.x has no fix
+httpcore5 = "5.4.4"             # BOM 5.3.6; GHSA-hf6x-8p5f-cgmf and GHSA-v3jc-474w-2wm6 (both HIGH, fixed in 5.4.3); httpcore5 and httpcore5-h2 on one version; the 5.3 line has no fix
 
 [libraries]
 spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
@@ -48,6 +50,9 @@ lz4-java = { module = "at.yawk.lz4:lz4-java", version.ref = "lz4-java" }
 bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
 log4j-to-slf4j = { module = "org.apache.logging.log4j:log4j-to-slf4j", version.ref = "log4j" }
+httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
+httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "httpcore5" }
+httpcore5-h2 = { module = "org.apache.httpcomponents.core5:httpcore5-h2", version.ref = "httpcore5" }
 
 # Gradle plugins, used as buildSrc dependencies
 spring-boot-gradle = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }

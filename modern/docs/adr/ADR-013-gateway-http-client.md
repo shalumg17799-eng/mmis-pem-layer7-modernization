@@ -1,5 +1,5 @@
 # ADR-013: Apache HttpClient 5 behind the gateway's proxy routes
-Status: APPLIED AS A DEFAULT, NOT YET CONFIRMED BY THE USER (written by the java-developer in the review fix of MAM-29 on 2026-11-21; question Q-157 in `modern/docs/analysis/questions.md`; the numbers are to be looked at again after the performance smoke MAM-88)
+Status: APPLIED AS A DEFAULT (written by the java-developer in the review fix of MAM-29 on 2026-11-21; question Q-157 in `modern/docs/analysis/questions.md`). On 2026-11-24 the user named the three raised versions and ordered review, commit and deploy of the upgrade; that is not an explicit answer to Q-157 about the choice of the library, so the question stays open. The numbers (pool size, wait for a connection) are to be looked at again after the performance smoke MAM-88
 
 ## Context
 The gateway (Spring Cloud Gateway Server MVC 4.3.5, Spring Framework 6.2.19, Spring Boot 3.5.16) forwards every call with the
@@ -14,7 +14,11 @@ The gateway (Spring Cloud Gateway Server MVC 4.3.5, Spring Framework 6.2.19, Spr
 
 ## Decision
 `spring.http.client.factory: http-components` in `api-gateway.yml`: **Apache HttpClient 5** (`org.apache.httpcomponents.client5:httpclient5`,
-version 5.5.2 with `httpcore5` and `httpcore5-h2` 5.3.6, managed by the Spring Boot BOM; Apache License 2.0). The limits stay the Boot properties
+version 5.6.5 with `httpcore5` and `httpcore5-h2` 5.4.4; Apache License 2.0). The Spring Boot BOM would manage 5.5.2 and 5.3.6; both have security advisories
+(OSV, 2026-11-21: httpclient5 5.5.2 GHSA-hjcp-jmpx-g3qm MODERATE; httpcore5 5.3.6 GHSA-hf6x-8p5f-cgmf HIGH; httpcore5-h2 5.3.6 GHSA-v3jc-474w-2wm6 HIGH) and
+the 5.5.x and 5.3.x lines have no fix (5.3.6 is the last 5.3 release), so the three are raised above the BOM by the constraints of `pem.java-conventions`
+(`gradle/libs.versions.toml`, ADR-010 section "Library raise of 2026-11-21", Q-122 option A). 5.4.4 is the httpcore line that httpclient5 5.6.5 itself names; httpcore5 5.5
+(published 2026-11-15) is only days old and is not used. The limits stay the Boot properties
 `spring.http.client.connect-timeout` and `read-timeout` (`PEM_GATEWAY_READ_TIMEOUT`); Boot maps them to the connect timeout and the SOCKET timeout of the
 connection, which is a limit per read: a download that keeps flowing is never cut off, a stalled one ends after the limit, a silent service is answered with the
 503 problem.

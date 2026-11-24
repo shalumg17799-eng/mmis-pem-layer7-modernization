@@ -14,8 +14,8 @@ decisions: [D-023, D-024]
 dependsOn: [MAM-26]
 mainJourney: true
 labels: [svc-api-gateway, kag-L-S005, agentic, decision-D-023, decision-D-024, slice-main-journey]
-builtCommit: 2e20ead
-testsSha256: 7df9a78ddad2c8a19fc1559dac0a9e7fff1ffbb5e4bf959812dd894c372888ff
+builtCommit: pending-user-commit
+testsSha256: 74bacd0f5f85815053e303fc0dad90da1185d8df0e1202c8a5fb82c5e9281793
 ---
 ## Business requirement
 Screens and other callers need one front door to the whole system. It forwards every request to the service that owns it, passes on the identity of the signed-in user, lets the web application call it from the browser, and answers clearly when something is wrong.

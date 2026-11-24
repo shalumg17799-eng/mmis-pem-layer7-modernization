@@ -3,4 +3,14 @@
 31f41b6f39c66d7015f9d4e35d9f7c2c489d7805  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/ProblemHandlerTest.java
 29ae61591562b37aa32ee75a9102618b5eaf95b6  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/ProblemHandlerUnreadableTest.java
 92b15550078dba0eaf1f70885eb59bcb4d26b913  modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/UnreadableBodyWebTest.java
+4463335d6add6d398345dd0fb6b86f273278aa74  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/AnsweringServiceStub.java
+0f77ad8f8be77f0ac982e54fb6936ed041d9ec99  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayFailureLoggingTest.java
+db5fc1c15e359f4e2b2a0bf79beb8db2f6f0b5ce  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayProxyTimeoutConfigTest.java
+40ac4704d5840b03d8bca9b0558c6b34cc67af3b  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayProxyTimeoutTest.java
+3243de8b41ffdf4676224cc57d2513099db95540  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayRelaysServiceErrorTest.java
+45fb7e85f4b388cf455e5de7b494911c1d1b41b7  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayRelaysWritesTest.java
 79d62420bee09b20399f6909077cdbfdf15fb646  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayRoutingTest.java
+96b8b4b35d54739d55cd5ddbcd5b5b106565e8e1  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayWriteTimeoutTest.java
+9e3c6fa105a44c41621a0d21d961907be5e439aa  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/ServiceAnswerTestBase.java
+6c0846091c15b913619dda28735e0bc383c076c1  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/SlowServiceStub.java
+fd87dc28eed6429f7ecdb253a3dbab4b3d9b0315  modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/UpstreamFailureTestBase.java

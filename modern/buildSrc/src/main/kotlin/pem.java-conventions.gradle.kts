@@ -30,7 +30,7 @@ dependencies {
     constraints {
         listOf(
             "tomcat-embed-core", "tomcat-embed-el", "tomcat-embed-websocket", "postgresql-driver", "snappy-java", "lz4-java",
-            "bouncycastle-bcprov", "log4j-api", "log4j-to-slf4j",
+            "bouncycastle-bcprov", "log4j-api", "log4j-to-slf4j", "httpclient5", "httpcore5", "httpcore5-h2",
         ).forEach { alias ->
             val dependency = lib(alias).get()
             add("implementation", "${dependency.module}:${dependency.versionConstraint.requiredVersion}") {

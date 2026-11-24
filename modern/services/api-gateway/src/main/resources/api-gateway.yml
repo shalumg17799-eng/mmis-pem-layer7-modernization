@@ -3,6 +3,21 @@ spring:
     name: api-gateway
   config:
     import: classpath:pem-common.yml
+  # MAM-29 AC-6 / D-024: every call the gateway forwards has a limit, so a service that accepts the call and never answers
+  # is answered with the 503 problem and does not hold the caller for ever. The read limit is the longest wait for the
+  # response headers and then for each next piece of the body; it is not a limit on the whole transfer, so an export or
+  # file download that keeps flowing is not cut off, and one that stalls ends after the limit. That needs Apache HttpClient 5
+  # (ADR-013, set up in GatewayHttpClient): the JDK factory, which Spring Cloud Gateway picks by default, limits the WHOLE
+  # exchange (Spring 6.2.19) and would cut a long download; the simple (HttpURLConnection) factory loses a service's 401 to a
+  # POST, PUT or DELETE (HttpRetryException when the body is streamed) and knows no PATCH. Default 30 s = six times the 5 s
+  # limit of a service's own calls (ServiceClients.DEFAULT_READ_TIMEOUT); the longest synchronous calls are the master export
+  # and the file downloads (every batch run is answered 202 at once). Set PEM_GATEWAY_READ_TIMEOUT (a duration such as 45s)
+  # to change it.
+  http:
+    client:
+      factory: http-components
+      connect-timeout: 2s
+      read-timeout: ${PEM_GATEWAY_READ_TIMEOUT:30s}
   mvc:
     problemdetails:
       enabled: true

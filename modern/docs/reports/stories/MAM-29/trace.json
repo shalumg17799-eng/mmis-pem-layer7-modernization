@@ -14,34 +14,62 @@
     "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/ProblemHandlerTest.java",
     "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/ProblemHandlerUnreadableTest.java",
     "modern/libs/service-kit/src/test/java/gov/medicaid/pem/kit/web/UnreadableBodyWebTest.java",
-    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayRoutingTest.java"
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayRoutingTest.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayFailureLoggingTest.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayProxyTimeoutConfigTest.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayProxyTimeoutTest.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/SlowServiceStub.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/UpstreamFailureTestBase.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/AnsweringServiceStub.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/ServiceAnswerTestBase.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayRelaysServiceErrorTest.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayRelaysWritesTest.java",
+    "modern/services/api-gateway/src/test/java/gov/medicaid/pem/apigateway/GatewayWriteTimeoutTest.java",
+    "modern/tools/checks/live/test_security.py"
   ],
   "testIds": {
-    "AC-1": [],
+    "AC-1": [
+      "GatewayRoutingTest: PASSED",
+      "GatewayRelaysWritesTest: PASSED"
+    ],
     "AC-2": [
-      "GatewayRoutingTest: PASSED"
+      "GatewayRoutingTest: PASSED",
+      "GatewayRelaysServiceErrorTest: PASSED"
     ],
     "AC-3": [
       "GatewayRoutingTest: PASSED",
-      "PemKitAutoConfigurationTest: PASSED"
+      "PemKitAutoConfigurationTest: PASSED",
+      "GatewayRelaysWritesTest: PASSED"
     ],
     "AC-4": [
       "GatewayRoutingTest: PASSED"
     ],
     "AC-5": [
-      "GatewayRoutingTest: PASSED"
+      "GatewayRoutingTest: PASSED",
+      "GatewayRelaysWritesTest: PASSED"
     ],
     "AC-6": [
       "GatewayRoutingTest: PASSED",
       "HelpersTest: PASSED",
       "ProblemHandlerTest: PASSED",
       "ProblemHandlerUnreadableTest: PASSED",
-      "UnreadableBodyWebTest: PASSED"
+      "UnreadableBodyWebTest: PASSED",
+      "GatewayProxyTimeoutTest: PASSED",
+      "GatewayProxyTimeoutConfigTest: PASSED",
+      "GatewayFailureLoggingTest: PASSED",
+      "GatewayRelaysServiceErrorTest: PASSED",
+      "GatewayRelaysWritesTest: PASSED",
+      "GatewayWriteTimeoutTest: PASSED"
     ]
   },
   "codeUnits": [
+    "modern/services/api-gateway/src/main/java/gov/medicaid/pem/apigateway/ApiGatewayApplication.java",
+    "modern/services/api-gateway/src/main/java/gov/medicaid/pem/apigateway/GatewayHttpClient.java",
+    "modern/services/api-gateway/src/main/java/gov/medicaid/pem/apigateway/GatewayProblems.java",
+    "modern/services/api-gateway/src/main/java/gov/medicaid/pem/apigateway/GatewayProperties.java",
+    "modern/services/api-gateway/src/main/java/gov/medicaid/pem/apigateway/PemRoutes.java",
     "modern/services/api-gateway/src/main/resources/api-gateway.yml",
-    "modern/tools/checks/live/test_security.py"
+    "modern/services/api-gateway/build.gradle.kts"
   ],
   "rules": []
 }
