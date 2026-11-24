@@ -1,47 +1,47 @@
 {
-  "total": 5,
   "size": 50,
   "items": [
     {
-      "noticeId": "20accd89-52d6-4c41-bacf-40f84accef73",
-      "npi": "1005933068",
-      "template": "RST",
-      "channel": "EMAIL",
-      "status": "SENT",
-      "sentAt": "2026-11-20T17:45:58.280040Z"
-    },
-    {
-      "noticeId": "fa24ebc5-43ca-443a-bba2-7f4e7824a9a0",
-      "npi": "1005933068",
-      "template": "APPROVED",
-      "channel": "EMAIL",
-      "status": "SENT",
-      "sentAt": "2026-11-20T17:45:58.056110Z"
-    },
-    {
-      "noticeId": "75155b8b-56ca-4810-9603-11e1f59fe9a2",
+      "noticeId": "ef9d456e-1bac-43d2-99fe-e3be7f18a384",
       "npi": "1005919109",
       "template": "RST",
       "channel": "EMAIL",
       "status": "SENT",
-      "sentAt": "2026-11-20T17:45:57.857019Z"
+      "sentAt": "2026-11-24T08:59:17.837479Z"
     },
     {
-      "noticeId": "548bae49-d5e2-4d8b-b811-8c943ed41fa9",
+      "noticeId": "0c708d79-cbe1-49b7-a172-d885d31af6aa",
+      "npi": "1005933068",
+      "template": "RST",
+      "channel": "EMAIL",
+      "status": "SENT",
+      "sentAt": "2026-11-24T08:59:17.825788Z"
+    },
+    {
+      "noticeId": "f9ad1939-3dc5-43e2-b59c-577e4b526566",
       "npi": "1005992312",
       "template": "SUS",
       "channel": "EMAIL",
       "status": "SENT",
-      "sentAt": "2026-11-20T17:45:57.813118Z"
+      "sentAt": "2026-11-24T08:59:17.812172Z"
     },
     {
-      "noticeId": "31359691-c555-40e9-9059-285e0bd28e1b",
+      "noticeId": "d1e1d26f-469b-4574-b516-7b343ee982ec",
       "npi": "1005943141",
       "template": "TRM",
       "channel": "EMAIL",
       "status": "SENT",
-      "sentAt": "2026-11-20T17:45:57.774405Z"
+      "sentAt": "2026-11-24T08:59:17.795330Z"
+    },
+    {
+      "noticeId": "cf6b3ad6-6556-42a5-80b3-7ae03610bdbe",
+      "npi": "1005933068",
+      "template": "APPROVED",
+      "channel": "EMAIL",
+      "status": "SENT",
+      "sentAt": "2026-11-24T08:59:17.724771Z"
     }
   ],
-  "page": 0
+  "page": 0,
+  "total": 5
 }

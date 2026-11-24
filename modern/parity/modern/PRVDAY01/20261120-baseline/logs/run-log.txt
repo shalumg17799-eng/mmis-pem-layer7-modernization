@@ -1,14 +1,19 @@
-17:43:13 scenario day-baseline: job PRVDAY01, run id 20261120-baseline, business date 2026-11-20
-17:43:15 memory ok before seed: 1929 MB free
-17:43:29 seed.sh done: seed files loaded: 10
-17:43:29 seed state: 16 providers
-17:43:32 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
-17:43:32 APPINPUT: 8 records of 200 bytes, same bytes as the legacy run
-17:43:34 memory ok before PRVENR01 intake: 1725 MB free
-17:43:35 PRVENR01 intake: POST /api/v1/batch/intake-runs -> 202
-17:43:37 PRVENR01 intake: run f03ebc2a-d602-48e0-bb09-88cbd676a879 COMPLETED counts={'read': 8, 'written': 3, 'errored': 4, 'skipped': 1} error=None
-17:43:39 new providers registered, screened and tiered by events: done (new=3/3, unscreened-or-untiered=[])
-17:43:43 memory ok before PRVSCR01 screening run: 1796 MB free
-17:43:43 PRVSCR01 screening run: POST /api/v1/batch/screening-runs -> 202
-17:43:45 PRVSCR01 screening run: run 70e83b40-cf42-4c28-875a-aecc763ddcc1 COMPLETED counts={'read': 19, 'screened': 2, 'skipped': 17, 'failed': 0} error=None
-17:43:45 every provider screened and tiered after the screening run: done (unscreened-or-untiered=[])
+08:44:08 scenario day-baseline: job PRVDAY01, run id 20261120-baseline, business date 2026-11-20
+08:44:09 memory 838 MB < 1024 MB before seed: waiting 60 s
+08:45:10 memory 695 MB < 1024 MB before seed: waiting 60 s
+08:46:12 memory 510 MB < 1024 MB before seed: waiting 60 s
+08:47:13 memory 424 MB < 1024 MB before seed: waiting 60 s
+08:48:13 memory 368 MB < 1024 MB before seed: waiting 60 s
+08:49:14 memory ok before seed: 1187 MB free
+08:49:25 seed.sh done: seed files loaded: 10
+08:49:25 seed state: 16 providers
+08:49:28 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
+08:49:28 APPINPUT: 8 records of 200 bytes, same bytes as the legacy run
+08:49:29 memory ok before PRVENR01 intake: 1142 MB free
+08:49:29 PRVENR01 intake: POST /api/v1/batch/intake-runs -> 202
+08:49:31 PRVENR01 intake: run 943ec2f7-7600-4a18-aec8-6823b588ff7f COMPLETED counts={'read': 8, 'written': 3, 'errored': 4, 'skipped': 1} error=None
+08:49:31 new providers registered, screened and tiered by events: done (new=3/3, unscreened-or-untiered=[])
+08:49:35 memory ok before PRVSCR01 screening run: 1125 MB free
+08:49:35 PRVSCR01 screening run: POST /api/v1/batch/screening-runs -> 202
+08:49:37 PRVSCR01 screening run: run 262ab4f9-be79-4449-b865-010508f8bf14 COMPLETED counts={'read': 19, 'screened': 2, 'skipped': 17, 'failed': 0} error=None
+08:49:37 every provider screened and tiered after the screening run: done (unscreened-or-untiered=[])

@@ -6,13 +6,13 @@
   "businessDate": "2026-11-20",
   "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
   "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
-  "startedUtc": "2026-11-20T17:43:50Z",
-  "finishedUtc": "2026-11-20T17:44:33Z",
+  "startedUtc": "2026-11-24T08:49:42Z",
+  "finishedUtc": "2026-11-24T08:50:08Z",
   "gateway": "http://localhost:8080",
   "user": "admin1 (ADMIN)",
   "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
   "modernBuild": {
-    "gitHead": "f72d4e5",
+    "gitHead": "fbe7a94",
     "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
     "workingTree": "uncommitted changes of the lead (no commit in this task)"
   },
@@ -22,7 +22,7 @@
       "step": "PRVENR01 intake",
       "startPath": "/api/v1/batch/intake-runs",
       "startHttpStatus": 202,
-      "runId": "3b38474e-dc56-4b7f-97aa-3628b0898966",
+      "runId": "957db0a6-cc51-4019-a5f8-045cdf84312d",
       "status": "COMPLETED",
       "businessDate": "2026-11-20",
       "counts": {
@@ -32,15 +32,15 @@
         "skipped": 0
       },
       "error": null,
-      "startedAt": "2026-11-20T17:44:18.869255Z",
-      "endedAt": "2026-11-20T17:44:19.220802Z",
+      "startedAt": "2026-11-24T08:49:57.324433Z",
+      "endedAt": "2026-11-24T08:49:57.401943Z",
       "job": "PRVENR01"
     },
     {
       "step": "PRVSCR01 screening run",
       "startPath": "/api/v1/batch/screening-runs",
       "startHttpStatus": 202,
-      "runId": "fd36eaf1-ad04-479c-8245-b1e8da8d96e8",
+      "runId": "3627e9e2-d010-477f-9a7a-8c0a2976c9d1",
       "status": "COMPLETED",
       "businessDate": "2026-11-20",
       "counts": {
@@ -50,8 +50,8 @@
         "failed": 0
       },
       "error": null,
-      "startedAt": "2026-11-20T17:44:27.896017Z",
-      "endedAt": "2026-11-20T17:44:28.398080Z",
+      "startedAt": "2026-11-24T08:50:03.323768Z",
+      "endedAt": "2026-11-24T08:50:03.505531Z",
       "job": "PRVSCR01"
     }
   ],
@@ -117,13 +117,13 @@
       "path": "after/provider-master-after-step010.delivered",
       "role": "provider master after the intake and the event-driven registration, screening and tiering (the modern system cannot stop between STEP010 and STEP030/040) (as delivered by the API, one record per line)",
       "bytes": 2488,
-      "sha256": "07988e16ec47b44b72482dbd1d3ef72d4e9fbdbb65263c0327784d7996944824"
+      "sha256": "8e7ea2916323e926c7c528273cccd47bc3adf9139c4b0989f6a9a2ae6ff30721"
     },
     {
       "path": "after/provider-master-after-step010.ascii",
       "role": "provider master after the intake and the event-driven registration, screening and tiering (the modern system cannot stop between STEP010 and STEP030/040) (record stream, records back to back)",
       "bytes": 2470,
-      "sha256": "07302a3f24547dc23cf038ca92398fc5105e0a0a666b6e409e8d5592a62f95a0",
+      "sha256": "254b91338bb8fbcedca7c2e403609209e8bb4acf3619ab28c8460b1c018f2254",
       "recordLength": 130,
       "records": 19,
       "goldenCounterpart": "after/provider-master-after-step010.ebcdic.ascii",
@@ -151,7 +151,7 @@
       "path": "logs/screenings-of-new-providers.json",
       "role": "GET /api/v1/screenings?npi=... for every provider registered by the intake (screened by events)",
       "bytes": 4194,
-      "sha256": "820bea79599aa302dc8db130c36492a347f0b77c755f31558d41fb96c18f2a4b"
+      "sha256": "41b3aed1b6cb5dc4d5d6db2c8eddb36e4cf468f5caaf668accc092b57daa2495"
     },
     {
       "path": "logs/applications.json",
@@ -163,13 +163,13 @@
       "path": "after/provider-master-after-step040.delivered",
       "role": "provider master after the screening run and the event-driven tiering (final) (as delivered by the API, one record per line)",
       "bytes": 2488,
-      "sha256": "143f1fdeadf688c72af55bf1ca7dba33118f8fe3f66dc10245ec94383fd45ef0"
+      "sha256": "c0ae6a4396de0091e31fe5a1a0f3292134e34efb618e2833d1a4c5283251469c"
     },
     {
       "path": "after/provider-master-after-step040.ascii",
       "role": "provider master after the screening run and the event-driven tiering (final) (record stream, records back to back)",
       "bytes": 2470,
-      "sha256": "f3668c505db87ad54505a019477f79d126b35457e4647ec8a3bc24f21e88119a",
+      "sha256": "297f6d3112f83e8e046af044ce28003ce83306a371e3051139909f5bf1a93f5b",
       "recordLength": 130,
       "records": 19,
       "goldenCounterpart": "after/provider-master-after-step040.ebcdic.ascii",
@@ -179,14 +179,14 @@
     {
       "path": "logs/modern-job-lines.txt",
       "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
-      "bytes": 3580,
-      "sha256": "419c2835a2f306cd1a01aaed2099db3b444bb608b91946306f8340a90128393a"
+      "bytes": 3579,
+      "sha256": "04defca758a51d8cc362b7b7c37cb4de4fce93ea5888a5849f0b22e094e66583"
     },
     {
       "path": "logs/run-log.txt",
       "role": "log of this script",
       "bytes": 1226,
-      "sha256": "e691d7d67488f3c32bcd4b1f89fbabaf2910a3b87a6d49cfb8e5bab181457914"
+      "sha256": "d4f7b3242ee867dc3ccc949feff21b5cbe558f585c710ce559563c6885999e91"
     }
   ]
 }

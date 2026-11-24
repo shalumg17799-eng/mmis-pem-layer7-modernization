@@ -1,7 +1,58 @@
 # Parity report: legacy PEM jobs on Hercules against the modern system (MAM-91)
 
-Date of this version: 2026-11-20, after a **re-run of the modern side** (scenarios 23:13 to 23:16, comparison 23:17, machine time UTC+5:30), corrected at 23:38 after two independent checks (11 new rows, not 4; AC-4 is partly met; the source of the value 20311120; see "Corrections of 23:38" below). First version of this report: 2026-11-20 18:20. Author: parity-checker. Business date of both sides: **2026-11-20** (not the frozen 2026-01-15, see section 7).
-Status: **current for the re-run.** Every difference in the captured files is classified below as EXPECTED with its decision number or as UNEXPECTED. Nothing was marked EXPECTED without an approved decision. The UNEXPECTED groups U-2 to U-9 are recorded as questions Q-125 to Q-129 in `modern/docs/analysis/questions.md`; Q-125 to Q-128 have the default "accept the difference, no code change" applied (to be confirmed by the user), Q-129 is BLOCKED (section 8). They stay UNEXPECTED here until the user decides. Story MAM-91 therefore stays In Progress (AC-7 open).
+## FINAL VERSION of 2026-11-24 (this block replaces the results of the version of 2026-11-20 below)
+
+**Result of the final comparison** (`python modern/tools/parity/compare_parity.py`, 2026-11-24 after the modern side was run again on deploy 12): units **MATCH 168, EXPECTED 67, UNEXPECTED 1**;
+rows **102 EXPECTED, 1 UNEXPECTED** (103 rows, the same set as in the version of 2026-11-20: only the class of 39 rows changed, because of four decisions); supplementary notices (PRVSAN01) MATCH 4,
+EXPECTED 2, UNEXPECTED 0. Premise checks: **213 ok, 0 failed**, 5 information only (the sizes and sha256 of all 52 golden files and of the modern captures, the inputs, the business date).
+Nothing was normalised: no manifest lists a run-dependent field.
+
+**The one UNEXPECTED unit is BLOCKED and stays listed: U-8 (Q-129).** The permanent generation `MMPRV.TMSIS.ARCHIVE(+1)` could not be created by the anonymous job on the Hercules lab (IEF197I, IEF453I) and the
+lab account HERC01 was refused (IEF722I INVALID PASSWORD GIVEN; no password was guessed or asked for in chat). Only a temporary copy of TMSISOUT was captured (byte-identical to TMSISOUT); the content of the modern archive
+generation was not exported, so the file `tmsis-archive-copy` has no modern counterpart. To close it: the lab password in the root `.env` (never in chat), one more PRVMTH01 run on Hercules and an export of the modern archive
+content. The user decided on 2026-11-24 that this job stays BLOCKED. No other difference is unexplained.
+
+**What happened on 2026-11-24**
+1. The user confirmed the recommended answers (message of 2026-11-24): Q-124 A (already D-030, live since deploy 4), **Q-125 A = D-031**, **Q-126 A = D-032**, **Q-127 A = D-033**, **Q-128 A = D-034**,
+   Q-130 A (the licence-board stub knows SD20001, applied and checked on 2026-11-20). The decisions are recorded in `defect-register.md` (section "Decisions recorded after Phase 2 that are not legacy defects") and the answers in
+   `questions.md`; no Defect story was created, because nothing points at a coding error.
+2. `compare_parity.py`: seven rules moved from UNEXPECTED to EXPECTED and cite their decision: E-7 = D-031 (effective date of a new provider, 9 rows), E-8 = D-032 (event chain instead of the step sequence: snapshot timing 12, new providers
+   in SCRNOUT 12, no JCL gate 2, no CAP030 snapshot 1 = 27 rows), E-9 = D-033 (tier only after PASS, 2 rows), E-10 = D-034 (the extra APPROVED notice, 1 row). Run on the captured files of 2026-11-20 first: the same 103 rows, 39 of
+   them changed class (U-2 9, U-3 12, U-4 2, U-5 12, U-6 2, U-7 1, U-9 1), 64 unchanged (commit 18f6efc).
+3. **The modern side was run again** on the deployed build of deploy 12 (the gateway on Apache HttpClient 5.6.5 and the shared kit change), all five scenarios one after another from the seed state, business date 2026-11-20 as the legacy
+   run (14:14 to 14:29 IST, manifests `startedUtc` 2026-11-24T08:44Z to 08:59Z, "problems: 0" in each); the stack was reseeded at the end (16 providers).
+4. **A frozen date, found and handled.** The modern services stamp the clock of the day on which they run (`business date` is a parameter only of the batch runs). The legacy run was frozen at 2026-11-20. So in the re-run of today the effective date of
+   a new provider reads **20261124** (D-031: "the registration date") and the due date at a completed revalidation **20311124** (D-003: "the date + 5 years"), where the version of 2026-11-20 had 20261120 and 20311120, which were right only on that day. The first
+   comparison of today therefore showed 13 rows with no rule (group U-0: 9 effective dates, 4 due dates). Both decisions are rules, not constants: the two rules of the tool now expect **the date of the modern run (read from its manifest) and that date + 5 years**.
+   The match is exact: a modern date that is neither is UNEXPECTED. The legacy values (20260115 from the intake record, 20311120 from the frozen run) are unchanged. Consequence for anyone repeating the run: the modern date of the run matters; the golden files stay frozen at
+   2026-11-20. No business field was normalised.
+5. No legacy job was run again: the Hercules containers (`mmis-hercules`) were up, the golden captures are unchanged (the premise checks compare size and sha256 of every golden file with its manifest).
+
+**Result per file (final)**
+
+| File | Result |
+|---|---|
+| REVALQ (PRVMTH01) | 4 / 4 records, **MATCH**, byte-identical |
+| TMSISOUT (PRVMTH01) | 8 / 8, **MATCH**, byte-identical (period 26324, D-015 preserved) |
+| TMSISOUT archive generation (PRVMTH01) | **BLOCKED** (U-8, Q-129, above) |
+| DIROUT (PRVDIR01) | 8 / 8, **EXPECTED**: only the name area, bytes 23-82 (D-028) |
+| APPERROR (PRVDAY01) | baseline: 1 MATCH unit and 5 EXPECTED (D-001: the legacy stops at the first invalid application and writes its error row twice); valid-only: both empty |
+| SCRNOUT (PRVDAY01) | 21 units **EXPECTED**: the stub rows without source, date and detail (D-005, 24 field rows) and the screening of new providers at registration and the missing baseline file (D-032) |
+| Provider master (sum of the 14 comparisons of the five runs) | MATCH 159, **EXPECTED 35**, **UNEXPECTED 0** (D-001, D-003, D-006, D-031, D-032, D-033); every BEFORE export is byte-identical to the legacy BEFORE file |
+| Sanction notices (supplementary) | MATCH 4, EXPECTED 2 (D-026, D-034), UNEXPECTED 0 |
+
+Groups of the 102 EXPECTED rows: E-1 D-001 x6, E-2 D-003 x23, E-3 D-005 x24, E-4 D-006 x1, E-5 D-028 x8, E-6 D-026 x1, E-7 D-031 x9, E-8 D-032 x27, E-9 D-033 x2, E-10 D-034 x1. UNEXPECTED: U-8 x1.
+
+**Acceptance criteria of MAM-91 after this version.** AC-1 not exercised (as before); AC-2 and AC-4 partly met for the reason in section 10 (both sides ran on 2026-11-20 as the business date, not 2026-01-15); AC-3, AC-5, AC-6, AC-8 met; **AC-7 met except for the one
+BLOCKED capture gap (U-8)**: every difference is MATCH or EXPECTED with a decision number, none was marked EXPECTED on its own, no Defect story was needed, and the legacy-side decisions are recorded as D-030 to D-034.
+
+**Reading the rest of this report.** Everything below this block is the text of the version of 2026-11-20 23:38, kept for its evidence rows. Where it says UNEXPECTED for the groups U-2 to U-7 and U-9, or "decision needed" for Q-125 to Q-128 (sections 0, 1, 4 to 6, 8, 10), it is
+**superseded by this block**: those groups are EXPECTED under D-031 to D-034.
+
+---
+
+Date of the version below: 2026-11-20 (superseded where the block above says so), after a **re-run of the modern side** (scenarios 23:13 to 23:16, comparison 23:17, machine time UTC+5:30), corrected at 23:38 after two independent checks (11 new rows, not 4; AC-4 is partly met; the source of the value 20311120; see "Corrections of 23:38" below). First version of this report: 2026-11-20 18:20. Author: parity-checker. Business date of both sides: **2026-11-20** (not the frozen 2026-01-15, see section 7).
+Status of the version of 2026-11-20 23:38: **was current for that re-run.** Every difference in the captured files is classified below as EXPECTED with its decision number or as UNEXPECTED. Nothing was marked EXPECTED without an approved decision. The UNEXPECTED groups U-2 to U-9 are recorded as questions Q-125 to Q-129 in `modern/docs/analysis/questions.md`; Q-125 to Q-128 have the default "accept the difference, no code change" applied (to be confirmed by the user), Q-129 is BLOCKED (section 8). They stay UNEXPECTED here until the user decides. Story MAM-91 therefore stays In Progress (AC-7 open).
 
 Inputs: `modern/parity/golden/**` (stage 1, legacy run, report `modern/docs/reports/parity-legacy-run.md`), `modern/parity/modern/**` (stage 2, modern run), `modern/docs/analysis/defect-register.md` (D-001 to D-029), `modern/docs/analysis/questions.md`, the layouts exported from the graph (`modern/libs/fixed-width/src/main/resources/layouts/*.json`). Comparison tool: `modern/tools/parity/compare_parity.py` (Python, standard library only, not changed in this re-run); full machine-readable result: `modern/parity/compare-result.json`.
 
@@ -35,7 +86,7 @@ Row by row (the rows of `compare-result.json` of the first final version against
 
 **Corrections of 23:38.** Two independent checks of this re-run found three errors in the first text of this version, all in the report, none in a file or a count of the comparison: (1) it said the only new rows were 4 rows of U-3, and left out the 7 E-2 rows (92 + 4 = 96 does not equal the 103 rows of the tool); (2) it called AC-4 met, although its Given is the business date 2026-01-15, which could not be run (section 7), so it is partly met, like AC-2; (3) it explained the value `20311120` of the 4 E-2 rows of PRVMTH01 as "business date + 5 years", but the modern code takes it from the service clock (processing date), which is the default of Q-018 (Q-A4), not an approved decision. No scenario was run again for this correction; the comparison result and all captured files are those of 23:17. The supplementary notice check is unchanged (MATCH 4, EXPECTED 1, UNEXPECTED 1). The seven non-master modern files (both APPERROR files, both SCRNOUT files, DIROUT, REVALQ, TMSISOUT) are byte-identical to those of the first run; all 12 master exports changed.
 
-## 0. Result per file (current)
+## 0. Result per file (version of 2026-11-20 23:38; the final result is in the block at the top)
 
 | File | Records legacy / modern | Result |
 |---|---|---|
@@ -47,7 +98,7 @@ Row by row (the rows of `compare-result.json` of the first final version against
 | Provider master (13 comparisons in 5 runs) | 205 / 204 | 155 **MATCH** (all five BEFORE exports are byte-identical to the legacy BEFORE files); 20 **EXPECTED** (D-001, D-003, D-006); 13 **UNEXPECTED**: 11 records (the 3 new providers after STEP010 in two runs: U-2 and U-3; the 3 new providers in the final valid-only file: U-2; the tier of 2 denied providers: U-4) and 2 files (U-6, U-7) |
 | Sanction notices (supplementary) | 5 / 5 | 4 MATCH, 1 EXPECTED (D-026), 1 UNEXPECTED (U-9, Q-128) |
 
-## 1. Result at a glance
+## 1. Result at a glance (version of 2026-11-20 23:38; the final result is in the block at the top)
 
 - Six file types in five runs, 21 file comparisons (a file on one side only counts as a comparison). Units are records, or one unit per file-level difference: **MATCH 168, EXPECTED 41, UNEXPECTED 27**. Difference rows behind them: 63 EXPECTED, 40 UNEXPECTED (one row per field, record or file; the notices are included).
 - Supplementary check of the PRVSAN01 notices (not one of the six files): MATCH 4, EXPECTED 1, UNEXPECTED 1.

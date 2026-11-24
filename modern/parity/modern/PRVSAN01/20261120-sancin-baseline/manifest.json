@@ -6,23 +6,23 @@
   "businessDate": "2026-11-20",
   "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
   "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
-  "startedUtc": "2026-11-20T17:45:34Z",
-  "finishedUtc": "2026-11-20T17:46:07Z",
+  "startedUtc": "2026-11-24T08:50:54Z",
+  "finishedUtc": "2026-11-24T08:59:28Z",
   "gateway": "http://localhost:8080",
   "user": "admin1 (ADMIN)",
   "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
   "modernBuild": {
-    "gitHead": "f72d4e5",
+    "gitHead": "fbe7a94",
     "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
     "workingTree": "uncommitted changes of the lead (no commit in this task)"
   },
-  "memoryPauseSeconds": 0,
+  "memoryPauseSeconds": 480,
   "runs": [
     {
       "step": "PRVSAN01 sanction intake",
       "startPath": "/api/v1/batch/sanction-intake-runs",
       "startHttpStatus": 202,
-      "runId": "b3bfb518-24d5-4ba5-973b-157349ba23ba",
+      "runId": "1abd0457-e2b7-4bdc-a383-6fb864ca1e3f",
       "status": "COMPLETED",
       "businessDate": "2026-11-20",
       "counts": {
@@ -34,8 +34,8 @@
         "terminated": 1
       },
       "error": null,
-      "startedAt": "2026-11-20T17:45:57.273337Z",
-      "endedAt": "2026-11-20T17:45:57.718165Z",
+      "startedAt": "2026-11-24T08:59:17.348178Z",
+      "endedAt": "2026-11-24T08:59:17.600134Z",
       "job": "PRVSAN01"
     }
   ],
@@ -104,25 +104,25 @@
       "path": "logs/sanction-history.json",
       "role": "GET /api/v1/sanctions after the run (HTTP 200)",
       "bytes": 2688,
-      "sha256": "9c4caf1985f1ada85d74d03ee04be4d8e07693557bfc42e009e45c8d4058c466"
+      "sha256": "039dd960d0afc1444c17f1fac933c100e4fc3d5d3870d081e08a7edfc4027abc"
     },
     {
       "path": "logs/notices.json",
       "role": "GET /api/v1/notices after the run (HTTP 200); modern counterpart of the PRVNT* CALLs",
       "bytes": 1160,
-      "sha256": "16f1c9c97c15336c394f4463bcf36b5695e2a010b5c91d23cc4569bfd31d2ba9"
+      "sha256": "cb3e2a69662ee1fb454b9e6b1c27b9bd803da781a4e6eb1d7605b3bf33ccb68a"
     },
     {
       "path": "logs/modern-job-lines.txt",
       "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
       "bytes": 2699,
-      "sha256": "a406d5b12fa690472b7a299753f2a79df525e49c93477a6a322dc886d1b3b71a"
+      "sha256": "51377b16beda66f5ab471478567374e69f37cf6f5cd87126742b718c26595f5d"
     },
     {
       "path": "logs/run-log.txt",
       "role": "log of this script",
-      "bytes": 721,
-      "sha256": "b39e9de2418741f98dd1a21abb2c982ee7905b4819fed984e60077b824aec868"
+      "bytes": 1355,
+      "sha256": "a7c8f99408cfe394ba9cf1062e161b54bb14a9543a177df9b42c54c88301dd77"
     }
   ]
 }

@@ -1,8 +1,16 @@
-17:45:34 scenario san-baseline: job PRVSAN01, run id 20261120-sancin-baseline, business date 2026-11-20
-17:45:36 memory ok before seed: 1336 MB free
-17:45:53 seed.sh done: seed files loaded: 10
-17:45:53 seed state: 16 providers
-17:45:56 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
-17:45:57 memory ok before PRVSAN01 sanction intake: 1781 MB free
-17:45:57 PRVSAN01 sanction intake: POST /api/v1/batch/sanction-intake-runs -> 202
-17:45:59 PRVSAN01 sanction intake: run b3bfb518-24d5-4ba5-973b-157349ba23ba COMPLETED counts={'read': 6, 'applied': 4, 'notFound': 1, 'rejected': 1, 'skipped': 0, 'terminated': 1} error=None
+08:50:54 scenario san-baseline: job PRVSAN01, run id 20261120-sancin-baseline, business date 2026-11-20
+08:50:55 memory ok before seed: 1091 MB free
+08:51:04 seed.sh done: seed files loaded: 10
+08:51:04 seed state: 16 providers
+08:51:08 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
+08:51:09 memory 1000 MB < 1024 MB before PRVSAN01 sanction intake: waiting 60 s
+08:52:09 memory 987 MB < 1024 MB before PRVSAN01 sanction intake: waiting 60 s
+08:53:11 memory 937 MB < 1024 MB before PRVSAN01 sanction intake: waiting 60 s
+08:54:12 memory 892 MB < 1024 MB before PRVSAN01 sanction intake: waiting 60 s
+08:55:13 memory 1009 MB < 1024 MB before PRVSAN01 sanction intake: waiting 60 s
+08:56:13 memory 913 MB < 1024 MB before PRVSAN01 sanction intake: waiting 60 s
+08:57:14 memory 929 MB < 1024 MB before PRVSAN01 sanction intake: waiting 60 s
+08:58:16 memory 912 MB < 1024 MB before PRVSAN01 sanction intake: waiting 60 s
+08:59:17 memory ok before PRVSAN01 sanction intake: 1321 MB free
+08:59:17 PRVSAN01 sanction intake: POST /api/v1/batch/sanction-intake-runs -> 202
+08:59:19 PRVSAN01 sanction intake: run 1abd0457-e2b7-4bdc-a383-6fb864ca1e3f COMPLETED counts={'read': 6, 'applied': 4, 'notFound': 1, 'rejected': 1, 'skipped': 0, 'terminated': 1} error=None

@@ -6,13 +6,13 @@
   "businessDate": "2026-11-20",
   "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
   "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
-  "startedUtc": "2026-11-20T17:44:34Z",
-  "finishedUtc": "2026-11-20T17:45:04Z",
+  "startedUtc": "2026-11-24T08:50:09Z",
+  "finishedUtc": "2026-11-24T08:50:33Z",
   "gateway": "http://localhost:8080",
   "user": "admin1 (ADMIN)",
   "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
   "modernBuild": {
-    "gitHead": "f72d4e5",
+    "gitHead": "fbe7a94",
     "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
     "workingTree": "uncommitted changes of the lead (no commit in this task)"
   },
@@ -22,7 +22,7 @@
       "step": "PRVREV01 revalidation sweep",
       "startPath": "/api/v1/batch/revalidation-sweeps",
       "startHttpStatus": 202,
-      "runId": "7f29f390-4ba4-46fe-9182-f3a5d910abfc",
+      "runId": "b4f50944-83eb-48ae-9ca3-5327fa63c805",
       "status": "COMPLETED",
       "businessDate": "2026-11-20",
       "counts": {
@@ -30,25 +30,25 @@
         "noDueDate": 0
       },
       "error": null,
-      "startedAt": "2026-11-20T17:44:55.186808Z",
-      "endedAt": "2026-11-20T17:44:55.347943Z",
+      "startedAt": "2026-11-24T08:50:25.391997Z",
+      "endedAt": "2026-11-24T08:50:25.442765Z",
       "job": "revalidation-sweep"
     },
     {
       "step": "PRVTMS01 T-MSIS extract",
       "startPath": "/api/v1/batch/tmsis-extracts",
       "startHttpStatus": 202,
-      "runId": "8e22f755-2153-4c53-bb80-e2c04e64d6c4",
+      "runId": "f6f41f5c-e4e8-4b2f-8a17-cc93b3633d0b",
       "status": "COMPLETED",
       "businessDate": "2026-11-20",
       "counts": {
         "rows": 8,
         "futureEnrolments": 0,
-        "archiveGeneration": 27
+        "archiveGeneration": 36
       },
       "error": null,
-      "startedAt": "2026-11-20T17:44:59.101181Z",
-      "endedAt": "2026-11-20T17:44:59.282374Z",
+      "startedAt": "2026-11-24T08:50:28.311814Z",
+      "endedAt": "2026-11-24T08:50:28.464574Z",
       "job": "PRVTMS01"
     }
   ],
@@ -108,8 +108,8 @@
     {
       "path": "logs/tmsis-extract-list.json",
       "role": "GET /api/v1/batch/tmsis-extracts after the run (runs and archive generations)",
-      "bytes": 9880,
-      "sha256": "f729fa6a572583c1ad01ee8e7854a4f2ae80eb728edbfb2d4623251900ddebb4"
+      "bytes": 13165,
+      "sha256": "e1327f2e825978b00c020f2d7669a5f0cd0642431ffad4dce2d722859b88499c"
     },
     {
       "path": "after/tmsisout.delivered",
@@ -132,13 +132,13 @@
       "path": "after/provider-master-after.delivered",
       "role": "provider master export AFTER (as delivered by the API, one record per line)",
       "bytes": 2095,
-      "sha256": "67a345c30559ebfd0a9c69bff59a8d986853253a7fc2a214f4727f3198bbffbd"
+      "sha256": "0756c09c3fcae9a4ebf55d6ea456870e97fafcdef069e842bf3c5c0a4b2a05e3"
     },
     {
       "path": "after/provider-master-after.ascii",
       "role": "provider master export AFTER (record stream, records back to back)",
       "bytes": 2080,
-      "sha256": "24571d6f821d25095a25b018c2e8d809e506d275d5c8e47c5be4150ab7486c4c",
+      "sha256": "3c58a37ef2385c228c7d190cdc8bc7b3fafcdc53dd7628be6aae40dfd276bd47",
       "recordLength": 130,
       "records": 16,
       "goldenCounterpart": "after/provider-master-after.ebcdic.ascii",
@@ -149,13 +149,13 @@
       "path": "logs/modern-job-lines.txt",
       "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
       "bytes": 1526,
-      "sha256": "99a6c442becba36b277d0c6785bb85870910387aee21d19c0ae708430fbc756c"
+      "sha256": "b4740372a10976ce77a15ad0cbb8f95647a70f1c75399bd3acd998b669f6d842"
     },
     {
       "path": "logs/run-log.txt",
       "role": "log of this script",
       "bytes": 1136,
-      "sha256": "b5545d7e454494d5a70ae3edb329673f079cb066acac94d322dc7d7e14f17d2d"
+      "sha256": "5500e54b29891f85d8afdd53105e1b65afa99ec2ea69c88208546d1cc2a9046c"
     }
   ]
 }

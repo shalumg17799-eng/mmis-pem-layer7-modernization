@@ -188,11 +188,26 @@ def _blank(v):
 
 
 # per run: the NPIs both sides queued in REVALQ (filled while the REVALQ pair is compared)
-CTX = {"queued": {}}
+CTX = {"queued": {}, "rundate": {}}   # rundate: (job, run) -> the CCYYMMDD on which the modern run happened (manifest startedUtc)
 
 
 def _queued(d):
     return d["key"] in CTX["queued"].get((d["job"], d["run"]), ())
+
+
+def _modern_run_date(d):
+    """The modern services stamp the clock of the day the run happened (the legacy run is frozen at 2026-11-20): D-031 and D-003
+    are rules, not constants, so the expected modern value is the date of the modern run, read from its manifest."""
+    return CTX["rundate"].get((d["job"], d["run"]))
+
+
+def _is_run_date(d):
+    return _modern_run_date(d) is not None and d["modern"] == _modern_run_date(d)
+
+
+def _is_run_date_plus_5y(d):
+    r = _modern_run_date(d)
+    return r is not None and d["modern"] == str(int(r[:4]) + 5) + r[4:]
 
 
 RULES = [
@@ -219,8 +234,10 @@ RULES = [
          "the month-end sweep queued this provider in both systems (REVALQ is identical); the legacy PRVREV01 only "
          "queues it and leaves the master unchanged, while in the modern system the re-screening (reason "
          "REVALIDATION) runs by events, passes and completes the revalidation, and D-003 sets the due date at each "
-         "completed revalidation (business date + 5 years = 20311120); D-029 gives the case its own state",
-         files=["master-after"], kind="field", field="PRV-REVAL-DUE-DATE", modern=r"20311120", when=_queued),
+         "completed revalidation (the date of the modern run + 5 years; the legacy run was frozen at 2026-11-20); D-029 gives "
+         "the case its own state",
+         files=["master-after"], kind="field", field="PRV-REVAL-DUE-DATE",
+         when=lambda d: _queued(d) and _is_run_date_plus_5y(d)),
     rule("E-D005-SCR-FIELDS", "EXPECTED", "E-3", "D-005",
          "the legacy stub rows carry no source, no verdict date and no detail; the replaced screening service "
          "fills them from its mocked sources (the field contents are the Q-045/C-7 default)",
@@ -242,10 +259,10 @@ RULES = [
 
     rule("E-D031-EFFDATE", "EXPECTED", "E-7", "D-031",
          "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, "
-         "D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, "
-         "2026-11-24)",
+         "D-025); provider-service sets the registration date, the date of the modern run (read from its manifest): "
+         "decision D-031 (answer A to Q-125, 2026-11-24)",
          files=["master-after-step010", "master-after-step040"], kind="field", field="PRV-EFFECTIVE-DATE",
-         legacy=r"20260115", modern=r"20261120"),
+         legacy=r"20260115", when=_is_run_date),
     rule("E-D032-SNAPSHOT-TIMING", "EXPECTED", "E-8", "D-032",
          "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system "
          "registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the "
@@ -673,6 +690,8 @@ def main(argv=None):
         gdir, mdir = GOLDEN / job / run, MODERN_RUNS / job / run
         gman, mman = load_json(gdir / "manifest.json"), load_json(mdir / "manifest.json")
         premises += check_premises(job, run, gdir, mdir, gman, mman, conv)
+        if mman and mman.get("startedUtc"):
+            CTX["rundate"][(job, run)] = mman["startedUtc"][:10].replace("-", "")
         normalised = run_dependent(gman) | run_dependent(mman)
         for pair in r["files"]:
             res = compare_file(job, run, pair, gdir, mdir, normalised)

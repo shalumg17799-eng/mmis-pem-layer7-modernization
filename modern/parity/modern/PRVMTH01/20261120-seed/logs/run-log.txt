@@ -1,13 +1,13 @@
-17:44:34 scenario month-seed: job PRVMTH01, run id 20261120-seed, business date 2026-11-20
-17:44:35 memory ok before seed: 1825 MB free
-17:44:50 seed.sh done: seed files loaded: 10
-17:44:50 seed state: 16 providers
-17:44:53 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
-17:44:55 memory ok before PRVREV01 revalidation sweep: 1659 MB free
-17:44:55 PRVREV01 revalidation sweep: POST /api/v1/batch/revalidation-sweeps -> 202
-17:44:57 PRVREV01 revalidation sweep: run 7f29f390-4ba4-46fe-9182-f3a5d910abfc COMPLETED counts={'queued': 4, 'noDueDate': 0} error=None
-17:44:59 memory ok before PRVTMS01 T-MSIS extract: 1717 MB free
-17:44:59 PRVTMS01 T-MSIS extract: POST /api/v1/batch/tmsis-extracts -> 202
-17:44:59 PRVTMS01 T-MSIS extract: run 8e22f755-2153-4c53-bb80-e2c04e64d6c4 RUNNING counts={'rows': 0, 'futureEnrolments': 0} error=None
-17:45:01 T-MSIS run listed as finished: done (COMPLETED)
-17:45:01 T-MSIS run 8e22f755-2153-4c53-bb80-e2c04e64d6c4 COMPLETED counts={'rows': 8, 'futureEnrolments': 0, 'archiveGeneration': 27} error=None
+08:50:09 scenario month-seed: job PRVMTH01, run id 20261120-seed, business date 2026-11-20
+08:50:10 memory ok before seed: 1106 MB free
+08:50:21 seed.sh done: seed files loaded: 10
+08:50:21 seed state: 16 providers
+08:50:24 SEED PREMISE (checked at run time): the exported BEFORE master equals the legacy provider-master-seed-sorted.dat byte for byte (16 of 16 records)
+08:50:25 memory ok before PRVREV01 revalidation sweep: 1110 MB free
+08:50:25 PRVREV01 revalidation sweep: POST /api/v1/batch/revalidation-sweeps -> 202
+08:50:27 PRVREV01 revalidation sweep: run b4f50944-83eb-48ae-9ca3-5327fa63c805 COMPLETED counts={'queued': 4, 'noDueDate': 0} error=None
+08:50:28 memory ok before PRVTMS01 T-MSIS extract: 1113 MB free
+08:50:28 PRVTMS01 T-MSIS extract: POST /api/v1/batch/tmsis-extracts -> 202
+08:50:28 PRVTMS01 T-MSIS extract: run f6f41f5c-e4e8-4b2f-8a17-cc93b3633d0b RUNNING counts={'rows': 0, 'futureEnrolments': 0} error=None
+08:50:30 T-MSIS run listed as finished: done (COMPLETED)
+08:50:30 T-MSIS run f6f41f5c-e4e8-4b2f-8a17-cc93b3633d0b COMPLETED counts={'rows': 8, 'futureEnrolments': 0, 'archiveGeneration': 36} error=None

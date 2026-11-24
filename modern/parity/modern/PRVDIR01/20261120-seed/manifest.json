@@ -6,13 +6,13 @@
   "businessDate": "2026-11-20",
   "businessDateNote": "the date the legacy run really used (MVS CURRENT-DATE of 2026-11-20); passed as the businessDate parameter of every modern run (D-020)",
   "codePage": "n/a (the modern system writes ASCII; the golden files were converted from EBCDIC 1047)",
-  "startedUtc": "2026-11-20T17:45:05Z",
-  "finishedUtc": "2026-11-20T17:45:33Z",
+  "startedUtc": "2026-11-24T08:50:34Z",
+  "finishedUtc": "2026-11-24T08:50:53Z",
   "gateway": "http://localhost:8080",
   "user": "admin1 (ADMIN)",
   "seedState": "bash infra/scripts/seed.sh, 16 providers, before each run",
   "modernBuild": {
-    "gitHead": "f72d4e5",
+    "gitHead": "fbe7a94",
     "pemAppsImageAndCreated": "sha256:8f6ac126f7810bb5549c4cd122d2bf0e9cda5bdeb0838aa928f09e779fd8bef8 2026-11-19T09:13:05.930521023Z",
     "workingTree": "uncommitted changes of the lead (no commit in this task)"
   },
@@ -22,15 +22,15 @@
       "step": "PRVDIR01 directory extract",
       "startPath": "/api/v1/batch/directory-extracts",
       "startHttpStatus": 202,
-      "runId": "bb3d61b1-84db-4dd0-9519-ba7f336b45e0",
+      "runId": "4dfde1c6-4c28-4d9e-8b83-f79fdbb23c95",
       "status": "COMPLETED",
       "businessDate": "2026-11-20",
       "counts": {
         "rows": 8
       },
       "error": null,
-      "startedAt": "2026-11-20T17:45:29.279651Z",
-      "endedAt": "2026-11-20T17:45:29.449696Z",
+      "startedAt": "2026-11-24T08:50:49.904247Z",
+      "endedAt": "2026-11-24T08:50:49.968183Z",
       "job": "PRVDIR01"
     }
   ],
@@ -106,14 +106,14 @@
     {
       "path": "logs/modern-job-lines.txt",
       "role": "job lines of pem-pem-apps-1 during the run (filtered; ECS JSON lines)",
-      "bytes": 1790,
-      "sha256": "f80fe48100e9cac6680964056680df0520e3ec8d3edd9a5f89d8eec724d1630a"
+      "bytes": 1789,
+      "sha256": "2a4c9ca6fd8945f78287875babad51b50d89eee432ce48c49d1861e0994f9f53"
     },
     {
       "path": "logs/run-log.txt",
       "role": "log of this script",
       "bytes": 635,
-      "sha256": "18e8816c0e54c34dd213cde57437e32cf786d14e2fc8cabba4b01c739073870a"
+      "sha256": "070e9d7ef68d237016635ef78014e63da18811e4cfc2b75aa1e7e69c3a4e94ff"
     }
   ]
 }

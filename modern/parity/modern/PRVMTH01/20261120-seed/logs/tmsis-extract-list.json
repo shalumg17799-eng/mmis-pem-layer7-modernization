@@ -1,7 +1,123 @@
 {
-  "total": 27,
   "size": 50,
   "items": [
+    {
+      "runId": "f6f41f5c-e4e8-4b2f-8a17-cc93b3633d0b",
+      "job": "PRVTMS01",
+      "businessDate": "2026-11-20",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 8,
+        "futureEnrolments": 0,
+        "archiveGeneration": 36
+      },
+      "startedAt": "2026-11-24T08:50:28.311814Z",
+      "endedAt": "2026-11-24T08:50:28.464574Z"
+    },
+    {
+      "runId": "53fa0f30-7b1f-4221-88ee-8a6693d1a52a",
+      "job": "PRVTMS01",
+      "businessDate": "2026-11-24",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 6008,
+        "futureEnrolments": 0,
+        "archiveGeneration": 35
+      },
+      "startedAt": "2026-11-24T08:40:56.600011Z",
+      "endedAt": "2026-11-24T08:40:57.697150Z"
+    },
+    {
+      "runId": "365fc331-810c-46a4-af45-b6c5c450d0cb",
+      "job": "PRVTMS01",
+      "businessDate": "2026-03-31",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 8,
+        "futureEnrolments": 0,
+        "archiveGeneration": 34
+      },
+      "startedAt": "2026-11-24T08:07:09.149912Z",
+      "endedAt": "2026-11-24T08:07:09.471931Z"
+    },
+    {
+      "runId": "def80e94-7b6e-4e06-9a7b-1b9b5be0765f",
+      "job": "PRVTMS01",
+      "businessDate": "2026-03-31",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 8,
+        "futureEnrolments": 0,
+        "archiveGeneration": 33
+      },
+      "startedAt": "2026-11-21T03:12:05.532774Z",
+      "endedAt": "2026-11-21T03:12:06.461046Z"
+    },
+    {
+      "runId": "b3483b68-dd01-4cac-800a-44b4b50b644e",
+      "job": "PRVTMS01",
+      "businessDate": "2026-03-31",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 8,
+        "futureEnrolments": 0,
+        "archiveGeneration": 32
+      },
+      "startedAt": "2026-11-20T23:22:48.780762Z",
+      "endedAt": "2026-11-20T23:22:49.966014Z"
+    },
+    {
+      "runId": "9b6954ed-49c6-433b-a0ec-7183ac28a2da",
+      "job": "PRVTMS01",
+      "businessDate": "2026-03-31",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 8,
+        "futureEnrolments": 0,
+        "archiveGeneration": 31
+      },
+      "startedAt": "2026-11-20T19:39:00.212183Z",
+      "endedAt": "2026-11-20T19:39:00.658015Z"
+    },
+    {
+      "runId": "04aa5f0e-e6f6-4c5a-b990-ae0a80db4887",
+      "job": "PRVTMS01",
+      "businessDate": "2026-03-31",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 8,
+        "futureEnrolments": 0,
+        "archiveGeneration": 30
+      },
+      "startedAt": "2026-11-20T18:38:07.445002Z",
+      "endedAt": "2026-11-20T18:38:08.782358Z"
+    },
+    {
+      "runId": "3dc10e94-749a-4c26-84fd-624719d1bb2d",
+      "job": "PRVTMS01",
+      "businessDate": "2000-06-01",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 6008,
+        "futureEnrolments": 6008,
+        "archiveGeneration": 29
+      },
+      "startedAt": "2026-11-20T18:22:39.212234Z",
+      "endedAt": "2026-11-20T18:22:49.041220Z"
+    },
+    {
+      "runId": "d9044add-ccdb-4702-966f-490fdfe42a5d",
+      "job": "PRVTMS01",
+      "businessDate": "2026-03-31",
+      "status": "COMPLETED",
+      "counts": {
+        "rows": 8,
+        "futureEnrolments": 0,
+        "archiveGeneration": 28
+      },
+      "startedAt": "2026-11-20T17:53:18.152215Z",
+      "endedAt": "2026-11-20T17:53:18.393797Z"
+    },
     {
       "runId": "8e22f755-2153-4c53-bb80-e2c04e64d6c4",
       "job": "PRVTMS01",
@@ -354,5 +470,6 @@
       "endedAt": "2026-11-19T12:18:17.434301Z"
     }
   ],
-  "page": 0
+  "page": 0,
+  "total": 36
 }
