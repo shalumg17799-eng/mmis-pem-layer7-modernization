@@ -20,6 +20,7 @@ Everything created for the PEM modernization lives here. The legacy estate in `s
 | `kag/loaders/` | Python loader scripts (`load_<nn>_<what>.py`), the only writers to Neo4j |
 | `kag/tests/` | pytest tests for the loaders and parsers |
 | `specs/` | One spec baseline per Jira story (`<KEY>.md`) |
+| `changes/` | Change requests of the HITL change loop: `TEMPLATE.md`, one `<name>.md` per request (it only points at Jira tickets) and one folder `<CR-ID>/` per request with the Jira snapshots, `plan.md`, `report.md` |
 | `contracts/openapi/` | REST contracts, one per service |
 | `contracts/asyncapi/` | Event contracts |
 | `services/` | The Spring Boot microservices, one folder each |
@@ -31,3 +32,4 @@ Everything created for the PEM modernization lives here. The legacy estate in `s
 | `parity/golden/` | Captured legacy job outputs and expected results |
 | `tools/` | Developer scripts and helpers |
 | `tools/data/` | Data-generation and conversion scripts |
+| `tools/changes/` | The tools of the change loop (`fe_plan.py`, `fe_diff.py`, `fe_impact.py`, `fe_tests.py`, `fe_spec_update.py`, `fe_report.py`) and their tests |

@@ -103,5 +103,6 @@ testsSha256:            # sha256 of modern/docs/reports/stories/<KEY>.tests.sha2
   found in step 1).
 - **Agents never move a story to Done.** At the service gate, after the user approves,
   the orchestrator moves that service's reviewed stories to Done.
-- Jira change loop (a human edits a story, agents rebuild): **open, not designed yet.**
-  Follow MODERNIZATION.md section 8.
+- Jira change loop (a human edits a story, agents rebuild): `/fe-analyze`, `/fe-approve`, `/fe-discard` and the skill
+  `hitl-change-loop` (MODERNIZATION.md section 8). The spec copy changes only on the change branch, through
+  `modern/tools/changes/fe_spec_update.py`.

@@ -104,13 +104,15 @@ them. At most 3 subagents run in parallel.
 | code-reviewer | Independent review; read-only |
 | parity-checker | Legacy vs modern output comparison (Phase 9, later) |
 
-## 8. Open item: the Jira change loop (human in the loop)
+## 8. The Jira change loop (human in the loop)
 
-How a human's edits to a Jira story flow back into code is **not designed yet**. We will
-design it together later. Until then:
+Designed on 2026-11-24: skill `.claude/skills/hitl-change-loop/SKILL.md`, commands `/fe-analyze`, `/fe-approve`, `/fe-discard`,
+runbook `modern/docs/runbooks/hitl-change-loop.md`. Jira is the only source of the requirement; `/fe-analyze` stops after the impact
+analysis; `/fe-approve` builds the change tests first on a local branch `cr/<CR-ID>` and **never** deploys, pushes or writes to Jira.
+The rule for a normal story build is unchanged:
 - Before building a story, compare its Jira description with `modern/specs/<KEY>.md`.
 - If they differ, **stop** and show the user the differences. Do not build until the
-  user says which version to use.
+  user says which version to use. A deliberate change goes through `/fe-analyze` and `/fe-approve`.
 
 ## 9. Phase report (end every phase and every story with this)
 
