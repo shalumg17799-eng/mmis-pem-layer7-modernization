@@ -1033,15 +1033,16 @@ and approve a new decision that the two values mean the same, so the comparison 
 **Default applied: nothing is changed** (every option changes an approved criterion, an approved library rule or needs a new
 decision, so it is the user's call); the 46 rows stay UNEXPECTED in docs/reports/parity-report.md. **Recommended: A.**
 
-## Q-125. (MAM-91 parity, group U-2, 2026-11-20 17:55) Effective date of a newly registered provider: parity evidence for Q-015 (Q-A1) (status: DEFAULT APPLIED - revisit)
+## Q-125. (MAM-91 parity, group U-2, 2026-11-20 17:55) Effective date of a newly registered provider: parity evidence for Q-015 (Q-A1) (status: ANSWERED 2026-11-24 by the user: A)
 
 The legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date
 (20261120), which is the default A of Q-015 (Q-A1), not an approved decision. 9 UNEXPECTED rows (3 new providers in 3 files).
 Options: A) confirm the Q-A1 default as a decision (the rows then become EXPECTED); B) carry the application's effective
 date through ApplicationValidated (a contract change). **Default applied: A** (behaviour unchanged); the rows stay
 UNEXPECTED until the decision is approved.
+**Answer (user, 2026-11-24): A, "I confirm the recommended defaults for Q-124 to Q-130": the default A of Q-015 / Q-A1 is a decision: a new provider gets the registration date. Recorded as D-031 in defect-register.md.**
 
-## Q-126. (MAM-91 parity, groups U-3, U-5, U-6, U-7, 2026-11-20 17:55) The event chain replaces the JCL step sequence (status: DEFAULT APPLIED - revisit)
+## Q-126. (MAM-91 parity, groups U-3, U-5, U-6, U-7, 2026-11-20 17:55) The event chain replaces the JCL step sequence (status: ANSWERED 2026-11-24 by the user: A)
 
 The modern system registers, screens and tiers a new provider by events within seconds. So: a snapshot "after STEP010"
 already holds the screening result and the tier (U-3, 10 rows); the screening rows of new providers are in
@@ -1051,19 +1052,22 @@ STEP040 has no modern counterpart (U-7, 1 file). No decision D-001 to D-029 stat
 Options: A) one new decision: compare final states only, new providers are screened at registration, intake errors do not
 block later work; B) decide each of the four separately; C) rebuild the step semantics (not recommended).
 **Default applied: A** (no code change); the rows stay UNEXPECTED until the decision is approved.
+**Answer (user, 2026-11-24): A, "I confirm the recommended defaults for Q-124 to Q-130": the event chain replaces the JCL step sequence; parity compares final states. Recorded as D-032 in defect-register.md.**
 
-## Q-127. (MAM-91 parity, group U-4, 2026-11-20 17:55) A risk tier only after a PASS screening (status: DEFAULT APPLIED - revisit)
+## Q-127. (MAM-91 parity, group U-4, 2026-11-20 17:55) A risk tier only after a PASS screening (status: ANSWERED 2026-11-24 by the user: A)
 
 The legacy PRVRSK01 sets a tier on every record whatever its status and screen flag; the modern risk-service assigns one
 only after a PASS screening (MAM-35 AC-6, an approved story), so denied and failed providers keep a blank tier (3 rows).
 Options: A) accept and record it as a decision; B) also tier denied and failed providers. **Default applied: A.**
+**Answer (user, 2026-11-24): A, "I confirm the recommended defaults for Q-124 to Q-130": a risk tier only after a PASS screening. Recorded as D-033 in defect-register.md.**
 
-## Q-128. (MAM-91 parity, group U-9, 2026-11-20 17:55) Reinstating a PENDING provider also sends an APPROVED notice (status: DEFAULT APPLIED - revisit)
+## Q-128. (MAM-91 parity, group U-9, 2026-11-20 17:55) Reinstating a PENDING provider also sends an APPROVED notice (status: ANSWERED 2026-11-24 by the user: A)
 
 Sanction action R on a PENDING provider makes it ACTIVE on both sides (D-027). The modern notification-service then sends
 the reinstatement notice and, because the status went from P to A, an APPROVED notice too; the legacy sends only the
 reinstatement notice (1 row, supplementary comparison). Options: A) accept; B) suppress the APPROVED notice when the cause
 is a sanction reinstatement. **Default applied: A** (business to confirm).
+**Answer (user, 2026-11-24): A, "I confirm the recommended defaults for Q-124 to Q-130": the APPROVED notice after reinstating a PENDING provider is accepted (the business may still revisit it). Recorded as D-034 in defect-register.md.**
 
 ## Q-129. (MAM-91 parity, group U-8, 2026-11-20 17:55) The GDG archive generation and the lab account (status: BLOCKED, open)
 
@@ -1071,8 +1075,9 @@ An anonymous job on the Hercules lab cannot create the permanent generation MMPR
 the lab account HERC01 was refused (IEF722I INVALID PASSWORD GIVEN; no password was guessed). Only a temporary copy was
 captured (byte-identical to TMSISOUT); the content of the modern archive generation was not exported. To close it: the lab
 password in the root .env (never in chat), then one more PRVMTH01 run and an export of the modern archive content.
+**Status 2026-11-24 (user): the job on the lab account HERC01 stays BLOCKED and is listed as such in the parity report; no password is guessed or requested in chat (it would go in the root .env).**
 
-## Q-130. (MAM-91 parity, group U-10, 2026-11-20 17:55) Licence SD20001 of the valid intake application is unknown to the licence-board stub (status: DEFAULT APPLIED - revisit)
+## Q-130. (MAM-91 parity, group U-10, 2026-11-20 17:55) Licence SD20001 of the valid intake application is unknown to the licence-board stub (status: ANSWERED 2026-11-24 by the user: A)
 
 tools/data/generate.py creates application 1006133288 as a valid individual with licence SD20001, but the licence-board
 stub (infra/wiremock/mappings/license-board/clean-seeded.json) knows only SD10001-SD10007 and the six sample licences. The
@@ -1081,6 +1086,7 @@ this provider's rows in U-3 and U-4). Options: A) add SD20001 (TX, ACTIVE) to th
 PRVDAY01 scenarios again; B) change the licence in the test data and run the legacy intake again; C) keep the failure as
 a deliberate scenario and record Q-041 default A as a decision. **Default applied: A** (a test-data and mock gap, no
 business rule changes); result recorded in the parity report after the re-run.
+**Answer (user, 2026-11-24): A, "I confirm the recommended defaults for Q-124 to Q-130": SD20001 (TX, ACTIVE) is in the licence-board stub (mapping clean-SD20001.json, applied and checked on 2026-11-20); no business rule changed.**
 
 ## Q-131. (provider-service, MAM-40, 2026-11-20 18:55) The audit history answer and its contract disagree (status: ANSWERED 2026-11-20 19:32 by the user: A)
 
@@ -1525,3 +1531,11 @@ since 09:00: the build change (devops-engineer), the gateway check with the rais
 review; the gateway is committed and deployed only after that. Fallback if the raised versions break the gateway's
 tests: the BOM versions with a written justification for the two HIGH advisories, which then needs the user's
 confirmation. **For the user:** confirm the raise (recommended), or name another way.
+
+**Addition of 2026-11-24 (the raise):** the user's instruction of 2026-11-24 names the three raised versions (httpclient5 5.6.5, httpcore5 and
+httpcore5-h2 5.4.4) and orders review, commit and deploy of the upgrade; the lead takes this as the confirmation of the raise that was asked for above.
+It does not answer the choice of Apache HttpClient 5 itself (option A or B), so this question stays DEFAULT APPLIED. Verified the same day: the
+resolved versions and the rebuilt deployable hold exactly these three jars; the dependency scan of the deployable shows no advisory on them; the independent review found no defect in code or tests and two
+statements in documents that were corrected (ADR-010 now records the raise). Left open by that review, for the performance smoke (MAM-88): the pool has
+no wait limit, so Apache's default of 3 minutes applies when all 200 connections to one silent service are held (each up to the 30 s read limit); a
+limit of about 2 s (the connect limit) and a per-service limit below the total are the suggested change, test first.

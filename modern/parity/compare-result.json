@@ -1795,13 +1795,13 @@
   ],
   "totals": {
     "MATCH": 168,
-    "EXPECTED": 41,
-    "UNEXPECTED": 27
+    "EXPECTED": 67,
+    "UNEXPECTED": 1
   },
   "supplementaryTotals": {
     "MATCH": 4,
-    "EXPECTED": 1,
-    "UNEXPECTED": 1
+    "EXPECTED": 2,
+    "UNEXPECTED": 0
   },
   "groups": [
     {
@@ -1812,6 +1812,15 @@
       "side": null,
       "why": "the legacy fall-through writes the error row of the same invalid application a second time; the modern run writes exactly one row per invalid application",
       "count": 6
+    },
+    {
+      "group": "E-10",
+      "cls": "EXPECTED",
+      "decision": "D-034",
+      "category": null,
+      "side": null,
+      "why": "reinstating (R) a PENDING provider makes it ACTIVE (D-027); notification-service then also sends an APPROVED notice besides the reinstatement notice, which the legacy does not: D-034 (answer A to Q-128)",
+      "count": 1
     },
     {
       "group": "E-2",
@@ -1859,58 +1868,31 @@
       "count": 1
     },
     {
-      "group": "U-2",
-      "cls": "UNEXPECTED",
-      "decision": null,
-      "category": "NEEDS-DECISION",
-      "side": "modern",
-      "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
+      "group": "E-7",
+      "cls": "EXPECTED",
+      "decision": "D-031",
+      "category": null,
+      "side": null,
+      "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
       "count": 9
     },
     {
-      "group": "U-3",
-      "cls": "UNEXPECTED",
-      "decision": null,
-      "category": "NEEDS-DECISION",
-      "side": "none",
-      "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-      "count": 12
+      "group": "E-8",
+      "cls": "EXPECTED",
+      "decision": "D-032",
+      "category": null,
+      "side": null,
+      "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+      "count": 27
     },
     {
-      "group": "U-4",
-      "cls": "UNEXPECTED",
-      "decision": null,
-      "category": "NEEDS-DECISION",
-      "side": "none",
-      "why": "the legacy PRVRSK01 sets a tier on every record of the file, whatever its status and screen flag; the modern risk-service assigns a tier only after a PASS screening (MAM-35 AC-6: a failed screening gets no tier), so denied or failed providers keep a blank tier; MAM-35 is an approved story, but no D decision states the rule",
+      "group": "E-9",
+      "cls": "EXPECTED",
+      "decision": "D-033",
+      "category": null,
+      "side": null,
+      "why": "the legacy PRVRSK01 sets a tier on every record whatever its status and screen flag; risk-service assigns a tier only after a PASS screening (MAM-35 AC-6), so denied or failed providers keep a blank tier: D-033 (answer A to Q-127)",
       "count": 2
-    },
-    {
-      "group": "U-5",
-      "cls": "UNEXPECTED",
-      "decision": null,
-      "category": "NEEDS-DECISION",
-      "side": "none",
-      "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-      "count": 12
-    },
-    {
-      "group": "U-6",
-      "cls": "UNEXPECTED",
-      "decision": null,
-      "category": "NEEDS-DECISION",
-      "side": "none",
-      "why": "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and the JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on to screening and tiering; D-001 and D-024 are the nearest decisions but neither states that gate",
-      "count": 2
-    },
-    {
-      "group": "U-7",
-      "cls": "UNEXPECTED",
-      "decision": null,
-      "category": "NOT-COMPARABLE",
-      "side": "none",
-      "why": "the legacy file is a lab capture between two steps (CAP030, after PRVSCR01); the modern system has no step between screening and tiering (events), so no such state can be exported; it is not a job output",
-      "count": 1
     },
     {
       "group": "U-8",
@@ -1919,15 +1901,6 @@
       "category": "CAPTURE-GAP",
       "side": "none",
       "why": "the legacy GDG generation MMPRV.TMSIS.ARCHIVE(+1) could not be created (BLOCKED, IEF197I in the anonymous job); only a temporary IEBGENER copy exists (byte-identical to TMSISOUT); the modern archive generation (16) is recorded in tmsis-extract-list.json but its content was not exported",
-      "count": 1
-    },
-    {
-      "group": "U-9",
-      "cls": "UNEXPECTED",
-      "decision": null,
-      "category": "NEEDS-DECISION",
-      "side": "none",
-      "why": "reinstating (R) a PENDING provider makes it ACTIVE (D-027 preserves the legacy rule); the modern notification-service then also sends an APPROVED notice besides the RST notice; the legacy sends only the reinstatement notice; no D decision covers the extra notice",
       "count": 1
     }
   ],
@@ -2189,13 +2162,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 32,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2210,13 +2183,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 34,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2231,13 +2204,13 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2252,13 +2225,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 32,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2273,13 +2246,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 34,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2294,13 +2267,13 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2315,13 +2288,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 32,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2336,13 +2309,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 34,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2357,25 +2330,25 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         }
       ],
       "legacyNotProducedBecause": null,
       "counts": {
         "MATCH": 16,
-        "EXPECTED": 1,
-        "UNEXPECTED": 3
+        "EXPECTED": 4,
+        "UNEXPECTED": 0
       },
       "fieldCounts": {
         "identical": 235,
-        "EXPECTED": 0,
-        "UNEXPECTED": 9
+        "EXPECTED": 9,
+        "UNEXPECTED": 0
       }
     },
     {
@@ -2421,20 +2394,20 @@
           "field": null,
           "legacy": null,
           "modern": "8 records",
-          "cls": "UNEXPECTED",
-          "group": "U-6",
-          "decision": null,
-          "why": "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and the JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on to screening and tiering; D-001 and D-024 are the nearest decisions but neither states that gate",
-          "rule": "U-COND-GATE",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and the JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on to screening and tiering: D-032 (intake errors do not block the later work)",
+          "rule": "E-D032-COND-GATE",
+          "side": null,
+          "category": null
         }
       ],
       "legacyNotProducedBecause": "step STEP030 was bypassed (COND=(0,LT,STEP010), STEP010 ended with RC=4): the legacy job never created it",
       "counts": {
         "MATCH": 0,
-        "EXPECTED": 0,
-        "UNEXPECTED": 1
+        "EXPECTED": 1,
+        "UNEXPECTED": 0
       },
       "fieldCounts": {
         "identical": 0,
@@ -2485,20 +2458,20 @@
           "field": null,
           "legacy": null,
           "modern": "19 records",
-          "cls": "UNEXPECTED",
-          "group": "U-6",
-          "decision": null,
-          "why": "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and the JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on to screening and tiering; D-001 and D-024 are the nearest decisions but neither states that gate",
-          "rule": "U-COND-GATE",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and the JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on to screening and tiering: D-032 (intake errors do not block the later work)",
+          "rule": "E-D032-COND-GATE",
+          "side": null,
+          "category": null
         }
       ],
       "legacyNotProducedBecause": "step CAP040 was bypassed (COND=(0,LT,STEP010), STEP010 ended with RC=4): the legacy job never created it",
       "counts": {
         "MATCH": 0,
-        "EXPECTED": 0,
-        "UNEXPECTED": 1
+        "EXPECTED": 1,
+        "UNEXPECTED": 0
       },
       "fieldCounts": {
         "identical": 0,
@@ -2648,13 +2621,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 32,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2669,13 +2642,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 34,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2690,13 +2663,13 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2711,13 +2684,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 32,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2732,13 +2705,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 34,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2753,13 +2726,13 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2774,13 +2747,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 32,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2795,13 +2768,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 34,
-          "cls": "UNEXPECTED",
-          "group": "U-3",
-          "decision": null,
-          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-          "rule": "U-SNAPSHOT-TIMING",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+          "rule": "E-D032-SNAPSHOT-TIMING",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -2816,25 +2789,25 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         }
       ],
       "legacyNotProducedBecause": null,
       "counts": {
         "MATCH": 16,
-        "EXPECTED": 0,
-        "UNEXPECTED": 3
+        "EXPECTED": 3,
+        "UNEXPECTED": 0
       },
       "fieldCounts": {
         "identical": 235,
-        "EXPECTED": 0,
-        "UNEXPECTED": 9
+        "EXPECTED": 9,
+        "UNEXPECTED": 0
       }
     },
     {
@@ -2883,13 +2856,13 @@
           "modern": null,
           "npi": "1006133288",
           "occurrence": 1,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -2903,13 +2876,13 @@
           "modern": null,
           "npi": "1006133288",
           "occurrence": 2,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -2923,13 +2896,13 @@
           "modern": null,
           "npi": "1006133288",
           "occurrence": 3,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -2943,13 +2916,13 @@
           "modern": null,
           "npi": "1006133288",
           "occurrence": 4,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -2963,13 +2936,13 @@
           "modern": null,
           "npi": "1006144350",
           "occurrence": 1,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -2983,13 +2956,13 @@
           "modern": null,
           "npi": "1006144350",
           "occurrence": 2,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -3003,13 +2976,13 @@
           "modern": null,
           "npi": "1006144350",
           "occurrence": 3,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -3023,13 +2996,13 @@
           "modern": null,
           "npi": "1006144350",
           "occurrence": 4,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -3043,13 +3016,13 @@
           "modern": null,
           "npi": "1006153716",
           "occurrence": 1,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -3063,13 +3036,13 @@
           "modern": null,
           "npi": "1006153716",
           "occurrence": 2,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -3083,13 +3056,13 @@
           "modern": null,
           "npi": "1006153716",
           "occurrence": 3,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -3103,13 +3076,13 @@
           "modern": null,
           "npi": "1006153716",
           "occurrence": 4,
-          "cls": "UNEXPECTED",
-          "group": "U-5",
-          "decision": null,
-          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-          "rule": "U-SCRNOUT-NEW",
-          "side": "none",
-          "category": "NEEDS-DECISION",
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+          "rule": "E-D032-SCRNOUT-NEW",
+          "side": null,
+          "category": null,
           "modernScreeningOfThisNpi": "LICBOARD=P OIGLEIE=P SAMGOV=P SSADMF=P"
         },
         {
@@ -3620,8 +3593,8 @@
       "legacyNotProducedBecause": null,
       "counts": {
         "MATCH": 0,
-        "EXPECTED": 8,
-        "UNEXPECTED": 12
+        "EXPECTED": 20,
+        "UNEXPECTED": 0
       },
       "fieldCounts": {
         "identical": 16,
@@ -3672,20 +3645,20 @@
           "field": null,
           "legacy": "19 records",
           "modern": null,
-          "cls": "UNEXPECTED",
-          "group": "U-7",
-          "decision": null,
-          "why": "the legacy file is a lab capture between two steps (CAP030, after PRVSCR01); the modern system has no step between screening and tiering (events), so no such state can be exported; it is not a job output",
-          "rule": "U-NO-SNAPSHOT",
-          "side": "none",
-          "category": "NOT-COMPARABLE"
+          "cls": "EXPECTED",
+          "group": "E-8",
+          "decision": "D-032",
+          "why": "the legacy file is a lab capture between two steps (CAP030, after PRVSCR01); the modern system has no step between screening and tiering (events), so no such state exists; it is not a job output: D-032",
+          "rule": "E-D032-NO-SNAPSHOT",
+          "side": null,
+          "category": null
         }
       ],
       "legacyNotProducedBecause": null,
       "counts": {
         "MATCH": 0,
-        "EXPECTED": 0,
-        "UNEXPECTED": 1
+        "EXPECTED": 1,
+        "UNEXPECTED": 0
       },
       "fieldCounts": {
         "identical": 0,
@@ -3762,13 +3735,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 32,
-          "cls": "UNEXPECTED",
-          "group": "U-4",
-          "decision": null,
-          "why": "the legacy PRVRSK01 sets a tier on every record of the file, whatever its status and screen flag; the modern risk-service assigns a tier only after a PASS screening (MAM-35 AC-6: a failed screening gets no tier), so denied or failed providers keep a blank tier; MAM-35 is an approved story, but no D decision states the rule",
-          "rule": "U-TIER-ON-PASS",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-9",
+          "decision": "D-033",
+          "why": "the legacy PRVRSK01 sets a tier on every record whatever its status and screen flag; risk-service assigns a tier only after a PASS screening (MAM-35 AC-6), so denied or failed providers keep a blank tier: D-033 (answer A to Q-127)",
+          "rule": "E-D033-TIER-ON-PASS",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -4014,13 +3987,13 @@
           "occurrence": 1,
           "width": 1,
           "start": 32,
-          "cls": "UNEXPECTED",
-          "group": "U-4",
-          "decision": null,
-          "why": "the legacy PRVRSK01 sets a tier on every record of the file, whatever its status and screen flag; the modern risk-service assigns a tier only after a PASS screening (MAM-35 AC-6: a failed screening gets no tier), so denied or failed providers keep a blank tier; MAM-35 is an approved story, but no D decision states the rule",
-          "rule": "U-TIER-ON-PASS",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-9",
+          "decision": "D-033",
+          "why": "the legacy PRVRSK01 sets a tier on every record whatever its status and screen flag; risk-service assigns a tier only after a PASS screening (MAM-35 AC-6), so denied or failed providers keep a blank tier: D-033 (answer A to Q-127)",
+          "rule": "E-D033-TIER-ON-PASS",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -4119,13 +4092,13 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -4161,13 +4134,13 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -4203,13 +4176,13 @@
           "occurrence": 1,
           "width": 8,
           "start": 35,
-          "cls": "UNEXPECTED",
-          "group": "U-2",
-          "decision": null,
-          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-          "rule": "U-EFFDATE",
-          "side": "modern",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-7",
+          "decision": "D-031",
+          "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+          "rule": "E-D031-EFFDATE",
+          "side": null,
+          "category": null
         },
         {
           "job": "PRVDAY01",
@@ -4236,13 +4209,13 @@
       "legacyNotProducedBecause": null,
       "counts": {
         "MATCH": 0,
-        "EXPECTED": 14,
-        "UNEXPECTED": 5
+        "EXPECTED": 19,
+        "UNEXPECTED": 0
       },
       "fieldCounts": {
         "identical": 220,
-        "EXPECTED": 19,
-        "UNEXPECTED": 5
+        "EXPECTED": 24,
+        "UNEXPECTED": 0
       }
     },
     {
@@ -5061,20 +5034,20 @@
           "field": "APPROVED",
           "legacy": null,
           "modern": "APPROVED 1005933068",
-          "cls": "UNEXPECTED",
-          "group": "U-9",
-          "decision": null,
-          "why": "reinstating (R) a PENDING provider makes it ACTIVE (D-027 preserves the legacy rule); the modern notification-service then also sends an APPROVED notice besides the RST notice; the legacy sends only the reinstatement notice; no D decision covers the extra notice",
-          "rule": "U-NOTICE-APPROVED",
-          "side": "none",
-          "category": "NEEDS-DECISION"
+          "cls": "EXPECTED",
+          "group": "E-10",
+          "decision": "D-034",
+          "why": "reinstating (R) a PENDING provider makes it ACTIVE (D-027); notification-service then also sends an APPROVED notice besides the reinstatement notice, which the legacy does not: D-034 (answer A to Q-128)",
+          "rule": "E-D034-NOTICE-APPROVED",
+          "side": null,
+          "category": null
         }
       ],
       "supplementary": true,
       "counts": {
         "MATCH": 4,
-        "EXPECTED": 1,
-        "UNEXPECTED": 1
+        "EXPECTED": 2,
+        "UNEXPECTED": 0
       },
       "fieldCounts": {
         "identical": 0,
@@ -5223,6 +5196,106 @@
       "field": null
     },
     {
+      "id": "E-D031-EFFDATE",
+      "cls": "EXPECTED",
+      "group": "E-7",
+      "decision": "D-031",
+      "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, 2026-11-24)",
+      "side": null,
+      "category": null,
+      "files": [
+        "master-after-step010",
+        "master-after-step040"
+      ],
+      "kind": "field",
+      "field": "PRV-EFFECTIVE-DATE"
+    },
+    {
+      "id": "E-D032-SNAPSHOT-TIMING",
+      "cls": "EXPECTED",
+      "group": "E-8",
+      "decision": "D-032",
+      "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and parity compares final states",
+      "side": null,
+      "category": null,
+      "files": [
+        "master-after-step010"
+      ],
+      "kind": "field",
+      "field": "PRV-(SCREEN-FLAG|RISK-TIER)"
+    },
+    {
+      "id": "E-D032-SCRNOUT-NEW",
+      "cls": "EXPECTED",
+      "group": "E-8",
+      "decision": "D-032",
+      "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its initial screening at registration (event), so its rows are not in the screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+      "side": null,
+      "category": null,
+      "files": [
+        "scrnout"
+      ],
+      "kind": "legacy-only",
+      "field": null
+    },
+    {
+      "id": "E-D032-COND-GATE",
+      "cls": "EXPECTED",
+      "group": "E-8",
+      "decision": "D-032",
+      "why": "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and the JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on to screening and tiering: D-032 (intake errors do not block the later work)",
+      "side": null,
+      "category": null,
+      "files": [
+        "scrnout",
+        "master-after-step040"
+      ],
+      "kind": "file-modern-only",
+      "field": null
+    },
+    {
+      "id": "E-D032-NO-SNAPSHOT",
+      "cls": "EXPECTED",
+      "group": "E-8",
+      "decision": "D-032",
+      "why": "the legacy file is a lab capture between two steps (CAP030, after PRVSCR01); the modern system has no step between screening and tiering (events), so no such state exists; it is not a job output: D-032",
+      "side": null,
+      "category": null,
+      "files": [
+        "master-after-step030"
+      ],
+      "kind": "file-legacy-only",
+      "field": null
+    },
+    {
+      "id": "E-D033-TIER-ON-PASS",
+      "cls": "EXPECTED",
+      "group": "E-9",
+      "decision": "D-033",
+      "why": "the legacy PRVRSK01 sets a tier on every record whatever its status and screen flag; risk-service assigns a tier only after a PASS screening (MAM-35 AC-6), so denied or failed providers keep a blank tier: D-033 (answer A to Q-127)",
+      "side": null,
+      "category": null,
+      "files": [
+        "master-after-step040"
+      ],
+      "kind": "field",
+      "field": "PRV-RISK-TIER"
+    },
+    {
+      "id": "E-D034-NOTICE-APPROVED",
+      "cls": "EXPECTED",
+      "group": "E-10",
+      "decision": "D-034",
+      "why": "reinstating (R) a PENDING provider makes it ACTIVE (D-027); notification-service then also sends an APPROVED notice besides the reinstatement notice, which the legacy does not: D-034 (answer A to Q-128)",
+      "side": null,
+      "category": null,
+      "files": [
+        "notices"
+      ],
+      "kind": "modern-only",
+      "field": null
+    },
+    {
       "id": "U-NO-DATE",
       "cls": "UNEXPECTED",
       "group": "U-1",
@@ -5233,92 +5306,6 @@
       "files": null,
       "kind": "field",
       "field": "PRV-REVAL-DUE-DATE"
-    },
-    {
-      "id": "U-EFFDATE",
-      "cls": "UNEXPECTED",
-      "group": "U-2",
-      "decision": null,
-      "why": "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT APPLIED - revisit, not an approved D decision",
-      "side": "modern",
-      "category": "NEEDS-DECISION",
-      "files": [
-        "master-after-step010",
-        "master-after-step040"
-      ],
-      "kind": "field",
-      "field": "PRV-EFFECTIVE-DATE"
-    },
-    {
-      "id": "U-SNAPSHOT-TIMING",
-      "cls": "UNEXPECTED",
-      "group": "U-3",
-      "decision": null,
-      "why": "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system registers, screens and tiers a new provider by events within seconds, so the modern snapshot already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers the event chain replacing the step sequence",
-      "side": "none",
-      "category": "NEEDS-DECISION",
-      "files": [
-        "master-after-step010"
-      ],
-      "kind": "field",
-      "field": "PRV-(SCREEN-FLAG|RISK-TIER)"
-    },
-    {
-      "id": "U-TIER-ON-PASS",
-      "cls": "UNEXPECTED",
-      "group": "U-4",
-      "decision": null,
-      "why": "the legacy PRVRSK01 sets a tier on every record of the file, whatever its status and screen flag; the modern risk-service assigns a tier only after a PASS screening (MAM-35 AC-6: a failed screening gets no tier), so denied or failed providers keep a blank tier; MAM-35 is an approved story, but no D decision states the rule",
-      "side": "none",
-      "category": "NEEDS-DECISION",
-      "files": [
-        "master-after-step040"
-      ],
-      "kind": "field",
-      "field": "PRV-RISK-TIER"
-    },
-    {
-      "id": "U-SCRNOUT-NEW",
-      "cls": "UNEXPECTED",
-      "group": "U-5",
-      "decision": null,
-      "why": "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern system a new provider gets its INITIAL screening at registration (event), so its rows are not in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-      "side": "none",
-      "category": "NEEDS-DECISION",
-      "files": [
-        "scrnout"
-      ],
-      "kind": "legacy-only",
-      "field": null
-    },
-    {
-      "id": "U-COND-GATE",
-      "cls": "UNEXPECTED",
-      "group": "U-6",
-      "decision": null,
-      "why": "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and the JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on to screening and tiering; D-001 and D-024 are the nearest decisions but neither states that gate",
-      "side": "none",
-      "category": "NEEDS-DECISION",
-      "files": [
-        "scrnout",
-        "master-after-step040"
-      ],
-      "kind": "file-modern-only",
-      "field": null
-    },
-    {
-      "id": "U-NO-SNAPSHOT",
-      "cls": "UNEXPECTED",
-      "group": "U-7",
-      "decision": null,
-      "why": "the legacy file is a lab capture between two steps (CAP030, after PRVSCR01); the modern system has no step between screening and tiering (events), so no such state can be exported; it is not a job output",
-      "side": "none",
-      "category": "NOT-COMPARABLE",
-      "files": [
-        "master-after-step030"
-      ],
-      "kind": "file-legacy-only",
-      "field": null
     },
     {
       "id": "U-ARCHIVE-COPY",
@@ -5332,20 +5319,6 @@
         "tmsis-archive-copy"
       ],
       "kind": "file-legacy-only",
-      "field": null
-    },
-    {
-      "id": "U-NOTICE-APPROVED",
-      "cls": "UNEXPECTED",
-      "group": "U-9",
-      "decision": null,
-      "why": "reinstating (R) a PENDING provider makes it ACTIVE (D-027 preserves the legacy rule); the modern notification-service then also sends an APPROVED notice besides the RST notice; the legacy sends only the reinstatement notice; no D decision covers the extra notice",
-      "side": "none",
-      "category": "NEEDS-DECISION",
-      "files": [
-        "notices"
-      ],
-      "kind": "modern-only",
       "field": null
     },
     {

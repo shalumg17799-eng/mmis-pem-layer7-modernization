@@ -23,7 +23,7 @@ What it does
   on one side only is a difference; a different record order is a difference.
 - Normalises nothing, except the fields a manifest lists under "runDependentFields" (no manifest does). A
   business field is never normalised.
-- Classifies every difference with the table RULES: EXPECTED only when an approved decision D-001..D-029
+- Classifies every difference with the table RULES: EXPECTED only when an approved decision D-001..D-034
   explains it; everything else is UNEXPECTED, with the side that looks wrong and the likely cause. This tool
   only proposes; the user decides (parity-testing skill, section 5).
 - Prints one block per file and writes the whole result as JSON.
@@ -175,7 +175,7 @@ RUNS = [
 # ---------------------------------------------------------------------------------------------------------
 # classification: the proposed decision for every difference
 # ---------------------------------------------------------------------------------------------------------
-# First matching rule wins. cls EXPECTED needs an approved decision D-001..D-029 (the "decision" field).
+# First matching rule wins. cls EXPECTED needs an approved decision D-001..D-034 (the "decision" field).
 # Everything not matched is UNEXPECTED, group U-0 (no known cause). "side" says which side looks wrong
 # (modern, legacy, none = a design difference no decision covers yet, so the user decides).
 
@@ -240,6 +240,42 @@ RULES = [
          "nothing but still queues the general notice PRVNTGEN (D-012: notification-service replaces the CALL)",
          files=["notices"], kind="legacy-only", when=lambda d: d["field"] == "GEN"),
 
+    rule("E-D031-EFFDATE", "EXPECTED", "E-7", "D-031",
+         "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, "
+         "D-025); provider-service sets the registration date (20261120): decision D-031 (answer A to Q-125, "
+         "2026-11-24)",
+         files=["master-after-step010", "master-after-step040"], kind="field", field="PRV-EFFECTIVE-DATE",
+         legacy=r"20260115", modern=r"20261120"),
+    rule("E-D032-SNAPSHOT-TIMING", "EXPECTED", "E-8", "D-032",
+         "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern system "
+         "registers, screens and tiers a new provider by events within seconds, so its snapshot already holds the "
+         "result of STEP030/STEP040; D-032 (answer A to Q-126): the event chain replaces the step sequence and "
+         "parity compares final states",
+         files=["master-after-step010"], kind="field", field=r"PRV-(SCREEN-FLAG|RISK-TIER)", legacy=r"U|"),
+    rule("E-D032-SCRNOUT-NEW", "EXPECTED", "E-8", "D-032",
+         "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the modern "
+         "system a new provider gets its initial screening at registration (event), so its rows are not in the "
+         "screening run's file but in screening-service (logs/screenings-of-new-providers.json): D-032",
+         files=["scrnout"], kind="legacy-only"),
+    rule("E-D032-COND-GATE", "EXPECTED", "E-8", "D-032",
+         "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and the "
+         "JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on to "
+         "screening and tiering: D-032 (intake errors do not block the later work)",
+         files=["scrnout", "master-after-step040"], kind="file-modern-only"),
+    rule("E-D032-NO-SNAPSHOT", "EXPECTED", "E-8", "D-032",
+         "the legacy file is a lab capture between two steps (CAP030, after PRVSCR01); the modern system has no step "
+         "between screening and tiering (events), so no such state exists; it is not a job output: D-032",
+         files=["master-after-step030"], kind="file-legacy-only"),
+    rule("E-D033-TIER-ON-PASS", "EXPECTED", "E-9", "D-033",
+         "the legacy PRVRSK01 sets a tier on every record whatever its status and screen flag; risk-service assigns "
+         "a tier only after a PASS screening (MAM-35 AC-6), so denied or failed providers keep a blank tier: D-033 "
+         "(answer A to Q-127)",
+         files=["master-after-step040"], kind="field", field="PRV-RISK-TIER", legacy=r"[LMH]", modern=r""),
+    rule("E-D034-NOTICE-APPROVED", "EXPECTED", "E-10", "D-034",
+         "reinstating (R) a PENDING provider makes it ACTIVE (D-027); notification-service then also sends an "
+         "APPROVED notice besides the reinstatement notice, which the legacy does not: D-034 (answer A to Q-128)",
+         files=["notices"], kind="modern-only"),
+
     # --- UNEXPECTED, with a known cause --------------------------------------------------------------------
     rule("U-NO-DATE", "UNEXPECTED", "U-1", None,
          "two conventions for 'no due date': the test-data files, and so the legacy run, carry 99991231 (Q-106 "
@@ -249,50 +285,11 @@ RULES = [
          "STEP010 (the intake record carries 99991231, the modern provider has no due date)",
          side="test data (Q-106) against MAM-43 AC-6", category="SPEC-CONFLICT", kind="field",
          field="PRV-REVAL-DUE-DATE", legacy=r"99991231", modern=r"00000000"),
-    rule("U-EFFDATE", "UNEXPECTED", "U-2", None,
-         "effective date of a new provider: the legacy keeps the effective date of the intake record (20260115, "
-         "D-025); the modern system sets the registration date (20261120), Q-015/Q-A1 default A, status DEFAULT "
-         "APPLIED - revisit, not an approved D decision",
-         side="modern", category="NEEDS-DECISION", files=["master-after-step010", "master-after-step040"],
-         kind="field", field="PRV-EFFECTIVE-DATE", legacy=r"20260115", modern=r"20261120"),
-    rule("U-SNAPSHOT-TIMING", "UNEXPECTED", "U-3", None,
-         "snapshot timing: the legacy file is the master right after STEP010 (flag U, no tier); the modern "
-         "system registers, screens and tiers a new provider by events within seconds, so the modern snapshot "
-         "already holds the result of STEP030/STEP040 (no stop between them is possible); no D decision covers "
-         "the event chain replacing the step sequence",
-         side="none", category="NEEDS-DECISION", files=["master-after-step010"], kind="field",
-         field=r"PRV-(SCREEN-FLAG|RISK-TIER)", legacy=r"U|"),
-    rule("U-TIER-ON-PASS", "UNEXPECTED", "U-4", None,
-         "the legacy PRVRSK01 sets a tier on every record of the file, whatever its status and screen flag; the "
-         "modern risk-service assigns a tier only after a PASS screening (MAM-35 AC-6: a failed screening gets "
-         "no tier), so denied or failed providers keep a blank tier; MAM-35 is an approved story, but no D "
-         "decision states the rule",
-         side="none", category="NEEDS-DECISION", files=["master-after-step040"], kind="field",
-         field="PRV-RISK-TIER", legacy=r"[LMH]", modern=r""),
-    rule("U-SCRNOUT-NEW", "UNEXPECTED", "U-5", None,
-         "the legacy PRVSCR01 screens every provider with flag U in one pass, new providers included; in the "
-         "modern system a new provider gets its INITIAL screening at registration (event), so its rows are not "
-         "in the screening run's file; they exist in the screening service (logs/screenings-of-new-providers.json)",
-         side="none", category="NEEDS-DECISION", files=["scrnout"], kind="legacy-only"),
-    rule("U-COND-GATE", "UNEXPECTED", "U-6", None,
-         "the legacy job never produced this file: STEP010 ended with RC=4 (the first invalid application) and "
-         "the JCL bypassed STEP015-STEP040 (COND); the modern run is not gated on the intake result and went on "
-         "to screening and tiering; D-001 and D-024 are the nearest decisions but neither states that gate",
-         side="none", category="NEEDS-DECISION", files=["scrnout", "master-after-step040"], kind="file-modern-only"),
-    rule("U-NO-SNAPSHOT", "UNEXPECTED", "U-7", None,
-         "the legacy file is a lab capture between two steps (CAP030, after PRVSCR01); the modern system has no "
-         "step between screening and tiering (events), so no such state can be exported; it is not a job output",
-         side="none", category="NOT-COMPARABLE", files=["master-after-step030"], kind="file-legacy-only"),
     rule("U-ARCHIVE-COPY", "UNEXPECTED", "U-8", None,
          "the legacy GDG generation MMPRV.TMSIS.ARCHIVE(+1) could not be created (BLOCKED, IEF197I in the "
          "anonymous job); only a temporary IEBGENER copy exists (byte-identical to TMSISOUT); the modern archive "
          "generation (16) is recorded in tmsis-extract-list.json but its content was not exported",
          side="none", category="CAPTURE-GAP", files=["tmsis-archive-copy"], kind="file-legacy-only"),
-    rule("U-NOTICE-APPROVED", "UNEXPECTED", "U-9", None,
-         "reinstating (R) a PENDING provider makes it ACTIVE (D-027 preserves the legacy rule); the modern "
-         "notification-service then also sends an APPROVED notice besides the RST notice; the legacy sends only "
-         "the reinstatement notice; no D decision covers the extra notice",
-         side="none", category="NEEDS-DECISION", files=["notices"], kind="modern-only"),
     rule("U-LICENCE-MOCK", "UNEXPECTED", "U-10", None,
          "the modern screening fails application 1006133288 (an individual whose licence SD20001 tools/data/"
          "generate.py:161 calls 'valid IN'): the licence-board stub knows only SD10001-SD10007 and the sample "

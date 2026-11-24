@@ -56,3 +56,22 @@ Defect node per table row), and the entries below are conventions of the new sys
   takes 99991231 as "no due date" (Q-135, default A: the API leaves the member out for such a provider). Stated in
   MAM-43 AC-6 (spec version 2); live since deploy 4 (2026-11-20 23:02); in the parity re-run of 2026-11-20 23:17 the 46
   rows concerned compare byte for byte. D-029 is unchanged: the legacy sweep itself treats a zero due date as due.
+
+- **D-031: the effective date of a newly registered provider is the registration date** (answer A to Q-125, i.e. the default A of Q-015 / Q-A1
+  confirmed by the user on 2026-11-24, in the instruction "I confirm the recommended defaults for Q-124 to Q-130"; recorded here the same day).
+  The legacy keeps the effective date of the intake record (PRVENR01 copies it; D-025). provider-service sets the date on which the provider is
+  registered; `ApplicationValidated` does not carry an effective date. A difference in bytes 35-42 of a new provider between the legacy master and
+  the modern master is therefore EXPECTED. Not changed: the effective date of a provider that is already on the master.
+- **D-032: the event chain replaces the JCL step sequence; parity compares final states** (answer A to Q-126, confirmed on 2026-11-24). The modern system
+  registers, screens and tiers a new provider by events within seconds. Accepted consequences, none of them a defect: (1) a snapshot "after STEP010"
+  of the modern system already holds the screening result and the tier of a new provider; (2) the initial screening rows of a new provider are written by
+  screening-service when the provider is registered and are not in the file of the screening run (SCRNOUT); (3) the later work is not gated on the return
+  code of the intake (the legacy JCL bypasses STEP015 to STEP040 after RC=4); (4) the lab capture between STEP030 and STEP040 has no modern counterpart.
+  The parity comparison therefore compares the final states (after the last step) and treats these four differences as EXPECTED. Not decided here: the
+  content of any single screening result (D-005) and the stop at the first invalid application (D-001).
+- **D-033: a risk tier is assigned only after a PASS screening** (answer A to Q-127, confirmed on 2026-11-24). The legacy PRVRSK01 sets a tier on every
+  record whatever its status and screen flag; risk-service assigns one only after a PASS screening (MAM-35 AC-6), so a denied or failed provider keeps a
+  blank tier. A blank tier in the modern master where the legacy has L, M or H on a denied or failed provider is EXPECTED.
+- **D-034: reinstating a PENDING provider also sends an APPROVED notice** (answer A to Q-128, confirmed on 2026-11-24; the business may still revisit it).
+  A sanction action R on a PENDING provider makes it ACTIVE in both systems (D-027); notification-service sends the reinstatement notice and, because the
+  status went from P to A, an APPROVED notice too, where the legacy sends only the reinstatement notice. The extra APPROVED notice is EXPECTED.
