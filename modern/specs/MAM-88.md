@@ -14,8 +14,8 @@ decisions: []
 dependsOn: [MAM-44, MAM-50, MAM-45, MAM-75, MAM-37, MAM-46, MAM-18]
 mainJourney: false
 labels: [svc-e2e, kag-L-S076, agentic]
-builtCommit:
-testsSha256:
+builtCommit: pending-user-commit
+testsSha256: c3ddc4a552a8b358e064b9f02fcfd813c564f3fc513e090393d424c7aa0075fb
 ---
 ## Business requirement
 The system must stay responsive and finish its monthly jobs in a reasonable time when it holds a realistic number of providers. This story fills the system with 10,000 fictitious providers and measures it against the agreed targets, saying plainly which targets are still only placeholders.

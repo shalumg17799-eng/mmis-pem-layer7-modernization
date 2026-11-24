@@ -1,9 +1,42 @@
 # Final report: PEM modernization, state at the deadline
 
+
+## UPDATE OF 2026-11-24 (baseline green except the Jira transitions): this block replaces the numbers of the deadline report below
+
+Written 2026-11-24 by the modernization lead. Every figure below was measured today in this session unless a date is given. The Jira figures are NOT from today: the Atlassian connection
+is not authorized in this session, so Jira could not be read or changed.
+
+| Question | Answer |
+|---|---|
+| Does the system run? | **Yes.** The `pem` stack (ten services and the web UI) was restarted with the rebuilt jar at 13:31 (deploy 12). All 7 containers healthy; **J1 to J7 pass** on the live stack; the live security suite **278 passed**; the stack is at the seed state (16 providers). |
+| What is in deploy 12? | The api-gateway on Apache HttpClient 5.6.5 with httpcore5 / httpcore5-h2 5.4.4 (MAM-29, commit c2ed622) and the shared-kit change (every event carries a uuid as correlation id, Q-142, commit a60dcd3), on top of the code of deploy 11. The jar holds exactly those three HTTP jars. |
+| CI on GitHub | **Run 20 (commit b82359a) is green in all four jobs** (2026-11-24, 31 min 56 s): contract lint, web UI tests, Gradle build and full check (JaCoCo 85 % and PIT per module, 26 min 40 s of gate on a clean Linux runner), compose smoke test. Runs 17 (a60dcd3), 18 (3222fbe) and 19 (ee34503) were red: HTTP 429 from Maven Central twice (17 probably), and 16 revalidation test timeouts in run 18 whose cause was not found (not reproduced locally, not seen in run 20). Two workflow changes (retry and library cache; failure annotations in detail): `modern/docs/reports/stories/MAM-39.md`, last section. |
+| Legacy rules | **433 of 433 kept rules have a passing test, 0 without** (`traceability.md`, generated 14:42 from the test results of today; on 2026-11-20 it was 327 of 433). The web UI results (Vitest: 44 files, **1112 tests, 0 skipped**) and the full revalidation-service results (610 tests, 0 failures) were run again today because other runs of today had replaced their result files. 22 rules were dropped by decision. |
+| Requirement checklist | `requirement-checklist.md` (regenerated 14:42): rule gaps 0, screens 13 of 13, open questions 1 (Q-144). It counts 61 of 64 stories as built because it reads the story reports: MAM-84, MAM-89 and MAM-91 have their reports under other names (`security-report.md`, `traceability.md`, `parity-report.md`). |
+| Security | Dependency scan of the deployable (110 Java libraries, 322 npm packages): nothing on the three raised HTTP libraries; two CRITICAL findings on spring-webmvc 6.2.19 (fixed only in Spring Framework 7), each with its written justification; **0 HIGH or CRITICAL without a justification**. Secret scan: clean. |
+| Performance (MAM-88) | **6 of 6 targets MET, 0 NOT MET** (search p95 144 ms, detail 60 ms, submit 63 ms, one screening 137 ms, T-MSIS extract 1.6 s, revalidation sweep 2.1 s for 10,016 providers). Every target is a DEFAULT of nfr.md (a placeholder), the 90 s job limit is a projection, and the smoke does not exhaust the gateway pool: `performance-report.md`, `stories/MAM-88.md`. |
+| Parity with the legacy jobs (MAM-91) | **MATCH 168, EXPECTED 67, UNEXPECTED 1** units (rows 102 EXPECTED, 1 UNEXPECTED). The one is **U-8, BLOCKED (Q-129)**: the permanent GDG generation could not be captured because the lab account HERC01 was refused; listed, not closed. Decisions D-031 to D-034 (your answers of 2026-11-24) explain the rest. `parity-report.md`, top block. |
+| Knowledge graph | `medicaid-kag` loaded again: **44 of 44 checks match**, a second load changes nothing (1029 nodes, 1399 relationships), 157 Question nodes (the loader had read only 102; fixed, commit b08b5fe). |
+| Jira | Last read **2026-11-21 09:02: 86 of 93 Done**. Open then: MAM-29, MAM-39, MAM-88, MAM-91 and the epics MAM-1, MAM-14, MAM-15. All four stories now meet their acceptance criteria (records above); **the transitions and comments are queued in PROGRESS.md and need the Atlassian connection**. |
+| Commits | Pushed to `origin/modernization` today: c2ed622 (gateway), b08b5fe (graph loader), 18f6efc (parity decisions), ee34503 and b82359a (CI). Documents of today are committed after this update. Nothing was pushed to `main`. |
+
+**What still needs you**
+1. **Authorize the Atlassian connector** (`/mcp` in an interactive session) so that MAM-29, MAM-39, MAM-88 and MAM-91 can go to Done with their comments and the epics MAM-1, MAM-14, MAM-15 can be closed (target 93 of 93).
+2. **Q-157**: Apache HttpClient 5 in the gateway (ADR-013) is applied as a default; your instruction of today named the raised versions, which is not an answer about the choice of the library.
+3. **Q-144** (the 503 of `requestScreening` in the screening contract) and the defaults applied on 2026-11-20 and 2026-11-21 (Q-136 to Q-155): still DEFAULT APPLIED, not confirmed.
+4. **Q-129**: the lab password for HERC01 in the root `.env` (never in chat) when you want the archive generation closed.
+5. **MAM-39 AC-6**: the spec still says the workflow is inert under `modern/.github`; the workflow runs from the repository root since your decision of 2026-11-20. Re-version the spec? (recommended)
+6. A story for the gateway pool limits (wait for a connection, limit per service), proposed in `stories/MAM-88.md` and `review-should-fix.md`.
+7. Not measured: the web UI line coverage (no coverage tool in the UI build, `ui-coverage.md`), and the 100,000-provider volume.
+
+---
+
+The text below is the deadline report of 2026-11-20 and is kept as history; where it differs from the update above, the update is current.
+
 Written 2026-11-20 19:32 IST by the modernization lead (Jira counts read at 19:31). The user's hard deadline was 20:00 (message of 18:02). Every number
 below was measured today, in this session, unless a date is given. Nothing here was committed after the checkpoint commit.
 
-## 1. In one page
+## 1. In one page (state at the deadline of 2026-11-20 19:32, superseded by the update above)
 
 | Question | Answer |
 |---|---|

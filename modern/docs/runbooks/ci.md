@@ -23,7 +23,7 @@ If step 4 fails, print the logs of every pem container that is not healthy:
 `docker ps -a --filter label=com.docker.compose.project=pem` then `docker logs --tail 200 <name>`.
 
 State on 2026-11-24: the workflow has run on every push since 2026-11-20. The first runs were red and were fixed one cause at a time
-(MAM-39.md); runs 8 to 16 (2026-11-21) were green; runs 17 (a60dcd3), 18 (3222fbe) and 19 (ee34503) were red: run 19 failed in the
+(MAM-39.md); runs 8 to 16 (2026-11-21) were green; run 20 (b82359a, 2026-11-24) was green in all four jobs (31 min 56 s); runs 17 (a60dcd3), 18 (3222fbe) and 19 (ee34503) were red: run 19 failed in the
 warm-up step with `HTTP 429 Too Many Requests` from repo.maven.apache.org (Maven Central limits the shared addresses of the runners),
 run 18 with 16 timeouts in one revalidation-service test class that passes locally, run 17 before any task. The workflow has two
 measures against the first kind of failure (below) and its failure summary now prints the first two failures in detail. The record of

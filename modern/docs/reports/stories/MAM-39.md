@@ -585,7 +585,7 @@ annotations do not):
 | 17 | a60dcd3 (shared kit: uuid correlation id) | **failure after 75 s**, step "Build and check", no task ran | recorded on 2026-11-21 as: buildSrc could not get `kotlin-stdlib 2.0.21` ("Could not find"). The log is not readable; run 19 shows the same artifact failing with HTTP 429, so this was **probably the same cause (not proven)** |
 | 18 | 3222fbe (documents only on top of a60dcd3) | **failure after 38 min**, `:services:revalidation-service:test`: 16 tests of `RevalidationCorrelationIdTest` (an event not processed within 45 s: `ConditionTimeoutException`) | the other 14 cases of the class and every other module passed. **Cause not found.** Local reproduction on 2026-11-24 (build with the kit change, the class alone): 30 tests, 0 failures, 0 skipped, about 1 s per case, BUILD SUCCESSFUL in 8 min 34 s; the test sends the event straight to Kafka (`EventProbe`, not through the changed `OutboxWriter`) and the consumer uses `auto-offset-reset: earliest`, so neither the kit change nor a lost first message explains it. A slow or throttled runner is a guess. |
 | 19 | ee34503 | **failure after 2 min 31 s**, step "Resolve build logic and plugins (up to three attempts)" (new in this commit) | the failure summary printed the cause: `Received status code 429 from server: Too Many Requests` from repo.maven.apache.org for `kotlin-gradle-plugin-api 2.0.21`; all three attempts (30 s apart) hit it. Contract lint and Web UI tests of the same run were green. |
-| 20 | b82359a | started 2026-11-24 13:51 | see the end of this section |
+| 20 | b82359a (final workflow) | **success, all four jobs**, 2026-11-24 13:51 to 14:23 IST (31 min 56 s) | Contract lint 1:02, Web UI tests 1:10, Gradle build and full check 28:27 (restore of the library cache 1 s: the first run with that step, so no earlier cache existed; warm-up 1:28 in total, with no "attempt n failed" warning in the annotations, so the first attempt succeeded; Build and check 26:40; save of the cache 6 s), Compose smoke test 3:23. The failure summary was skipped (nothing failed); the only annotation is GitHub's Node.js 20 deprecation notice. The Gradle gate passed with `RevalidationCorrelationIdTest` and the kit change in it: the 16 timeouts of run 18 did not return. Their cause stays unknown (a slow or throttled runner is a guess). |
 
 **What was changed on 2026-11-24** (`.github/workflows/ci.yml`; against 3222fbe one line of the old file is gone, inside the failure-summary step; the four gated
 steps "Build and check", "Lint OpenAPI", "Validate AsyncAPI" and "Install and test" are untouched, the reviewer's `git diff` of ee34503 and the diff of b82359a show 0
@@ -624,25 +624,25 @@ executable bit is recorded in git as mode 100755 (`git ls-files -s`), as the rev
 **Closing report for the story (MODERNIZATION.md section 9)**
 ```
 Phase / item:      MAM-39 CI pipeline
-Outcome:           NEEDS DECISION until a green run of the final workflow exists (run 20 in progress); the demonstration part is DONE
+Outcome:           DONE: a green run of the final workflow exists (run 20, 2026-11-24, all four jobs); one question for you below
 What was done:     workflow on GitHub since 2026-11-20 (user decision 19:32); eight fixes to a first green run (2026-11-21 05:05); gate demonstration (AC-1, AC-2, AC-3)
                    with the faults named by the failing commands, run three times on 2026-11-24, final run 30 PASS 0 FAIL; runs 17 to 19 analysed; two workflow changes
                    (warm-up with retry, Gradle library cache, failure annotations in detail)
 Checks run:        demo-ci-gates.sh (13:52:38 to 13:57:55, HEAD b82359a): 30 PASS, 0 FAIL; static step on the final workflow; the failure-summary script run against fake
                    results with and without gradle.log; GitHub API reads of runs 13 to 19
 AC-1 coverage gate     demonstrated locally (block ac1: the clean copy passes, a copy with deleted test classes fails in jacocoTestCoverageVerification with the rule's message);
-                       on GitHub the Gradle job was green in runs 8 to 16 and is red in 17, 18 (revalidation timeouts, cause unknown), 19 (HTTP 429)
+                       on GitHub the Gradle job was green in runs 8 to 16 and 20, red in 17 (probably HTTP 429), 18 (revalidation timeouts, cause unknown) and 19 (HTTP 429)
 AC-2 contract lint     demonstrated locally (block ac2: unresolved $ref in each of nine OpenAPI files and in events.yaml fails and names the file); GitHub job green in runs 18 and 19
 AC-3 web UI tests      demonstrated locally (block ac3: it.skip, describe.skip, it.skipIf, it.todo and a failing test are red and named); GitHub job green in runs 18 and 19
 AC-4 compose smoke     ran green in the green runs; skipped when the Gradle job is red (it needs it)
 AC-5 pinned versions   met; actions/cache v5.0.5 added with an exact version (published 2026-04-13)
 AC-6 inert workflow    SUPERSEDED by the user's decision of 2026-11-20 19:32 ("KEEP GOING", answer 1, PROGRESS.md): the workflow is at the repository root and runs. The spec
                        modern/specs/MAM-39.md (specVersion 1) still says it is at modern/.github and nothing is pushed; changing the spec is the user's call (MODERNIZATION.md section 8)
-Not verified:      a green run of the final workflow (run 20 is the first); the cause of the 16 timeouts of run 18 (not reproduced; if run 20 shows them again the new annotation
-                   prints the first two failures in detail); the "First failure in detail" annotation on GitHub (no test failed in run 19); that the cache is restored and saved on
-                   GitHub; that this demonstration says anything about a red run on GitHub (it is a local run on Windows)
+Not verified:      the cause of the 16 timeouts of run 18 (not reproduced locally, not seen in run 20; if they return, the new annotation prints the first two failures in
+                   detail); the "First failure in detail" annotation on GitHub (no test failed in runs 19 and 20); that the library cache is RESTORED on GitHub (run 20 saved it; the
+                   next run is the first that can restore it); that this demonstration says anything about a red run on GitHub (it is a local run on Windows)
 Questions for you: 1. Spec MAM-39 AC-6: re-version it to say "the workflow runs from the repository root" (recommended), or leave the Jira text and keep this record? 2. If run 18's
                    timeouts come back: how much time may be spent on them, since no local reproduction exists?
-Next step:         read run 20; Jira Done only after a green run of the final workflow
+Next step:         Jira Done for MAM-39 (the connection to Jira was not available when this was written; queued in PROGRESS.md)
 ```
 Files: `.github/workflows/ci.yml`, `modern/tools/checks/demo-ci-gates.sh` (sha256 above, mode 100755), `modern/docs/runbooks/ci.md`, `.gitignore` (`**/.kotlin/`), this report.

@@ -1,10 +1,10 @@
 # Requirement checklist (FINAL PLAN Part C)
 
-Generated 2026-11-20 19:27 by `modern/tools/trace/build_checklist.py` from the repo; do not edit by hand.
+Generated 2026-11-24 14:42 by `modern/tools/trace/build_checklist.py` from the repo; do not edit by hand.
 
-## 1. Business stories: 59 of 64 built
+## 1. Business stories: 61 of 64 built
 
-37 built test-first (Outcome DONE); 22 built in the build phase with their tests in Part D (Outcome BUILT).
+39 built test-first (Outcome DONE); 22 built in the build phase with their tests in Part D (Outcome BUILT).
 
 | Story | Service | Title | Built | Outcome (story report) |
 |---|---|---|---|---|
@@ -64,9 +64,9 @@ Generated 2026-11-20 19:27 by `modern/tools/trace/build_checklist.py` from the r
 | MAM-83 | e2e | Journey J7 end to end: month-end extracts and the public directory | yes | BUILT (build-phase: journey test written by the lead after the build, on the user's instruction 2026-11-19 20:00); AC-1..AC-7 pass live |
 | MAM-84 | e2e | Security: role tests for every endpoint, dependency check, no secrets (NFR) | no | no report yet |
 | MAM-85 | web-ui | Console: work queues (pending approval, failed screening, revalidation due, rejected applications) | yes | DONE (fast-mode, gates postponed); AC-1..AC-8 built, tests 35/35 green |
-| MAM-86 | e2e | Accessibility: WCAG 2.1 AA on every page, zero axe violations, keyboard-only walk-through (NFR) | no | no report yet |
+| MAM-86 | e2e | Accessibility: WCAG 2.1 AA on every page, zero axe violations, keyboard-only walk-through (NFR) | yes | DONE (closed by the lead on 2026-11-21; details in modern/docs/reports/accessibility-report.md) |
 | MAM-87 | web-ui | Console: approve or deny an enrolment | yes | DONE (AC-1..AC-7), In Review |
-| MAM-88 | e2e | Performance smoke: 10,000 synthetic providers, batch jobs and search against the NFR targets (NFR) | no | no report yet |
+| MAM-88 | e2e | Performance smoke: 10,000 synthetic providers, batch jobs and search against the NFR targets (NFR) | yes | DONE for the story as written (AC-1 to AC-5 met); the targets themselves are DEFAULTS (see below); one gap recorded (the gateway pool is not |
 | MAM-89 | e2e | Traceability report (rule -> story -> AC -> test -> code) and runbooks | no | no report yet |
 | MAM-90 | web-ui | Console: record a sanction (supervisor) | yes | DONE (fast-mode, gates postponed); AC-1..AC-8 built, tests 44/44 green |
 | MAM-91 | parity | Parity: run the legacy jobs on Hercules and compare their outputs with the modern system (deferred) | no | no report yet |
@@ -82,14 +82,14 @@ Tasks (not business stories): MAM-16 (open), MAM-19 (built), MAM-24 (built), MAM
 | Service | Main classes | Stories built / total |
 |---|---|---|
 | provider-service | 55 | 9 / 9 |
-| enrollment-service | 33 | 4 / 4 |
-| screening-service | 35 | 6 / 6 |
+| enrollment-service | 34 | 4 / 4 |
+| screening-service | 36 | 6 / 6 |
 | risk-service | 16 | 3 / 3 |
-| revalidation-service | 33 | 3 / 3 |
-| sanctions-service | 22 | 2 / 2 |
-| notification-service | 15 | 3 / 3 |
+| revalidation-service | 34 | 3 / 3 |
+| sanctions-service | 23 | 2 / 2 |
+| notification-service | 16 | 3 / 3 |
 | directory-service | 28 | 4 / 4 |
-| tmsis-service | 26 | 3 / 3 |
+| tmsis-service | 27 | 3 / 3 |
 
 ## 4. Screens: 13 of 13 built
 
@@ -125,7 +125,13 @@ UX overhaul status per screen: see the UI agent's group reports and `modern/docs
 
 ## 6. Open questions (1) and BLOCKED items
 
-- Q-131: (provider-service, MAM-40, 2026-11-20 18:55) The audit history answer and its contract disagree ( (OPEN, needs the user)
+- Q-144: (screening lane, MAM-28 AC-2, 2026-11-21 03:02) The screening contract does not list the 503 of requestScreening ( (OPEN - needs the user's approval; nothing changed)
+- PROGRESS: | 2026-11-24 13:30 | STEP 1 (baseline green) under way: Docker up, graph fixed, gateway upgrade committed, parity decisions recorded; CI fix and deploy next (Jira not reachable) | **Stack**: Docker De
+- PROGRESS: | 2026-11-21 05:05 | MAM-86 (accessibility) closed (Jira Done 77 of 93); revalidation green after its developer step, last tests and review started; notification fix green, in its second review; commi
+- PROGRESS: | 2026-11-21 04:04 | Step (b) done: screening-service APPROVED, deploy 6, four stories and epic MAM-5 closed (Jira Done 76 of 93); CI run 6: one module left; revalidation tests complete | **Screening 
+- PROGRESS: | 2026-11-21 03:30 | Enrollment committed and pushed; screening's whole check is green and its code review has started; CI run 6 running (Jira Done 71 of 93) | **Enrollment (step c)** closed: deploy 5
+- PROGRESS: | 2026-11-21 00:01 | New instruction 23:51 (no deadline, commit after each closed item); commit 14e0707 pushed; CI run 2 started; parity closed as far as it can be; perf runner rehearsed (Jira Done 69
+- PROGRESS: | 2026-11-20 23:37 | Parity re-run done (168 MATCH, was 128), in verification; accessibility tests written, 2 UI defects in repair; screening tests in their gate run (Jira Done 69 of 93) | **Step (f) 
 - PROGRESS: | 2026-11-20 18:12 | HARD DEADLINE 20:00: PIT and reviews cut, deferred work stopped, deploy 2 started (Jira Done 42 of 93) | User message 18:02 (recorded above). **Done since 17:36**: MAM-29 (gateway
 - PROGRESS: | 2026-11-20 17:36 | Deploy 1 DEPLOYED; checkpoint commit 2e20ead pushed; 6 stories + 3 epics Done (Jira Done 40 of 93) | **Deploy 1**: `RESULT DEPLOYED` at 17:07 (pem-apps healthy 16:59:59; J1 passed
 - PROGRESS: | 2026-11-20 16:18 | Parity: legacy run captured; MAM-84 scans | **Parity stage 1 (legacy run on Hercules) PARTIAL but with real golden files**: MVS jobs 193-197 ran with the lab's load modules (code 
